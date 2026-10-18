@@ -19,3 +19,16 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
 - Canlı alan adına geçiş, DNS ve e-posta ayarları yalnız Muhittin’in onayıyla yapılır.
 - Anahtarlar ve şifreler repoya yazılmaz.
 - Metinler TDK yazım kurallarına uyar; paragraflar iki yana yaslıdır.
+
+## Yönetim paneli (`/yonetim`)
+
+- Sunucu kodu `worker/index.js`; veritabanı Cloudflare D1 (`DB`), şema `worker/sema.js` ilk istekte kendiliğinden kurulur.
+- Herkese açık tek uç: `POST /api/talep` (site formları). Korumalar: KVKK onayı zorunlu, tuzak alan, IP başına 10 dakikada 5 talep, Turnstile (anahtar tanımlıysa).
+- `/yonetim/*` ve `/api/yonetim/*` yalnız Cloudflare Access girişiyle açılır; sunucu Access jetonunu ayrıca doğrular.
+  Değişkenler tanımlanmadan panel **kapalıdır** (401):
+  - `TEAM_DOMAIN` — ör. `https://<ekip>.cloudflareaccess.com`
+  - `POLICY_AUD` — Access uygulamasının "Application Audience (AUD) Tag" değeri
+  - `YONETICILER` — izinli e-postalar, virgülle (ör. `info@idexya.com`)
+  - Gizli: `TURNSTILE_SECRET`; derleme değişkeni: `PUBLIC_TURNSTILE_SITE_KEY`
+- Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
+  sonra boş veritabanıyla `node tools/test-yonetim.mjs http://127.0.0.1:8787 <ekran-klasörü>` (uçtan uca: form → talep → CRM → kart).

@@ -1,0 +1,104 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Müşteri kartı" aktif="crm" yol="Müşteri ilişkileri › CRM">
+<div data-ust style="display: flex; flex-direction: column; gap: 12px"></div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<section class="kart" aria-label="Müşteri bilgileri" style="flex: 1 1 320px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; color: var(--head)">Bilgiler</h2>
+<form data-bilgi style="display: flex; flex-direction: column; gap: 10px">
+<label class="alan">Firma<input name="firma"></label>
+<label class="alan">Yetkili kişi<input name="ad"></label>
+<label class="alan">E-posta<input name="eposta" type="email"></label>
+<label class="alan">Telefon<input name="telefon" type="tel"></label>
+<label class="alan">Sektör<input name="sektor"></label>
+<label class="alan">İlgilendiği paket<input name="paket"></label>
+<label class="alan">Tahmini aylık değer (TL, KDV hariç)<input name="deger" inputmode="numeric" pattern="[0-9]*"></label>
+<button type="submit" class="dugme ana" style="align-self: flex-start">Bilgileri kaydet</button>
+<p data-bilgi-durum role="status" hidden class="uyari" style="margin: 0"></p>
+</form>
+</section>
+<section class="kart" aria-label="Günlük" style="flex: 2 1 460px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; color: var(--head)">Günlük</h2>
+<form data-not style="display: flex; flex-direction: column; gap: 8px">
+<div role="group" aria-label="Kayıt türü" data-tur style="display: flex; gap: 6px; flex-wrap: wrap"></div>
+<label class="alan"><span style="position: absolute; left: -10000px">Kayıt metni</span><textarea name="metin" rows="3" placeholder="Görüşme özeti, alınan karar, sonraki adım…" style="resize: vertical"></textarea></label>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><button type="submit" class="dugme ana">Günlüğe ekle</button><span data-not-durum role="status" style="font-size: 13px; color: var(--err)"></span></div>
+</form>
+<ol data-gunluk style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ol>
+</section>
+</div>
+<script>
+  import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata } from '../../scripts/yonetim/ortak.js';
+  const id = new URLSearchParams(location.search).get('id') || '';
+  const ust = document.querySelector('[data-ust]'), bilgi = document.querySelector('[data-bilgi]'), gunluk = document.querySelector('[data-gunluk]');
+  const TUR = [['not', 'Not'], ['gorusme', 'Görüşme'], ['eposta', 'E-posta'], ['gorev', 'Görev']];
+  const TUR_RENK = { talep: '#1F4E8C', sistem: '#5F574F', not: '#B84406', gorusme: '#176041', eposta: '#6B3FA0', gorev: '#7A4E00' };
+  let tur = 'not', m = null;
+
+  function turCiz() {
+    document.querySelector('[data-tur]').replaceChildren(...TUR.map(([k, ad]) => el('button', { type: 'button', class: 'dugme kucuk', 'aria-pressed': String(k === tur), style: k === tur ? 'background: var(--tint); border-color: var(--brand); color: var(--tintx)' : '', onclick: () => { tur = k; turCiz(); } }, ad)));
+  }
+
+  function ciz(veri) {
+    m = veri.musteri;
+    const ad = m.firma || m.ad || m.eposta || 'Adsız müşteri';
+    document.title = ad + ' · Idexya Platform';
+    document.querySelectorAll('[data-baslik]').forEach((b) => (b.textContent = ad));
+    const asamaSatiri = el('div', { role: 'group', 'aria-label': 'Aşama', style: 'display: flex; gap: 6px; flex-wrap: wrap' }, ASAMALAR.map((a) => el('button', {
+      type: 'button', class: 'dugme kucuk', 'aria-pressed': String(a.k === m.asama),
+      style: a.k === m.asama ? 'background: var(--fill); border-color: var(--fill); color: #FFFFFF' : '',
+      onclick: async (o) => {
+        if (a.k === m.asama) return;
+        o.currentTarget.disabled = true;
+        try { await api(`musteriler/${encodeURIComponent(id)}/asama`, { asama: a.k }); yukle(); } catch (h) { genelHata('Aşama değiştirilemedi: ' + h.message); o.currentTarget.disabled = false; }
+      }
+    }, a.ad)));
+    const iletisim = [m.ad && m.firma ? m.ad : null, m.eposta, m.telefon, m.kaynak ? 'Kaynak: ' + (KAYNAK[m.kaynak] || (m.kaynak === 'elle' ? 'Elle eklendi' : m.kaynak)) : null, 'Değer: ' + para(m.deger)].filter(Boolean).join(' · ');
+    const yeniMi = new URLSearchParams(location.search).get('mevcut') === '1';
+    ust.replaceChildren(
+      yeniMi ? el('div', { class: 'uyari bilgi', role: 'status' }, 'Bu e-posta veya telefonla kayıtlı bir müşteri zaten vardı; yeni kart açılmadı, mevcut kart açıldı.') : '',
+      el('div', { class: 'kart', style: 'padding: 16px; display: flex; flex-direction: column; gap: 10px' },
+        el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center' },
+          el('span', { style: 'color: var(--tx2); font-size: 13px; overflow-wrap: anywhere' }, iletisim),
+          el('span', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, m.eposta ? el('a', { class: 'dugme kucuk', href: 'mailto:' + m.eposta }, 'E-posta yaz') : '', m.telefon ? el('a', { class: 'dugme kucuk', href: 'tel:' + m.telefon.replace(/[^\d+]/g, '') }, 'Ara') : '', el('button', { type: 'button', class: 'dugme kucuk', onclick: () => window.print() }, 'Yazdır'))),
+        asamaSatiri)
+    );
+    ['firma', 'ad', 'eposta', 'telefon', 'sektor', 'paket'].forEach((k) => (bilgi.elements[k].value = m[k] || ''));
+    bilgi.elements.deger.value = m.deger ?? '';
+    gunluk.replaceChildren(...(veri.kayitlar.length ? veri.kayitlar.map((k) => el('li', { style: 'display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line)' },
+      el('span', { 'aria-hidden': 'true', style: `flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: ${TUR_RENK[k.tur] || '#5F574F'}` }),
+      el('div', { style: 'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px' },
+        el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap' }, el('strong', { style: 'color: var(--head)' }, k.baslik), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim)),
+        k.detay ? el('span', { style: 'white-space: pre-wrap; overflow-wrap: anywhere' }, k.detay) : '')))
+      : [el('li', { class: 'bos' }, 'Günlükte kayıt yok.')]));
+  }
+
+  async function yukle() {
+    try { ciz(await api('musteriler/' + encodeURIComponent(id))); }
+    catch (h) { genelHata(h.durum === 404 ? 'Bu müşteri bulunamadı. Bağlantı eski olabilir; CRM listesinden açın.' : 'Müşteri yüklenemedi: ' + h.message); }
+  }
+
+  bilgi.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const d = document.querySelector('[data-bilgi-durum]');
+    const v = Object.fromEntries(new FormData(bilgi));
+    const deger = String(v.deger || '').replace(/\./g, '').trim();
+    if (deger && !/^\d+$/.test(deger)) { d.hidden = false; d.className = 'uyari hata'; d.textContent = 'Değer yalnız rakam olmalı (ör. 18000).'; return; }
+    v.deger = deger;
+    try { const r = await api(`musteriler/${encodeURIComponent(id)}/bilgi`, v); d.hidden = false; d.className = r.degisen && !r.degisen.length ? 'uyari bilgi' : 'uyari ok'; d.textContent = r.degisen && !r.degisen.length ? 'Değişiklik yok; bir şey kaydedilmedi.' : 'Kaydedildi ve günlüğe işlendi.'; yukle(); }
+    catch (h) { d.hidden = false; d.className = 'uyari hata'; d.textContent = 'Kaydedilemedi: ' + h.message; }
+  });
+  const notForm = document.querySelector('[data-not]');
+  notForm.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const d = document.querySelector('[data-not-durum]'); d.textContent = '';
+    const metin = notForm.elements.metin.value.trim();
+    if (!metin) { d.textContent = 'Önce bir şey yazın.'; return; }
+    try { await api(`musteriler/${encodeURIComponent(id)}/not`, { tur, metin }); notForm.reset(); yukle(); }
+    catch (h) { d.textContent = 'Eklenemedi: ' + h.message; }
+  });
+  turCiz();
+  if (!id) genelHata('Müşteri seçilmedi. CRM listesinden bir müşteri açın.'); else yukle();
+</script>
+</Yonetim>

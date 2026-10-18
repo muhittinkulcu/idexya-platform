@@ -1,0 +1,46 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Genel bakış" aktif="genel" aciklama="Siteden gelen talepler ve CRM'deki müşterilerin bugünkü durumu. Rakamlar doğrudan panel veritabanından okunur.">
+<div data-kpi style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px"></div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<section class="kart" style="flex: 1 1 320px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 16px; color: var(--head)">Satış hunisi</h2>
+<div data-huni style="display: flex; flex-direction: column; gap: 8px"></div>
+<a href="/yonetim/crm/" style="font-size: 13px; font-weight: 600">CRM panosunu aç →</a>
+</section>
+<section class="kart" style="flex: 2 1 460px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<h2 style="margin: 0; font-size: 16px; color: var(--head)">Son hareketler</h2>
+<div data-hareket style="display: flex; flex-direction: column"></div>
+</section>
+</div>
+<script>
+  import { api, el, ASAMALAR, asamaAdi, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
+  const kpi = document.querySelector('[data-kpi]'), huni = document.querySelector('[data-huni]'), har = document.querySelector('[data-hareket]');
+  const kart = (ad, deger, alt, href) => el(href ? 'a' : 'div', { class: 'kart', href, style: 'padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; text-decoration: none; color: inherit' },
+    el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ad), el('span', { style: 'font-size: 24px; font-weight: 700; color: var(--head)' }, deger), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, alt));
+  (async () => { try {
+    const o = await api('ozet');
+    const t = Object.fromEntries(o.talepler.map((x) => [x.durum, x.n]));
+    const acik = o.asamalar.filter((a) => !['kazanildi', 'kaybedildi'].includes(a.asama)).reduce((s, a) => s + a.n, 0);
+    kpi.append(
+      kart('Yanıt bekleyen talep', String(t.yeni || 0), 'Henüz CRM’e alınmadı veya ayıklanmadı', '/yonetim/talepler/'),
+      kart('CRM’deki müşteri', String(o.musteri.n || 0), `${acik} açık fırsat`, '/yonetim/crm/'),
+      kart('Açık fırsat değeri', o.musteri.n ? para(o.musteri.hat || 0) : '—', 'Kazanılan ve kaybedilenler hariç · tahmini aylık', '/yonetim/crm/'),
+      kart('Spam olarak ayrılan', String(t.spam || 0), 'Robot ve geçersiz talepler', '/yonetim/talepler/')
+    );
+    const say = Object.fromEntries(o.asamalar.map((a) => [a.asama, a.n]));
+    const enCok = Math.max(1, ...Object.values(say));
+    ASAMALAR.forEach((a) => huni.append(el('div', { style: 'display: flex; flex-direction: column; gap: 4px' },
+      el('div', { style: 'display: flex; justify-content: space-between; font-size: 13px' }, el('span', {}, a.ad), el('strong', {}, String(say[a.k] || 0))),
+      el('div', { style: 'height: 8px; border-radius: 6px; background: var(--card2); overflow: hidden' }, el('div', { style: `height: 100%; width: ${((say[a.k] || 0) / enCok) * 100}%; background: ${a.k === 'kaybedildi' ? 'var(--err)' : '#F07A23'}` })))));
+    if (!o.sonKayitlar.length) har.append(el('div', { class: 'bos' }, 'Henüz hareket yok. Siteden gelen ilk talep CRM’e alındığında burada görünür.'));
+    o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 10px; justify-content: space-between; padding: 10px 2px; border-top: 1px solid var(--line); text-decoration: none; color: inherit' },
+      el('span', { style: 'display: flex; flex-direction: column; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, k.firma || k.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, k.baslik + ' · ' + k.kim)),
+      el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(k.zaman)))));
+  } catch (h) {
+    genelHata('Özet yüklenemedi: ' + h.message);
+    kpi.append(el('div', { class: 'bos' }, 'Veri alınamadı; rakamlar gösterilmiyor.'));
+  } })();
+</script>
+</Yonetim>

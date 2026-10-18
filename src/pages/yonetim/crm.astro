@@ -1,0 +1,81 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="CRM" aktif="crm" yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
+<div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line)"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
+<button type="button" class="dugme ana" data-yeni-ac>+ Yeni müşteri</button>
+</div>
+<form data-yeni-form hidden class="kart" style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end">
+<label class="alan">Firma<input name="firma" autocomplete="off"></label>
+<label class="alan">Yetkili kişi<input name="ad" autocomplete="off"></label>
+<label class="alan">E-posta<input name="eposta" type="email" autocomplete="off"></label>
+<label class="alan">Telefon<input name="telefon" type="tel" autocomplete="off"></label>
+<div style="display: flex; gap: 8px"><button type="submit" class="dugme ana">Kaydet</button><button type="button" class="dugme" data-yeni-kapat>Vazgeç</button></div>
+<p data-yeni-durum role="status" hidden class="uyari hata" style="grid-column: 1 / -1; margin: 0"></p>
+</form>
+<div data-alan></div>
+<script>
+  import { api, el, ASAMALAR, asamaAdi, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
+  const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
+  let tum = [], gorunum = 'pano';
+  try { gorunum = localStorage.getItem('idx-crm-gorunum') || 'pano'; } catch (e) {}
+  const bag = (m) => '/yonetim/musteri/?id=' + encodeURIComponent(m.id);
+  const baslik = (m) => m.firma || m.ad || m.eposta || '—';
+
+  async function asamaDegis(m, yeni, sec) {
+    sec.disabled = true;
+    try { await api(`musteriler/${encodeURIComponent(m.id)}/asama`, { asama: yeni }); m.asama = yeni; m.guncelleme = new Date().toISOString(); ciz(); }
+    catch (h) { sec.value = m.asama; sec.disabled = false; genelHata('Aşama değiştirilemedi: ' + h.message); }
+  }
+  const asamaSec = (m) => el('select', { 'aria-label': baslik(m) + ' aşaması', style: 'min-height: 32px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 12px; max-width: 100%', onchange: (o) => asamaDegis(m, o.currentTarget.value, o.currentTarget) },
+    ASAMALAR.map((a) => el('option', { value: a.k, selected: a.k === m.asama }, a.ad)));
+
+  function ciz() {
+    document.querySelectorAll('[data-gorunum]').forEach((d) => { const s = d.dataset.gorunum === gorunum; d.setAttribute('aria-pressed', String(s)); d.style.cssText = s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent'; });
+    const q = ara.value.trim().toLocaleLowerCase('tr-TR');
+    const gor = tum.filter((m) => !q || [m.firma, m.ad, m.eposta, m.telefon].some((x) => x && x.toLocaleLowerCase('tr-TR').includes(q)));
+    if (!tum.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, 'CRM’de henüz müşteri yok. Talepler sayfasından bir talebi CRM’e alın veya “Yeni müşteri” ile elle ekleyin.')); return; }
+    if (gorunum === 'liste') {
+      alan.replaceChildren(el('div', { class: 'kart', style: 'overflow-x: auto' }, el('table', { style: 'width: 100%; min-width: 720px; border-collapse: collapse; font-size: 13px' },
+        el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 10px 14px; font-weight: 600${i === 3 ? '; text-align: right' : ''}` }, b)))),
+        el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid var(--line)' },
+          el('td', { style: 'padding: 10px 14px' }, el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null),
+          el('td', { style: 'padding: 10px 14px; color: var(--tx2)' }, [m.eposta, m.telefon].filter(Boolean).join(' · ') || '—'),
+          el('td', { style: 'padding: 10px 14px' }, asamaSec(m)),
+          el('td', { style: 'padding: 10px 14px; text-align: right; white-space: nowrap' }, para(m.deger)),
+          el('td', { style: 'padding: 10px 14px; color: var(--tx2); white-space: nowrap' }, once(m.guncelleme))))))));
+      if (!gor.length) alan.append(el('div', { class: 'bos' }, 'Aramayla eşleşen müşteri yok.'));
+      return;
+    }
+    alan.replaceChildren(el('div', { style: 'display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 6px' },
+      ASAMALAR.map((a) => {
+        const ms = gor.filter((m) => m.asama === a.k);
+        const top = ms.reduce((s, m) => s + (m.deger || 0), 0);
+        return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
+          el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px' }, el('strong', { style: 'color: var(--head)' }, a.ad + ' · ' + ms.length), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ms.some((m) => m.deger) ? para(top) : '')),
+          ms.length ? ms.map((m) => el('article', { class: 'kart', style: 'padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-radius: 12px' },
+            el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)),
+            el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.paket].filter(Boolean).join(' · ') || (m.eposta || m.telefon || '')),
+            el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; align-items: center; flex-wrap: wrap' }, asamaSec(m), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, once(m.guncelleme)))))
+            : el('span', { style: 'font-size: 12px; color: var(--tx2); padding: 6px 4px' }, 'Bu aşamada müşteri yok.'));
+      })));
+  }
+  document.querySelectorAll('[data-gorunum]').forEach((d) => d.addEventListener('click', () => { gorunum = d.dataset.gorunum; try { localStorage.setItem('idx-crm-gorunum', gorunum); } catch (e) {} ciz(); }));
+  ara.addEventListener('input', ciz);
+  const form = document.querySelector('[data-yeni-form]'), fdurum = document.querySelector('[data-yeni-durum]');
+  document.querySelector('[data-yeni-ac]').addEventListener('click', () => { form.hidden = false; form.querySelector('input').focus(); });
+  document.querySelector('[data-yeni-kapat]').addEventListener('click', () => { form.hidden = true; form.reset(); fdurum.hidden = true; });
+  form.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const v = Object.fromEntries(new FormData(form));
+    try { const s = await api('musteriler', v); location.href = '/yonetim/musteri/?id=' + encodeURIComponent(s.musteri_id) + (s.mevcut ? '&mevcut=1' : ''); }
+    catch (h) { fdurum.hidden = false; fdurum.textContent = h.message; }
+  });
+  (async () => {
+    try { tum = (await api('musteriler')).musteriler; ciz(); }
+    catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
+  })();
+</script>
+</Yonetim>

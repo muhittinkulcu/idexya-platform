@@ -1,13 +1,21 @@
 {
   // Idexya Platform - statik site (Workers Static Assets)
   "name": "idexya-platform",
+  "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
   // Deneme adresi: idexya-platform.<hesap>.workers.dev (arama motorlarına kapalı, bkz. public/_headers)
   "workers_dev": true,
   "preview_urls": true,
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/yonetim", "/yonetim/*"],
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
-  }
+  },
+  // Veritabanı: ilk yayında Cloudflare kendiliğinden oluşturur (otomatik kaynak oluşturma).
+  "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform" }],
+  // Yönetim paneli girişi: Cloudflare Access. Değerler Cloudflare panelinden "Variables" olarak girilir.
+  // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
+  "observability": { "enabled": true }
 }

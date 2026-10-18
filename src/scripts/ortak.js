@@ -1,3 +1,4 @@
+import { formlar } from './form.js';
 // Ortak istemci davranışları: tema, çerez onayı, sekme ve süzgeçler.
 const oku = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const yaz = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* tarayıcı depolamayı engelliyor olabilir */ } };
@@ -93,4 +94,4 @@ function yasla() {
   let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(isle, 150); });
 }
 
-export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); }
+export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); formlar(); }

@@ -1,0 +1,78 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Talepler" aktif="talepler" aciklama="Siteden gelen her talep önce burada ayıklanır. Gerçek talep tek tıkla CRM'e geçer; aynı e-posta veya telefonla kayıtlı müşteri varsa yeni kart açılmaz, mevcut karta eklenir.">
+<div role="tablist" aria-label="Talep durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); align-self: flex-start; flex-wrap: wrap"></div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<section aria-label="Talep listesi" class="kart" data-liste style="flex: 2 1 380px; overflow: hidden"></section>
+<section aria-label="Talep ayrıntısı" class="kart" data-ayrinti style="flex: 3 1 460px; padding: 18px; display: flex; flex-direction: column; gap: 14px"></section>
+</div>
+<script>
+  import { api, el, tarih, once, KAYNAK, TALEP_DURUM, genelHata } from '../../scripts/yonetim/ortak.js';
+  const liste = document.querySelector('[data-liste]'), ayr = document.querySelector('[data-ayrinti]'), sekmeler = document.querySelector('[data-sekmeler]');
+  let tum = [], sekme = 'yeni', secili = null, sabit = null, mesaj = null;
+  const BOLUM = [['yeni', 'Yeni'], ['crm', 'CRM’e alınan'], ['spam', 'Spam'], ['hepsi', 'Tümü']];
+
+  function ciz() {
+    sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
+      const n = k === 'hepsi' ? tum.length : tum.filter((t) => t.durum === k).length;
+      const s = k === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; secili = null; sabit = null; mesaj = null; ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+    }));
+    const gor = tum.filter((t) => sekme === 'hepsi' || t.durum === sekme);
+    // İşlem yapılan talep, sekmeden çıksa da sonucu görülsün diye ayrıntıda kalır.
+    if (!(sabit && secili === sabit) && (!secili || !gor.some((t) => t.id === secili))) secili = gor[0] ? gor[0].id : null;
+    liste.replaceChildren(...(gor.length ? gor.map((t) => el('button', {
+      type: 'button', 'aria-pressed': String(t.id === secili), onclick: () => { secili = t.id; sabit = null; mesaj = null; ciz(); },
+      style: `width: 100%; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${t.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer`
+    }, el('span', { style: 'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px' },
+      el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('strong', { style: 'color: var(--head)' }, t.ad || '—'), el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(t.olusturma))),
+      el('span', { style: 'font-size: 12px; color: var(--tx2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap' }, [KAYNAK[t.kaynak] || t.kaynak, t.firma, t.konu].filter(Boolean).join(' · ')),
+      el('span', {}, el('span', { class: 'cip ' + t.durum }, TALEP_DURUM[t.durum] || t.durum)))))
+      : [el('div', { class: 'bos' }, sekme === 'yeni' ? 'Yanıt bekleyen talep yok.' : 'Bu bölümde talep yok.')]));
+    ayrinti(tum.find((t) => t.id === secili));
+  }
+
+  function ayrinti(t) {
+    if (!t) { ayr.replaceChildren(el('div', { class: 'bos' }, 'Soldan bir talep seçin.')); return; }
+    const ek = (() => { try { return JSON.parse(t.ek || '{}'); } catch (e) { return {}; } })();
+    const alanlar = [['E-posta', t.eposta], ['Telefon', t.telefon], ['Firma', t.firma], ['Konu', t.konu], ['Web sitesi', ek.site], ['Seçilen paket', ek.paket], ['Gönderildiği sayfa', t.sayfa], ['Robot doğrulaması', { gecti: 'Geçti', yapilandirilmadi: 'Kurulmadı (Turnstile anahtarı yok)' }[t.dogrulama] || t.dogrulama]].filter((a) => a[1]);
+    const durumYaz = el('div', { role: 'status', 'aria-live': 'polite', hidden: !(mesaj && sabit === t.id), class: 'uyari ok' }, mesaj && sabit === t.id ? mesaj : '');
+    const islem = async (yol, d) => {
+      d.disabled = true; durumYaz.hidden = true;
+      try {
+        const s = await api(`talepler/${encodeURIComponent(t.id)}/${yol}`, {});
+        if (yol === 'crm') { t.durum = 'crm'; t.musteri_id = s.musteri_id; }
+        else t.durum = yol === 'spam' ? 'spam' : 'yeni';
+        sabit = t.id;
+        mesaj = yol === 'crm' ? (s.mevcut ? 'Bu kişi zaten CRM’de kayıtlıydı; talep mevcut kartın günlüğüne eklendi.' : 'Müşteri kartı oluşturuldu ve talep günlüğe işlendi.') : yol === 'spam' ? 'Talep spam olarak ayrıldı. Yanlışsa “Spam değil, geri al” ile geri alabilirsiniz.' : 'Talep yeniden “Yeni” durumuna alındı.';
+        ciz();
+      } catch (h) { d.disabled = false; durumYaz.hidden = false; durumYaz.className = 'uyari hata'; durumYaz.textContent = 'İşlem yapılamadı: ' + h.message; }
+    };
+    const dugmeler = [];
+    if (t.durum === 'yeni') {
+      dugmeler.push(el('button', { type: 'button', class: 'dugme ana', onclick: (o) => islem('crm', o.currentTarget) }, 'CRM’e al'));
+      dugmeler.push(el('button', { type: 'button', class: 'dugme', onclick: (o) => islem('spam', o.currentTarget) }, 'Spam olarak ayır'));
+    } else if (t.durum === 'spam') {
+      dugmeler.push(el('button', { type: 'button', class: 'dugme', onclick: (o) => islem('geri', o.currentTarget) }, 'Spam değil, geri al'));
+    } else if (t.musteri_id) {
+      dugmeler.push(el('a', { class: 'dugme ana', href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id) }, 'Müşteri kartını aç'));
+    }
+    if (t.eposta) dugmeler.push(el('a', { class: 'dugme', href: 'mailto:' + t.eposta }, 'E-postayla yanıtla'));
+    if (t.telefon) dugmeler.push(el('a', { class: 'dugme', href: 'tel:' + t.telefon.replace(/[^\d+]/g, '') }, 'Ara'));
+    ayr.replaceChildren(
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap' },
+        el('div', { style: 'display: flex; flex-direction: column; gap: 2px' }, el('strong', { style: 'font-size: 18px; color: var(--head)' }, t.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, (KAYNAK[t.kaynak] || t.kaynak) + ' · ' + tarih(t.olusturma))),
+        el('span', { class: 'cip ' + t.durum, style: 'align-self: flex-start' }, TALEP_DURUM[t.durum] || t.durum)),
+      el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; font-size: 13px' },
+        alanlar.map(([ad, d]) => el('div', { style: 'padding: 10px 12px; border-radius: 10px; background: var(--card2); display: flex; flex-direction: column; min-width: 0' }, el('span', { style: 'font-size: 11px; color: var(--tx2)' }, ad), el('span', { style: 'font-weight: 600; overflow-wrap: anywhere' }, d)))),
+      el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere' }, t.mesaj || ek.not || 'Mesaj yazılmamış.'),
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, dugmeler),
+      durumYaz
+    );
+  }
+
+  (async () => { try { tum = (await api('talepler')).talepler; ciz(); }
+  catch (h) { genelHata('Talepler yüklenemedi: ' + h.message); liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); ayr.replaceChildren(); } })();
+</script>
+</Yonetim>

@@ -8,9 +8,11 @@ const MENU = [
 ];
 const tamBaslik = baslik ? `${baslik} | Idexya | Good Things` : 'Idexya | Good Things · 360° dijital performans ajansı';
 const kanonik = new URL(Astro.url.pathname, Astro.site);
+// Robot doğrulaması: Cloudflare Turnstile site anahtarı (gizli değildir) derleme ortamından gelir; yoksa form doğrulamasız çalışır, sunucu yine sınır uygular.
+const turnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 ---
 <!doctype html>
-<html lang={dil}>
+<html lang={dil} data-turnstile={turnstile || undefined}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -27,9 +29,10 @@ const kanonik = new URL(Astro.url.pathname, Astro.site);
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style is:global>
+[hidden]{display:none!important}
 html,body{margin:0}body{background:var(--bg);color:var(--tx);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:16px;line-height:1.55;overflow-x:hidden}*,*::before,*::after{box-sizing:border-box}img{max-width:100%;height:auto}:focus-visible{outline:3px solid var(--brand);outline-offset:2px}.gizli{display:none!important}
-.acik{--bg:#FBF8F4;--bg2:#F4EEE6;--card:#FFFFFF;--card2:#F7F1EA;--line:#E9DED2;--tx:#2A2622;--tx2:#5F574F;--head:#002559;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--shadow:rgba(0,37,89,.12);--blob:#FCE7D6;--blob2:#E7EDF6}
-.koyu{--bg:#171C24;--bg2:#131820;--card:#202630;--card2:#262D38;--line:#394352;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--shadow:rgba(0,0,0,.5);--blob:rgba(240,122,35,.10);--blob2:rgba(156,195,255,.07)}
+.acik{--bg:#FBF8F4;--bg2:#F4EEE6;--card:#FFFFFF;--card2:#F7F1EA;--line:#E9DED2;--tx:#2A2622;--tx2:#5F574F;--head:#002559;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--err:#8A1F2E;--errb:#FCE4E6;--shadow:rgba(0,37,89,.12);--blob:#FCE7D6;--blob2:#E7EDF6}
+.koyu{--bg:#171C24;--bg2:#131820;--card:#202630;--card2:#262D38;--line:#394352;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--err:#FF9AA6;--errb:rgba(255,122,138,.14);--shadow:rgba(0,0,0,.5);--blob:rgba(240,122,35,.10);--blob2:rgba(156,195,255,.07)}
 a{color:var(--acc)}a:hover{color:var(--tintx)}
 .acik{--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3}.koyu{--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14)}
 

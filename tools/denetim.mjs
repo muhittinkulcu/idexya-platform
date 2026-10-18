@@ -12,11 +12,11 @@ for (const gen of [1440, 768, 390, 360]) {
   for (const y of yollar) {
     const h = [];
     s.removeAllListeners('pageerror'); s.on('pageerror', (e) => h.push(e.message));
-    await s.goto('http://localhost:4321' + y);
+    await s.goto((process.env.KOK || 'http://localhost:4321') + y);
     const tasma = await s.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     if (tasma > 0) sorun.push(`${gen}px ${y}: ${tasma}px yatay taşma`);
     if (h.length) sorun.push(`${gen}px ${y}: ${h.join('; ')}`);
-    if (gen === 1440) (await s.$$eval('a[href^="/"]', (a) => a.map((x) => x.getAttribute('href')))).forEach((b) => baglantilar.add(b.split('#')[0]));
+    if (gen === 1440) (await s.$$eval('a[href^="/"]', (a) => a.map((x) => x.getAttribute('href')))).forEach((b) => { if (!b.startsWith('/cdn-cgi/')) baglantilar.add(b.split('#')[0].split('?')[0]); });
   }
   await s.close();
 }
