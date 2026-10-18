@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Idexya Platform · CRM</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.acik{--bg:#F4F1EC;--card:#FFFFFF;--card2:#F8F5F1;--line:#E8DFD4;--tx:#27231F;--tx2:#5F574F;--head:#0B1B33;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--shadow:rgba(11,27,51,.07);--grid:#EFE8DF}
+.koyu{--bg:#12161D;--card:#1B212B;--card2:#222935;--line:#323C4B;--tx:#EEF1F4;--tx2:#AEB9C7;--head:#F4F6F8;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--shadow:rgba(0,0,0,.4);--grid:#2A323E}
+.yan a{color:#C3CEDD}.yan a:hover{color:#FFFFFF}
+a{color:var(--acc)}a:hover{color:var(--tintx)}
+</style>
+</helmet>
+<div class="{{temaSinifi}}" style="background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<aside class="yan" style="flex: 1 1 236px; max-width: 100%; background: #0B1B33; color: #C3CEDD; padding: 16px 12px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 6px 8px 10px; border-bottom: 1px solid rgba(255,255,255,.08)">
+<svg viewBox="0 0 1000 1000" width="28" height="28" role="img" aria-label="Idexya logosu"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg>
+<span style="display: flex; flex-direction: column; line-height: 1.15; flex: 1"><span style="font-weight: 700; color: #FFFFFF; font-size: 15px">Idexya Platform</span><span style="font-size: 12px; color: #8EA0B8">idexya.com · TR / EN</span></span>
+</div>
+<nav aria-label="Platform menüsü" style="display: flex; flex-direction: column; gap: 14px; font-size: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a href="YonetimGenel.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>Genel bakış</a>
+<a href="YonetimTalepler.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"></path></svg><span style="flex: 1">Talepler</span><span style="padding: 0 7px; border-radius: 999px; background: #F07A23; color: #1A1206; font-size: 12px; font-weight: 700">3</span></a>
+<a href="#" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M7 15l4-4 3 3 5-6"></path></svg>Analitik</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">MÜŞTERİ İLİŞKİLERİ</span>
+<a href="YonetimCrm.dc.html" aria-current="page" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; background: rgba(240,122,35,.18); color: #FFFFFF; text-decoration: none; font-weight: 600"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="color: #F7894A"><circle cx="9" cy="8" r="4"></circle><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 11l2 2 4-4"></path></svg>CRM</a>
+<a href="YonetimEposta.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>E-posta pazarlama</a>
+<a href="YonetimTeklif.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 15l2 2 4-4"></path></svg><span style="flex: 1">Teklifler</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">4</span></a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9z"></path></svg>Otomasyonlar</a>
+<a href="YonetimGorevler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"></path></svg><span style="flex: 1">Görevler ve takvim</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">5</span></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">İÇERİK</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg>Sayfalar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l10 5-10 5L2 7z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>Hizmetler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>Referanslar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>Blog</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Medya</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">SATIŞ</span>
+<a href="YonetimPaketler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>Paketler ve teklifler</a>
+<a href="YonetimSablonlar.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 7h8M8 11h3M13 11h3M8 15h8"></path></svg>Belgeler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2l-2 5v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-2-5z"></path><path d="M4 7h16M16 11a4 4 0 0 1-8 0"></path></svg>Mağaza</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 1 2V2l-3 2-3-2-3 2-3-2-3 2z"></path><path d="M8 9h8M8 13h6"></path></svg>Siparişler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"></path><circle cx="7" cy="7" r="1.5"></circle></svg>Kuponlar</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">FİNANS</span>
+<a href="YonetimMuhasebe.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18l-3-2-2 2-3-2-3 2-2-2-3 2z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg>Muhasebe</a>
+<a href="YonetimMuhasebe.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg><span style="flex: 1">Faturalar</span><span style="padding: 0 7px; border-radius: 999px; background: #A32F3D; color: #FFFFFF; font-size: 12px; font-weight: 700">1</span></a>
+<a href="YonetimEsitleme.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"></path><path d="M21 3v5h-5M3 21v-5h5"></path></svg>Veri eşitleme</a>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">EĞİTİM</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path></svg>Akademi</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6"></circle><path d="M8.5 14L7 22l5-3 5 3-1.5-8"></path></svg>Sertifikalar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Etkinlikler</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">TOPLULUK VE KANALLAR</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg>Üyeler</a>
+<a href="YonetimTalepler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span style="flex: 1">Yorumlar</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">3</span></a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>Instagram</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08)">
+<a href="YonetimEntegrasyonlar.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg>Entegrasyonlar</a>
+<a href="YonetimModuller.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12h-2a2 2 0 1 0-4 0H12V8a2 2 0 1 0 0-4V2H4v8h2a2 2 0 1 1 4 0h2v4a2 2 0 1 0 0 4v4h8z"></path></svg><span style="flex: 1">Modüller</span><span style="font-size: 12px; color: #8EA0B8">{{menuSayac}}</span></a>
+<a href="YonetimGuvenlik.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>Ayarlar</a>
+</div>
+</nav>
+</aside>
+
+<main style="flex: 999 1 680px; min-width: 0; display: flex; flex-direction: column">
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 12px 24px; border-bottom: 1px solid var(--line); background: var(--card)">
+<label style="flex: 1 1 320px; min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card2); color: var(--tx2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input type="search" placeholder="Sayfa, talep, sipariş, öğrenci ara…" aria-label="Platformda ara" style="flex: 1; min-width: 0; border: 0; background: transparent; color: var(--tx); font: inherit; outline: none"><span style="padding: 1px 6px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px">⌘K</span></label>
+<div style="display: flex; align-items: center; gap: 8px; margin-left: auto">
+<button type="button" style="min-height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer"><span aria-hidden="true" style="font-size: 18px; line-height: 1">+</span>Yeni</button>
+<button type="button" aria-label="Bildirimler, 5 yeni" style="position: relative; min-height: 40px; min-width: 40px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: #F07A23"></span></button>
+<button type="button" onClick="{{temaDegistir}}" aria-label="{{temaEtiketi}}" style="min-height: 40px; min-width: 40px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
+<a href="Main.dc.html" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Siteyi aç ↗</a>
+<span aria-label="Kullanıcı: Muhittin Külcü, Süper yönetici" style="width: 40px; height: 40px; border-radius: 50%; background: #0B1B33; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">MK</span>
+</div>
+</header>
+
+<div style="padding: 20px 24px 40px; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<nav aria-label="Sayfa yolu" style="font-size: 13px; color: var(--tx2)"><a href="YonetimGenel.dc.html" style="color: var(--tx2); text-decoration: none">Idexya Platform</a> › Müşteri ilişkileri › CRM</nav>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px"><h1 style="margin: 0; font-size: 26px; letter-spacing: -0.01em; color: var(--head)">Satış hattı</h1><span style="padding: 3px 10px; border-radius: 999px; background: var(--warnb); color: var(--warn); font-size: 12px; font-weight: 600">Örnek veri</span></div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<div role="group" aria-label="Görünüm" style="display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 11px; background: var(--card)">
+<sc-for list="{{gorunumler}}" as="g" hint-placeholder-count="2"><button type="button" onClick="{{g.sec}}" aria-pressed="{{g.secili}}" style="{{g.stil}}">{{g.ad}}</button></sc-for>
+</div>
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">İçe aktar</button>
+<button type="button" style="min-height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">+ Kişi ekle</button>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 8px; align-items: center">
+<span style="font-size: 13px; color: var(--tx2)">Segment:</span>
+<sc-for list="{{segmentler}}" as="s" hint-placeholder-count="5"><button type="button" onClick="{{s.sec}}" aria-pressed="{{s.secili}}" style="{{s.stil}}">{{s.ad}} <span style="opacity: .7">{{s.sayi}}</span></button></sc-for>
+<span style="margin-left: auto; font-size: 13px; color: var(--tx2)">Hat değeri: <strong style="color: var(--head)">{{hatDegeri}}</strong></span>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start">
+
+<section aria-label="Fırsatlar" style="flex: 3 1 640px; min-width: 0">
+<sc-if value="{{kanban}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px">
+<sc-for list="{{asamalar}}" as="a" hint-placeholder-count="5">
+<div style="flex: 1 0 200px; min-width: 200px; background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; align-items: center; padding: 2px 4px"><span style="display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--head)"><span style="width: 8px; height: 8px; border-radius: 50%; background: {{a.renk}}"></span>{{a.ad}}</span><span style="font-size: 12px; color: var(--tx2)">{{a.sayi}}</span></div>
+<sc-for list="{{a.firsatlar}}" as="f" hint-placeholder-count="2">
+<button type="button" onClick="{{f.sec}}" aria-pressed="{{f.secili}}" style="{{f.stil}}">
+<span style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600; color: var(--head)">{{f.firma}}</span><span style="font-size: 12px; color: var(--tx2)">{{f.gun}}</span></span>
+<span style="font-size: 12px; color: var(--tx2); text-align: left">{{f.paket}}</span>
+<span style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="padding: 1px 8px; border-radius: 999px; background: var(--tint); color: var(--tintx); font-size: 11px; font-weight: 600">{{f.kaynak}}</span><span style="font-size: 12px; font-weight: 600; color: var(--head)">{{f.deger}}</span></span>
+</button>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{liste}}" hint-placeholder-val="{{ false }}">
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow-x: auto">
+<table style="width: 100%; min-width: 680px; border-collapse: collapse; font-size: 13px">
+<thead><tr style="text-align: left; color: var(--tx2)"><th scope="col" style="padding: 12px 16px; font-weight: 600">Firma</th><th scope="col" style="padding: 12px 8px; font-weight: 600">İlgilendiği</th><th scope="col" style="padding: 12px 8px; font-weight: 600">Aşama</th><th scope="col" style="padding: 12px 8px; font-weight: 600">Kaynak</th><th scope="col" style="padding: 12px 8px; font-weight: 600">Değer</th><th scope="col" style="padding: 12px 16px; font-weight: 600">Son temas</th></tr></thead>
+<tbody>
+<sc-for list="{{tumFirsatlar}}" as="f" hint-placeholder-count="8">
+<tr style="border-top: 1px solid var(--line)"><td style="padding: 10px 16px"><button type="button" onClick="{{f.sec}}" style="border: 0; background: transparent; padding: 6px 0; font: inherit; font-weight: 600; color: var(--acc); cursor: pointer">{{f.firma}}</button></td><td style="padding: 10px 8px">{{f.paket}}</td><td style="padding: 10px 8px">{{f.asama}}</td><td style="padding: 10px 8px; color: var(--tx2)">{{f.kaynak}}</td><td style="padding: 10px 8px; font-weight: 600">{{f.deger}}</td><td style="padding: 10px 16px; color: var(--tx2)">{{f.gun}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+</sc-if>
+</section>
+
+<aside aria-label="Seçili kişi" style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 10px 30px var(--shadow); display: flex; flex-direction: column">
+<div style="padding: 18px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; align-items: center">
+<span style="width: 46px; height: 46px; flex: none; border-radius: 50%; background: #0B1B33; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">{{sk.bas}}</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column"><span style="font-weight: 700; font-size: 16px; color: var(--head)">{{sk.kisi}}</span><span style="font-size: 13px; color: var(--tx2)">{{sk.firma}} · {{sk.sektor}}</span><a href="YonetimMusteri.dc.html" style="font-size: 13px; font-weight: 600; color: var(--link, #B84406)">Müşteri kartını aç ›</a></div>
+<span style="padding: 2px 9px; border-radius: 999px; background: var(--infob); color: var(--info); font-size: 11px; font-weight: 600">{{sk.asama}}</span>
+</div>
+<div style="padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 8px; border-bottom: 1px solid var(--line)">
+<button type="button" onClick="{{teklifAc}}" style="min-height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Teklif oluştur</button>
+<button type="button" style="min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">E-posta</button>
+<button type="button" style="min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">Görev</button>
+<button type="button" style="min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">Not</button>
+</div>
+
+<sc-if value="{{teklifModu}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 16px 18px; border-bottom: 1px solid var(--line); background: var(--card2); display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center"><span style="font-weight: 700; color: var(--head)">Yeni teklif</span><button type="button" onClick="{{teklifKapat}}" aria-label="Teklifi kapat" style="min-height: 32px; min-width: 32px; border: 0; background: transparent; color: var(--tx2); font: inherit; cursor: pointer">✕</button></div>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--head)">Paket<select style="min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px; font-weight: 400"><option>{{sk.paket}}</option><option>Reklam ikilisi</option><option>Google Ads yönetimi · Büyüme</option><option>Meta Ads yönetimi · Büyüme</option><option>Pazaryeri satış seti</option></select></label>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--head)">Aylık ücret<input type="text" value="[Tutar] TL" style="min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px; font-weight: 400"></label>
+<label style="flex: 1; display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--head)">Geçerlilik<input type="text" value="15 gün" style="min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px; font-weight: 400"></label>
+</div>
+<div style="padding: 12px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12px; color: var(--tx2)">Önizleme · markalı PDF ve onay bağlantısı</span>
+<span style="font-weight: 700; color: var(--head)">{{sk.firma}} için teklif</span>
+<span style="font-size: 12px; color: var(--tx2)">Kapsam maddeleri paket kataloğundan otomatik gelir; düzenlenebilir.</span>
+</div>
+<div style="display: flex; gap: 8px"><button type="button" onClick="{{teklifGonder}}" style="flex: 1; min-height: 40px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Gönder</button><button type="button" style="min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">Taslak kaydet</button></div>
+</div>
+</sc-if>
+
+<dl style="margin: 0; padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid var(--line); font-size: 13px">
+<div style="display: flex; justify-content: space-between; gap: 10px"><dt style="color: var(--tx2)">E-posta</dt><dd style="margin: 0">[e-posta]</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 10px"><dt style="color: var(--tx2)">Telefon</dt><dd style="margin: 0">[telefon]</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 10px"><dt style="color: var(--tx2)">İlgilendiği</dt><dd style="margin: 0; font-weight: 600; color: var(--head)">{{sk.paket}}</dd></div>
+<div style="display: flex; justify-content: space-between; gap: 10px"><dt style="color: var(--tx2)">Pazarlama izni</dt><dd style="margin: 0"><span style="padding: 1px 8px; border-radius: 999px; background: var(--okb); color: var(--ok); font-size: 11px; font-weight: 600">E-posta · İYS onaylı</span></dd></div>
+<div style="display: flex; justify-content: space-between; gap: 10px"><dt style="color: var(--tx2)">Etiketler</dt><dd style="margin: 0; display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end"><span style="padding: 1px 8px; border-radius: 6px; background: var(--card2); border: 1px solid var(--line); font-size: 11px">{{sk.etiket}}</span><span style="padding: 1px 8px; border-radius: 6px; background: var(--card2); border: 1px solid var(--line); font-size: 11px">Ankara</span></dd></div>
+</dl>
+
+<div style="padding: 14px 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; font-weight: 700; color: var(--head)">Zaman çizelgesi</span>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column">
+<sc-for list="{{sk.zaman}}" as="z" hint-placeholder-count="5">
+<li style="display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line)"><span style="flex: none; width: 8px; height: 8px; margin-top: 6px; border-radius: 50%; background: {{z.renk}}"></span><span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 13px">{{z.metin}}</span><span style="font-size: 11px; color: var(--tx2)">{{z.ne}}</span></span></li>
+</sc-for>
+</ol>
+</div>
+</aside>
+</div>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"koyu":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null, gorunum: 'kanban', segment: 'tumu', secId: 'f1', teklif: false, asamaDegisen: {} };
+  }
+  renderVals() {
+    const self = this;
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const asamaTanim = [ ['yeni', 'Yeni talep', '#B84406'], ['gorusme', 'Görüşülüyor', '#1F4E8C'], ['teklif', 'Teklif gönderildi', '#7A4E00'], ['goruldu', 'Teklif görüntülendi', '#5F574F'], ['kazanildi', 'Kazanıldı', '#2F7D5B'] ];
+    const ham = [
+      { id: 'f1', firma: '[Firma A]', kisi: '[Ad Soyad]', bas: 'FA', sektor: 'E-ticaret', paket: 'Reklam ikilisi', kaynak: 'Sihirbaz', deger: 18000, gun: 'Bugün', asama: 'yeni', seg: ['sihirbaz', 'eticaret'], etiket: 'E-ticaret' },
+      { id: 'f2', firma: '[Firma B]', kisi: '[Ad Soyad]', bas: 'FB', sektor: 'Sağlık', paket: 'Meta Ads · Büyüme', kaynak: 'Paketler', deger: 12000, gun: 'Bugün', asama: 'yeni', seg: ['yerel'], etiket: 'Sağlık' },
+      { id: 'f3', firma: '[Firma C]', kisi: '[Ad Soyad]', bas: 'FC', sektor: 'Pazaryeri', paket: 'Pazaryeri satış seti', kaynak: 'Sihirbaz', deger: 22000, gun: 'Dün', asama: 'gorusme', seg: ['sihirbaz', 'eticaret'], etiket: 'Pazaryeri' },
+      { id: 'f4', firma: '[Firma D]', kisi: '[Ad Soyad]', bas: 'FD', sektor: 'Hizmet', paket: 'Google Ads · Başlangıç', kaynak: 'WhatsApp', deger: 9000, gun: '2 gün', asama: 'gorusme', seg: ['yerel'], etiket: 'Yerel' },
+      { id: 'f5', firma: '[Firma E]', kisi: '[Ad Soyad]', bas: 'FE', sektor: 'E-ticaret', paket: 'E-ticaret büyüme seti', kaynak: 'İletişim', deger: 35000, gun: '3 gün', asama: 'teklif', seg: ['eticaret', 'bekleyen'], etiket: 'E-ticaret' },
+      { id: 'f6', firma: '[Firma F]', kisi: '[Ad Soyad]', bas: 'FF', sektor: 'Eğitim', paket: 'Dijital başlangıç seti', kaynak: 'Sihirbaz', deger: 15000, gun: '4 gün', asama: 'goruldu', seg: ['sihirbaz', 'bekleyen'], etiket: 'Eğitim' },
+      { id: 'f7', firma: '[Firma G]', kisi: '[Ad Soyad]', bas: 'FG', sektor: 'Turizm', paket: 'SEO · Büyüme', kaynak: 'Referans', deger: 14000, gun: '1 hafta', asama: 'kazanildi', seg: ['yerel'], etiket: 'Turizm' },
+      { id: 'f8', firma: '[Firma H]', kisi: '[Ad Soyad]', bas: 'FH', sektor: 'E-ticaret', paket: 'Google Ads · Büyüme', kaynak: 'Paketler', deger: 16000, gun: '1 hafta', asama: 'kazanildi', seg: ['eticaret'], etiket: 'E-ticaret' }
+    ];
+    const ad = this.state.asamaDegisen;
+    const firsat = ham.map(function (f) { return Object.assign({}, f, { asama: ad[f.id] || f.asama }); });
+    const tl = function (n) { return n.toLocaleString('tr-TR') + ' TL/ay'; };
+    const segTanim = [ ['tumu', 'Tümü'], ['sihirbaz', 'Sihirbazdan gelenler'], ['eticaret', 'E-ticaret'], ['yerel', 'Yerel işletme'], ['bekleyen', 'Teklif bekleyen'] ];
+    const seg = this.state.segment;
+    const uy = function (f) { return seg === 'tumu' || f.seg.indexOf(seg) >= 0; };
+    const segmentler = segTanim.map(function (x) { const sec = x[0] === seg; return { ad: x[1], sayi: firsat.filter(function (f) { return x[0] === 'tumu' || f.seg.indexOf(x[0]) >= 0; }).length, secili: sec, sec: function () { self.setState({ segment: x[0] }); },
+      stil: 'min-height: 34px; padding: 0 12px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; ' + (sec ? 'border: 1px solid var(--head); background: var(--head); color: var(--card)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') }; });
+    const kart = function (f) { const sec = f.id === self.state.secId; const at = asamaTanim.find(function (a) { return a[0] === f.asama; });
+      return Object.assign({}, f, { deger: tl(f.deger), asama: at[1], secili: sec, sec: function () { self.setState({ secId: f.id, teklif: false }); },
+        stil: 'width: 100%; display: flex; flex-direction: column; gap: 6px; padding: 10px; border-radius: 10px; font: inherit; font-size: 13px; cursor: pointer; color: var(--tx); background: var(--card); ' + (sec ? 'border: 2px solid var(--brand)' : 'border: 1px solid var(--line)') }); };
+    const gorunen = firsat.filter(uy);
+    const asamalar = asamaTanim.map(function (a) { const l = gorunen.filter(function (f) { return f.asama === a[0]; }); return { ad: a[1], renk: a[2], sayi: String(l.length), firsatlar: l.map(kart) }; });
+    const toplam = gorunen.filter(function (f) { return f.asama !== 'kazanildi'; }).reduce(function (t, f) { return t + f.deger; }, 0);
+    const secHam = firsat.find(function (f) { return f.id === self.state.secId; }) || firsat[0];
+    const at = asamaTanim.find(function (a) { return a[0] === secHam.asama; });
+    const zaman = [
+      { metin: 'Sihirbazı tamamladı: ' + secHam.sektor + ' · daha fazla satış', ne: 'Paket sihirbazı · 3 gün önce', renk: '#B84406' },
+      { metin: 'Talep bıraktı: ' + secHam.paket, ne: secHam.kaynak + ' · 3 gün önce', renk: '#F07A23' },
+      { metin: 'Hoş geldiniz e-postasını açtı', ne: 'Otomasyon · 3 gün önce', renk: '#1F4E8C' },
+      { metin: 'Telefon görüşmesi: bütçe ve hedef konuşuldu', ne: 'Not · 2 gün önce', renk: '#5F574F' }
+    ];
+    if (secHam.asama === 'teklif' || secHam.asama === 'goruldu' || secHam.asama === 'kazanildi') zaman.unshift({ metin: 'Teklif gönderildi', ne: 'Teklifler · dün', renk: '#7A4E00' });
+    if (secHam.asama === 'goruldu') zaman.unshift({ metin: 'Teklifi 2 kez görüntüledi', ne: 'Teklifler · 3 saat önce', renk: '#2F7D5B' });
+    const sk = { bas: secHam.bas, kisi: secHam.kisi, firma: secHam.firma, sektor: secHam.sektor, asama: at[1], paket: secHam.paket, etiket: secHam.etiket, zaman: zaman };
+    const gT = [ ['kanban', 'Pano'], ['liste', 'Liste'] ];
+    const gorunumler = gT.map(function (x) { const sec = x[0] === self.state.gorunum; return { ad: x[1], secili: sec, sec: function () { self.setState({ gorunum: x[0] }); },
+      stil: 'min-height: 34px; padding: 0 14px; border: 0; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; ' + (sec ? 'background: var(--head); color: var(--card)' : 'background: transparent; color: var(--tx2)') }; });
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      menuSayac: '22 / 32',
+      gorunumler: gorunumler, kanban: this.state.gorunum === 'kanban', liste: this.state.gorunum === 'liste',
+      segmentler: segmentler, asamalar: asamalar, tumFirsatlar: gorunen.map(kart), hatDegeri: tl(toplam),
+      sk: sk, teklifModu: this.state.teklif,
+      teklifAc: function () { self.setState({ teklif: true }); },
+      teklifKapat: function () { self.setState({ teklif: false }); },
+      teklifGonder: function () { const y = Object.assign({}, ad); y[secHam.id] = 'teklif'; self.setState({ asamaDegisen: y, teklif: false }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

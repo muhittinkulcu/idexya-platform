@@ -1,0 +1,105 @@
+---
+import Site from '../../../layouts/Site.astro';
+// Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
+class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null };
+  }
+  renderVals() {
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      rakamlar: [{ deger: '10+', ad: 'yıl e-ticaret ve dijital pazarlama' }, { deger: '27', ad: 'hizmet, 5 alanda' }, { deger: '[X]', ad: 'yönetilen marka' }, { deger: '[X]', ad: 'yönetilen reklam bütçesi' }],
+      ilkeler: [
+        { no: '01', ad: 'Önce ölçüm', metin: 'Doğru ölçülmeyen reklam büyütülmez. İlk işimiz dönüşüm takibini düzeltmek.' },
+        { no: '02', ad: 'Onaysız değişiklik yok', metin: 'Bütçe ve kampanya değişiklikleri sizin onayınızla yapılır; her adım kayıt altındadır.' },
+        { no: '03', ad: 'Hesaplar sizin', metin: 'Reklam hesapları ve veriler sizin adınıza açılır. Ayrılırsanız her şey sizde kalır.' },
+        { no: '04', ad: 'Her an görünür', metin: 'Sonuçlar IDOS panelinde her zaman açık; satış, form ve mesaj ayrı ayrı görünür.' }
+      ],
+      uzmanlik: ['Google Ads', 'Meta reklamları', 'E-ticaret', 'Ölçümleme ve GTM', 'BigQuery ve raporlama', 'Otomasyon'],
+      tarihce: [
+        { yil: '[Yıl]', ad: 'İlk adım', metin: 'E-ticaret ve dijital pazarlamada çalışmaya başlangıç.' },
+        { yil: '[Yıl]', ad: 'Idexya kuruldu', metin: 'Ajans olarak markalara 360° hizmet.' },
+        { yil: '2026', ad: 'IDOS', metin: 'Çok müşterili ajans operasyon paneli ve yapay zekâ destekli öneriler.' },
+        { yil: '2026', ad: 'Yeni site ve platform', metin: 'Paketler, teklif, CRM ve eğitim modülleriyle tek platform.' }
+      ]
+    };
+  }
+}
+const __c = new Component({}); Object.assign(__c.state, {});
+const __v = __c.renderVals();
+const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
+const ilkeler = __v.ilkeler;
+const rakamlar = __v.rakamlar;
+const tarihce = __v.tarihce;
+const uzmanlik = __v.uzmanlik;
+---
+<Site baslik="Hakkımızda" aciklama="10 yılı aşkın e-ticaret ve dijital pazarlama deneyimi." aktif="Hakkımızda">
+
+
+<section style="position: relative; overflow: hidden">
+<svg aria-hidden="true" viewBox="0 0 1440 620" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0"><path d="M760 0 C 980 140 1120 40 1440 130 L1440 0 Z" fill="var(--blob2)"></path><path d="M900 620 C 900 430 1080 300 1440 280 L1440 620 Z" fill="var(--blob)"></path></svg>
+<div style="position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 36px 24px 80px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: var(--head); font-weight: 600">Hakkımızda</span></nav>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">HAKKIMIZDA</span></div>
+<h1 style="margin: 0; font-size: clamp(36px, 7vw, 58px); line-height: 1.06; letter-spacing: -0.03em; color: var(--head)">İyi işler, ölçülebilir sonuçlar</h1>
+<p style="margin: 0; font-size: 20px; color: var(--tx2)">Idexya | Good Things, 10 yılı aşkın e-ticaret ve dijital pazarlama deneyimiyle kurulmuş bir ajans. Reklamı, mağazayı, SEO’yu ve yazılımı ayrı ayrı değil, tek bir büyüme planı olarak yönetiyoruz.</p>
+<div style="display: flex; gap: 12px; flex-wrap: wrap"><a href="/tr/iletisim" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-weight: 600">Ücretsiz analiz iste</a><a href="/tr/referanslar" style="min-height: 52px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--head); text-decoration: none; font-weight: 600">Çalışmalarımız</a></div>
+</div>
+<div style="flex: 1 1 400px; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px">
+{(rakamlar || []).map((r) => (<Fragment><div style="padding: 24px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); box-shadow: 0 18px 44px var(--shadow); display: flex; flex-direction: column; gap: 6px"><span style="font-size: 40px; font-weight: 700; color: var(--head); line-height: 1">{r.deger}</span><span style="color: var(--tx2); font-size: 15px">{r.ad}</span></div></Fragment>))}
+</div>
+</div>
+</section>
+
+<section style="background: var(--bg2); border-top: 1px solid var(--line)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 88px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 36px">
+<div style="display: flex; flex-direction: column; gap: 10px; max-width: 760px"><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">NASIL ÇALIŞIRIZ</span><h2 style="margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">Dört ilke, her müşteride aynı</h2></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px">
+{(ilkeler || []).map((i) => (<Fragment><article style="padding: 28px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px"><span style="font-size: 44px; font-weight: 700; color: var(--brand); opacity: .4; line-height: 1">{i.no}</span><h3 style="margin: 0; font-size: 21px; color: var(--head)">{i.ad}</h3><p style="margin: 0; color: var(--tx2)">{i.metin}</p></article></Fragment>))}
+</div>
+</div>
+</section>
+
+<section>
+<div style="max-width: 1240px; margin: 0 auto; padding: 88px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div role="img" aria-label="Kurucu fotoğrafı alanı" style="flex: 1 1 340px; min-width: 0; aspect-ratio: 4 / 5; max-height: 520px; border-radius: 28px; background: #002559; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 24px; box-sizing: border-box">
+<svg aria-hidden="true" viewBox="0 0 400 500" style="position: absolute; inset: 0; width: 100%; height: 100%"><circle cx="300" cy="120" r="160" fill="none" stroke="#F07A23" stroke-width="1.5" opacity=".5"></circle><circle cx="300" cy="120" r="100" fill="none" stroke="#F07A23" stroke-width="1.5" opacity=".3"></circle></svg>
+<span style="position: relative; color: #C6D2E3; font-size: 13px">[Kurucu fotoğrafı]</span>
+</div>
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+<span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">KURUCU</span>
+<h2 style="margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">Muhittin Külcü</h2>
+<p style="margin: 0; font-size: 18px; color: var(--tx2)">E-ticaret ve dijital pazarlamada 10 yılı aşkın süredir çalışıyor. Google Ads, Meta reklamları, ölçümleme ve otomasyonu bir arada yöneten Idexya’yı ve ajans operasyon paneli IDOS’u kurdu.</p>
+<p style="margin: 0; font-size: 18px; color: var(--tx2)">[Kurucunun kendi anlatımıyla kısa bir paragraf: neden bu işi yapıyor, müşteriye ne söz veriyor.]</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">{(uzmanlik || []).map((u) => (<Fragment><span style="padding: 6px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 14px; font-weight: 600; color: var(--head)">{u}</span></Fragment>))}</div>
+</div>
+</div>
+</section>
+
+<section style="background: var(--bg2); border-top: 1px solid var(--line)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 88px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; flex-direction: column; gap: 10px"><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">YOLCULUK</span><h2 style="margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">Kısa tarihçe</h2></div>
+<ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0; border-top: 2px solid var(--line)">
+{(tarihce || []).map((t) => (<Fragment><li style="position: relative; padding: 28px 20px 0 0; display: flex; flex-direction: column; gap: 8px"><span aria-hidden="true" style="position: absolute; top: -8px; left: 0; width: 14px; height: 14px; border-radius: 50%; background: var(--brand); border: 3px solid var(--bg2)"></span><span style="font-size: 22px; font-weight: 700; color: var(--head)">{t.yil}</span><strong style="color: var(--head)">{t.ad}</strong><span style="color: var(--tx2); font-size: 15px">{t.metin}</span></li></Fragment>))}
+</ol>
+</div>
+</section>
+
+<section style="padding: 88px 24px">
+<div style="max-width: 1192px; margin: 0 auto; box-sizing: border-box; background: #002559; color: #F1F3F5; border-radius: 28px; padding: clamp(28px, 6vw, 52px); overflow: hidden; display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between">
+<div style="flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 12px"><h2 style="margin: 0; font-size: 36px; line-height: 1.12; color: #FFFFFF">Birlikte çalışalım mı?</h2><p style="margin: 0; color: #C6D2E3; font-size: 17px">Önce hesaplarınıza ve sitenize ücretsiz bakalım; sonra size uygun planı birlikte seçelim.</p></div>
+<div style="display: flex; gap: 12px; flex-wrap: wrap"><a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700">Ücretsiz analiz iste</a><a href="/tr/paketler" style="min-height: 54px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 600">Paketleri incele</a></div>
+</div>
+</section>
+
+
+
+
+</Site>

@@ -1,0 +1,144 @@
+---
+import Site from '../../layouts/Site.astro';
+// Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
+class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null };
+  }
+  renderVals() {
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      ozellikler: [
+        { no: '01', ad: 'Tek ekranda tüm kanallar', aciklama: 'Google Ads, Meta Ads, GA4, Search Console, Tag Manager ve Merchant Center verileri bir arada.' },
+        { no: '02', ad: 'Günlük kontrol', aciklama: 'Her sabah neyin yolunda olmadığı, hangi müşteriyi etkilediği ve ne yapılması gerektiği tek listede.' },
+        { no: '03', ad: 'Yapay zekâ önerileri', aciklama: 'Hesaplar düzenli taranır; öneriler gerekçesi ve önceliğiyle sıralanır.' },
+        { no: '04', ad: 'Onaylı uygulama', aciklama: 'Bütçe, duraklatma ve negatif kelime gibi değişiklikler yalnızca onayla hesaba yazılır.' },
+        { no: '05', ad: 'Markalı raporlar', aciklama: 'Dönemsel PDF raporlar sonuç türleri ayrı ayrı gösterilerek hazırlanır ve e-postayla gönderilir.' },
+        { no: '06', ad: 'Müşteri portalı', aciklama: 'Müşteriler kendi sonuçlarını ve gönderilen raporları kendi girişleriyle görür.', yakinda: true }
+      ]
+    };
+  }
+}
+const __c = new Component({}); Object.assign(__c.state, {});
+const __v = __c.renderVals();
+const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
+const ozellikler = __v.ozellikler;
+---
+<Site baslik="IDOS" aciklama="Tüm reklam hesaplarınız, raporlarınız ve onaylı değişiklikler tek panelde." aktif="IDOS">
+
+
+<section style="background: #002559; color: #F1F3F5; position: relative; overflow: hidden">
+<svg aria-hidden="true" viewBox="0 0 1440 820" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%"><path d="M0 640 C 380 560 640 780 1020 690 S 1320 560 1440 590 L1440 820 L0 820 Z" fill="#0A3270"></path><circle cx="1260" cy="120" r="220" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.35"></circle><circle cx="1260" cy="120" r="150" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.22"></circle></svg>
+<div style="position: relative; max-width: 1240px; margin: 0 auto; padding: 36px 24px 96px; box-sizing: border-box; display: flex; flex-direction: column; gap: 48px">
+<nav aria-label="Sayfa yolu" style="font-size: 14px; color: #C6D2E3; display: flex; gap: 8px; align-items: center"><a href="/" style="color: #C6D2E3; text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: #FFFFFF; font-weight: 600">IDOS</span></nav>
+<div style="display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: #F07A23"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: #FFB58A">IDOS · IDEXYA AGENCY OS</span></div>
+<h1 style="margin: 0; font-size: 58px; line-height: 1.05; letter-spacing: -0.03em; color: #FFFFFF">Reklam hesaplarınızın kontrol merkezi</h1>
+<p style="margin: 0; font-size: 19px; color: #C6D2E3; max-width: 560px">Google, Meta ve analiz hesaplarınız tek panelde. Yapay zekâ önerir, uzmanımız inceler, siz onaylarsınız. Onayınız olmadan hiçbir canlı ayar değişmez.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Tanıtım iste</a>
+<a href="https://idos.idexya.com" style="min-height: 54px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 17px">Panele giriş yap</a>
+</div>
+</div>
+<figure style="flex: 1 1 540px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div role="img" aria-label="IDOS genel bakış ekranının temsili görünümü" style="background: #F7F9FC; border-radius: 20px; box-shadow: 0 40px 90px rgba(0,0,0,.45); overflow: hidden; color: #1F2A3A">
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #EAF0F7; border-bottom: 1px solid #D8E1EC"><span style="width: 10px; height: 10px; border-radius: 50%; background: #E9A28A"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #F3C56D"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #9FD4B5"></span><span style="margin-left: 10px; font-size: 13px; color: #4A5A70">idos.idexya.com · Günlük kontrol</span></div>
+<div style="display: flex">
+<div style="width: 150px; flex: none; padding: 16px 12px; background: #FFFFFF; border-right: 1px solid #E3E9F1; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4A5A70"><span style="padding: 7px 10px; border-radius: 8px; background: #FDE9DB; color: #A9420A; font-weight: 600">Günlük kontrol</span><span style="padding: 7px 10px">Müşteriler</span><span style="padding: 7px 10px">Google Ads</span><span style="padding: 7px 10px">Meta Ads</span><span style="padding: 7px 10px">GA4</span><span style="padding: 7px 10px">Öneriler</span><span style="padding: 7px 10px">Raporlar</span></div>
+<div style="flex: 1; min-width: 0; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; gap: 10px">
+<div style="flex: 1; padding: 12px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E9F1; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: #4A5A70">Onay bekleyen</span><span style="height: 10px; width: 46%; border-radius: 4px; background: #F07A23"></span></div>
+<div style="flex: 1; padding: 12px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E9F1; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: #4A5A70">Kritik uyarı</span><span style="height: 10px; width: 24%; border-radius: 4px; background: #C2410C"></span></div>
+<div style="flex: 1; padding: 12px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E9F1; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: #4A5A70">Veri tazeliği</span><span style="height: 10px; width: 82%; border-radius: 4px; background: #2F7D5B"></span></div>
+</div>
+<div style="padding: 14px; border-radius: 12px; background: #FFFFFF; border: 1px solid #E3E9F1; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 600">Öneriler</span>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px"><span>Negatif anahtar kelime ekle</span><span style="padding: 3px 8px; border-radius: 999px; background: #FDE9DB; color: #A9420A; font-weight: 600">Onay bekliyor</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px"><span>Bütçeyi verimli kampanyaya kaydır</span><span style="padding: 3px 8px; border-radius: 999px; background: #E3ECF8; color: #1F4E8C; font-weight: 600">Uygulandı</span></div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px"><span>Yorgun kreatifi yenile</span><span style="padding: 3px 8px; border-radius: 999px; background: #E2F2E9; color: #176041; font-weight: 600">Etkisi doğrulandı</span></div>
+</div>
+</div>
+</div>
+</div>
+<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez.</figcaption>
+</figure>
+</div>
+</div>
+</section>
+
+<section style="border-bottom: 1px solid var(--line)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 22px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; font-size: 15px; font-weight: 600; color: var(--tx2)">
+<span style="font-size: 13px; letter-spacing: 0.05em; color: var(--acc)">BAĞLANAN HESAPLAR</span><span>Google Ads</span><span>Meta Ads</span><span>Google Analytics 4</span><span>Search Console</span><span>Tag Manager</span><span>Merchant Center</span><span>HubSpot</span>
+</div>
+</section>
+
+<section style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 700px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">NELER VAR</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Ajans gücü, panel şeffaflığı</h2>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px">
+{(ozellikler || []).map((o) => (<Fragment>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 30px; font-weight: 700; color: var(--brand); opacity: 0.45">{o.no}</span>{(o.yakinda) && (<Fragment><span style="padding: 3px 10px; border-radius: 999px; background: var(--tint); color: var(--tintx); font-size: 12px; font-weight: 600">Yakında</span></Fragment>)}</div>
+<h3 style="margin: 0; font-size: 21px; color: var(--head)">{o.ad}</h3>
+<p style="margin: 0; color: var(--tx2); font-size: 15px">{o.aciklama}</p>
+</article>
+</Fragment>))}
+</div>
+</section>
+
+<section style="background: var(--bg2); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 760px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">BİR ÖNERİNİN YOLCULUĞU</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Her adım ayrı görünür</h2>
+<p style="margin: 0; font-size: 18px; color: var(--tx2)">"Onaylandı" ile "uygulandı" aynı şey değildir; "uygulandı" ile "işe yaradı" da. IDOS bu farkı her öneride ayrı gösterir.</p>
+</div>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 16px">
+<li style="flex: 1 1 230px; min-width: 0; padding: 24px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px"><span style="align-self: flex-start; padding: 4px 12px; border-radius: 999px; background: var(--card2); border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--head)">1 · Öneri</span><span style="color: var(--tx2); font-size: 15px">Hesaplar taranır; yapay zekâ gerekçesiyle bir öneri çıkarır.</span></li>
+<li style="flex: 1 1 230px; min-width: 0; padding: 24px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px"><span style="align-self: flex-start; padding: 4px 12px; border-radius: 999px; background: var(--tint); color: var(--tintx); font-size: 13px; font-weight: 600">2 · Onaylandı</span><span style="color: var(--tx2); font-size: 15px">Uzman inceler; yetkili kişi onaylar ya da reddeder.</span></li>
+<li style="flex: 1 1 230px; min-width: 0; padding: 24px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px"><span style="align-self: flex-start; padding: 4px 12px; border-radius: 999px; background: #E3ECF8; color: #1F4E8C; font-size: 13px; font-weight: 600">3 · Uygulandı</span><span style="color: var(--tx2); font-size: 15px">Değişiklik hesaba yazılır ve işlem kaydına geçer.</span></li>
+<li style="flex: 1 1 230px; min-width: 0; padding: 24px; border-radius: 18px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px"><span style="align-self: flex-start; padding: 4px 12px; border-radius: 999px; background: var(--okb); color: var(--ok); font-size: 13px; font-weight: 600">4 · Etkisi doğrulandı</span><span style="color: var(--tx2); font-size: 15px">Sonraki günlerin verisiyle işe yarayıp yaramadığı ölçülür.</span></li>
+</ol>
+</div>
+</section>
+
+<section style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">GÜVENLİK</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Kontrol her zaman insanda</h2>
+<p style="margin: 0; font-size: 18px; color: var(--tx2)">Yapay zekâ yalnızca öneri sunar. Bütçe, kampanya ve anahtar kelime değişiklikleri insan onayı olmadan uygulanamaz.</p>
+</div>
+<ul style="flex: 1 1 520px; min-width: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px">
+<li style="display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--line)"><span style="flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--okb); color: var(--ok); display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span><strong style="color: var(--head)">İnsan onayı zorunlu.</strong> Canlı hesaplarda onaysız değişiklik yapılmaz.</span></li>
+<li style="display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--line)"><span style="flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--okb); color: var(--ok); display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span><strong style="color: var(--head)">Rol bazlı erişim.</strong> Herkes yalnızca yetkili olduğu müşteriyi görür.</span></li>
+<li style="display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--line)"><span style="flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--okb); color: var(--ok); display: flex; align-items: center; justify-content: center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span><span><strong style="color: var(--head)">İşlem kaydı.</strong> Kim, neyi, ne zaman değiştirdi; hepsi kayıtlı.</span></li>
+<li style="display: flex; gap: 14px; align-items: flex-start; padding: 18px 20px; border-radius: 16px; background: var(--card); border: 1px solid var(--line)"><span style="flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">…</span><span><strong style="color: var(--head)">İki adımlı doğrulama.</strong> Kişisel giriş ile birlikte geliyor. <span style="color: var(--acc); font-weight: 600">Yakında</span></span></li>
+</ul>
+</section>
+
+<section style="padding: 0 24px 96px">
+<div style="max-width: 1192px; margin: 0 auto; box-sizing: border-box; background: var(--card); border: 1px solid var(--line); border-radius: 28px; box-shadow: 0 30px 80px var(--shadow); padding: 48px; display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between">
+<div style="flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 36px; line-height: 1.15; color: var(--head)">IDOS'u hesaplarınızla görün</h2>
+<p style="margin: 0; font-size: 17px; color: var(--tx2)">Kısa bir tanıtımda panelin sizin hesaplarınızda neler göstereceğini anlatalım.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 600">Tanıtım iste</a>
+<a href="/tr/paketler" style="min-height: 54px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-size: 17px; font-weight: 600">Paketleri gör</a>
+</div>
+</div>
+</section>
+
+
+
+
+</Site>

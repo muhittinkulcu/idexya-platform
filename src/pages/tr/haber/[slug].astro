@@ -1,0 +1,25 @@
+---
+// Eski siteden gelen yazı adresleri korunur; içerikler taşınana kadar başlık ve özetle yayınlanır.
+import Site from '../../../layouts/Site.astro';
+import CagriKutusu from '../../../components/CagriKutusu.astro';
+const YAZILAR = [
+  { slug: 'performans-ve-hiz-odakli-reklam-optimizasyon-modeli', baslik: 'Performans ve hız odaklı reklam optimizasyon modeli', kategori: 'Reklam' },
+  { slug: 'donusum-degeri-odakli-e-ticaret-donusum-modeli', baslik: 'Dönüşüm değeri odaklı e-ticaret dönüşüm modeli', kategori: 'E-ticaret' },
+  { slug: 'e-ticaret-danismanligi-ile-dogru-karari-verin', baslik: 'E-ticaret danışmanlığı ile doğru kararı verin', kategori: 'E-ticaret' }
+];
+export function getStaticPaths() {
+  return [
+    'performans-ve-hiz-odakli-reklam-optimizasyon-modeli', 'donusum-degeri-odakli-e-ticaret-donusum-modeli', 'e-ticaret-danismanligi-ile-dogru-karari-verin'
+  ].map((slug) => ({ params: { slug } }));
+}
+const y = YAZILAR.find((x) => x.slug === Astro.params.slug);
+---
+<Site baslik={y.baslik} aktif="Blog">
+<article style="max-width: 820px; margin: 0 auto; padding: 36px 24px 64px; display: flex; flex-direction: column; gap: 18px">
+<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/haberler" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Blog</a></nav>
+<span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">{y.kategori.toLocaleUpperCase('tr-TR')}</span>
+<h1 style="margin: 0; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">{y.baslik}</h1>
+<p style="margin: 0; font-size: 18px; line-height: 1.75">[Bu yazının metni eski siteden taşınacak. Adres aynı kaldığı için arama motorlarındaki sıralaması korunur.]</p>
+</article>
+<CagriKutusu />
+</Site>

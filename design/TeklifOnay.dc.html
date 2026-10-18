@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Teklif · Idexya</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.acik{--ok:#1F6B45;--okb:#E3F3EA;--bg:#FBF8F4;--bg2:#F4EEE6;--card:#FFFFFF;--card2:#F9F4EE;--line:#E9DED2;--tx:#2A2622;--tx2:#5F574F;--head:#002559;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--shadow:rgba(0,37,89,.12);--blob:#FCE7D6;--blob2:#E7EDF6}
+.koyu{--ok:#7FD3A6;--okb:rgba(127,211,166,.14);--bg:#171C24;--bg2:#131820;--card:#202630;--card2:#262D38;--line:#394352;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--shadow:rgba(0,0,0,.5);--blob:rgba(240,122,35,.10);--blob2:rgba(156,195,255,.07)}
+a{color:var(--acc)}a:hover{color:var(--tintx)}
+</style>
+</helmet>
+<div class="{{temaSinifi}}" style="background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100vh; overflow-x: hidden">
+
+<header style="border-bottom: 1px solid var(--line); background: var(--bg)">
+<div style="max-width: 1080px; margin: 0 auto; padding: 14px 24px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap">
+<a href="Main.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--head)">
+<svg viewBox="0 0 1000 1000" width="34" height="34" role="img" aria-label="Idexya logosu"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg>
+<span style="display: flex; flex-direction: column; line-height: 1.1"><span style="font-weight: 700; font-size: 20px; letter-spacing: -0.01em">Idexya</span><span style="font-size: 12px; color: var(--tx2); letter-spacing: 0.04em">GOOD THINGS</span></span>
+</a>
+<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"><span style="font-size: 13px; color: var(--tx2)">Teklif no: IDX-T-2026-018 · Sürüm 2</span><button type="button" onClick="{{temaDegistir}}" aria-label="{{temaEtiketi}}" style="min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--head); font: inherit; font-size: 13px; cursor: pointer">{{temaEtiketi}}</button></div>
+</div>
+</header>
+
+<main style="max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; box-sizing: border-box; display: flex; flex-direction: column; gap: 24px">
+
+<section style="position: relative; overflow: hidden; border-radius: 24px; background: #0B1B33; color: #C3CEDD; padding: 36px 32px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between">
+<div aria-hidden="true" style="position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle, rgba(240,122,35,.35), transparent 70%)"></div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 10px; max-width: 620px">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: .08em; color: #F7894A">[FİRMA E] İÇİN HAZIRLANDI</span>
+<h1 style="margin: 0; font-size: 34px; line-height: 1.15; color: #FFFFFF">E-ticaret büyüme seti</h1>
+<span>12 Ekim’deki görüşmemizde konuştuğumuz hedef: Kasım indirim dönemine kadar reklamdan gelen satışı artırmak ve ikas geçişinde SEO kaybını önlemek.</span>
+</div>
+<div style="position: relative; display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: 16px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12)">
+<span style="font-size: 12px">Geçerlilik</span><strong style="font-size: 18px; color: #FFFFFF">24 Ekim 2026’ya kadar</strong><span style="font-size: 12px">6 gün kaldı</span>
+</div>
+</section>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start">
+<div style="flex: 3 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: 20px; color: var(--head)">Pakete dahil olanlar</h2>
+<sc-for list="{{kalemler}}" as="k" hint-placeholder-count="4">
+<div style="display: flex; gap: 14px; align-items: flex-start; padding: 14px; border-radius: 14px; background: var(--card2)">
+<span style="width: 40px; height: 40px; flex: none; border-radius: 11px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">{{k.kisa}}</span>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px"><strong style="color: var(--head)">{{k.ad}}</strong><span style="font-size: 14px; color: var(--tx2)">{{k.aciklama}}</span></div>
+</div>
+</sc-for>
+</section>
+
+<section style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 20px; color: var(--head)">İsteğe bağlı eklemeler</h2>
+<sc-for list="{{ekler}}" as="e" hint-placeholder-count="2">
+<button type="button" role="checkbox" aria-checked="{{e.secili}}" onClick="{{e.degistir}}" style="{{e.stil}}"><span style="{{e.kutuStil}}">{{e.isaret}}</span><span style="flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left"><strong style="color: var(--head)">{{e.ad}}</strong><span style="font-size: 13px; color: var(--tx2)">{{e.aciklama}}</span></span><strong style="white-space: nowrap; color: var(--head)">{{e.fiyat}}</strong></button>
+</sc-for>
+</section>
+
+<section style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+<h2 style="margin: 0; font-size: 20px; color: var(--head)">Koşullar</h2>
+<span>• Sözleşme süresi: {{sureKosul}}</span>
+<span>• ikas geçişi SEO koruması ilk 3 ay içindir; 4. aydan itibaren aylık hizmet bedeli 5.000 TL azalır (dönem indirimi ayrıca uygulanır).</span>
+<span>• Süre dolmadan 30 gün önceden bildirimle sonlandırabilirsiniz; ek ücret yoktur, kullanılan dönem indirimi faturalanır.</span>
+<span>• Reklam bütçesi bu ücrete dahil değildir; doğrudan Google ve Meta’ya ödenir.</span>
+<span>• Hizmet bedeli her ayın başında faturalanır; ödeme vadesi 15 gündür.</span>
+<span>• Reklam hesaplarındaki her bütçe ve kampanya değişikliği önce size sorulur.</span>
+<span>• Raporlar IDOS panelinde her zaman açıktır; aylık özet PDF olarak e-postanıza gelir.</span>
+</section>
+</div>
+
+<aside style="flex: 2 1 340px; min-width: 0; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 14px">
+<section style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 16px 40px var(--shadow)">
+<div role="radiogroup" aria-label="Sözleşme süresi" style="display: flex; flex-direction: column; gap: 6px"><span style="font-size: 13px; font-weight: 600; color: var(--head)">Sözleşme süresi</span><div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px"><sc-for list="{{sureler}}" as="s" hint-placeholder-count="4"><button type="button" role="radio" aria-checked="{{s.secili}}" onClick="{{s.sec}}" style="{{s.stil}}"><span style="font-weight: 700">{{s.ad}}</span><span style="font-size: 11px; color: var(--tx2)">{{s.alt}}</span></button></sc-for></div></div>
+<div style="display: flex; flex-direction: column; gap: 6px; font-size: 14px">
+<div style="display: flex; justify-content: space-between"><span>Aylık hizmet bedeli</span><span>35.000 TL</span></div>
+<sc-if value="{{ekVar}}" hint-placeholder-val="{{ true }}"><div style="display: flex; justify-content: space-between"><span>Eklemeler</span><span>{{ekToplam}}</span></div></sc-if>
+<sc-if value="{{indirimVar}}" hint-placeholder-val="{{ true }}"><div style="display: flex; justify-content: space-between; color: var(--ok)"><span>{{indirimEtiket}}</span><span>{{indirimTutar}}</span></div></sc-if>
+<div style="display: flex; justify-content: space-between; color: var(--tx2)"><span>KDV (%20)</span><span>{{kdv}}</span></div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; padding-top: 10px; border-top: 1px solid var(--line)"><strong style="color: var(--head)">Aylık toplam</strong><strong style="font-size: 26px; color: var(--head)">{{toplam}}</strong></div>
+</div>
+
+<sc-if value="{{bekliyor}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)">Ad soyad<input type="text" placeholder="Onaylayan kişi" style="min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-weight: 400"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)">Unvan<input type="text" placeholder="Örneğin kurucu" style="min-height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-weight: 400"></label>
+<button type="button" role="checkbox" aria-checked="{{kabul}}" onClick="{{kabulDegistir}}" style="display: flex; gap: 10px; align-items: flex-start; padding: 0; border: 0; background: transparent; color: var(--tx); font: inherit; font-size: 13px; text-align: left; cursor: pointer"><span style="{{kabulKutu}}">{{kabulIsaret}}</span><span>Teklif koşullarını ve <a href="#">KVKK aydınlatma metnini</a> okudum, firmam adına onaylamaya yetkiliyim.</span></button>
+<button type="button" onClick="{{onayla}}" style="{{onayStil}}">Teklifi onayla</button>
+<div style="display: flex; gap: 8px"><button type="button" style="flex: 1; min-height: 42px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">Değişiklik iste</button><button type="button" style="flex: 1; min-height: 42px; border: 1px solid var(--line); border-radius: 11px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">PDF indir</button></div>
+</div>
+</sc-if>
+
+<sc-if value="{{onaylandi}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="padding: 16px; border-radius: 14px; background: var(--okb, #E3F3EA); color: var(--ok, #1F6B45); display: flex; flex-direction: column; gap: 6px">
+<strong style="font-size: 16px">Onayınız alındı, teşekkürler.</strong>
+<span style="font-size: 14px">Onay kaydı: ad, unvan, tarih ve saat. Sözleşme ve ilk fatura 1 iş günü içinde e-postanıza gelecek; çalışmaya sözleşme imzalanınca başlıyoruz.</span>
+</div>
+</sc-if>
+</section>
+
+<section style="background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 18px; display: flex; gap: 12px; align-items: center">
+<span style="width: 48px; height: 48px; flex: none; border-radius: 50%; background: #0B1B33; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">MK</span>
+<div style="flex: 1; display: flex; flex-direction: column; font-size: 14px"><strong style="color: var(--head)">Muhittin Külcü</strong><span style="color: var(--tx2)">Sorunuz varsa doğrudan yazın</span></div>
+<a href="#" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600; font-size: 14px">WhatsApp</a>
+</section>
+</aside>
+</div>
+</main>
+
+<footer style="border-top: 1px solid var(--line); background: var(--bg2)"><div style="max-width: 1080px; margin: 0 auto; padding: 20px 24px; box-sizing: border-box; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-size: 13px; color: var(--tx2)"><span>Idexya | Good Things · info@idexya.com</span><span>Bu sayfa yalnız size özel bağlantıyla açılır.</span></div></footer>
+
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"koyu":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null, ek: {}, kabul: false, onay: false, sure: 6 };
+  }
+  renderVals() {
+    const self = this;
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const tl = function (n) { return n.toLocaleString('tr-TR') + ' TL'; };
+    const kalemler = [
+      ['GA', 'Google Ads yönetimi', 'Arama, Performance Max ve alışveriş kampanyaları; haftalık optimizasyon.'],
+      ['MA', 'Meta reklam yönetimi', 'Instagram ve Facebook satış kampanyaları, yeniden pazarlama, kreatif testleri.'],
+      ['MC', 'Ürün akışı ve Merchant Center', 'Ürün akışının düzenlenmesi, onaylanmayan ürünlerin takibi.'],
+      ['SE', 'ikas geçişi SEO koruması', 'Adres eşleştirme listesi ve 301 yönlendirmeler, geçiş sonrası 30 gün takip.'],
+      ['ID', 'IDOS paneli ve aylık rapor', 'Sonuçlar tür tür ayrı (satış, form, mesaj); aylık değerlendirme toplantısı.']
+    ].map(function (k) { return { kisa: k[0], ad: k[1], aciklama: k[2] }; });
+    const E = [['kreatif', 'Aylık kreatif seti', '8 statik ve 4 video reklam görseli', 6000], ['tiktok', 'TikTok reklam yönetimi', 'Kampanya kurulumu ve yönetimi', 8000]];
+    const ek = this.state.ek; const kilit = this.state.onay;
+    const ekler = E.map(function (e) { const v = !!ek[e[0]];
+      return { ad: e[1], aciklama: e[2], fiyat: '+' + tl(e[3]) + '/ay', secili: v, isaret: v ? '✓' : '',
+        degistir: function () { if (kilit) return; const y = Object.assign({}, ek); if (v) delete y[e[0]]; else y[e[0]] = true; self.setState({ ek: y }); },
+        kutuStil: 'width: 22px; height: 22px; flex: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; ' + (v ? 'background: var(--fill); color: #FFFFFF' : 'border: 2px solid var(--line)'),
+        stil: 'display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 14px; font: inherit; cursor: ' + (kilit ? 'default' : 'pointer') + '; background: var(--card); color: var(--tx); ' + (v ? 'border: 2px solid var(--fill)' : 'border: 1px solid var(--line)') }; });
+    const ekT = E.reduce(function (a, e) { return a + (ek[e[0]] ? e[3] : 0); }, 0);
+    const kabul = this.state.kabul;
+    const SU = { 1: ['1 ay', 'deneme', '1 aylık deneme; kendiliğinden yenilenmez, bitişten 7 gün önce devam seçenekleri sunulur.'], 3: ['3 ay', '', '3 ay; bitişten 30 gün önce bildirim yapılmazsa aynı süreyle yenilenir.'], 6: ['6 ay', '%5 indirim', '6 ay; bitişten 30 gün önce bildirim yapılmazsa aynı süreyle yenilenir.'], 12: ['12 ay', '%10 indirim', '12 ay; bitişten 30 gün önce bildirim yapılmazsa aynı süreyle yenilenir.'] };
+    const sure = this.state.sure;
+    const yuz = { 1: 0, 3: 0, 6: 5, 12: 10 }[sure]; const indirim = Math.round((35000 + ekT) * yuz / 100);
+    const ara = 35000 + ekT - indirim; const kdv = Math.round(ara * 0.2);
+    const sureler = [1, 3, 6, 12].map(function (n) { const s = n === sure; return { ad: SU[n][0], alt: SU[n][1] || '\u00a0', secili: s, sec: function () { if (!kilit) self.setState({ sure: n }); },
+      stil: 'min-height: 52px; padding: 6px 4px; border-radius: 11px; font: inherit; font-size: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--card); color: var(--head); ' + (s ? 'border: 2px solid var(--fill)' : 'border: 1px solid var(--line)') }; });
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      sureler: sureler, sureKosul: SU[sure][2], indirimVar: indirim > 0, indirimEtiket: 'Dönem indirimi (%' + yuz + ')', indirimTutar: '−' + tl(indirim),
+      kalemler: kalemler, ekler: ekler, ekVar: ekT > 0, ekToplam: tl(ekT), kdv: tl(kdv), toplam: tl(ara + kdv),
+      bekliyor: !this.state.onay, onaylandi: this.state.onay,
+      kabul: kabul, kabulIsaret: kabul ? '✓' : '', kabulDegistir: () => this.setState({ kabul: !kabul }),
+      kabulKutu: 'width: 22px; height: 22px; flex: none; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; ' + (kabul ? 'background: var(--fill); color: #FFFFFF' : 'border: 2px solid var(--line)'),
+      onayla: () => { if (kabul) this.setState({ onay: true }); },
+      onayStil: 'min-height: 50px; border: 0; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 700; ' + (kabul ? 'background: var(--fill); color: #FFFFFF; cursor: pointer' : 'background: var(--card2); color: var(--tx2); cursor: not-allowed')
+    };
+  }
+}
+</script>
+</body>
+</html>

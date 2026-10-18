@@ -1,0 +1,119 @@
+---
+import Site from '../../layouts/Site.astro';
+// Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
+class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null };
+  }
+  renderVals() {
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const gruplar = [
+      { id: 'e-ticaret', no: '01', ad: 'E-ticaret', aciklama: 'Mağaza kurulumundan pazaryerine, entegrasyondan kargoya kadar e-ticaretin tamamını yönetiyoruz.', hizmetler: [
+        { ad: '360° e-ticaret yönetimi', slug: 'e-ticaret-yonetimi', ozet: 'Mağazanızın günlük işleyişi uçtan uca.' },
+        { ad: 'Pazaryeri yönetimi', slug: 'e-ticaret-pazaryeri-yonetimi', ozet: 'Pazaryerlerinde ürün, fiyat ve sipariş yönetimi.' },
+        { ad: 'Entegrasyon yönetimi', slug: 'e-ticaret-entegrasyon-yonetimi', ozet: 'Mağaza, pazaryeri, muhasebe ve kargo sistemlerini bağlama.' },
+        { ad: 'Ürün ve kategori yönetimi', slug: 'e-ticaret-urun-kategori-yonetimi', ozet: 'Ürün içerikleri, görseller ve kategori yapısı.' },
+        { ad: 'Kargo ve lojistik yönetimi', slug: 'e-ticaret-kargo-lojistik-yonetimi', ozet: 'Kargo anlaşmaları ve gönderim süreçleri.' } ] },
+      { id: 'dijital-reklam', no: '02', ad: 'Dijital reklam', aciklama: 'Doğru kanalda, doğru bütçeyle, ölçülebilir reklam. Her değişiklik onayınızla yapılır.', hizmetler: [
+        { ad: 'Google Ads yönetimi', slug: 'google-ads-yonetimi', ozet: 'Arama, alışveriş, görüntülü ve yeniden pazarlama kampanyaları.' },
+        { ad: 'Meta reklam yönetimi', slug: 'meta-business-ads-yonetimi', ozet: 'Facebook ve Instagram kampanyaları.' },
+        { ad: 'Dijital pazarlama yönetimi', slug: 'dijital-pazarlama-yonetimi', ozet: 'Tüm kanallar için strateji ve bütçe planı.' },
+        { ad: 'E-posta ve SMS pazarlama', slug: 'e-mail-sms-marketing-yonetimi', ozet: 'Müşterilerinize doğrudan ulaşan kampanyalar.' },
+        { ad: 'Influencer pazarlama', slug: 'influencer-marketing-yonetimi', ozet: 'Markanıza uygun içerik üreticileriyle iş birliği.' },
+        { ad: 'Pazaryeri reklam yönetimi', slug: 'e-ticaret-pazaryeri-reklam-yonetimi', ozet: 'Trendyol, Hepsiburada ve Amazon içi reklamlar.' } ] },
+      { id: 'seo', no: '03', ad: 'SEO', aciklama: 'Google aramalarında kalıcı görünürlük. Teknik altyapıdan içeriğe kadar.', hizmetler: [
+        { ad: 'SEO içerik optimizasyonu', slug: 'seo-icerik-optimizasyonu', ozet: 'Arayan kişiye cevap veren içerikler.' },
+        { ad: 'Anahtar kelime analizi', slug: 'seo-anahtar-kelime-analizi', ozet: 'Müşterilerinizin gerçekte ne aradığı.' },
+        { ad: 'Teknik SEO', slug: 'teknik-seo', ozet: 'Hız, taranabilirlik ve site altyapısı.' },
+        { ad: 'Site içi SEO', slug: 'site-ici-seo-on-page-seo', ozet: 'Başlıklar, açıklamalar ve sayfa yapısı.' },
+        { ad: 'Yerel SEO', slug: 'yerel-seo-hizmeti', ozet: 'Haritalarda ve yakınımdaki aramalarda görünürlük.' },
+        { ad: 'Backlink stratejisi', slug: 'backlink-stratejisi', ozet: 'Güvenilir sitelerden bağlantı kazanımı.' } ] },
+      { id: 'web-yazilim', no: '04', ad: 'Web ve yazılım', aciklama: 'İşinize uygun web sitesi ve iş yazılımlarının seçimi, kurulumu ve bağlanması.', hizmetler: [
+        { ad: 'Web tasarım', slug: 'web-tasarim-hizmetleri', ozet: 'Hızlı, mobil uyumlu ve satışa odaklı siteler.' },
+        { ad: 'Yazılım danışmanlığı', slug: 'yazilim-danismanligi', ozet: 'Doğru yazılımı seçme ve uygulama.' },
+        { ad: 'ERP yazılım danışmanlığı', slug: 'erp-yazilim-danismanligi', ozet: 'Kurumsal kaynak planlama sistemleri.' },
+        { ad: 'CRM yazılım danışmanlığı', slug: 'crm-yazilim-danismanligi', ozet: 'Müşteri ilişkileri yönetimi sistemleri.' },
+        { ad: 'Ön muhasebe yazılım danışmanlığı', slug: 'on-muhasebe-yazilim-danismanligi', ozet: 'Fatura, cari ve stok takibi.' } ] },
+      { id: 'tasarim-icerik', no: '05', ad: 'Tasarım ve içerik', aciklama: 'Markanızı tanıtan görsel kimlik ve satışa katkı sağlayan içerikler.', hizmetler: [
+        { ad: 'Grafik tasarım', slug: 'grafik-tasarim-hizmetleri', ozet: 'Reklam, sosyal medya ve basılı tasarımlar.' },
+        { ad: 'Logo tasarımı', slug: 'logo-tasarimi', ozet: 'Markanızın temel imzası.' },
+        { ad: 'Kurumsal kimlik tasarımı', slug: 'kurumsal-kimlik-tasarimi', ozet: 'Kartvizitten sunuma tutarlı marka dili.' },
+        { ad: 'Reels ve Shorts çekimleri', slug: 'instagram-reels-youtube-shorts-cekimleri', ozet: 'Kısa dikey video içerikleri.' },
+        { ad: 'Ürün fotoğraf ve video çekimleri', slug: 'urun-fotograf-video-cekimleri', ozet: 'E-ticaret ve reklam için ürün görselleri.' } ] }
+    ];
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      gruplar: gruplar.map(function (g, i) { return Object.assign({}, g, { zemin: i % 2 === 0 ? 'var(--bg)' : 'var(--bg2)' }); })
+    };
+  }
+}
+const __c = new Component({}); Object.assign(__c.state, {});
+const __v = __c.renderVals();
+const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
+const gruplar = __v.gruplar;
+---
+<Site baslik="Hizmetler" aciklama="E-ticaret, dijital reklam, SEO, web ve yazılım, tasarım ve içerik: 27 hizmet, tek ekip." aktif="Hizmetler">
+
+
+<section style="position: relative">
+<svg aria-hidden="true" viewBox="0 0 1440 520" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0"><path d="M820 0 C 1000 110 1120 50 1440 120 L1440 0 Z" fill="var(--blob2)"></path><path d="M980 520 C 950 380 1100 250 1440 230 L1440 520 Z" fill="var(--blob)"></path></svg>
+<div style="position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 36px 24px 72px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: var(--head); font-weight: 600">Hizmetler</span></nav>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">HİZMETLER</span></div>
+<h1 style="margin: 0; font-size: clamp(36px, 7vw, 58px); line-height: 1.06; letter-spacing: -0.03em; color: var(--head); max-width: 860px">Büyümenin her parçası, tek ekipte</h1>
+<p style="margin: 0; font-size: 20px; color: var(--tx2); max-width: 700px">E-ticaretten reklama, SEO'dan yazılıma kadar beş alanda çalışıyoruz. İhtiyacınız olanı seçin, gerisini biz birbirine bağlayalım.</p>
+<nav aria-label="Hizmet alanları" style="display: flex; flex-wrap: wrap; gap: 10px; padding-top: 6px">
+{(gruplar || []).map((g) => (<Fragment>
+<a href={`#${g.id}`} style="min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--head); text-decoration: none; font-weight: 600; font-size: 15px"><span style="color: var(--acc); font-size: 13px">{g.no}</span>{g.ad}</a>
+</Fragment>))}
+</nav>
+</div>
+</section>
+
+{(gruplar || []).map((g) => (<Fragment>
+<section id={g.id} style={`background: ${g.zemin}; border-top: 1px solid var(--line)`}>
+<div style="max-width: 1240px; margin: 0 auto; padding: 80px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 48px">
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<span style="font-size: 64px; line-height: 1; font-weight: 700; color: var(--brand); opacity: 0.35">{g.no}</span>
+<h2 style="margin: 0; font-size: 38px; line-height: 1.12; letter-spacing: -0.02em; color: var(--head)">{g.ad}</h2>
+<p style="margin: 0; color: var(--tx2); font-size: 17px">{g.aciklama}</p>
+<a href="#basla" style="align-self: flex-start; min-height: 48px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--head); text-decoration: none; font-weight: 600">Bu alanda analiz iste</a>
+</div>
+<ul style="flex: 2 1 560px; min-width: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">
+{(g.hizmetler || []).map((h) => (<Fragment>
+<li style="flex: 1 1 300px; min-width: 0; display: flex">
+<a href={`/tr/hizmet/${__slug(h.slug)}`} style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 22px 24px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); text-decoration: none; color: var(--tx)">
+<span style="display: flex; justify-content: space-between; gap: 12px; font-weight: 600; font-size: 18px; color: var(--head)">{h.ad}<span aria-hidden="true" style="color: var(--acc)">→</span></span>
+<span style="font-size: 15px; color: var(--tx2)">{h.ozet}</span>
+</a>
+</li>
+</Fragment>))}
+</ul>
+</div>
+</section>
+</Fragment>))}
+
+<section id="basla" style="padding: 24px 24px 96px">
+<div style="max-width: 1192px; margin: 0 auto; box-sizing: border-box; background: #002559; color: #F1F3F5; border-radius: 28px; padding: clamp(28px, 6vw, 52px); overflow: hidden; display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between; position: relative; overflow: hidden">
+<svg aria-hidden="true" viewBox="0 0 400 400" style="position: absolute; left: -110px; bottom: -150px; width: 360px; height: 360px"><circle cx="200" cy="200" r="190" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.45"></circle><circle cx="200" cy="200" r="130" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.3"></circle></svg>
+<div style="flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 12px; position: relative">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.06em; color: #FFB58A">KARARSIZ MISINIZ?</span>
+<h2 style="margin: 0; font-size: 38px; line-height: 1.12; color: #FFFFFF">Hangi hizmetle başlamanız gerektiğini birlikte bulalım</h2>
+<p style="margin: 0; color: #C6D2E3; font-size: 17px">Hesaplarınızı ve sitenizi ücretsiz inceleyip size bir yol haritası çıkaralım.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; position: relative">
+<a href="/" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Ücretsiz analiz iste</a>
+<a href="https://wa.me/905078700629" style="min-height: 54px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 17px">WhatsApp'tan yaz</a>
+</div>
+</div>
+</section>
+
+
+
+
+</Site>

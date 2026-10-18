@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Idexya ana sayfa</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.acik{--bg:#FBF8F4;--bg2:#F4EEE6;--card:#FFFFFF;--card2:#F7F1EA;--line:#E9DED2;--tx:#2A2622;--tx2:#5F574F;--head:#002559;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--shadow:rgba(0,37,89,.12);--blob:#FCE7D6;--blob2:#E7EDF6}
+.koyu{--bg:#171C24;--bg2:#131820;--card:#202630;--card2:#262D38;--line:#394352;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--shadow:rgba(0,0,0,.5);--blob:rgba(240,122,35,.10);--blob2:rgba(156,195,255,.07)}
+a{color:var(--acc)}a:hover{color:var(--tintx)}
+</style>
+</helmet>
+<div class="{{temaSinifi}}" style="background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; line-height: 1.55; min-height: 100vh; overflow-x: hidden">
+
+<header style="position: relative; z-index: 2; border-bottom: 1px solid var(--line); background: var(--bg)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 14px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px">
+<a href="#ust" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--head)">
+<svg viewBox="0 0 1000 1000" width="34" height="34" role="img" aria-label="Idexya logosu"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg>
+<span style="display: flex; flex-direction: column; line-height: 1.1"><span style="font-weight: 700; font-size: 20px; letter-spacing: -0.01em">Idexya</span><span style="font-size: 12px; color: var(--tx2); letter-spacing: 0.04em">GOOD THINGS</span></span>
+</a>
+<nav aria-label="Ana menü" style="display: flex; flex-wrap: wrap; gap: 4px 26px; flex: 1 1 420px; font-size: 15px; font-weight: 500">
+<a href="Hizmetler.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">Hizmetler</a>
+<a href="Paketler.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">Paketler</a>
+<a href="Idos.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">IDOS</a>
+<sc-if value="{{referansGoster}}" hint-placeholder-val="{{ true }}"><a href="Referanslar.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">Referanslar</a></sc-if>
+<a href="#yorumlar" style="color: var(--tx); text-decoration: none; padding: 10px 0">Yorumlar</a>
+<a href="Blog.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">Blog</a>
+<a href="Hakkimizda.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">Hakkımızda</a>
+<a href="Iletisim.dc.html" style="color: var(--tx); text-decoration: none; padding: 10px 0">İletişim</a>
+</nav>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<div role="group" aria-label="Dil seçimi" style="display: flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden">
+<button type="button" aria-pressed="true" style="min-height: 44px; min-width: 44px; padding: 0 10px; border: 0; background: var(--tint); color: var(--tintx); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">TR</button>
+<button type="button" aria-pressed="false" style="min-height: 44px; min-width: 44px; padding: 0 10px; border: 0; background: transparent; color: var(--tx2); font: inherit; font-size: 14px; cursor: pointer">EN</button>
+</div>
+<button type="button" onClick="{{temaDegistir}}" aria-label="{{temaEtiketi}}" style="min-height: 44px; min-width: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); font: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+</button>
+<a href="https://idos.idexya.com" style="min-height: 44px; display: flex; align-items: center; padding: 0 16px; border-radius: 10px; color: var(--head); text-decoration: none; font-size: 15px; font-weight: 600">Giriş</a>
+<a href="#analiz" style="min-height: 44px; display: flex; align-items: center; padding: 0 18px; border-radius: 10px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 600">Ücretsiz analiz iste</a>
+</div>
+</div>
+</header>
+
+<section id="ust" style="position: relative">
+<svg aria-hidden="true" viewBox="0 0 1440 760" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0"><path d="M780 0 C 980 120 1100 60 1440 140 L1440 0 Z" fill="var(--blob2)"></path><path d="M900 760 C 860 520 1040 300 1440 260 L1440 760 Z" fill="var(--blob)"></path></svg>
+<div style="position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 84px 24px 72px; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; gap: 56px">
+<div style="flex: 1 1 500px; min-width: 0; display: flex; flex-direction: column; gap: 26px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">360° DİJİTAL PERFORMANS AJANSI</span></div>
+<h1 style="margin: 0; font-size: 60px; line-height: 1.06; letter-spacing: -0.03em; font-weight: 700; color: var(--head)">Reklam, e-ticaret ve SEO tek ekipte.<br><span style="color: var(--acc)">Ölçülebilir büyüme.</span></h1>
+<p style="margin: 0; font-size: 19px; color: var(--tx2); max-width: 560px">Google Ads, Meta reklamları, pazaryeri ve SEO çalışmalarınızı tek ekip yönetir. Her kararı kendi panelimiz IDOS'taki gerçek veriyle gösteririz.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="#analiz" style="min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 26px; border-radius: 12px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 600; box-shadow: 0 10px 24px rgba(184,68,6,.25)">Ücretsiz analiz iste
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<a href="https://wa.me/905078700629" style="min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 22px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--head); text-decoration: none; font-size: 17px; font-weight: 600">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.5 8.5 0 1 1 21 11.5z"></path></svg>
+WhatsApp'tan yaz</a>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 0; padding-top: 10px">
+<div style="display: flex; flex-direction: column; padding-right: 28px; border-right: 1px solid var(--line)"><span style="font-size: 32px; font-weight: 700; color: var(--head)">10+ yıl</span><span style="font-size: 14px; color: var(--tx2)">e-ticaret ve dijital pazarlama</span></div>
+<div style="display: flex; flex-direction: column; padding-left: 28px"><span style="font-size: 32px; font-weight: 700; color: var(--head)">5 alan</span><span style="font-size: 14px; color: var(--tx2)">tek ekipte yönetilir</span></div>
+</div>
+</div>
+
+<figure style="flex: 1 1 520px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 12px">
+<div role="img" aria-label="IDOS panelinin temsili görünümü: reklam hesapları, grafik ve onay bekleyen bir yapay zekâ önerisi" style="position: relative; min-height: 500px">
+<div style="position: absolute; left: 0; top: 24px; width: 88%; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 30px 70px var(--shadow); overflow: hidden">
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--card2)"><span style="width: 10px; height: 10px; border-radius: 50%; background: #E9A28A"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #F3C56D"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #9FD4B5"></span><span style="margin-left: 10px; font-size: 13px; color: var(--tx2)">IDOS · Genel bakış</span></div>
+<div style="padding: 18px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 12px; font-weight: 600"><span style="padding: 5px 10px; border-radius: 8px; background: var(--tint); color: var(--tintx)">Tüm hesaplar</span><span style="padding: 5px 10px; border-radius: 8px; color: var(--tx2)">Google Ads</span><span style="padding: 5px 10px; border-radius: 8px; color: var(--tx2)">Meta Ads</span><span style="padding: 5px 10px; border-radius: 8px; color: var(--tx2)">GA4</span></div>
+<div style="display: flex; gap: 10px">
+<div style="flex: 1; padding: 12px; border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: var(--tx2)">Harcama</span><svg viewBox="0 0 100 28" style="width: 100%; height: 28px"><polyline points="0,22 15,18 30,20 45,12 60,14 75,8 100,6" fill="none" stroke="#F07A23" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div>
+<div style="flex: 1; padding: 12px; border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: var(--tx2)">Dönüşüm</span><svg viewBox="0 0 100 28" style="width: 100%; height: 28px"><polyline points="0,24 15,20 30,16 45,18 60,10 75,9 100,4" fill="none" stroke="#2F7D5B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div>
+<div style="flex: 1; padding: 12px; border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; gap: 6px"><span style="font-size: 12px; color: var(--tx2)">Maliyet / dönüşüm</span><svg viewBox="0 0 100 28" style="width: 100%; height: 28px"><polyline points="0,6 15,9 30,8 45,14 60,13 75,18 100,21" fill="none" stroke="#3B6FB6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></div>
+</div>
+<svg viewBox="0 0 400 130" style="width: 100%; height: 150px"><line x1="0" y1="32" x2="400" y2="32" stroke="var(--line)" stroke-width="1"></line><line x1="0" y1="72" x2="400" y2="72" stroke="var(--line)" stroke-width="1"></line><line x1="0" y1="112" x2="400" y2="112" stroke="var(--line)" stroke-width="1"></line><path d="M0 104 C 40 98 60 86 100 88 S 170 64 210 66 S 290 40 330 34 S 380 24 400 18 L400 130 L0 130 Z" fill="#F07A23" opacity="0.12"></path><path d="M0 104 C 40 98 60 86 100 88 S 170 64 210 66 S 290 40 330 34 S 380 24 400 18" fill="none" stroke="#F07A23" stroke-width="3" stroke-linecap="round"></path><path d="M0 116 C 50 112 80 106 120 104 S 200 96 240 90 S 320 80 400 70" fill="none" stroke="#3B6FB6" stroke-width="2" stroke-dasharray="5 5" stroke-linecap="round"></path></svg>
+</div>
+</div>
+<div style="position: absolute; right: 0; top: 0; width: 52%; max-width: 290px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: 0 20px 44px var(--shadow); display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; gap: 10px"><span style="width: 32px; height: 32px; border-radius: 10px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.4 5.6L20 9.3l-4.3 3.9 1.2 5.8L12 16l-4.9 3 1.2-5.8L4 9.3l5.6-.7z"></path></svg></span><span style="font-size: 14px; font-weight: 600; color: var(--head)">Yapay zekâ önerisi</span></div>
+<span style="font-size: 13px; color: var(--tx2)">Yeni negatif anahtar kelime önerileri hazır.</span>
+<div style="display: flex; gap: 8px"><span style="padding: 6px 12px; border-radius: 8px; background: var(--fill); color: #FFFFFF; font-size: 12px; font-weight: 600">Onayla</span><span style="padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line); font-size: 12px; font-weight: 600; color: var(--tx)">İncele</span></div>
+</div>
+<div style="position: absolute; right: 4%; bottom: 0; width: 56%; max-width: 310px; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: 0 20px 44px var(--shadow); display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13px; font-weight: 600; color: var(--head)">Bağlı hesaplar</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; font-weight: 600">
+<span style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: var(--okb); color: var(--ok)"><span style="width: 7px; height: 7px; border-radius: 50%; background: #34A853"></span>Google Ads</span>
+<span style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: var(--okb); color: var(--ok)"><span style="width: 7px; height: 7px; border-radius: 50%; background: #1877F2"></span>Meta</span>
+<span style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: var(--okb); color: var(--ok)"><span style="width: 7px; height: 7px; border-radius: 50%; background: #F9AB00"></span>GA4</span>
+<span style="display: flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: var(--okb); color: var(--ok)"><span style="width: 7px; height: 7px; border-radius: 50%; background: #4285F4"></span>Search Console</span>
+</div>
+</div>
+</div>
+<figcaption style="font-size: 13px; color: var(--tx2)">IDOS panelinden temsili görünüm, gerçek veri içermez.</figcaption>
+</figure>
+</div>
+<div style="position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 0 24px 56px; box-sizing: border-box">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding: 18px 24px; border: 1px solid var(--line); border-radius: 14px; background: var(--card); font-size: 15px; font-weight: 600; color: var(--tx2)">
+<span style="font-size: 13px; font-weight: 600; letter-spacing: 0.05em; color: var(--acc)">ÇALIŞTIĞIMIZ PLATFORMLAR</span>
+<span>Google Ads</span><span>Meta</span><span>Google Analytics 4</span><span>Search Console</span><span>Tag Manager</span><span>ikas</span><span>Ticimax</span>
+</div>
+</div>
+</section>
+
+<section id="hizmetler" style="background: var(--bg2)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 680px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">HİZMETLER</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Büyümenin her parçası, tek ekipte</h2>
+</div>
+<p style="margin: 0; font-size: 17px; color: var(--tx2); max-width: 400px">Beş alanda birbirine bağlı hizmetler. İhtiyacınız olanı seçin, gerisini biz birbirine bağlayalım. <a href="Hizmetler.dc.html" style="font-weight: 600">Tüm hizmetler →</a></p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px">
+<article style="flex: 2 1 560px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-wrap: wrap; gap: 28px; box-shadow: 0 1px 0 var(--line)">
+<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 16px">
+<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"></path><circle cx="9" cy="20" r="1.3"></circle><circle cx="17" cy="20" r="1.3"></circle></svg></span>
+<h3 style="margin: 0; font-size: 26px; color: var(--head)">E-ticaret</h3>
+<p style="margin: 0; color: var(--tx2)">Mağaza kurulumundan pazaryerine, kargodan entegrasyona kadar e-ticaretin tamamı.</p>
+<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
+</div>
+<ul style="flex: 1 1 220px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 15px">
+<li style="padding: 11px 0; border-bottom: 1px solid var(--line)">360° e-ticaret yönetimi</li><li style="padding: 11px 0; border-bottom: 1px solid var(--line)">Pazaryeri yönetimi</li><li style="padding: 11px 0; border-bottom: 1px solid var(--line)">Entegrasyon yönetimi</li><li style="padding: 11px 0; border-bottom: 1px solid var(--line)">Ürün ve kategori yönetimi</li><li style="padding: 11px 0">Kargo ve lojistik yönetimi</li>
+</ul>
+</article>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="1"></circle></svg></span>
+<h3 style="margin: 0; font-size: 22px; color: var(--head)">Dijital reklam</h3>
+<p style="margin: 0; color: var(--tx2); font-size: 15px">Google Ads, Meta reklamları, e-posta ve SMS, influencer pazarlama.</p>
+<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
+</article>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>
+<h3 style="margin: 0; font-size: 22px; color: var(--head)">SEO</h3>
+<p style="margin: 0; color: var(--tx2); font-size: 15px">Teknik SEO, site içi SEO, anahtar kelime analizi, yerel SEO ve backlink.</p>
+<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
+</article>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"></path></svg></span>
+<h3 style="margin: 0; font-size: 22px; color: var(--head)">Web ve yazılım</h3>
+<p style="margin: 0; color: var(--tx2); font-size: 15px">Web tasarım ile ERP, CRM ve ön muhasebe yazılım danışmanlığı.</p>
+<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
+</article>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19l7-7 2 2-7 7z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18z"></path><circle cx="11" cy="11" r="2"></circle></svg></span>
+<h3 style="margin: 0; font-size: 22px; color: var(--head)">Tasarım ve içerik</h3>
+<p style="margin: 0; color: var(--tx2); font-size: 15px">Logo, kurumsal kimlik, grafik tasarım, Reels ve ürün çekimleri.</p>
+<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
+</article>
+</div>
+</div>
+</section>
+
+<section style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 48px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 680px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">NASIL ÇALIŞIYORUZ</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Dört adım, sıfır sürpriz</h2>
+</div>
+<ol style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 28px 24px">
+<li style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; flex: none; border-radius: 50%; background: var(--fill); color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">01</span><span style="flex: 1; height: 1px; background: var(--brand); opacity: 0.6"></span></div><span style="font-size: 20px; font-weight: 600; color: var(--head)">Ücretsiz analiz</span><span style="color: var(--tx2); font-size: 15px">Reklam hesaplarınızı, sitenizi ve ölçüm kurulumunuzu inceleriz.</span></li>
+<li style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; flex: none; border-radius: 50%; border: 2px solid var(--brand); color: var(--acc); display: flex; align-items: center; justify-content: center; font-weight: 700; box-sizing: border-box">02</span><span style="flex: 1; height: 1px; background: var(--brand); opacity: 0.6"></span></div><span style="font-size: 20px; font-weight: 600; color: var(--head)">Plan</span><span style="color: var(--tx2); font-size: 15px">Hedefi, bütçeyi ve neyin nasıl ölçüleceğini birlikte belirleriz.</span></li>
+<li style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; flex: none; border-radius: 50%; border: 2px solid var(--brand); color: var(--acc); display: flex; align-items: center; justify-content: center; font-weight: 700; box-sizing: border-box">03</span><span style="flex: 1; height: 1px; background: var(--brand); opacity: 0.6"></span></div><span style="font-size: 20px; font-weight: 600; color: var(--head)">Onaylı uygulama</span><span style="color: var(--tx2); font-size: 15px">Canlı hesaplarınızda hiçbir değişiklik onayınız olmadan yapılmaz.</span></li>
+<li style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; gap: 12px"><span style="width: 48px; height: 48px; flex: none; border-radius: 50%; border: 2px solid var(--brand); color: var(--acc); display: flex; align-items: center; justify-content: center; font-weight: 700; box-sizing: border-box">04</span></div><span style="font-size: 20px; font-weight: 600; color: var(--head)">Şeffaf rapor</span><span style="color: var(--tx2); font-size: 15px">Sonuçları markalı raporlarda ve panelde düzenli görürsünüz.</span></li>
+</ol>
+</section>
+
+<section id="idos" style="background: #002559; color: #F1F3F5; position: relative; overflow: hidden">
+<svg aria-hidden="true" viewBox="0 0 1440 640" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%"><path d="M0 520 C 360 440 620 640 1000 560 S 1300 420 1440 460 L1440 640 L0 640 Z" fill="#0A3270"></path><path d="M1100 0 C 1180 120 1320 160 1440 150 L1440 0 Z" fill="#F07A23" opacity="0.10"></path></svg>
+<div style="position: relative; max-width: 1240px; margin: 0 auto; padding: 100px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
+<div style="flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: #F07A23"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: #FFB58A">IDOS · IDEXYA AGENCY OS</span></div>
+<h2 style="margin: 0; font-size: 46px; line-height: 1.1; letter-spacing: -0.025em; color: #FFFFFF">Tüm hesaplarınız tek panelde</h2>
+<p style="margin: 0; font-size: 18px; color: #C6D2E3">Kendi geliştirdiğimiz panel, reklam ve analiz verilerinizi tek ekranda toplar. Yapay zekâ öneri sunar; karar her zaman sizde kalır.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px">
+<a href="#analiz" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700">IDOS'u tanıyın</a>
+<a href="#idos" style="min-height: 52px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 600">Panele giriş yap</a>
+</div>
+</div>
+<div style="flex: 1 1 540px; min-width: 0; display: flex; flex-wrap: wrap; gap: 16px">
+<div style="flex: 1 1 250px; min-width: 0; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px"><span style="width: 44px; height: 44px; border-radius: 12px; background: rgba(240,122,35,.18); color: #FFB58A; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect></svg></span><span style="font-weight: 600; font-size: 18px; color: #FFFFFF">Tek ekran</span><span style="color: #C6D2E3; font-size: 15px">Google Ads, Meta Ads, GA4, Search Console ve Tag Manager bir arada.</span></div>
+<div style="flex: 1 1 250px; min-width: 0; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px"><span style="width: 44px; height: 44px; border-radius: 12px; background: rgba(240,122,35,.18); color: #FFB58A; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.4 5.6L20 9.3l-4.3 3.9 1.2 5.8L12 16l-4.9 3 1.2-5.8L4 9.3l5.6-.7z"></path></svg></span><span style="font-weight: 600; font-size: 18px; color: #FFFFFF">Yapay zekâ önerileri</span><span style="color: #C6D2E3; font-size: 15px">Hesaplar düzenli taranır, öneriler öncelik sırasıyla çıkar.</span></div>
+<div style="flex: 1 1 250px; min-width: 0; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px"><span style="width: 44px; height: 44px; border-radius: 12px; background: rgba(240,122,35,.18); color: #FFB58A; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg></span><span style="font-weight: 600; font-size: 18px; color: #FFFFFF">Onaylı değişiklik</span><span style="color: #C6D2E3; font-size: 15px">Bütçe, kampanya ve anahtar kelime değişiklikleri yalnız onayla uygulanır.</span></div>
+<div style="flex: 1 1 250px; min-width: 0; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px"><span style="width: 44px; height: 44px; border-radius: 12px; background: rgba(240,122,35,.18); color: #FFB58A; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg></span><span style="font-weight: 600; font-size: 18px; color: #FFFFFF">Markalı raporlar</span><span style="color: #C6D2E3; font-size: 15px">Dönemsel PDF raporlar e-postanıza gelir. <span style="color: #FFB58A; font-weight: 600">Yakında:</span> müşteri portalı.</span></div>
+</div>
+</div>
+</section>
+
+<section id="paketler" style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 680px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">PAKETLER</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">İhtiyacınıza göre paketler</h2>
+</div>
+<p style="margin: 0; font-size: 17px; color: var(--tx2); max-width: 420px">Her işletme farklı. Kapsamı ve fiyatı ücretsiz analizden sonra size özel hazırlıyoruz.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 14px"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.05em; color: var(--tx2)">REKLAM</span><h3 style="margin: 0; font-size: 23px; color: var(--head)">Google Ads yönetimi</h3><ul style="margin: 0; padding-left: 18px; color: var(--tx2); font-size: 15px; display: flex; flex-direction: column; gap: 6px"><li>Arama, alışveriş, görüntülü ve yeniden pazarlama kampanyaları</li><li>Anahtar kelime ve negatif kelime yönetimi</li><li>Dönüşüm takibi (GA4 ve Tag Manager) kontrolü</li><li>Aylık rapor ve strateji görüşmesi</li></ul><a href="#analiz" style="margin-top: auto; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Teklif al</a></article>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 2px solid var(--brand); border-radius: 20px; padding: 29px; display: flex; flex-direction: column; gap: 14px; box-shadow: 0 24px 50px var(--shadow)"><span style="align-self: flex-start; padding: 4px 12px; border-radius: 999px; background: var(--tint); color: var(--tintx); font-size: 13px; font-weight: 600">En kapsamlı · Google + Meta</span><h3 style="margin: 0; font-size: 23px; color: var(--head)">Birleşik reklam yönetimi</h3><ul style="margin: 0; padding-left: 18px; color: var(--tx2); font-size: 15px; display: flex; flex-direction: column; gap: 6px"><li>Google ve Meta için tek bütçe planı</li><li>Tüm kanallar tek panelde (IDOS)</li><li>Kanallar arası sonuç karşılaştırması</li><li>Aylık rapor ve strateji görüşmesi</li></ul><a href="#analiz" style="margin-top: auto; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-weight: 600">Teklif al</a></article>
+<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 14px"><span style="font-size: 13px; font-weight: 600; letter-spacing: 0.05em; color: var(--tx2)">REKLAM</span><h3 style="margin: 0; font-size: 23px; color: var(--head)">Meta Ads yönetimi</h3><ul style="margin: 0; padding-left: 18px; color: var(--tx2); font-size: 15px; display: flex; flex-direction: column; gap: 6px"><li>Facebook ve Instagram kampanya kurgusu</li><li>Hedef kitle ve yeniden pazarlama</li><li>Piksel ve dönüşüm API kontrolü</li><li>Kreatif testleri ve aylık rapor</li></ul><a href="#analiz" style="margin-top: auto; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Teklif al</a></article>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<a href="#analiz" style="flex: 1 1 280px; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 24px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">SEO paketleri<span style="color: var(--acc)">→</span></a>
+<a href="#analiz" style="flex: 1 1 280px; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 24px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Sosyal medya içerik paketleri<span style="color: var(--acc)">→</span></a>
+<a href="#analiz" style="flex: 1 1 280px; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 24px; border-radius: 14px; background: var(--bg2); border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">ikas e-ticaret paketleri<span style="color: var(--acc)">→</span></a>
+</div>
+</section>
+
+<sc-if value="{{referansGoster}}" hint-placeholder-val="{{ true }}">
+<section id="referanslar" style="background: var(--bg2)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 640px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">REFERANSLAR</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Birlikte büyüdüğümüz markalar</h2>
+</div>
+<a href="Referanslar.dc.html" style="font-weight: 600; padding: 10px 0">Tüm projeleri gör →</a>
+</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">
+<sc-for list="{{markaListesi}}" as="marka" hint-placeholder-count="8">
+<li style="flex: 1 1 260px; min-height: 96px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 18px 22px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-sizing: border-box"><span style="font-weight: 700; color: var(--head)">{{marka.ad}}</span></li>
+</sc-for>
+</ul>
+</div>
+</section>
+</sc-if>
+
+<section id="yorumlar" style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 640px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">MÜŞTERİ YORUMLARI</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Müşterilerimiz ne diyor</h2>
+</div>
+<a href="#yorumlar" style="min-height: 48px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Yorum bırakın</a>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 20px">
+<figure style="flex: 1 1 320px; min-width: 0; margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 20px"><svg width="34" height="26" viewBox="0 0 34 26" aria-hidden="true"><path d="M0 26V15C0 6 5 1 13 0l1 4c-4 1-7 4-7 9h6v13zm20 0V15c0-9 5-14 13-15l1 4c-4 1-7 4-7 9h6v13z" fill="#F07A23" opacity="0.8"></path></svg><blockquote style="margin: 0; font-size: 17px; color: var(--tx)">[Yorum metni mevcut siteden alınacak]</blockquote><figcaption style="display: flex; align-items: center; gap: 12px; margin-top: auto"><span style="width: 44px; height: 44px; border-radius: 50%; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center; font-weight: 700">KÖ</span><span style="display: flex; flex-direction: column"><span style="font-weight: 600; color: var(--head)">K. Özer</span><span style="font-size: 14px; color: var(--tx2)">Sağlık turizmi</span></span></figcaption></figure>
+<figure style="flex: 1 1 320px; min-width: 0; margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 20px"><svg width="34" height="26" viewBox="0 0 34 26" aria-hidden="true"><path d="M0 26V15C0 6 5 1 13 0l1 4c-4 1-7 4-7 9h6v13zm20 0V15c0-9 5-14 13-15l1 4c-4 1-7 4-7 9h6v13z" fill="#F07A23" opacity="0.8"></path></svg><blockquote style="margin: 0; font-size: 17px; color: var(--tx)">[Yorum metni mevcut siteden alınacak]</blockquote><figcaption style="display: flex; align-items: center; gap: 12px; margin-top: auto"><span style="width: 44px; height: 44px; border-radius: 50%; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center; font-weight: 700">AG</span><span style="display: flex; flex-direction: column"><span style="font-weight: 600; color: var(--head)">A. Genç</span><span style="font-size: 14px; color: var(--tx2)">Yoga ve sağlıklı yaşam eğitmeni</span></span></figcaption></figure>
+<figure style="flex: 1 1 320px; min-width: 0; margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 30px; display: flex; flex-direction: column; gap: 20px"><svg width="34" height="26" viewBox="0 0 34 26" aria-hidden="true"><path d="M0 26V15C0 6 5 1 13 0l1 4c-4 1-7 4-7 9h6v13zm20 0V15c0-9 5-14 13-15l1 4c-4 1-7 4-7 9h6v13z" fill="#F07A23" opacity="0.8"></path></svg><blockquote style="margin: 0; font-size: 17px; color: var(--tx)">[Yorum metni mevcut siteden alınacak]</blockquote><figcaption style="display: flex; align-items: center; gap: 12px; margin-top: auto"><span style="width: 44px; height: 44px; border-radius: 50%; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center; font-weight: 700">MK</span><span style="display: flex; flex-direction: column"><span style="font-weight: 600; color: var(--head)">M. Kılıç</span><span style="font-size: 14px; color: var(--tx2)">E-ticaret · Moda</span></span></figcaption></figure>
+</div>
+</section>
+
+<section id="instagram" style="background: var(--bg2)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 36px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 14px; max-width: 640px">
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">INSTAGRAM</span></div>
+<h2 style="margin: 0; font-size: 44px; line-height: 1.12; letter-spacing: -0.025em; color: var(--head)">Instagram'dan son paylaşımlar</h2>
+</div>
+<a href="https://www.instagram.com/idexya.ads" style="min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-radius: 12px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-weight: 600"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.5"></circle></svg>@idexya.ads takip et</a>
+</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">
+<sc-for list="{{instagramKutulari}}" as="kutu" hint-placeholder-count="6">
+<li style="flex: 1 1 180px; aspect-ratio: 1 / 1; border-radius: 16px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--tx2); font-size: 13px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.5"></circle></svg><span>{{kutu.etiket}}</span></li>
+</sc-for>
+</ul>
+<p style="margin: 0; font-size: 13px; color: var(--tx2)">Paylaşımlar Instagram hesabınızdan otomatik gelir; yeni bir gönderi paylaştığınızda sitede de görünür.</p>
+</div>
+</section>
+
+<section id="analiz" style="padding: 96px 24px">
+<div style="max-width: 1192px; margin: 0 auto; box-sizing: border-box; background: var(--card); border: 1px solid var(--line); border-radius: 28px; box-shadow: 0 30px 80px var(--shadow); overflow: hidden; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 400px; min-width: 0; background: #002559; color: #F1F3F5; padding: 48px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px; position: relative; overflow: hidden">
+<svg aria-hidden="true" viewBox="0 0 400 400" style="position: absolute; right: -80px; bottom: -80px; width: 320px; height: 320px"><circle cx="200" cy="200" r="190" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.5"></circle><circle cx="200" cy="200" r="130" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.35"></circle><circle cx="200" cy="200" r="70" fill="none" stroke="#F07A23" stroke-width="1.5" opacity="0.2"></circle></svg>
+<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: #F07A23"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: #FFB58A">ÜCRETSİZ ANALİZ</span></div>
+<h2 style="margin: 0; font-size: 38px; line-height: 1.12; letter-spacing: -0.02em; color: #FFFFFF">Nereden başlayacağınızı birlikte bulalım</h2>
+<p style="margin: 0; font-size: 17px; color: #C6D2E3">Formu doldurun; hesaplarınızı ve sitenizi inceleyip size dönüş yapalım.</p>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; position: relative">
+<a href="tel:+905078700629" style="color: #FFFFFF; text-decoration: none; font-size: 22px; font-weight: 700; padding: 6px 0">0507 870 06 29</a>
+<a href="mailto:info@idexya.com" style="color: #FFFFFF; text-decoration: none; font-size: 17px; padding: 6px 0">info@idexya.com</a>
+<span style="color: #C6D2E3; font-size: 15px; padding-top: 6px">Ankara</span>
+</div>
+</div>
+<form style="flex: 1 1 520px; min-width: 0; padding: 44px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 18px; align-content: flex-start">
+<label style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: var(--head)">Ad soyad<input type="text" name="ad" autocomplete="name" style="min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 16px; font-weight: 400"></label>
+<label style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: var(--head)">E-posta<input type="email" name="eposta" autocomplete="email" style="min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 16px; font-weight: 400"></label>
+<label style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: var(--head)">Telefon<input type="tel" name="telefon" autocomplete="tel" style="min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 16px; font-weight: 400"></label>
+<label style="flex: 1 1 220px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: var(--head)">Web siteniz<input type="url" name="site" placeholder="https://" style="min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 16px; font-weight: 400"></label>
+<label style="flex: 1 1 100%; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: var(--head)">İlgilendiğiniz alan<select name="alan" style="min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 16px; font-weight: 400"><option>Dijital reklam</option><option>E-ticaret</option><option>SEO</option><option>Web ve yazılım</option><option>Tasarım ve içerik</option><option>Emin değilim</option></select></label>
+<label style="flex: 1 1 100%; display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; color: var(--head)">Mesajınız<textarea name="mesaj" rows="3" style="padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 16px; font-weight: 400; resize: vertical"></textarea></label>
+<label style="flex: 1 1 100%; display: flex; gap: 10px; align-items: flex-start; font-size: 14px; color: var(--tx2)"><input type="checkbox" name="kvkk" style="width: 20px; height: 20px; margin: 1px 0 0; flex: none"><span><a href="#analiz">KVKK aydınlatma metnini</a> okudum, iletişim için bilgilerimin işlenmesini kabul ediyorum.</span></label>
+<button type="submit" style="flex: 1 1 100%; min-height: 54px; border: 0; border-radius: 12px; background: var(--fill); color: #FFFFFF; font: inherit; font-size: 17px; font-weight: 600; cursor: pointer">Ücretsiz analiz iste</button>
+</form>
+</div>
+</section>
+
+<footer style="background: var(--bg2); border-top: 1px solid var(--line)">
+<div style="max-width: 1240px; margin: 0 auto; padding: 60px 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; flex-wrap: wrap; gap: 40px">
+<div style="flex: 2 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<span style="font-weight: 700; font-size: 20px; color: var(--head)">Idexya | Good Things</span>
+<span style="color: var(--tx2); font-size: 15px; max-width: 360px">360° dijital performans ajansı. Reklam, e-ticaret, SEO ve yazılım tek ekipte.</span>
+<div style="display: flex; gap: 8px">
+<a href="https://www.instagram.com/idexya.ads" aria-label="Instagram" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 10px; color: var(--head); background: var(--card)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.5"></circle></svg></a>
+<a href="https://www.facebook.com/idexya.ads" aria-label="Facebook" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 10px; color: var(--head); background: var(--card)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h2.5l.5-4h-3V7a1 1 0 0 1 1-1h2z"></path></svg></a>
+<a href="https://twitter.com/idexya_ads" aria-label="X" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 10px; color: var(--head); background: var(--card)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l16 16M20 4L4 20"></path></svg></a>
+</div>
+</div>
+<nav aria-label="Kurumsal" style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; font-size: 15px"><span style="font-weight: 600; padding-bottom: 8px; color: var(--head)">Kurumsal</span><a href="Hakkimizda.dc.html" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Hakkımızda</a><a href="#ust" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Ekibimiz</a><a href="Blog.dc.html" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Blog</a><a href="#ust" style="color: var(--tx2); text-decoration: none; padding: 7px 0">SSS</a></nav>
+<nav aria-label="Hizmet alanları" style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; font-size: 15px"><span style="font-weight: 600; padding-bottom: 8px; color: var(--head)">Hizmetler</span><a href="Hizmetler.dc.html#e-ticaret" style="color: var(--tx2); text-decoration: none; padding: 7px 0">E-ticaret</a><a href="Hizmetler.dc.html#dijital-reklam" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Dijital reklam</a><a href="Hizmetler.dc.html#seo" style="color: var(--tx2); text-decoration: none; padding: 7px 0">SEO</a><a href="Hizmetler.dc.html#web-yazilim" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Web ve yazılım</a></nav>
+<nav aria-label="Yasal" style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; font-size: 15px"><span style="font-weight: 600; padding-bottom: 8px; color: var(--head)">Yasal</span><a href="Yasal.dc.html" style="color: var(--tx2); text-decoration: none; padding: 7px 0">KVKK aydınlatma metni</a><a href="Yasal.dc.html" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Çerez politikası</a><a href="Yasal.dc.html" style="color: var(--tx2); text-decoration: none; padding: 7px 0">Gizlilik politikası</a></nav>
+</div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 14px; color: var(--tx2)"><span>© 2026 Idexya | Good Things</span><span>Türkçe · English</span></div>
+</div>
+</footer>
+
+<sc-if value="{{cerezGoster}}" hint-placeholder-val="{{ true }}">
+<div role="dialog" aria-label="Çerez tercihleri" style="position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 50; max-width: 720px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 60px var(--shadow); padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 17px; color: var(--head)">Çerezleri nasıl kullanalım?</strong><span style="font-size: 14px; color: var(--tx2)">Zorunlu çerezler site için gereklidir. Analitik ve pazarlama çerezleri yalnız izin verirseniz çalışır. <a href="Yasal.dc.html">Çerez politikası</a></span></div>
+<sc-if value="{{cerezDetay}}" hint-placeholder-val="{{ false }}"><div style="display: flex; flex-direction: column; gap: 8px"><sc-for list="{{cerezTurleri}}" as="c" hint-placeholder-count="3"><button type="button" role="switch" aria-checked="{{c.acik}}" onClick="{{c.degistir}}" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--tx); font: inherit; font-size: 14px; text-align: left; cursor: pointer"><span style="display: flex; flex-direction: column"><b style="color: var(--head)">{{c.ad}}</b><span style="font-size: 13px; color: var(--tx2)">{{c.aciklama}}</span></span><span style="{{c.anahtarStil}}"><span style="width: 18px; height: 18px; border-radius: 50%; background: #FFFFFF"></span></span></button></sc-for></div></sc-if>
+<div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" onClick="{{cerezReddet}}" style="flex: 1 1 150px; min-height: 46px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">Reddet</button><button type="button" onClick="{{cerezDetayAc}}" style="flex: 1 1 150px; min-height: 46px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">{{cerezDetayMetin}}</button><button type="button" onClick="{{cerezKabul}}" style="flex: 1 1 150px; min-height: 46px; border: 0; border-radius: 12px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">{{cerezKabulMetin}}</button></div>
+</div>
+</sc-if>
+
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"koyu":{"editor":"boolean","default":false},"referansGoster":{"editor":"boolean","default":true,"section":"Referanslar"},"markalar":{"editor":"text","default":"Marco Polo Chocolate, Halıbank Kayseri, Halıbank Sincan, BT Halı Dünyası, Polatlı Halı Dünyası, Integral Enerji, Mavera Havuz, RS Aydınlatma","section":"Referanslar"},"$preview":{"width":1440,"height":6200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null, cerez: null, detay: false, analitik: false, pazarlama: false };
+  }
+  renderVals() {
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const self = this;
+    const turler = [['zorunlu', 'Zorunlu', 'Site ve güvenlik için gerekli; kapatılamaz.'], ['analitik', 'Analitik', 'Ziyaretleri ölçmemize yardım eder (Google Analytics).'], ['pazarlama', 'Pazarlama', 'Reklamları ölçer ve size uygun gösterir (Google, Meta).']];
+    const cerezTurleri = turler.map(function (t) { const a = t[0] === 'zorunlu' ? true : !!self.state[t[0]];
+      return { ad: t[1], aciklama: t[2], acik: a, degistir: function () { if (t[0] === 'zorunlu') return; const y = {}; y[t[0]] = !a; self.setState(y); },
+        anahtarStil: 'width: 44px; height: 26px; flex: none; border-radius: 999px; padding: 4px; box-sizing: border-box; display: flex; justify-content: ' + (a ? 'flex-end' : 'flex-start') + '; background: ' + (a ? 'var(--fill)' : 'var(--line)') + (t[0] === 'zorunlu' ? '; opacity: .6' : '') }; });
+    return {
+      cerezGoster: this.state.cerez === null, cerezDetay: this.state.detay, cerezTurleri: cerezTurleri,
+      cerezDetayAc: () => this.setState({ detay: !this.state.detay }), cerezDetayMetin: this.state.detay ? 'Gizle' : 'Tercihler',
+      cerezReddet: () => this.setState({ cerez: 'red', analitik: false, pazarlama: false }),
+      cerezKabul: () => this.setState(this.state.detay ? { cerez: 'secim' } : { cerez: 'kabul', analitik: true, pazarlama: true }), cerezKabulMetin: this.state.detay ? 'Seçimi kaydet' : 'Tümünü kabul et',
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      referansGoster: this.props.referansGoster ?? true,
+      instagramKutulari: [1, 2, 3, 4, 5, 6].map(function (n) { return { etiket: 'Paylaşım ' + n }; }),
+      markaListesi: String(this.props.markalar ?? 'Marco Polo Chocolate, Halıbank Kayseri, Halıbank Sincan, BT Halı Dünyası, Polatlı Halı Dünyası, Integral Enerji, Mavera Havuz, RS Aydınlatma').split(',').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; }).map(function (s) { return { ad: s }; })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Idexya Platform · Paketler</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.acik{--bg:#F4F1EC;--card:#FFFFFF;--card2:#F8F5F1;--line:#E8DFD4;--tx:#27231F;--tx2:#5F574F;--head:#0B1B33;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--shadow:rgba(11,27,51,.07);--grid:#EFE8DF}
+.koyu{--bg:#12161D;--card:#1B212B;--card2:#222935;--line:#323C4B;--tx:#EEF1F4;--tx2:#AEB9C7;--head:#F4F6F8;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--shadow:rgba(0,0,0,.4);--grid:#2A323E}
+.yan a{color:#C3CEDD}.yan a:hover{color:#FFFFFF}
+a{color:var(--acc)}a:hover{color:var(--tintx)}
+</style>
+</helmet>
+<div class="{{temaSinifi}}" style="background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<aside class="yan" style="flex: 1 1 236px; max-width: 100%; background: #0B1B33; color: #C3CEDD; padding: 16px 12px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 6px 8px 10px; border-bottom: 1px solid rgba(255,255,255,.08)">
+<svg viewBox="0 0 1000 1000" width="28" height="28" role="img" aria-label="Idexya logosu"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg>
+<span style="display: flex; flex-direction: column; line-height: 1.15; flex: 1"><span style="font-weight: 700; color: #FFFFFF; font-size: 15px">Idexya Platform</span><span style="font-size: 12px; color: #8EA0B8">idexya.com · TR / EN</span></span>
+</div>
+<nav aria-label="Platform menüsü" style="display: flex; flex-direction: column; gap: 14px; font-size: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a href="YonetimGenel.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>Genel bakış</a>
+<a href="YonetimTalepler.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"></path></svg><span style="flex: 1">Talepler</span><span style="padding: 0 7px; border-radius: 999px; background: #F07A23; color: #1A1206; font-size: 12px; font-weight: 700">3</span></a>
+<a href="#" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M7 15l4-4 3 3 5-6"></path></svg>Analitik</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">MÜŞTERİ İLİŞKİLERİ</span>
+<a href="YonetimCrm.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 11l2 2 4-4"></path></svg>CRM</a>
+<a href="YonetimEposta.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>E-posta pazarlama</a>
+<a href="YonetimTeklif.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 15l2 2 4-4"></path></svg><span style="flex: 1">Teklifler</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">4</span></a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9z"></path></svg>Otomasyonlar</a>
+<a href="YonetimGorevler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"></path></svg><span style="flex: 1">Görevler ve takvim</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">5</span></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">İÇERİK</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg>Sayfalar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l10 5-10 5L2 7z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>Hizmetler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>Referanslar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>Blog</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Medya</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">SATIŞ</span>
+<a href="YonetimPaketler.dc.html" aria-current="page" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; background: rgba(240,122,35,.18); color: #FFFFFF; text-decoration: none; font-weight: 600"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>Paketler ve teklifler</a>
+<a href="YonetimSablonlar.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 7h8M8 11h3M13 11h3M8 15h8"></path></svg>Belgeler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2l-2 5v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-2-5z"></path><path d="M4 7h16M16 11a4 4 0 0 1-8 0"></path></svg>Mağaza</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 1 2V2l-3 2-3-2-3 2-3-2-3 2z"></path><path d="M8 9h8M8 13h6"></path></svg>Siparişler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"></path><circle cx="7" cy="7" r="1.5"></circle></svg>Kuponlar</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">FİNANS</span>
+<a href="YonetimMuhasebe.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18l-3-2-2 2-3-2-3 2-2-2-3 2z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg>Muhasebe</a>
+<a href="YonetimMuhasebe.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg><span style="flex: 1">Faturalar</span><span style="padding: 0 7px; border-radius: 999px; background: #A32F3D; color: #FFFFFF; font-size: 12px; font-weight: 700">1</span></a>
+<a href="YonetimEsitleme.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"></path><path d="M21 3v5h-5M3 21v-5h5"></path></svg>Veri eşitleme</a>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">EĞİTİM</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path></svg>Akademi</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6"></circle><path d="M8.5 14L7 22l5-3 5 3-1.5-8"></path></svg>Sertifikalar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Etkinlikler</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">TOPLULUK VE KANALLAR</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg>Üyeler</a>
+<a href="YonetimTalepler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span style="flex: 1">Yorumlar</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">3</span></a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>Instagram</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08)">
+<a href="YonetimEntegrasyonlar.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg>Entegrasyonlar</a>
+<a href="YonetimModuller.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12h-2a2 2 0 1 0-4 0H12V8a2 2 0 1 0 0-4V2H4v8h2a2 2 0 1 1 4 0h2v4a2 2 0 1 0 0 4v4h8z"></path></svg><span style="flex: 1">Modüller</span><span style="font-size: 12px; color: #8EA0B8">{{menuSayac}}</span></a>
+<a href="YonetimGuvenlik.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>Ayarlar</a>
+</div>
+</nav>
+</aside>
+
+<main style="flex: 999 1 680px; min-width: 0; display: flex; flex-direction: column">
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 12px 24px; border-bottom: 1px solid var(--line); background: var(--card)">
+<label style="flex: 1 1 320px; min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card2); color: var(--tx2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input type="search" placeholder="Sayfa, talep, sipariş, öğrenci ara…" aria-label="Platformda ara" style="flex: 1; min-width: 0; border: 0; background: transparent; color: var(--tx); font: inherit; outline: none"><span style="padding: 1px 6px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px">⌘K</span></label>
+<div style="display: flex; align-items: center; gap: 8px; margin-left: auto">
+<button type="button" style="min-height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer"><span aria-hidden="true" style="font-size: 18px; line-height: 1">+</span>Yeni</button>
+<button type="button" aria-label="Bildirimler, 5 yeni" style="position: relative; min-height: 40px; min-width: 40px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: #F07A23"></span></button>
+<button type="button" onClick="{{temaDegistir}}" aria-label="{{temaEtiketi}}" style="min-height: 40px; min-width: 40px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
+<a href="Main.dc.html" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Siteyi aç ↗</a>
+<span aria-label="Kullanıcı: Muhittin Külcü, Süper yönetici" style="width: 40px; height: 40px; border-radius: 50%; background: #0B1B33; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">MK</span>
+</div>
+</header>
+<div style="padding: 22px 28px 0; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<nav aria-label="Sayfa yolu" style="font-size: 13px; color: var(--tx2)"><a href="YonetimGenel.dc.html" style="color: var(--tx2); text-decoration: none">Idexya Platform</a> › Satış › Paketler ve teklifler</nav>
+<h1 style="margin: 0; font-size: 26px; letter-spacing: -0.01em; color: var(--head)">Paketler</h1>
+<span style="color: var(--tx2); max-width: 820px">Sitedeki paket kutuları, kademeler ve öneri sihirbazı buradan düzenlenir. Değişiklik taslak olarak kalır, “Yayına al” deyince sitede görünür.</span>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<span style="padding: 4px 10px; border-radius: 999px; background: var(--warnb); color: var(--warn); font-size: 12px; font-weight: 600">{{taslakDurum}}</span>
+<a href="Paketler.dc.html" style="min-height: 40px; display: flex; align-items: center; padding: 0 14px; border-radius: 10px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-size: 14px; font-weight: 600">Sitede önizle ↗</a>
+<button type="button" onClick="{{yayinla}}" style="min-height: 40px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer">Yayına al</button>
+</div>
+</div>
+
+
+<div style="padding: 24px 28px 40px; display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start">
+
+<section aria-label="Paket kutuları" style="flex: 1 1 280px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--line)"><h2 style="margin: 0; font-size: 16px; color: var(--head)">Paket kutuları</h2><button type="button" style="min-height: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--head); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">+ Yeni kutu</button></div>
+<ul style="margin: 0; padding: 6px; list-style: none; display: flex; flex-direction: column; gap: 2px">
+<sc-for list="{{liste}}" as="l" hint-placeholder-count="9">
+<li><button type="button" onClick="{{l.sec}}" aria-pressed="{{l.secili}}" style="{{l.stil}}"><span aria-hidden="true" style="color: var(--tx2); font-size: 14px; letter-spacing: -2px">⋮⋮</span><span style="flex: 1; display: flex; flex-direction: column; text-align: left"><span style="font-weight: 600">{{l.ad}}</span><span style="font-size: 12px; color: var(--tx2)">{{l.altYazi}}</span></span><span style="{{l.gorunurStil}}">{{l.gorunurYazi}}</span></button></li>
+</sc-for>
+</ul>
+<p style="margin: 0; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 12px; color: var(--tx2)">Sırayı değiştirmek için sürükleyin. Sitede bu sırayla görünür.</p>
+</section>
+
+<section aria-label="Kutu düzenleyici" style="flex: 3 1 620px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
+<div role="tablist" aria-label="Düzenleme bölümleri" style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{sekmeler}}" as="s" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{s.secili}}" onClick="{{s.sec}}" style="{{s.stil}}">{{s.ad}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{sekmeKademe}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 20px; display: flex; flex-wrap: wrap; gap: 16px">
+<label style="flex: 2 1 280px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)">Kutu adı<input type="text" value="{{secili.ad}}" style="min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 15px; font-weight: 400"></label>
+<label style="flex: 1 1 200px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)">Tür<select style="min-height: 42px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 15px; font-weight: 400"><option>{{secili.turAd}}</option><option>Reklam</option><option>Birleşik</option><option>Web sitesi</option><option>E-ticaret</option><option>Pazaryeri</option><option>SEO</option><option>Sosyal medya</option></select></label>
+<label style="flex: 1 1 100%; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)">Kısa açıklama<input type="text" value="{{secili.ozet}}" style="min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 15px; font-weight: 400"></label>
+<label style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)">Ücret notu<input type="text" value="{{secili.ucretNotu}}" style="min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; font-size: 15px; font-weight: 400"></label>
+<div style="flex: 1 1 280px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding-bottom: 8px"><span style="display: flex; flex-direction: column"><span style="font-size: 13px; font-weight: 600; color: var(--head)">Sitede göster</span><span style="font-size: 12px; color: var(--tx2)">{{secili.gorunurYazi}}</span></span><button type="button" role="switch" aria-checked="{{secili.gorunur}}" aria-label="Kutuyu sitede göster" onClick="{{gorunurDegistir}}" style="{{secili.anahtarStil}}"><span style="width: 20px; height: 20px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,.25)"></span></button></div>
+</div>
+
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><h2 style="margin: 0; font-size: 17px; color: var(--head)">Kademeler</h2><button type="button" style="min-height: 36px; padding: 0 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--card); color: var(--head); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">+ Kademe ekle</button></div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: stretch">
+<sc-for list="{{secili.kademeler}}" as="k" hint-placeholder-count="3">
+<div style="flex: 1 1 230px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><span style="font-size: 12px; color: var(--tx2)">⋮⋮ Kademe</span><button type="button" aria-label="Kademeyi sil" style="min-height: 30px; min-width: 30px; border: 0; background: transparent; color: var(--tx2); font: inherit; cursor: pointer">✕</button></div>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--head)">Ad<input type="text" value="{{k.ad}}" style="min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--tx); font: inherit; font-size: 14px; font-weight: 400"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--head)">Rozet<input type="text" value="{{k.rozet}}" placeholder="Örn. Önerilen" style="min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--tx); font: inherit; font-size: 14px; font-weight: 400"></label>
+<label style="display: flex; flex-direction: column; gap: 4px; font-size: 12px; font-weight: 600; color: var(--head)">Kimin için<input type="text" value="{{k.kimIcin}}" style="min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); color: var(--tx); font: inherit; font-size: 14px; font-weight: 400"></label>
+<span style="font-size: 12px; font-weight: 600; color: var(--head)">Maddeler</span>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{k.maddeler}}" as="m" hint-placeholder-count="4">
+<li style="display: flex; gap: 6px; align-items: center"><span aria-hidden="true" style="color: var(--tx2); font-size: 12px">⋮⋮</span><input type="text" value="{{m}}" aria-label="Madde" style="flex: 1; min-width: 0; min-height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit; font-size: 13px"></li>
+</sc-for>
+</ul>
+<button type="button" style="align-self: flex-start; min-height: 32px; padding: 0 4px; border: 0; background: transparent; color: var(--acc); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">+ Madde ekle</button>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{sekmeSihirbaz}}" hint-placeholder-val="{{ false }}">
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 18px; overflow: hidden">
+<div style="padding: 16px 20px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 4px"><h2 style="margin: 0; font-size: 17px; color: var(--head)">Sihirbaz kuralları</h2><span style="font-size: 13px; color: var(--tx2)">Kurallar yukarıdan aşağıya denenir; ilk uyan kural öneriyi belirler.</span></div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; color: var(--tx2)"><th scope="col" style="padding: 12px 20px; font-weight: 600">Sıra</th><th scope="col" style="padding: 12px 10px; font-weight: 600">Eğer</th><th scope="col" style="padding: 12px 10px; font-weight: 600">Öneri</th><th scope="col" style="padding: 12px 20px; font-weight: 600">Bu hafta</th></tr></thead>
+<tbody>
+<sc-for list="{{kurallar}}" as="r" hint-placeholder-count="6">
+<tr style="border-top: 1px solid var(--line)"><td style="padding: 12px 20px; color: var(--tx2)">{{r.sira}}</td><td style="padding: 12px 10px">{{r.kosul}}</td><td style="padding: 12px 10px; font-weight: 600; color: var(--head)">{{r.oneri}}</td><td style="padding: 12px 20px; color: var(--tx2)">{{r.sayi}}</td></tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<p style="margin: 0; padding: 12px 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--tx2)">"Bu hafta" sütunu örnek veridir.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{sekmeGecmis}}" hint-placeholder-val="{{ false }}">
+<div style="background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 8px 20px">
+<sc-for list="{{gecmis}}" as="g" hint-placeholder-count="4">
+<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 14px"><span><strong style="color: var(--head)">{{g.kim}}</strong> · {{g.ne}}</span><span style="color: var(--tx2); white-space: nowrap">{{g.zaman}}</span></div>
+</sc-for>
+<p style="margin: 0; padding: 12px 0; font-size: 13px; color: var(--tx2)">Her değişiklik geri alınabilir. Örnek kayıtlar.</p>
+</div>
+</sc-if>
+
+</section>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"koyu":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null, secId: 'meta-ads', sekme: 'kademe', gizli: {}, yayinda: true };
+  }
+  katalog() {
+    return [
+      { id: 'google-ads', tur: 'reklam', turEtiket: 'REKLAM · TEK KANAL', ad: 'Google Ads yönetimi', ozet: 'Google aramalarında, alışverişte ve YouTube’da satışa odaklı reklam.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
+        { ad: 'Başlangıç', kimIcin: 'Tek kampanya türüyle başlayanlar için.', maddeler: ['Hesap denetimi ve kurulum', 'Arama ağı kampanyaları', 'Anahtar ve negatif kelime yönetimi', 'GA4 ve Tag Manager dönüşüm kontrolü', 'Aylık rapor'] },
+        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Satışını ölçerek büyütmek isteyenler için.', maddeler: ['Başlangıç kapsamı', 'Alışveriş ve Performance Max', 'Yeniden pazarlama', 'Haftalık optimizasyon', 'Aylık rapor ve görüşme'] },
+        { ad: 'Kurumsal', kimIcin: 'Çoklu ürün, marka veya pazar için.', maddeler: ['Büyüme kapsamı', 'Görüntülü reklam ve YouTube', 'Rakip analizi', 'Çoklu hesap ve ülke yapısı', 'Aylık strateji toplantısı'] } ] },
+      { id: 'meta-ads', tur: 'reklam', turEtiket: 'REKLAM · TEK KANAL', ad: 'Meta Ads yönetimi', ozet: 'Facebook ve Instagram reklamlarıyla doğru kitleye ulaşın.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
+        { ad: 'Başlangıç', kimIcin: 'Mesaj, form veya trafik hedefiyle başlayanlar için.', maddeler: ['Business Manager ve piksel kurulumu', 'Hedef kitle yapısı', 'Ayda 4 reklam kreatifi', 'Aylık rapor'] },
+        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Satışa ve yeniden pazarlamaya odaklananlar için.', maddeler: ['Başlangıç kapsamı', 'Dönüşüm API (CAPI) kurulumu', 'Satış hunisi ve yeniden pazarlama', 'Ayda 8 reklam kreatifi ve A/B testi', 'Aylık rapor ve görüşme'] },
+        { ad: 'Kurumsal', kimIcin: 'Geniş ürün kataloğu olan markalar için.', maddeler: ['Büyüme kapsamı', 'Katalog ve dinamik reklamlar', 'Advantage+ kampanyaları', 'Ayda 16 reklam kreatifi', 'Aylık strateji toplantısı'] } ] },
+      { id: 'birlesik', tur: 'birlesik', turEtiket: 'BİRLEŞİK PAKETLER', ad: 'Birden fazla hizmet, tek plan', ozet: 'Kanallar birlikte çalışır: tek bütçe planı, tek rapor, tek ekip.', ucretNotu: 'Aylık · tek tek almaktan daha avantajlı', birlesik: true, kademeler: [
+        { ad: 'Reklam ikilisi', rozet: 'En çok önerilen', kimIcin: 'Google + Meta Ads', maddeler: ['İki kanalın Büyüme kapsamı', 'Tek bütçe planı', 'Kanallar arası sonuç karşılaştırması', 'Tüm kanallar tek panelde (IDOS)'] },
+        { ad: 'E-ticaret büyüme seti', kimIcin: 'E-ticaret yönetimi + Google + Meta', maddeler: ['Mağaza yönetimi Büyüme kapsamı', 'Google ve Meta reklamları', 'Ürün ve kampanya takvimi', 'Satış odaklı aylık rapor'] },
+        { ad: 'Pazaryeri satış seti', kimIcin: 'Pazaryeri yönetimi + pazaryeri reklamları', maddeler: ['2–3 pazaryerinde yönetim', 'Pazaryeri içi reklam yönetimi', 'Fiyat ve stok takibi', 'Haftalık rapor'] },
+        { ad: 'Dijital başlangıç seti', kimIcin: 'Kurumsal web sitesi + Google Ads + sosyal medya', maddeler: ['Kurumsal web sitesi kurulumu', 'Google Ads Başlangıç', 'Sosyal medya Başlangıç', 'İlk 3 ay yakın takip'] } ] },
+      { id: 'kurumsal-site', tur: 'web', turEtiket: 'WEB SİTESİ', ad: 'Kurumsal web sitesi', ozet: 'Hızlı, mobil uyumlu ve Google dostu kurumsal site. Kurulum tek seferlik, bakım isteğe bağlı aylık.', ucretNotu: 'Kurulum tek seferlik', kademeler: [
+        { ad: 'Tanıtım', kimIcin: 'Küçük işletmeler ve tek hizmet sunanlar için.', maddeler: ['5 sayfaya kadar', 'Mobil uyumlu tasarım', 'İletişim formu ve WhatsApp', 'Temel SEO ayarları', 'İlk yıl alan adı ve barındırma'] },
+        { ad: 'Kurumsal', rozet: 'Önerilen', kimIcin: 'Çok hizmetli firmalar için.', maddeler: ['15 sayfaya kadar', 'Blog ve referans bölümü', 'Kendi içerik yönetim paneli', 'GA4 ve Tag Manager kurulumu', 'Teslim sonrası 1 ay destek'] },
+        { ad: 'Çok dilli', kimIcin: 'Yurt dışına açılan firmalar için.', maddeler: ['Kurumsal kapsamı', 'İki veya daha fazla dil', 'Dile göre SEO yapısı', 'Özel modüller (bayi, kariyer vb.)', 'Aylık bakım seçeneği'] } ] },
+      { id: 'eticaret-site', tur: 'eticaret', turEtiket: 'E-TİCARET · KURULUM', ad: 'E-ticaret sitesi kurulumu (ikas)', ozet: 'ikas altyapısıyla satışa hazır mağaza. Platform lisansı ayrıca ikas’a ödenir.', ucretNotu: 'Kurulum tek seferlik', kademeler: [
+        { ad: 'Grow', kimIcin: 'E-ticarete başlangıç paketi.', maddeler: ['Tema kurulumu ve marka uyarlaması', '[X] ürün yükleme', 'Ödeme ve kargo ayarları', 'Temel SEO ayarları'] },
+        { ad: 'Scale', rozet: 'En çok tercih edilen', kimIcin: 'Büyüyen mağazalar için.', maddeler: ['Grow kapsamı', '[X] ürün yükleme', 'Banner tasarımları', 'E-posta otomasyonları', 'Pazaryeri entegrasyonu'] },
+        { ad: 'Scale Plus', kimIcin: 'E-ticaret büyüme paketi.', maddeler: ['Scale kapsamı', '[X] ürün yükleme', 'Eski siteden SEO taşıma', 'Gelişmiş ölçüm kurulumu'] } ] },
+      { id: 'eticaret-yonetim', tur: 'eticaret', turEtiket: 'E-TİCARET · YÖNETİM', ad: 'E-ticaret yönetimi', ozet: 'Mağazanızın günlük işleyişini biz yönetelim, siz işinize odaklanın.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
+        { ad: 'Başlangıç', kimIcin: 'Yeni açılan mağazalar için.', maddeler: ['Ürün ve kategori düzenleme', 'Kampanya takvimi', 'Fiyat ve stok kontrolü', 'Aylık rapor'] },
+        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Satışı artırmak isteyen mağazalar için.', maddeler: ['Başlangıç kapsamı', 'Ürün içerik ve SEO iyileştirme', 'Dönüşüm oranı analizi', 'Haftalık takip ve aylık görüşme'] },
+        { ad: 'Kurumsal', kimIcin: 'Geniş katalog ve çoklu kanal için.', maddeler: ['Büyüme kapsamı', 'Entegrasyon ve ERP bağlantıları', 'Kargo ve iade süreç tasarımı', 'Aylık strateji toplantısı'] } ] },
+      { id: 'pazaryeri', tur: 'pazaryeri', turEtiket: 'PAZARYERİ', ad: 'Pazaryeri yönetimi', ozet: 'Trendyol, Hepsiburada, Amazon, N11 ve diğer pazaryerlerinde mağaza yönetimi.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
+        { ad: 'Tek pazaryeri', kimIcin: 'Tek pazaryerinde başlayanlar için.', maddeler: ['1 pazaryeri', 'Ürün yükleme ve içerik', 'Soru ve yorumlara günlük yanıt', 'Aylık fiyat analizi', 'Aylık rapor'] },
+        { ad: 'Çoklu pazaryeri', rozet: 'Önerilen', kimIcin: 'Satışını yaymak isteyenler için.', maddeler: ['2–3 pazaryeri', 'Kampanya takvimi', 'Pazaryeri reklam yönetimi', 'Haftalık fiyat analizi', 'Haftalık rapor ve aylık görüşme'] },
+        { ad: 'Tam yönetim', kimIcin: 'Yüksek hacimli satıcılar için.', maddeler: ['5 ve üzeri pazaryeri', 'Tam reklam yönetimi', 'İade ve satıcı puanı yönetimi', 'Günlük fiyat ve stok takibi', 'Ürün bazında kârlılık raporu'] } ] },
+      { id: 'seo', tur: 'seo', turEtiket: 'SEO', ad: 'SEO paketleri', ozet: 'Google ve yapay zekâ aramalarında kalıcı görünürlük.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
+        { ad: 'Başlangıç', kimIcin: 'Sitesinin temelini düzeltmek isteyenler için.', maddeler: ['Teknik SEO denetimi', 'Anahtar kelime analizi', 'Ayda 2 içerik', 'Search Console takibi', 'Aylık rapor'] },
+        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Düzenli içerikle trafik artırmak isteyenler için.', maddeler: ['Başlangıç kapsamı', 'Ayda 4 içerik', 'Yerel SEO', 'Aylık bağlantı (backlink) planı', 'Aylık görüşme'] },
+        { ad: 'Otorite', kimIcin: 'Rekabetçi sektörlerde öne çıkmak isteyenler için.', maddeler: ['Büyüme kapsamı', 'Ayda 8 içerik', 'Dijital PR', 'Yapay zekâ aramalarında görünürlük', 'Çok dilli SEO'] } ] },
+      { id: 'sosyal-medya', tur: 'icerik', turEtiket: 'İÇERİK', ad: 'Sosyal medya yönetimi', ozet: 'Markanıza uygun, düzenli ve ölçülen içerik.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
+        { ad: 'Başlangıç', kimIcin: 'Düzenli paylaşıma başlamak isteyenler için.', maddeler: ['Ayda 8 gönderi', 'Ayda 8 hikâye', 'Ayda 2 Reels', 'İçerik takvimi', 'Aylık rapor'] },
+        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Etkileşimi ve takipçiyi büyütmek isteyenler için.', maddeler: ['Ayda 12 gönderi', 'Ayda 16 hikâye', 'Ayda 4 Reels', 'Mesaj ve yorum yönetimi', 'Meta reklam desteği'] },
+        { ad: 'Profesyonel', kimIcin: 'Profesyonel çekimle marka dili kuranlar için.', maddeler: ['Ayda 20 gönderi', 'Ayda 30 hikâye', 'Ayda 8 Reels', 'Profesyonel çekim günü', 'Influencer iş birliği planı'] } ] }
+    ];
+  }
+  renderVals() {
+    const self = this;
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const katalog = this.katalog();
+    const turAd = { reklam: 'Reklam', birlesik: 'Birleşik', web: 'Web sitesi', eticaret: 'E-ticaret', pazaryeri: 'Pazaryeri', seo: 'SEO', icerik: 'Sosyal medya' };
+    const gizli = this.state.gizli;
+    const menuTanim = [
+      { baslik: 'GENEL', ogeler: [ { ad: 'Genel bakış', hedef: 'YonetimGenel.dc.html' }, { ad: 'Talepler', hedef: '#', rozet: '3' }, { ad: 'Sihirbaz sonuçları', hedef: '#' } ] },
+      { baslik: 'İÇERİK', ogeler: [ { ad: 'Sayfalar', hedef: '#' }, { ad: 'Hizmetler', hedef: '#' }, { ad: 'Paketler', hedef: 'YonetimPaketler.dc.html', aktif: true }, { ad: 'Referanslar', hedef: '#' }, { ad: 'Yorumlar', hedef: '#', rozet: '2' }, { ad: 'Blog', hedef: '#' }, { ad: 'Medya kütüphanesi', hedef: '#' } ] },
+      { baslik: 'KANALLAR', ogeler: [ { ad: 'Instagram', hedef: '#' }, { ad: 'Formlar', hedef: '#' } ] },
+      { baslik: 'SİTE', ogeler: [ { ad: 'SEO ve yönlendirmeler', hedef: '#' }, { ad: 'Diller', hedef: '#' }, { ad: 'Menü ve alt bilgi', hedef: '#' }, { ad: 'Takip kodları', hedef: '#' }, { ad: 'Yasal metinler', hedef: '#' } ] },
+      { baslik: 'YÖNETİM', ogeler: [ { ad: 'Kullanıcılar ve roller', hedef: '#' }, { ad: 'İşlem kaydı', hedef: '#' }, { ad: 'Ayarlar', hedef: '#' } ] }
+    ];
+    const menu = menuTanim.map(function (g) { return { baslik: g.baslik, ogeler: g.ogeler.map(function (o) {
+      return { ad: o.ad, hedef: o.hedef, rozet: o.rozet || '', aktifAria: o.aktif ? 'page' : 'false',
+        stil: 'min-height: 38px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 10px; border-radius: 9px; text-decoration: none; font-size: 14px; ' + (o.aktif ? 'background: var(--tint); color: var(--tintx); font-weight: 600' : 'color: var(--tx)') };
+    }) }; });
+    const cip = function (acik) { return 'flex: none; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; ' + (acik ? 'background: var(--okb); color: var(--ok)' : 'background: var(--card2); color: var(--tx2)'); };
+    const liste = katalog.map(function (g) {
+      const secili = g.id === self.state.secId;
+      const acik = !gizli[g.id];
+      return { ad: g.ad, altYazi: turAd[g.tur] + ' · ' + g.kademeler.length + ' kademe', secili: secili, gorunurYazi: acik ? 'Yayında' : 'Gizli', gorunurStil: cip(acik),
+        sec: function () { self.setState({ secId: g.id }); },
+        stil: 'width: 100%; min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; font: inherit; font-size: 14px; cursor: pointer; color: var(--tx); ' + (secili ? 'border: 1px solid var(--brand); background: var(--tint)' : 'border: 1px solid transparent; background: transparent') };
+    });
+    const g = katalog.find(function (x) { return x.id === self.state.secId; }) || katalog[0];
+    const gorunur = !gizli[g.id];
+    const secili = { ad: g.ad, ozet: g.ozet, ucretNotu: g.ucretNotu, turAd: turAd[g.tur], gorunur: gorunur, gorunurYazi: gorunur ? 'Paketler sayfasında görünüyor' : 'Sitede gizli',
+      anahtarStil: 'flex: none; width: 46px; height: 26px; padding: 3px; border-radius: 999px; border: 0; cursor: pointer; display: flex; box-sizing: border-box; justify-content: ' + (gorunur ? 'flex-end; background: var(--fill)' : 'flex-start; background: var(--line)'),
+      kademeler: g.kademeler.map(function (k) { return { ad: k.ad, rozet: k.rozet || '', kimIcin: k.kimIcin, maddeler: k.maddeler }; }) };
+    const sekmeTanim = [ ['kademe', 'Kutu ve kademeler'], ['sihirbaz', 'Sihirbaz kuralları'], ['gecmis', 'Değişiklik geçmişi'] ];
+    const sekmeler = sekmeTanim.map(function (s) {
+      const sec = s[0] === self.state.sekme;
+      return { ad: s[1], secili: sec, sec: function () { self.setState({ sekme: s[0] }); },
+        stil: 'min-height: 40px; padding: 0 16px; border-radius: 10px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; ' + (sec ? 'border: 1px solid var(--head); background: var(--head); color: var(--card)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') };
+    });
+    return {
+      menuSayac: '22 / 32',
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      menu: menu,
+      liste: liste,
+      secili: secili,
+      gorunurDegistir: function () { const y = Object.assign({}, gizli); y[g.id] = gorunur; self.setState({ gizli: y, yayinda: false }); },
+      taslakDurum: this.state.yayinda ? 'Tüm değişiklikler yayında' : 'Yayınlanmamış değişiklik var',
+      yayinla: function () { self.setState({ yayinda: true }); },
+      sekmeler: sekmeler,
+      sekmeKademe: this.state.sekme === 'kademe',
+      sekmeSihirbaz: this.state.sekme === 'sihirbaz',
+      sekmeGecmis: this.state.sekme === 'gecmis',
+      kurallar: [
+        { sira: '1', kosul: 'Henüz dijitalde yok veya hedef "site kurmak"', oneri: 'Dijital başlangıç seti / ikas Scale', sayi: '4' },
+        { sira: '2', kosul: 'Pazaryerinden satıyor ve bütçe 15.000 TL üzeri', oneri: 'Pazaryeri satış seti', sayi: '3' },
+        { sira: '3', kosul: 'Pazaryerinden satıyor', oneri: 'Pazaryeri yönetimi · Tek pazaryeri', sayi: '5' },
+        { sira: '4', kosul: 'Hedef marka bilinirliği', oneri: 'Meta Ads · Büyüme veya Sosyal medya · Büyüme', sayi: '6' },
+        { sira: '5', kosul: 'E-ticaret sitesi ve bütçe 40.000 TL üzeri', oneri: 'E-ticaret büyüme seti', sayi: '2' },
+        { sira: '6', kosul: 'E-ticaret sitesi ve bütçe 15.000 TL üzeri', oneri: 'Reklam ikilisi', sayi: '7' },
+        { sira: '7', kosul: 'Diğer tüm durumlar', oneri: 'Google Ads · Başlangıç veya Büyüme', sayi: '11' }
+      ],
+      gecmis: [
+        { kim: 'Muhittin Külcü', ne: 'Meta Ads · Büyüme kademesine madde ekledi', zaman: 'Bugün 18.40' },
+        { kim: 'Muhittin Külcü', ne: 'Birleşik paketlerin sırasını değiştirdi', zaman: 'Dün 11.05' },
+        { kim: 'Muhittin Külcü', ne: 'SEO paketlerini yayına aldı', zaman: '16 Ekim 15.20' },
+        { kim: 'Sistem', ne: 'Otomatik yedek alındı', zaman: '16 Ekim 03.00' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

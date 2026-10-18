@@ -1,0 +1,95 @@
+---
+import Site from '../../../layouts/Site.astro';
+// Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
+class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null, sekme: 'kvkk' };
+  }
+  renderVals() {
+    const self = this;
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const VS = 'Muhittin Külcü (Idexya | Good Things)';
+    const M = {
+      kvkk: { ad: 'KVKK aydınlatma metni', bolumler: [
+        ['Veri sorumlusu', ['6698 sayılı Kişisel Verilerin Korunması Kanunu (“Kanun”) uyarınca kişisel verileriniz veri sorumlusu sıfatıyla ' + VS + ' tarafından işlenmektedir. İletişim: info@idexya.com · [Veri sorumlusu adresi].']],
+        ['İşlenen kişisel veriler', ['Kimlik (ad, soyad), iletişim (e-posta, telefon), müşteri işlem (firma, talep, teklif, sözleşme ve fatura bilgileri), pazarlama (ileti izni ve tercihleri), işlem güvenliği (IP adresi, oturum ve giriş kayıtları) ve müşteri adına yönetilen reklam ve analitik hesaplarına ait veriler.']],
+        ['İşleme amaçları', ['Talebinize yanıt vermek ve teklif hazırlamak; sözleşmenin kurulması ve ifası; faturalama ve tahsilat; hizmet kalitesinin ölçülmesi; bilgi güvenliğinin sağlanması; izniniz varsa ticari ileti gönderilmesi; yasal yükümlülüklerin yerine getirilmesi.']],
+        ['Hukuki sebepler', ['Kanun’un 5. maddesindeki sebepler: sözleşmenin kurulması veya ifası, hukuki yükümlülük, meşru menfaat ve bir hakkın tesisi. Ticari ileti, analitik ve pazarlama çerezleri yalnız açık rızanıza dayanır; rızanızı istediğiniz zaman geri alabilirsiniz.']],
+        ['Aktarım', ['Kişisel verileriniz hizmetin sağlanması için gerekli ölçüde barındırma, e-posta, ödeme ve muhasebe hizmeti aldığımız tedarikçilere, yetkili kamu kurumlarına ve hukuken zorunlu hâllerde ilgili kişilere aktarılabilir.', 'Kullandığımız bazı hizmet sağlayıcıların sunucuları yurt dışındadır (ör. Google, Meta, Cloudflare). Yurt dışına aktarım Kanun’un 9. maddesindeki şartlara uygun yapılır. [Aktarım dayanağı ve tedarikçi listesi hukuk danışmanıyla netleşecek.]']],
+        ['Saklama süresi', ['Veriler işleme amacının gerektirdiği süre ve ilgili mevzuattaki süreler boyunca saklanır, süre sonunda silinir, yok edilir veya anonim hâle getirilir. [Veri türlerine göre saklama süreleri tablosu eklenecek.]']],
+        ['Haklarınız', ['Kanun’un 11. maddesi uyarınca verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini veya silinmesini isteme, aktarıldığı üçüncü kişileri bilme, itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz.', 'Başvurularınızı info@idexya.com adresine iletebilirsiniz; başvurunuz en geç 30 gün içinde yanıtlanır.']]
+      ] },
+      cerez: { ad: 'Çerez politikası', bolumler: [
+        ['Çerez nedir?', ['Çerezler, siteyi ziyaret ettiğinizde tarayıcınıza kaydedilen küçük dosyalardır. Sitenin çalışması, ziyaretlerin ölçülmesi ve reklamların ilgili kişilere gösterilmesi için kullanılır.']],
+        ['Kullandığımız çerez türleri', ['Zorunlu çerezler sitenin çalışması için gereklidir ve kapatılamaz. Analitik ve pazarlama çerezleri yalnız onay verirseniz çalışır; onay vermezseniz Google ve Meta araçları çerez bırakmaz.']],
+        ['Onay ve tercih yönetimi', ['İlk ziyaretinizde çıkan pencereden tümünü kabul edebilir, reddedebilir veya türlere göre seçebilirsiniz. Tercihiniz 6 ay hatırlanır; sayfanın altındaki bağlantıdan istediğiniz zaman değiştirebilirsiniz.']]
+      ] },
+      gizlilik: { ad: 'Gizlilik politikası', bolumler: [
+        ['Kapsam', ['Bu politika idexya.com, IDOS paneli ve müşteri teklif sayfaları için geçerlidir.']],
+        ['Müşteri reklam hesapları', ['Müşterilerimiz adına yönettiğimiz reklam ve analitik hesaplarındaki veriler yalnız hizmetin sunulması ve raporlanması için kullanılır, başka bir müşteriyle paylaşılmaz ve sözleşme sona erdiğinde erişimimiz kaldırılır.']],
+        ['Güvenlik', ['Veriler şifreli bağlantı üzerinden taşınır; panel erişimi iki adımlı doğrulama ve rol bazlı yetkiyle sınırlıdır. Erişim ve dışa aktarma işlemleri kayıt altındadır.']],
+        ['İletişim', ['Gizlilikle ilgili sorularınız için: info@idexya.com']]
+      ] }
+    };
+    const sk = this.state.sekme; const x = M[sk];
+    const sekmeler = Object.keys(M).map(function (k) { const s = k === sk; return { ad: M[k].ad, secili: s, sec: function () { self.setState({ sekme: k }); },
+      stil: 'min-height: 44px; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; ' + (s ? 'border: 1px solid var(--head); background: var(--head); color: var(--bg)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') }; });
+    const cerezler = [
+      ['cerez_onay', 'idexya.com', 'Zorunlu', 'Çerez tercihinizi hatırlar', '6 ay'],
+      ['__cf_bm', 'Cloudflare', 'Zorunlu', 'Bot koruması', '30 dakika'],
+      ['_ga, _ga_*', 'Google Analytics', 'Analitik', 'Ziyaretleri ölçer', '2 yıl'],
+      ['_gcl_au', 'Google Ads', 'Pazarlama', 'Reklam dönüşümlerini ölçer', '90 gün'],
+      ['_fbp', 'Meta', 'Pazarlama', 'Reklam dönüşümlerini ölçer', '90 gün']
+    ].map(function (c) { return { ad: c[0], saglayici: c[1], tur: c[2], amac: c[3], sure: c[4] }; });
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      sekmeler: sekmeler, sec: { ad: x.ad, bolumler: x.bolumler.map(function (b) { return { baslik: b[0], metin: b[1] }; }) },
+      cerezGor: sk === 'cerez', cerezler: cerezler
+    };
+  }
+}
+const __c = new Component({}); Object.assign(__c.state, {"sekme":"gizlilik"});
+const __v = __c.renderVals();
+const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
+const cerezGor = __v.cerezGor;
+const cerezler = __v.cerezler;
+const sec = __v.sec;
+const sekmeler = __v.sekmeler;
+---
+<Site baslik="Gizlilik politikası" aciklama="" aktif="">
+
+
+<section style="position: relative">
+<div style="max-width: 1100px; margin: 0 auto; padding: 36px 24px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
+<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: var(--head); font-weight: 600">{sec.ad}</span></nav>
+<h1 style="margin: 0; font-size: 46px; line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">{sec.ad}</h1>
+<span style="color: var(--tx2)">Son güncelleme: [tarih] · Sürüm 1.0</span>
+<div role="status" style="padding: 12px 16px; border-radius: 12px; background: #FCEFD3; color: #7A4E00; font-size: 14px">Taslak metindir. Yayından önce hukuk danışmanı tarafından kontrol edilmelidir.</div>
+<div role="navigation" aria-label="Yasal metinler" style="display: flex; gap: 8px; flex-wrap: wrap">{(sekmeler || []).map((t) => (<Fragment><a href={({'KVKK aydınlatma metni': '/tr/sayfa/kvkk-aydinlatma-metni', 'Çerez politikası': '/tr/sayfa/cerez-politikasi', 'Gizlilik politikası': '/tr/sayfa/gizlilik-politikasi'})[t.ad]} aria-current={t.secili ? 'page' : undefined} style={t.stil + '; display: inline-flex; align-items: center; text-decoration: none'}>{t.ad}</a></Fragment>))}</div>
+</div>
+</section>
+<section style="padding: 0 24px 88px">
+<div style="max-width: 1100px; margin: 0 auto; display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start">
+<aside aria-label="Bölümler" style="flex: 0 1 240px; min-width: 200px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 14px"><b style="color: var(--head)">Bölümler</b>{(sec.bolumler || []).map((b) => (<Fragment><a href="#" style="color: var(--tx2); text-decoration: none; border-left: 2px solid var(--line); padding: 4px 0 4px 12px">{b.baslik}</a></Fragment>))}</aside>
+<div style="flex: 1 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 26px; font-size: 17px; line-height: 1.75">
+{(sec.bolumler || []).map((b) => (<Fragment><div style="display: flex; flex-direction: column; gap: 10px"><h2 style="margin: 0; font-size: 24px; color: var(--head)">{b.baslik}</h2>{(b.metin || []).map((m) => (<Fragment><p style="margin: 0">{m}</p></Fragment>))}</div></Fragment>))}
+{(cerezGor) && (<Fragment>
+<div style="border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: var(--card)"><div style="overflow-x: auto"><table style="width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px">
+<thead><tr style="text-align: left; color: var(--tx2); font-size: 13px; background: var(--card2)"><th style="padding: 10px 14px">Çerez</th><th style="padding: 10px 14px">Sağlayıcı</th><th style="padding: 10px 14px">Tür</th><th style="padding: 10px 14px">Amaç</th><th style="padding: 10px 14px">Süre</th></tr></thead>
+<tbody>{(cerezler || []).map((c) => (<Fragment><tr style="border-top: 1px solid var(--line)"><td style="padding: 10px 14px; font-family: monospace">{c.ad}</td><td style="padding: 10px 14px">{c.saglayici}</td><td style="padding: 10px 14px">{c.tur}</td><td style="padding: 10px 14px">{c.amac}</td><td style="padding: 10px 14px; white-space: nowrap">{c.sure}</td></tr></Fragment>))}</tbody>
+</table></div><div style="padding: 10px 14px; font-size: 13px; color: var(--tx2); border-top: 1px solid var(--line)">Liste, yayından önce canlı sitede tarayıcı taramasıyla doğrulanır ve her yeni araç eklendiğinde güncellenir.</div></div>
+<button type="button" style="align-self: flex-start; min-height: 48px; padding: 0 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); color: var(--head); font: inherit; font-weight: 600; cursor: pointer">Çerez tercihlerimi değiştir</button>
+</Fragment>)}
+</div>
+</div>
+</section>
+
+
+
+
+</Site>

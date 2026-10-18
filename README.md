@@ -1,2 +1,21 @@
-# idexya-platform
-idexya-platform
+# Idexya Platform
+
+idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudflare Workers.
+
+## Komutlar
+- `npm run dev` — yerel geliştirme
+- `npm run build` — `dist/` üretir
+- `sh tools/donustur.sh` — kamu sayfalarını `design/` içindeki tasarım dosyalarından yeniden üretir
+- `node tools/ekran.mjs <yol> <genişlik> <çıktı.png>` — ekran görüntüsü (önizleme sunucusu açıkken)
+
+## Yapı
+- `design/` — onaylanan tasarım dosyaları (.dc.html). Sayfa metinleri ve veriler buradan gelir.
+- `src/layouts/Site.astro` — ortak üst menü, alt kısım, tema, çerez onayı
+- `src/pages/` — eski sitenin adresleri korunur: `/tr/hizmet/…`, `/tr/proje/…`, `/tr/haber/…`, `/tr/sayfa/…`, `/tr/iletisim`
+- `public/_redirects` — taşınan eski adresler için 301 yönlendirmeleri
+- `public/_headers` — güvenlik başlıkları; deneme ortamında arama motorlarına kapalı (noindex)
+
+## Kurallar
+- Canlı alan adına geçiş, DNS ve e-posta ayarları yalnız Muhittin’in onayıyla yapılır.
+- Anahtarlar ve şifreler repoya yazılmaz.
+- Metinler TDK yazım kurallarına uyar; paragraflar iki yana yaslıdır.

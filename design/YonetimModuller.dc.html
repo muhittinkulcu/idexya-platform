@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<title>Idexya Platform · Modüller</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap">
+<style>
+body{margin:0}
+.acik{--bg:#F4F1EC;--card:#FFFFFF;--card2:#F8F5F1;--line:#E8DFD4;--tx:#27231F;--tx2:#5F574F;--head:#0B1B33;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--shadow:rgba(11,27,51,.07);--grid:#EFE8DF}
+.koyu{--bg:#12161D;--card:#1B212B;--card2:#222935;--line:#323C4B;--tx:#EEF1F4;--tx2:#AEB9C7;--head:#F4F6F8;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--shadow:rgba(0,0,0,.4);--grid:#2A323E}
+.yan a{color:#C3CEDD}.yan a:hover{color:#FFFFFF}
+a{color:var(--acc)}a:hover{color:var(--tintx)}
+</style>
+</helmet>
+<div class="{{temaSinifi}}" style="background: var(--bg); color: var(--tx); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.5; min-height: 100vh; display: flex; flex-wrap: wrap; align-items: stretch">
+
+<aside class="yan" style="flex: 1 1 236px; max-width: 100%; background: #0B1B33; color: #C3CEDD; padding: 16px 12px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 6px 8px 10px; border-bottom: 1px solid rgba(255,255,255,.08)">
+<svg viewBox="0 0 1000 1000" width="28" height="28" role="img" aria-label="Idexya logosu"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg>
+<span style="display: flex; flex-direction: column; line-height: 1.15; flex: 1"><span style="font-weight: 700; color: #FFFFFF; font-size: 15px">Idexya Platform</span><span style="font-size: 12px; color: #8EA0B8">idexya.com · TR / EN</span></span>
+</div>
+<nav aria-label="Platform menüsü" style="display: flex; flex-direction: column; gap: 14px; font-size: 14px">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<a href="YonetimGenel.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>Genel bakış</a>
+<a href="YonetimTalepler.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"></path></svg><span style="flex: 1">Talepler</span><span style="padding: 0 7px; border-radius: 999px; background: #F07A23; color: #1A1206; font-size: 12px; font-weight: 700">3</span></a>
+<a href="#" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"></path><path d="M7 15l4-4 3 3 5-6"></path></svg>Analitik</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">MÜŞTERİ İLİŞKİLERİ</span>
+<a href="YonetimCrm.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"></circle><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 11l2 2 4-4"></path></svg>CRM</a>
+<a href="YonetimEposta.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path></svg>E-posta pazarlama</a>
+<a href="YonetimTeklif.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 15l2 2 4-4"></path></svg><span style="flex: 1">Teklifler</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">4</span></a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9z"></path></svg>Otomasyonlar</a>
+<a href="YonetimGorevler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"></path></svg><span style="flex: 1">Görevler ve takvim</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">5</span></a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">İÇERİK</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg>Sayfalar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l10 5-10 5L2 7z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>Hizmetler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"></rect><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"></path></svg>Referanslar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>Blog</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg>Medya</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">SATIŞ</span>
+<a href="YonetimPaketler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5v8l9 5 9-5z"></path><path d="M3 8l9 5 9-5M12 13v8"></path></svg>Paketler ve teklifler</a>
+<a href="YonetimSablonlar.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 7h8M8 11h3M13 11h3M8 15h8"></path></svg>Belgeler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2l-2 5v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7l-2-5z"></path><path d="M4 7h16M16 11a4 4 0 0 1-8 0"></path></svg>Mağaza</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 1 2V2l-3 2-3-2-3 2-3-2-3 2z"></path><path d="M8 9h8M8 13h6"></path></svg>Siparişler</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z"></path><circle cx="7" cy="7" r="1.5"></circle></svg>Kuponlar</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">FİNANS</span>
+<a href="YonetimMuhasebe.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 3h16v18l-3-2-2 2-3-2-3 2-2-2-3 2z"></path><path d="M8 8h8M8 12h8M8 16h5"></path></svg>Muhasebe</a>
+<a href="YonetimMuhasebe.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg><span style="flex: 1">Faturalar</span><span style="padding: 0 7px; border-radius: 999px; background: #A32F3D; color: #FFFFFF; font-size: 12px; font-weight: 700">1</span></a>
+<a href="YonetimEsitleme.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"></path><path d="M21 3v5h-5M3 21v-5h5"></path></svg>Veri eşitleme</a>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">EĞİTİM</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path></svg>Akademi</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="6"></circle><path d="M8.5 14L7 22l5-3 5 3-1.5-8"></path></svg>Sertifikalar</a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>Etkinlikler</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="padding: 0 10px 4px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: #6F829C">TOPLULUK VE KANALLAR</span>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path></svg>Üyeler</a>
+<a href="YonetimTalepler.dc.html" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg><span style="flex: 1">Yorumlar</span><span style="padding: 0 7px; border-radius: 999px; background: rgba(255,255,255,.14); color: #FFFFFF; font-size: 12px; font-weight: 700">3</span></a>
+<a href="#" style="min-height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle></svg>Instagram</a>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,.08)">
+<a href="YonetimEntegrasyonlar.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path></svg>Entegrasyonlar</a>
+<a href="YonetimModuller.dc.html" aria-current="page" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; background: rgba(240,122,35,.18); color: #FFFFFF; text-decoration: none; font-weight: 600"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12h-2a2 2 0 1 0-4 0H12V8a2 2 0 1 0 0-4V2H4v8h2a2 2 0 1 1 4 0h2v4a2 2 0 1 0 0 4v4h8z"></path></svg><span style="flex: 1">Modüller</span><span style="font-size: 12px; color: #8EA0B8">{{menuSayac}}</span></a>
+<a href="YonetimGuvenlik.dc.html" style="min-height: 36px; display: flex; align-items: center; gap: 10px; padding: 0 10px; border-radius: 9px; text-decoration: none"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"></path></svg>Ayarlar</a>
+</div>
+</nav>
+</aside>
+
+<main style="flex: 999 1 680px; min-width: 0; display: flex; flex-direction: column">
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 12px 24px; border-bottom: 1px solid var(--line); background: var(--card)">
+<label style="flex: 1 1 320px; min-height: 40px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card2); color: var(--tx2)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input type="search" placeholder="Sayfa, talep, sipariş, öğrenci ara…" aria-label="Platformda ara" style="flex: 1; min-width: 0; border: 0; background: transparent; color: var(--tx); font: inherit; outline: none"><span style="padding: 1px 6px; border: 1px solid var(--line); border-radius: 6px; font-size: 12px">⌘K</span></label>
+<div style="display: flex; align-items: center; gap: 8px; margin-left: auto">
+<button type="button" style="min-height: 40px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer"><span aria-hidden="true" style="font-size: 18px; line-height: 1">+</span>Yeni</button>
+<button type="button" aria-label="Bildirimler, 5 yeni" style="position: relative; min-height: 40px; min-width: 40px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"></path></svg><span style="position: absolute; top: 6px; right: 7px; width: 8px; height: 8px; border-radius: 50%; background: #F07A23"></span></button>
+<button type="button" onClick="{{temaDegistir}}" aria-label="{{temaEtiketi}}" style="min-height: 40px; min-width: 40px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--tx); cursor: pointer; display: flex; align-items: center; justify-content: center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
+<a href="Main.dc.html" style="min-height: 40px; display: flex; align-items: center; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); color: var(--head); text-decoration: none; font-weight: 600">Siteyi aç ↗</a>
+<span aria-label="Kullanıcı: Muhittin Külcü, Süper yönetici" style="width: 40px; height: 40px; border-radius: 50%; background: #0B1B33; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-weight: 700">MK</span>
+</div>
+</header>
+
+<div style="padding: 22px 24px 40px; display: flex; flex-direction: column; gap: 18px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<nav aria-label="Sayfa yolu" style="font-size: 13px; color: var(--tx2)"><a href="YonetimGenel.dc.html" style="color: var(--tx2); text-decoration: none">Idexya Platform</a> › Modüller</nav>
+<h1 style="margin: 0; font-size: 26px; letter-spacing: -0.01em; color: var(--head)">Modüller</h1>
+<span style="color: var(--tx2); max-width: 720px">Platform bir çekirdek ve üzerine eklenen modüllerden oluşur. Her modülün kendi menüsü, izinleri ve verisi vardır; açıp kapatmak diğerlerini etkilemez.</span>
+</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap">
+<div style="padding: 10px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column"><span style="font-size: 12px; color: var(--tx2)">Etkin</span><span style="font-size: 20px; font-weight: 700; color: var(--head)">{{sayEtkin}}</span></div>
+<div style="padding: 10px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column"><span style="font-size: 12px; color: var(--tx2)">Kurulabilir</span><span style="font-size: 20px; font-weight: 700; color: var(--head)">{{sayKurulabilir}}</span></div>
+<div style="padding: 10px 14px; border-radius: 12px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column"><span style="font-size: 12px; color: var(--tx2)">Yol haritasında</span><span style="font-size: 20px; font-weight: 700; color: var(--head)">{{sayYakinda}}</span></div>
+</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px">
+<div role="group" aria-label="Duruma göre süz" style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{filtreler}}" as="f" hint-placeholder-count="4"><button type="button" onClick="{{f.sec}}" aria-pressed="{{f.secili}}" style="{{f.stil}}">{{f.ad}}</button></sc-for>
+</div>
+<span style="font-size: 13px; color: var(--tx2)">Faz numaraları yol haritasını gösterir; tarihler planla birlikte netleşir.</span>
+</div>
+
+<sc-for list="{{kategoriler}}" as="k" hint-placeholder-count="6">
+<section style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: baseline; gap: 10px"><h2 style="margin: 0; font-size: 17px; color: var(--head)">{{k.ad}}</h2><span style="font-size: 13px; color: var(--tx2)">{{k.aciklama}}</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<sc-for list="{{k.moduller}}" as="m" hint-placeholder-count="4">
+<article style="{{m.kartStil}}">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
+<span style="width: 40px; height: 40px; flex: none; border-radius: 11px; background: {{m.ikonZemin}}; color: {{m.ikonRenk}}; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px">{{m.kisa}}</span>
+<span style="{{m.durumStil}}">{{m.durum}}</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px"><h3 style="margin: 0; font-size: 16px; color: var(--head)">{{m.ad}}</h3><p style="margin: 0; font-size: 13px; color: var(--tx2)">{{m.aciklama}}</p></div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px">
+<sc-for list="{{m.ozellik}}" as="o" hint-placeholder-count="3"><li style="padding: 2px 8px; border-radius: 6px; background: var(--card2); border: 1px solid var(--line); font-size: 12px">{{o}}</li></sc-for>
+</ul>
+<div style="margin-top: auto; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 10px">
+<span style="font-size: 12px; color: var(--tx2)">{{m.alt}}</span>
+<sc-if value="{{m.anahtarVar}}" hint-placeholder-val="{{ true }}"><button type="button" role="switch" aria-checked="{{m.acik}}" aria-label="{{m.ad}} modülünü aç veya kapat" onClick="{{m.degistir}}" style="{{m.anahtarStil}}"><span style="width: 20px; height: 20px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,.25)"></span></button></sc-if>
+<sc-if value="{{m.kurVar}}" hint-placeholder-val="{{ false }}"><button type="button" onClick="{{m.kur}}" style="min-height: 34px; padding: 0 14px; border: 0; border-radius: 9px; background: var(--fill); color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer">Kur</button></sc-if>
+</div>
+</article>
+</sc-for>
+</div>
+</section>
+</sc-for>
+
+<section style="background: #0B1B33; color: #C3CEDD; border-radius: 20px; padding: 24px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center">
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 6px"><h2 style="margin: 0; font-size: 18px; color: #FFFFFF">Yeni bir modül mü lazım?</h2><span>Platform yeni iş kollarına göre büyür. İhtiyacı tarif edin; kapsamını, fazını ve diğer modüllerle bağını birlikte planlayalım.</span></div>
+<button type="button" style="min-height: 44px; padding: 0 18px; border: 0; border-radius: 11px; background: #F07A23; color: #1A1206; font: inherit; font-weight: 700; cursor: pointer">Modül talebi oluştur</button>
+</section>
+
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"koyu":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":2600}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { koyu: null, filtre: 'tumu', degisen: {} };
+  }
+  renderVals() {
+    const self = this;
+    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
+    const cip = function (tur) {
+      const r = { ok: ['var(--okb)', 'var(--ok)'], info: ['var(--infob)', 'var(--info)'], warn: ['var(--warnb)', 'var(--warn)'], gri: ['var(--card2)', 'var(--tx2)'], tint: ['var(--tint)', 'var(--tintx)'] }[tur];
+      return 'flex: none; padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; background: ' + r[0] + '; color: ' + r[1];
+    };
+    const K = [
+      { ad: 'Çekirdek', aciklama: 'Her zaman açık; tüm modüller bunun üstünde çalışır.', moduller: [
+        { id: 'sayfa', kisa: 'SY', ad: 'Sayfalar ve içerik', aciklama: 'Sürükle-bırak bölümlerle sayfa oluşturma ve düzenleme.', ozellik: ['Bölüm kütüphanesi', 'Taslak ve yayın', 'Sürüm geçmişi'], d: 'cekirdek' },
+        { id: 'medya', kisa: 'MD', ad: 'Medya kütüphanesi', aciklama: 'Görsel, video ve belgeler; otomatik boyutlandırma.', ozellik: ['WebP dönüştürme', 'Alternatif metin'], d: 'cekirdek' },
+        { id: 'seo', kisa: 'SE', ad: 'SEO ve yönlendirmeler', aciklama: 'Başlık, açıklama, site haritası ve 301 yönlendirmeler.', ozellik: ['301 içe aktarma', 'hreflang', 'Yapılandırılmış veri'], d: 'cekirdek' },
+        { id: 'dil', kisa: 'DL', ad: 'Diller', aciklama: 'Türkçe ve İngilizce; yeni dil eklenebilir.', ozellik: ['Yapay zekâ çeviri taslağı', 'Onaylı yayın'], d: 'cekirdek' },
+        { id: 'kullanici', kisa: 'KR', ad: 'Kullanıcılar ve roller', aciklama: 'Ekip üyeleri, roller ve iki adımlı doğrulama.', ozellik: ['Rol bazlı izin', '2FA'], d: 'cekirdek' },
+        { id: 'kayit', kisa: 'İK', ad: 'İşlem kaydı', aciklama: 'Kim, neyi, ne zaman değiştirdi; geri alma.', ozellik: ['Geri alma', 'Dışa aktarma'], d: 'cekirdek' } ] },
+      { ad: 'Müşteri ilişkileri (CRM)', aciklama: 'Kişiler, satış hattı, e-posta pazarlama ve teklifler.', moduller: [
+        { id: 'crm', kisa: 'CR', ad: 'CRM', aciklama: 'Kişiler, firmalar ve satış hattı; tüm formlar ve sihirbaz buraya düşer.', ozellik: ['Kişi ve firma kartı', 'Satış hattı', 'Etiket ve segment', 'Zaman çizelgesi'], d: 'etkin' },
+        { id: 'gorev', kisa: 'GT', ad: 'Görevler ve takvim', aciklama: 'Görev, atama, pano ve haftalık takvim; Google Takvim ile iki yönlü eşitleme.', ozellik: ['Atama', 'Pano', 'Haftalık takvim', 'Google Takvim'], d: 'etkin' },
+        { id: 'eposta', kisa: 'EP', ad: 'E-posta pazarlama', aciklama: 'Seçtiğiniz segmente kampanya; açılma ve tıklama takibi.', ozellik: ['Şablon düzenleyici', 'Segment', 'A/B testi', 'İYS uyumu'], d: 'etkin' },
+        { id: 'teklif', kisa: 'TK', ad: 'Teklifler', aciklama: 'Paketlerden teklif hazırlayıp gönderme; müşteri bağlantıdan onaylar.', ozellik: ['Markalı PDF', 'Onay bağlantısı', 'Görüntülenme takibi'], d: 'etkin' },
+        { id: 'otomasyon', kisa: 'OT', ad: 'Otomasyonlar', aciklama: 'Olaya bağlı akışlar: talep gelince e-posta dizisi, teklif açılınca hatırlatma.', ozellik: ['Tetikleyici', 'Bekleme', 'Koşul'], d: 'kurulabilir', faz: 'Faz 2' } ] },
+      { ad: 'Satış', aciklama: 'Teklif, ürün ve ödeme.', moduller: [
+        { id: 'paket', kisa: 'PK', ad: 'Paketler ve teklifler', aciklama: 'Paket kutuları, kademeler ve öneri sihirbazı.', ozellik: ['Sihirbaz kuralları', 'Teklif formu'], d: 'etkin' },
+        { id: 'sablon', kisa: 'ŞB', ad: 'Belgeler', aciklama: 'Seçicilerle sözleşme, teklif ve e-posta oluşturma; onay, gönderim, revizyon ve kayıt geçmişi.', ozellik: ['Değişkenler', 'Onay akışı', 'Sürümler', 'Kayıt geçmişi'], d: 'etkin' },
+        { id: 'magaza', kisa: 'MĞ', ad: 'Mağaza', aciklama: 'Dijital ve fiziksel ürün satışı: eğitim seti, şablon, danışmanlık saati.', ozellik: ['Ürün varyantı', 'Stok', 'Dijital teslimat'], d: 'kurulabilir', faz: 'Faz 2' },
+        { id: 'odeme', kisa: 'ÖD', ad: 'Ödeme', aciklama: 'Kartla ödeme ve taksit; iyzico veya PayTR ile.', ozellik: ['3D Secure', 'Taksit', 'İade'], d: 'kurulabilir', faz: 'Faz 2' },
+        { id: 'kupon', kisa: 'KP', ad: 'Kuponlar ve kampanyalar', aciklama: 'İndirim kodu, sepette indirim, süreli kampanya.', ozellik: ['Kullanım sınırı', 'Tarih aralığı'], d: 'yakinda', faz: 'Faz 2' },
+        { id: 'fatura', kisa: 'FT', ad: 'E-fatura ve e-arşiv', aciklama: 'Satış sonrası faturanın otomatik kesilmesi.', ozellik: ['Entegratör bağlantısı'], d: 'yakinda', faz: 'Faz 3' },
+        { id: 'muhasebe', kisa: 'MH', ad: 'Muhasebe', aciklama: 'Fatura, tahsilat, gider, cari hesap ve alacak takibi; BizimHesap ve IDOS ile eşitlenir.', ozellik: ['Tekrarlayan fatura', 'Alacak yaşlandırma', 'Banka eşleştirme'], d: 'etkin' } ] },
+      { ad: 'Eğitim', aciklama: 'Akademi ve sertifika programları.', moduller: [
+        { id: 'akademi', kisa: 'AK', ad: 'Akademi', aciklama: 'Video dersler, bölümler, sınavlar ve ilerleme takibi.', ozellik: ['Video ders', 'Sınav', 'İlerleme'], d: 'yakinda', faz: 'Faz 3' },
+        { id: 'sertifika', kisa: 'SR', ad: 'Sertifika programları', aciklama: 'Otomatik sertifika, karekodlu doğrulama sayfası.', ozellik: ['PDF sertifika', 'Doğrulama bağlantısı'], d: 'yakinda', faz: 'Faz 3' },
+        { id: 'etkinlik', kisa: 'ET', ad: 'Etkinlik ve webinar', aciklama: 'Kayıt, hatırlatma ve kayıt videosu.', ozellik: ['Kontenjan', 'Takvim daveti'], d: 'yakinda', faz: 'Faz 3' } ] },
+      { ad: 'Topluluk', aciklama: 'Üyeler, yorumlar ve destek.', moduller: [
+        { id: 'uyelik', kisa: 'ÜY', ad: 'Üyelik ve müşteri hesabı', aciklama: 'Kayıt, giriş, siparişlerim, kurslarım; IDOS’a tek girişle geçiş.', ozellik: ['Tek giriş', 'Profil', 'KVKK izinleri'], d: 'kurulabilir', faz: 'Faz 2' },
+        { id: 'yorum', kisa: 'YR', ad: 'Yorumlar', aciklama: 'Onaylı müşteri yorumları ve puanlama.', ozellik: ['Onay kuyruğu', 'Spam filtresi'], d: 'etkin' },
+        { id: 'destek', kisa: 'DS', ad: 'Destek talepleri', aciklama: 'Müşterilerin talep açıp takip ettiği destek merkezi.', ozellik: ['Talep durumu', 'Bilgi bankası'], d: 'yakinda', faz: 'Faz 4' } ] },
+      { ad: 'Pazarlama', aciklama: 'İçerik ve kanallar.', moduller: [
+        { id: 'blog', kisa: 'BL', ad: 'Blog', aciklama: 'Yazılar, kategoriler ve yazarlar.', ozellik: ['Zamanlı yayın', 'SEO kontrolü'], d: 'etkin' },
+        { id: 'instagram', kisa: 'IG', ad: 'Instagram akışı', aciklama: '@idexya.ads paylaşımları sitede otomatik görünür.', ozellik: ['Social Engine bağlantısı'], d: 'etkin' },
+        { id: 'form', kisa: 'FR', ad: 'Formlar', aciklama: 'Form oluşturucu; talepler platform CRM’ine düşer.', ozellik: ['Spam koruması', 'Bildirim'], d: 'etkin' },
+        { id: 'webform', kisa: 'SH', ad: 'Paket sihirbazı', aciklama: 'Ziyaretçiye soru sorup paket öneren araç.', ozellik: ['Kural düzenleyici', 'CRM’e aktarım'], d: 'etkin' } ] },
+      { ad: 'Entegrasyonlar', aciklama: 'Dış sistem bağlantıları.', moduller: [
+        { id: 'merkez', kisa: 'EM', ad: 'Entegrasyon merkezi', aciklama: 'Google, Microsoft, WhatsApp, ödeme, muhasebe ve pazaryeri bağlantıları tek yerde.', ozellik: ['İzin özeti', 'Eşitleme durumu', 'Webhook ve API'], d: 'etkin' },
+        { id: 'idos', kisa: 'ID', ad: 'IDOS', aciklama: 'Talepler, müşteriler ve raporlar IDOS ile eşleşir.', ozellik: ['CRM aktarımı', 'Panel girişi'], d: 'etkin' },
+        { id: 'olcum', kisa: 'GA', ad: 'Google Analytics ve Tag Manager', aciklama: 'GA4 ve GTM; çerez onayıyla birlikte.', ozellik: ['GTM-KT53Q8P7', 'Onay modu'], d: 'etkin' },
+        { id: 'meta', kisa: 'MP', ad: 'Meta piksel ve CAPI', aciklama: 'Form ve satış olaylarının Meta’ya sunucudan gönderilmesi.', ozellik: ['Olay eşleştirme'], d: 'etkin' } ] }
+    ];
+    const degisen = this.state.degisen;
+    const durumu = function (m) { return degisen[m.id] || m.d; };
+    const tumu = []; K.forEach(function (k) { k.moduller.forEach(function (m) { tumu.push(m); }); });
+    const say = function (d) { return tumu.filter(function (m) { return durumu(m) === d; }).length; };
+    const aktif = this.state.filtre;
+    const uyar = function (m) { const d = durumu(m); if (aktif === 'tumu') return true; if (aktif === 'etkin') return d === 'etkin' || d === 'cekirdek'; return d === aktif; };
+    const kategoriler = K.map(function (k) {
+      return { ad: k.ad, aciklama: k.aciklama, moduller: k.moduller.filter(uyar).map(function (m) {
+        const d = durumu(m);
+        const etkin = d === 'etkin' || d === 'cekirdek';
+        const etiket = { cekirdek: ['Çekirdek', 'gri'], etkin: ['Etkin', 'ok'], kapali: ['Kapalı', 'gri'], kurulabilir: ['Kurulabilir · ' + (m.faz || ''), 'info'], yakinda: ['Yol haritası · ' + (m.faz || ''), 'warn'] }[d];
+        return { ad: m.ad, kisa: m.kisa, aciklama: m.aciklama, ozellik: m.ozellik, durum: etiket[0], durumStil: cip(etiket[1]),
+          ikonZemin: etkin ? 'var(--tint)' : 'var(--card2)', ikonRenk: etkin ? 'var(--tintx)' : 'var(--tx2)',
+          alt: d === 'cekirdek' ? 'Her zaman açık' : (d === 'yakinda' ? 'Planlandı' : (d === 'kurulabilir' ? 'Kurulum birkaç adım' : (d === 'kapali' ? 'Sitede ve menüde gizli' : 'Sitede ve menüde görünür'))),
+          anahtarVar: d === 'etkin' || d === 'kapali', acik: d === 'etkin', kurVar: d === 'kurulabilir',
+          degistir: function () { const y = Object.assign({}, degisen); y[m.id] = d === 'etkin' ? 'kapali' : 'etkin'; self.setState({ degisen: y }); },
+          kur: function () { const y = Object.assign({}, degisen); y[m.id] = 'etkin'; self.setState({ degisen: y }); },
+          anahtarStil: 'flex: none; width: 46px; height: 26px; padding: 3px; border-radius: 999px; border: 0; cursor: pointer; display: flex; box-sizing: border-box; justify-content: ' + (d === 'etkin' ? 'flex-end; background: var(--fill)' : 'flex-start; background: var(--line)'),
+          kartStil: 'flex: 1 1 260px; min-width: 0; max-width: 420px; background: var(--card); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; ' + (d === 'yakinda' ? 'border: 1px dashed var(--line); opacity: 0.85' : 'border: 1px solid var(--line); box-shadow: 0 6px 18px var(--shadow)') };
+      }) };
+    }).filter(function (k) { return k.moduller.length > 0; });
+    const fT = [ ['tumu', 'Tümü'], ['etkin', 'Etkin'], ['kurulabilir', 'Kurulabilir'], ['yakinda', 'Yol haritası'] ];
+    const filtreler = fT.map(function (f) { const sec = f[0] === aktif; return { ad: f[1], secili: sec, sec: function () { self.setState({ filtre: f[0] }); },
+      stil: 'min-height: 36px; padding: 0 14px; border-radius: 999px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; ' + (sec ? 'border: 1px solid var(--head); background: var(--head); color: var(--card)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') }; });
+    const etkinSay = say('etkin') + say('cekirdek');
+    return {
+      temaSinifi: koyu ? 'koyu' : 'acik',
+      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
+      temaDegistir: () => this.setState({ koyu: !koyu }),
+      kategoriler: kategoriler, filtreler: filtreler,
+      sayEtkin: String(etkinSay), sayKurulabilir: String(say('kurulabilir')), sayYakinda: String(say('yakinda')),
+      menuSayac: etkinSay + ' / ' + tumu.length
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+[
+  {
+    "id": "e-ticaret",
+    "ad": "E-ticaret",
+    "aciklama": "Mağaza kurulumundan pazaryerine, entegrasyondan kargoya kadar e-ticaretin tamamını yönetiyoruz.",
+    "hizmetler": [
+      {
+        "ad": "360° e-ticaret yönetimi",
+        "slug": "e-ticaret-yonetimi",
+        "ozet": "Mağazanızın günlük işleyişi uçtan uca."
+      },
+      {
+        "ad": "Pazaryeri yönetimi",
+        "slug": "e-ticaret-pazaryeri-yonetimi",
+        "ozet": "Pazaryerlerinde ürün, fiyat ve sipariş yönetimi."
+      },
+      {
+        "ad": "Entegrasyon yönetimi",
+        "slug": "e-ticaret-entegrasyon-yonetimi",
+        "ozet": "Mağaza, pazaryeri, muhasebe ve kargo sistemlerini bağlama."
+      },
+      {
+        "ad": "Ürün ve kategori yönetimi",
+        "slug": "e-ticaret-urun-kategori-yonetimi",
+        "ozet": "Ürün içerikleri, görseller ve kategori yapısı."
+      },
+      {
+        "ad": "Kargo ve lojistik yönetimi",
+        "slug": "e-ticaret-kargo-lojistik-yonetimi",
+        "ozet": "Kargo anlaşmaları ve gönderim süreçleri."
+      }
+    ]
+  },
+  {
+    "id": "dijital-reklam",
+    "ad": "Dijital reklam",
+    "aciklama": "Doğru kanalda, doğru bütçeyle, ölçülebilir reklam. Her değişiklik onayınızla yapılır.",
+    "hizmetler": [
+      {
+        "ad": "Google Ads yönetimi",
+        "slug": "google-ads-yonetimi",
+        "ozet": "Arama, alışveriş, görüntülü ve yeniden pazarlama kampanyaları."
+      },
+      {
+        "ad": "Meta reklam yönetimi",
+        "slug": "meta-business-ads-yonetimi",
+        "ozet": "Facebook ve Instagram kampanyaları."
+      },
+      {
+        "ad": "Dijital pazarlama yönetimi",
+        "slug": "dijital-pazarlama-yonetimi",
+        "ozet": "Tüm kanallar için strateji ve bütçe planı."
+      },
+      {
+        "ad": "E-posta ve SMS pazarlama",
+        "slug": "e-mail-sms-marketing-yonetimi",
+        "ozet": "Müşterilerinize doğrudan ulaşan kampanyalar."
+      },
+      {
+        "ad": "Influencer pazarlama",
+        "slug": "influencer-marketing-yonetimi",
+        "ozet": "Markanıza uygun içerik üreticileriyle iş birliği."
+      },
+      {
+        "ad": "Pazaryeri reklam yönetimi",
+        "slug": "e-ticaret-pazaryeri-reklam-yonetimi",
+        "ozet": "Trendyol, Hepsiburada ve Amazon içi reklamlar."
+      }
+    ]
+  },
+  {
+    "id": "seo",
+    "ad": "SEO",
+    "aciklama": "Google aramalarında kalıcı görünürlük. Teknik altyapıdan içeriğe kadar.",
+    "hizmetler": [
+      {
+        "ad": "SEO içerik optimizasyonu",
+        "slug": "seo-icerik-optimizasyonu",
+        "ozet": "Arayan kişiye cevap veren içerikler."
+      },
+      {
+        "ad": "Anahtar kelime analizi",
+        "slug": "seo-anahtar-kelime-analizi",
+        "ozet": "Müşterilerinizin gerçekte ne aradığı."
+      },
+      {
+        "ad": "Teknik SEO",
+        "slug": "teknik-seo",
+        "ozet": "Hız, taranabilirlik ve site altyapısı."
+      },
+      {
+        "ad": "Site içi SEO",
+        "slug": "site-ici-seo-on-page-seo",
+        "ozet": "Başlıklar, açıklamalar ve sayfa yapısı."
+      },
+      {
+        "ad": "Yerel SEO",
+        "slug": "yerel-seo-hizmeti",
+        "ozet": "Haritalarda ve yakınımdaki aramalarda görünürlük."
+      },
+      {
+        "ad": "Backlink stratejisi",
+        "slug": "backlink-stratejisi",
+        "ozet": "Güvenilir sitelerden bağlantı kazanımı."
+      }
+    ]
+  },
+  {
+    "id": "web-yazilim",
+    "ad": "Web ve yazılım",
+    "aciklama": "İşinize uygun web sitesi ve iş yazılımlarının seçimi, kurulumu ve bağlanması.",
+    "hizmetler": [
+      {
+        "ad": "Web tasarım",
+        "slug": "web-tasarim-hizmetleri",
+        "ozet": "Hızlı, mobil uyumlu ve satışa odaklı siteler."
+      },
+      {
+        "ad": "Yazılım danışmanlığı",
+        "slug": "yazilim-danismanligi",
+        "ozet": "Doğru yazılımı seçme ve uygulama."
+      },
+      {
+        "ad": "ERP yazılım danışmanlığı",
+        "slug": "erp-yazilim-danismanligi",
+        "ozet": "Kurumsal kaynak planlama sistemleri."
+      },
+      {
+        "ad": "CRM yazılım danışmanlığı",
+        "slug": "crm-yazilim-danismanligi",
+        "ozet": "Müşteri ilişkileri yönetimi sistemleri."
+      },
+      {
+        "ad": "Ön muhasebe yazılım danışmanlığı",
+        "slug": "on-muhasebe-yazilim-danismanligi",
+        "ozet": "Fatura, cari ve stok takibi."
+      }
+    ]
+  },
+  {
+    "id": "tasarim-icerik",
+    "ad": "Tasarım ve içerik",
+    "aciklama": "Markanızı tanıtan görsel kimlik ve satışa katkı sağlayan içerikler.",
+    "hizmetler": [
+      {
+        "ad": "Grafik tasarım",
+        "slug": "grafik-tasarim-hizmetleri",
+        "ozet": "Reklam, sosyal medya ve basılı tasarımlar."
+      },
+      {
+        "ad": "Logo tasarımı",
+        "slug": "logo-tasarimi",
+        "ozet": "Markanızın temel imzası."
+      },
+      {
+        "ad": "Kurumsal kimlik tasarımı",
+        "slug": "kurumsal-kimlik-tasarimi",
+        "ozet": "Kartvizitten sunuma tutarlı marka dili."
+      },
+      {
+        "ad": "Reels ve Shorts çekimleri",
+        "slug": "instagram-reels-youtube-shorts-cekimleri",
+        "ozet": "Kısa dikey video içerikleri."
+      },
+      {
+        "ad": "Ürün fotoğraf ve video çekimleri",
+        "slug": "urun-fotograf-video-cekimleri",
+        "ozet": "E-ticaret ve reklam için ürün görselleri."
+      }
+    ]
+  }
+]

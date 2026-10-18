@@ -1,0 +1,8 @@
+# Eski site adresleri (301). Var olan adresler aynı kalır; yalnız taşınan sayfalar yönlendirilir.
+/tr                      /                          301
+/tr/                     /                          301
+/tr/sayfa/vizyonumuz     /tr/sayfa/hakkimizda       301
+/tr/sayfa/misyonumuz     /tr/sayfa/hakkimizda       301
+/tr/urun/*               /tr/paketler               301
+/tr/projeler/*           /tr/referanslar            301
+/tr/projeler             /tr/referanslar            301
