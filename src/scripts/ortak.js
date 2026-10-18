@@ -83,4 +83,14 @@ function menu() {
   ac.addEventListener('click', () => { const acik = ust.classList.toggle('menu-acik'); ac.setAttribute('aria-expanded', String(acik)); });
 }
 
-export function baslat() { tema(); cerez(); suzgecler(); menu(); }
+// Üç satır ve üzeri paragraflar iki yana yaslanır; kısa giriş metinlerinde boşluk açılmaz.
+function yasla() {
+  const isle = () => document.querySelectorAll('main p').forEach((p) => {
+    const satir = parseFloat(getComputedStyle(p).lineHeight) || 24;
+    p.classList.toggle('yasli', p.offsetHeight / satir >= 2.6);
+  });
+  isle();
+  let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(isle, 150); });
+}
+
+export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); }
