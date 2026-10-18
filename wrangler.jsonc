@@ -2,6 +2,9 @@
   // Idexya Platform - statik site (Workers Static Assets)
   "name": "idexya-platform",
   "compatibility_date": "2026-09-01",
+  // Deneme adresi: idexya-platform.<hesap>.workers.dev (arama motorlarına kapalı, bkz. public/_headers)
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
