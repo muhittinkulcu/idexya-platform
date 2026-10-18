@@ -99,18 +99,25 @@ export async function uyeApi(istek, env, yol) {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'bekliyor', ?, ?)`).bind(id, z, z, ad, eposta, kirp(g.telefon, 40) || null, kirp(g.firma, 160) || null, kirp(g.neden, 1000) || null,
         await sifreOzet(g.sifre, tuz), tuz, TUR, z, g.iys === true ? 1 : 0).run();
       await islemYaz(db, 'Web sitesi', 'uye_kayit', id, ipOzet);
-    } else await islemYaz(db, 'Web sitesi', 'uye_kayit', null, ipOzet);
+    } else {
+      // Kayıtlı adreste de aynı süre harcanır: yanıt süresinden üyelik anlaşılmasın.
+      await sifreOzet(g.sifre, rastgele(16));
+      await islemYaz(db, 'Web sitesi', 'uye_kayit', null, ipOzet);
+    }
     return json({ ok: true });
   }
 
   if (yol === 'giris') {
     const eposta = kirp(g.eposta, 160).toLowerCase();
     const sinir = new Date(Date.now() - 15 * 60 * 1000).toISOString();
-    const [e, i] = await db.batch([
-      db.prepare('SELECT COUNT(*) AS n FROM giris_denemeleri WHERE eposta = ? AND basarili = 0 AND zaman > ?').bind(eposta, sinir),
-      db.prepare('SELECT COUNT(*) AS n FROM giris_denemeleri WHERE ip_ozet = ? AND basarili = 0 AND zaman > ?').bind(ipOzet, sinir)
+    // Kilit e-posta + IP başına (8) ve IP başına (30): başkası bir üyeyi her yerden kilitleyemez.
+    // Adrese tüm IP'lerden gelen hata sayısı 50'yi geçerse yine durur (dağıtık deneme).
+    const [e, i, t] = await db.batch([
+      db.prepare('SELECT COUNT(*) AS n FROM giris_denemeleri WHERE eposta = ? AND ip_ozet = ? AND basarili = 0 AND zaman > ?').bind(eposta, ipOzet, sinir),
+      db.prepare('SELECT COUNT(*) AS n FROM giris_denemeleri WHERE ip_ozet = ? AND basarili = 0 AND zaman > ?').bind(ipOzet, sinir),
+      db.prepare('SELECT COUNT(*) AS n FROM giris_denemeleri WHERE eposta = ? AND basarili = 0 AND zaman > ?').bind(eposta, sinir)
     ]);
-    if (e.results[0].n >= 8 || i.results[0].n >= 30) return hata('Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin.', 429);
+    if (e.results[0].n >= 8 || i.results[0].n >= 30 || t.results[0].n >= 50) return hata('Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin.', 429);
     const robot = await robotDogrula(env, g.turnstile, ip);
     if (robot === 'kaldi') return hata('Robot doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.', 403);
     const u = EPOSTA_DESEN.test(eposta) ? await db.prepare('SELECT * FROM uyeler WHERE eposta = ?').bind(eposta).first() : null;
@@ -154,7 +161,13 @@ export async function uyeApi(istek, env, yol) {
   if (yol === 'sifre-degistir') {
     const u = await oturumUyesi(istek, db);
     if (!u) return hata('Giriş yapın.', 401);
-    if (!esit(await sifreOzet(String(g.eski || ''), u.sifre_tuz), u.sifre_ozet)) return hata('Mevcut şifre hatalı.', 403);
+    const sinir = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const hatali = await db.prepare("SELECT COUNT(*) AS n FROM giris_denemeleri WHERE eposta = ? AND basarili = 0 AND zaman > ?").bind('sifre:' + u.eposta, sinir).first();
+    if (hatali.n >= 5) return hata('Çok fazla hatalı deneme. 15 dakika sonra tekrar deneyin.', 429);
+    if (!esit(await sifreOzet(String(g.eski || ''), u.sifre_tuz), u.sifre_ozet)) {
+      await db.prepare('INSERT INTO giris_denemeleri (id, zaman, eposta, ip_ozet, basarili) VALUES (?, ?, ?, ?, 0)').bind(kimlik(), simdi(), 'sifre:' + u.eposta, ipOzet).run();
+      return hata('Mevcut şifre hatalı.', 403);
+    }
     const sk = sifreKontrol(g.yeni); if (sk) return hata(sk, 422);
     const tuz = rastgele(16), jeton = cerezOku(istek, OTURUM_CEREZ);
     await db.batch([

@@ -84,7 +84,8 @@ export async function icerikApi(istek, env, yol) {
     const son = await db.prepare('SELECT COUNT(*) AS n FROM yorumlar WHERE ip_ozet = ? AND zaman > ?').bind(ipOzet, new Date(Date.now() - 10 * 60 * 1000).toISOString()).first();
     if (son.n >= 5) return hata('Çok fazla yorum gönderdiniz. Biraz sonra tekrar deneyin.', 429);
     let ad, eposta, durum;
-    if (iz) { ad = iz.ad; eposta = iz.eposta; durum = 'yayinda'; }
+    // Üye yorumu yalnız 'kullan' yetkisi veya erişim listesi varsa hemen yayınlanır; diğerleri onay bekler.
+    if (iz) { ad = iz.ad; eposta = iz.eposta; durum = iz.moduller['uye-icerik'] === 'kullan' || listede(iz, erisim) ? 'yayinda' : 'bekliyor'; }
     else {
       ad = kirp(g.ad, 80); eposta = kirp(g.eposta, 160).toLowerCase();
       if (!ad) return hata('Adınızı yazın.', 422);
@@ -147,6 +148,7 @@ export async function icerikSayfasi(istek, env, kisa) {
   if (ac) yanit.headers.delete('X-Robots-Tag');
   // Üyeye özel içerik paylaşılan önbelleklerde tutulmaz.
   yanit.headers.set('Cache-Control', 'private, no-store');
+  yanit.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
   return yanit;
 }
 

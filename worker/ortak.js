@@ -43,7 +43,13 @@ export function ayniKaynak(istek) {
 export async function govdeOku(istek, sinir = 20000) {
   if (!(istek.headers.get('content-type') || '').includes('application/json')) return { hata: hata('Geçersiz istek', 415) };
   if (Number(istek.headers.get('content-length') || 0) > sinir) return { hata: hata('İstek çok büyük', 413) };
-  try { return { g: await istek.json() }; } catch (e) { return { hata: hata('Geçersiz istek', 400) }; }
+  try {
+    const ham = await istek.text();
+    if (ham.length > sinir) return { hata: hata('İstek çok büyük', 413) };
+    const g = JSON.parse(ham);
+    if (!g || typeof g !== 'object' || Array.isArray(g)) return { hata: hata('Geçersiz istek', 400) };
+    return { g };
+  } catch (e) { return { hata: hata('Geçersiz istek', 400) }; }
 }
 
 export const ipAl = (istek) => istek.headers.get('cf-connecting-ip') || 'yerel';

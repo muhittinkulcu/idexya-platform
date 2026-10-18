@@ -32,7 +32,7 @@ export function robotBagla(form) {
     if (await turnstileYukle() && window.turnstile) widget = window.turnstile.render(kutu, { sitekey: ANAHTAR, language: 'tr' });
   });
   return {
-    gerekli: !!ANAHTAR,
+    gerekli: !!ANAHTAR && !!kutu,
     jeton: () => { const t = form.querySelector('[name="cf-turnstile-response"]'); return t ? t.value : ''; },
     sifirla: () => { if (widget && window.turnstile) window.turnstile.reset(widget); }
   };

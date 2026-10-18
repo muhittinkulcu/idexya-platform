@@ -23,7 +23,8 @@ async function yonetici(istek, env) {
     const { payload } = await jwtVerify(jeton, jwks, { issuer: env.TEAM_DOMAIN, audience: env.POLICY_AUD });
     const izinli = (env.YONETICILER || '').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean);
     const e = String(payload.email || '').toLowerCase();
-    if (izinli.length && !izinli.includes(e)) return null;
+    // İzinli yönetici listesi boşsa panel kapalıdır (Access politikası geniş olsa bile).
+    if (!izinli.length || !e || !izinli.includes(e)) return null;
     return { eposta: e };
   } catch (e) {
     return null;
@@ -37,7 +38,8 @@ async function talepAl(istek, env) {
   const boy = Number(istek.headers.get('content-length') || 0);
   if (boy > 20000) return hata('İstek çok büyük', 413);
   let g;
-  try { g = await istek.json(); } catch (e) { return hata('Geçersiz istek', 400); }
+  try { const ham = await istek.text(); if (ham.length > 20000) return hata('İstek çok büyük', 413); g = JSON.parse(ham); } catch (e) { return hata('Geçersiz istek', 400); }
+  if (!g || typeof g !== 'object' || Array.isArray(g)) return hata('Geçersiz istek', 400);
   if (g.web_adresi_tekrar) return json({ ok: true }); // tuzak alan doluysa robot: sessizce kabul et, kaydetme
   const ad = kirp(g.ad, 120), eposta = kirp(g.eposta, 160).toLowerCase(), telefon = kirp(g.telefon, 40);
   if (!ad) return hata('Ad soyad gerekli', 422);
@@ -78,7 +80,13 @@ async function yonetimApi(istek, env, yol, kim) {
     const kaynak = istek.headers.get('origin');
     if (!kaynak || new URL(kaynak).host !== new URL(istek.url).host) return hata('Geçersiz kaynak', 403);
   }
-  const govde = yontem === 'POST' ? await istek.json().catch(() => ({})) : {};
+  let govde = {};
+  if (yontem === 'POST') {
+    const ham = await istek.text();
+    if (ham.length > 300000) return hata('İstek çok büyük', 413);
+    try { govde = JSON.parse(ham || '{}'); } catch (e) { return hata('Geçersiz istek', 400); }
+    if (!govde || typeof govde !== 'object' || Array.isArray(govde)) return hata('Geçersiz istek', 400);
+  }
 
   if (yol === 'ozet' && yontem === 'GET') {
     const [t, m, a, k, u, yo] = await db.batch([

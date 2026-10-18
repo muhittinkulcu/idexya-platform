@@ -81,6 +81,8 @@ kontrol('yetkili üye yorumu hemen yayınlanır', true);
 await uyeB.goto(B + '/icerik/' + k.uyeler);
 kontrol('yetkisiz üye yorum formu görmez', !(await uyeB.$('[data-yorum-form]')));
 kontrol('yetkisiz üye API ile yorum yapamaz', (await istek(uyeB, `/api/icerik/${k.uyeler}/yorum`, { metin: 'Deneme' })).durum === 404);
+kontrol('yetkisiz üyenin yorumu onay bekler', (await istek(uyeB, `/api/icerik/${k.herkes}/yorum`, { metin: 'B yorumu' })).durum === 'bekliyor');
+kontrol('null gövde 400 döner', (await uyeB.evaluate(async (y) => (await fetch(y, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: 'null' })).status, `/api/icerik/${k.herkes}/yorum`)) === 400);
 kontrol('yorumu kapalı içeriğe yorum yapılamaz', (await istek(uyeA, `/api/icerik/${k.secili}/yorum`, { metin: 'Deneme' })).durum === 403);
 
 // Yönetim ekranı: arayüzden içerik oluştur

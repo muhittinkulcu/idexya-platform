@@ -29,6 +29,9 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
   - `TEAM_DOMAIN` — ör. `https://<ekip>.cloudflareaccess.com`
   - `POLICY_AUD` — Access uygulamasının "Application Audience (AUD) Tag" değeri
   - `YONETICILER` — izinli e-postalar, virgülle (ör. `info@idexya.com`)
-  - Gizli: `TURNSTILE_SECRET`; derleme değişkeni: `PUBLIC_TURNSTILE_SITE_KEY`
+  - Gizli: `IP_TUZ` (uzun rastgele metin; IP adresleri yalnız bununla özetlenerek saklanır, KVKK)
+  - Gizli: `TURNSTILE_SECRET` ve derleme değişkeni `PUBLIC_TURNSTILE_SITE_KEY` — **ikisi birlikte** girilir; yalnız biri
+    girilirse formlar çalışmaz
+  - `YONETICILER` boşsa panel kapalı kalır
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
   sonra boş veritabanıyla `node tools/test-yonetim.mjs http://127.0.0.1:8787 <ekran-klasörü>` (uçtan uca: form → talep → CRM → kart).

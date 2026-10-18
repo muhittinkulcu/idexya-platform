@@ -3,7 +3,7 @@
 const kac = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 function satirIci(s) {
   let t = kac(s);
-  t = t.replace(/\[([^\]]{1,200})\]\((https?:\/\/[^\s)]{1,500}|\/[^\s)]{0,500})\)/g, (_, y, u) => `<a href="${u}"${u.startsWith('/') ? '' : ' rel="noopener nofollow" target="_blank"'}>${y}</a>`);
+  t = t.replace(/\[([^\]]{1,200})\]\((https?:\/\/[^\s)]{1,500}|\/(?![\/\\])[^\s)]{0,500})\)/g, (_, y, u) => `<a href="${u}"${u.startsWith('/') ? '' : ' rel="noopener nofollow" target="_blank"'}>${y}</a>`);
   t = t.replace(/\*\*([^*]{1,500})\*\*/g, '<strong>$1</strong>');
   t = t.replace(/(^|[\s(])_([^_]{1,500})_(?=[\s.,;:!?)]|$)/g, '$1<em>$2</em>');
   return t;
