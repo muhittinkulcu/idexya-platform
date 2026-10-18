@@ -78,7 +78,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('kaynak'); ap.add_argument('cikti')
     ap.add_argument('--aktif', default=''); ap.add_argument('--baslik', default=''); ap.add_argument('--aciklama', default='')
-    ap.add_argument('--kok', default='../layouts/Site.astro'); ap.add_argument('--ekyok', action='store_true'); ap.add_argument('--durum', default='{}'); ap.add_argument('--suzgec', action='append', default=[]); ap.add_argument('--bag', action='append', default=[])
+    ap.add_argument('--kok', default='../layouts/Site.astro'); ap.add_argument('--ekyok', action='store_true'); ap.add_argument('--durum', default='{}'); ap.add_argument('--props', default='{}'); ap.add_argument('--suzgec', action='append', default=[]); ap.add_argument('--bag', action='append', default=[])
     a = ap.parse_args()
     s = open(a.kaynak, encoding='utf-8').read()
     b = s.index('</header>') + len('</header>')
@@ -101,7 +101,7 @@ def main():
         "// Tasarım verisi derleme anında üretilir (tools/dc2astro.py).\n"
         "class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }\n"
         + betik.strip() + "\n"
-        "const __c = new Component({}); Object.assign(__c.state, " + a.durum + ");\nconst __v = __c.renderVals();\n"
+        "const __c = new Component(" + a.props + "); Object.assign(__c.state, " + a.durum + ");\nconst __v = __c.renderVals();\n"
         "const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');\n"
         "const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });\n"
         + ''.join(f"const {n} = __v.{n};\n" for n in adlar)

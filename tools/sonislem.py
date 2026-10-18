@@ -34,3 +34,30 @@ for p, kaynak in FORMLAR.items():
     s = s[:i] + TUZAK + '<div data-turnstile style="flex: 1 1 100%"></div>\n' + DURUM + s[i:]
     open(p, 'w', encoding='utf-8').write(s)
 print('formlar bağlandı')
+
+# Referanslar ve IDOS tanıtımı şimdilik gizli (Muhittin, 19 Eki 2026): bu sayfalara giden bağlantılar kaldırılır.
+p = 'src/pages/tr/sayfa/hakkimizda.astro'
+s = open(p, encoding='utf-8').read()
+s, n = re.subn(r'<a href="/tr/referanslar"[^>]*>Çalışmalarımız</a>', '', s)
+assert n == 1, 'hakkımızda çalışmalarımız bağlantısı'
+open(p, 'w', encoding='utf-8').write(s)
+p = 'src/pages/index.astro'
+s = open(p, encoding='utf-8').read()
+s, n = re.subn(r'<a href="#idos"[^>]*>Panele giriş yap</a>\n?', '', s)
+assert n == 1, 'panele giriş düğmesi'
+s, n = re.subn(r'<a href="#analiz"([^>]*>IDOS\'u tanıyın</a>)', r'<a href="/tr/idos"\1', s)
+assert n == 1, 'idos tanıtım bağlantısı'
+open(p, 'w', encoding='utf-8').write(s)
+# Gizli sayfalara kalan bağlantıları tools/denetim.mjs kırık bağlantı olarak yakalar (sayfalar derlenmediği için).
+print('gizli sayfa bağlantıları temizlendi')
+
+# IDOS tanıtım sayfası (Muhittin, 19 Eki 2026): panel bağlantısı ve panel adresi hiçbir yerde görünmez; sayfa arama motorlarına kapalı.
+p = 'src/pages/tr/idos.astro'
+s = open(p, encoding='utf-8').read()
+s, n = re.subn(r'<a href="https://idos\.idexya\.com"[^>]*>Panele giriş yap</a>\n?', '', s)
+assert n == 1, 'idos panele giriş'
+s = s.replace('idos.idexya.com · Günlük kontrol', 'IDOS · Günlük kontrol')
+s = s.replace('<Site baslik="IDOS"', '<Site aramayaKapali baslik="IDOS"')
+assert 'idos.idexya' not in s and 'aramayaKapali' in s
+open(p, 'w', encoding='utf-8').write(s)
+print('IDOS tanıtım sayfası temizlendi')

@@ -28,7 +28,7 @@ class Component extends DCLogic {
     };
   }
 }
-const __c = new Component({}); Object.assign(__c.state, {});
+const __c = new Component({"referansGoster":false}); Object.assign(__c.state, {});
 const __v = __c.renderVals();
 const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
@@ -169,8 +169,7 @@ WhatsApp'tan yaz</a>
 <h2 style="margin: 0; font-size: 46px; line-height: 1.1; letter-spacing: -0.025em; color: #FFFFFF">Tüm hesaplarınız tek panelde</h2>
 <p style="margin: 0; font-size: 18px; color: #C6D2E3">Kendi geliştirdiğimiz panel, reklam ve analiz verilerinizi tek ekranda toplar. Yapay zekâ öneri sunar; karar her zaman sizde kalır.</p>
 <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 8px">
-<a href="#analiz" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700">IDOS'u tanıyın</a>
-<a href="#idos" style="min-height: 52px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 600">Panele giriş yap</a>
+<a href="/tr/idos" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700">IDOS'u tanıyın</a>
 </div>
 </div>
 <div style="flex: 1 1 540px; min-width: 0; display: flex; flex-wrap: wrap; gap: 16px">

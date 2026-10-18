@@ -30,7 +30,7 @@ const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').r
 const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
 const ozellikler = __v.ozellikler;
 ---
-<Site baslik="IDOS" aciklama="Tüm reklam hesaplarınız, raporlarınız ve onaylı değişiklikler tek panelde." aktif="IDOS">
+<Site aramayaKapali baslik="IDOS" aciklama="Tüm reklam hesaplarınız, raporlarınız ve onaylı değişiklikler tek panelde." aktif="IDOS">
 
 
 <section style="background: #002559; color: #F1F3F5; position: relative; overflow: hidden">
@@ -44,12 +44,11 @@ const ozellikler = __v.ozellikler;
 <p style="margin: 0; font-size: 19px; color: #C6D2E3; max-width: 560px">Google, Meta ve analiz hesaplarınız tek panelde. Yapay zekâ önerir, uzmanımız inceler, siz onaylarsınız. Onayınız olmadan hiçbir canlı ayar değişmez.</p>
 <div style="display: flex; flex-wrap: wrap; gap: 12px">
 <a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Tanıtım iste</a>
-<a href="https://idos.idexya.com" style="min-height: 54px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 600; font-size: 17px">Panele giriş yap</a>
 </div>
 </div>
 <figure style="flex: 1 1 540px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
 <div role="img" aria-label="IDOS genel bakış ekranının temsili görünümü" style="background: #F7F9FC; border-radius: 20px; box-shadow: 0 40px 90px rgba(0,0,0,.45); overflow: hidden; color: #1F2A3A">
-<div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #EAF0F7; border-bottom: 1px solid #D8E1EC"><span style="width: 10px; height: 10px; border-radius: 50%; background: #E9A28A"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #F3C56D"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #9FD4B5"></span><span style="margin-left: 10px; font-size: 13px; color: #4A5A70">idos.idexya.com · Günlük kontrol</span></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #EAF0F7; border-bottom: 1px solid #D8E1EC"><span style="width: 10px; height: 10px; border-radius: 50%; background: #E9A28A"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #F3C56D"></span><span style="width: 10px; height: 10px; border-radius: 50%; background: #9FD4B5"></span><span style="margin-left: 10px; font-size: 13px; color: #4A5A70">IDOS · Günlük kontrol</span></div>
 <div style="display: flex">
 <div style="width: 150px; flex: none; padding: 16px 12px; background: #FFFFFF; border-right: 1px solid #E3E9F1; display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #4A5A70"><span style="padding: 7px 10px; border-radius: 8px; background: #FDE9DB; color: #A9420A; font-weight: 600">Günlük kontrol</span><span style="padding: 7px 10px">Müşteriler</span><span style="padding: 7px 10px">Google Ads</span><span style="padding: 7px 10px">Meta Ads</span><span style="padding: 7px 10px">GA4</span><span style="padding: 7px 10px">Öneriler</span><span style="padding: 7px 10px">Raporlar</span></div>
 <div style="flex: 1; min-width: 0; padding: 18px; display: flex; flex-direction: column; gap: 14px">

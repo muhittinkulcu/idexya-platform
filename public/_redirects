@@ -4,5 +4,10 @@
 /tr/sayfa/vizyonumuz     /tr/sayfa/hakkimizda       301
 /tr/sayfa/misyonumuz     /tr/sayfa/hakkimizda       301
 /tr/urun/*               /tr/paketler               301
-/tr/projeler/*           /tr/referanslar            301
-/tr/projeler             /tr/referanslar            301
+
+# GEÇİCİ (Muhittin, 19 Eki 2026): Referanslar sayfası şimdilik yayında değil.
+# 302 (geçici) kullanılır; sayfalar geri açılınca bu satırlar silinir. Bkz. src/gizli/README.md
+/tr/referanslar          /tr/hizmetler              302
+/tr/projeler             /tr/hizmetler              302
+/tr/projeler/*           /tr/hizmetler              302
+/tr/proje/*              /tr/hizmetler              302

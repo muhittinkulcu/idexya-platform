@@ -94,4 +94,27 @@ function yasla() {
   let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(isle, 150); });
 }
 
-export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); formlar(); }
+export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); formlar(); efektler(); }
+
+// Kaydırınca üst menü yarı saydam ve gölgeli olur; süreç adımları sırayla görününce yanar; koyu bölümdeki kartlarda imleci izleyen ışık.
+function efektler() {
+  const ust = document.querySelector('.site-ust');
+  if (ust) { const k = () => ust.classList.toggle('kaydi', scrollY > 8); k(); addEventListener('scroll', k, { passive: true }); }
+  const sira = document.querySelector('main ol');
+  if (sira && sira.querySelector('li span[style*="border-radius: 50%"]')) {
+    sira.classList.add('adim-sira');
+    const li = [...sira.children];
+    if ('IntersectionObserver' in window) {
+      const g = new IntersectionObserver((e) => e.forEach((x) => {
+        if (!x.isIntersecting) return;
+        li.forEach((l, i) => setTimeout(() => l.classList.add('gorundu'), i * 220));
+        g.disconnect();
+      }), { threshold: 0.4 });
+      g.observe(sira);
+    } else li.forEach((l) => l.classList.add('gorundu'));
+  }
+  document.querySelectorAll('#idos [style*="rgba(255,255,255,.06)"]').forEach((k) => {
+    k.classList.add('isik');
+    k.addEventListener('pointermove', (o) => { const r = k.getBoundingClientRect(); k.style.setProperty('--x', o.clientX - r.left + 'px'); k.style.setProperty('--y', o.clientY - r.top + 'px'); });
+  });
+}
