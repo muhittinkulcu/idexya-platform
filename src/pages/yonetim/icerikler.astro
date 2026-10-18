@@ -1,0 +1,120 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+import IcerikStil from '../../components/IcerikStil.astro';
+---
+<Yonetim baslik="İçerikler" aktif="icerikler" yol="Üyelik ve içerik" aciklama="Yazı ve kaynakları buradan yayınlayın. Her içerik için kimin göreceğini, kimin yorum yapabileceğini ve arama motorlarında görünüp görünmeyeceğini ayrı ayrı seçersiniz. Silme yoktur; yayından kaldırmak için arşive alın.">
+<IcerikStil />
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); flex-wrap: wrap"></div>
+<button type="button" class="dugme ana" data-yeni style="margin-left: auto">+ Yeni içerik</button>
+</div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<section aria-label="İçerik listesi" class="kart" data-liste style="flex: 1 1 300px; overflow: hidden"></section>
+<section aria-label="İçerik düzenle" class="kart" data-duzen style="flex: 3 1 560px; padding: 18px; display: flex; flex-direction: column; gap: 16px"></section>
+</div>
+<script>
+  import { api, el, tarih, once, genelHata, sayacGuncelle } from '../../scripts/yonetim/ortak.js';
+  import { metinHtml } from '../../../worker/metin.js';
+  const $ = (s) => document.querySelector(s);
+  const liste = $('[data-liste]'), duzen = $('[data-duzen]'), sekmeler = $('[data-sekmeler]');
+  let tum = [], adlar = { gorunurluk: {}, etkilesim: {} }, uyeler = null, gruplar = null, sekme = 'Tümü', secili = new URLSearchParams(location.search).get('id');
+  const BOLUM = ['Tümü', 'Yayında', 'Zamanlanmış', 'Gizli', 'Arşivde'];
+  const CIP = { 'Yayında': 'kazanildi', 'Zamanlanmış': 'gorusme', 'Gizli': 'yeni', 'Arşivde': 'kaybedildi' };
+  const ACIKLAMA = {
+    herkes: 'Siteye giren herkes görür ve İçerikler listesinde yer alır.',
+    uyeler: '“Üyelere özel içerikler” bölümü açık onaylı üyeler okur. Diğerleri yalnız başlık ve özeti görür, giriş çağrısı alır.',
+    secili: 'Yalnız aşağıda seçtiğiniz üyeler ve gruplardakiler görür. Diğerleri için içerik yokmuş gibi davranılır.',
+    liste_disi: 'Listelerde görünmez, arama motorlarına kapalıdır; bağlantıyı bilen herkes açabilir (YouTube’daki “liste dışı” gibi).',
+    gizli: 'Yalnız siz görürsünüz. Taslak olarak da kullanabilirsiniz.'
+  };
+  const ISLEM = { icerik_olustur: 'Oluşturuldu', icerik_guncelle: 'Güncellendi', icerik_arsiv: 'Arşive alındı', icerik_arsivden: 'Arşivden çıkarıldı', yorum_yayinla: 'Yorum yayınlandı', yorum_gizle: 'Yorum gizlendi' };
+  const yerel = (iso) => { if (!iso) return ''; const d = new Date(iso); const p = (n) => String(n).padStart(2, '0'); return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`; };
+
+  function listeCiz() {
+    sekmeler.replaceChildren(...BOLUM.map((b) => { const n = b === 'Tümü' ? tum.length : tum.filter((x) => x.durum === b).length, s = b === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = b; listeCiz(); } }, b + ' ', el('span', { style: 'opacity: .7' }, String(n))); }));
+    const gor = tum.filter((x) => sekme === 'Tümü' || x.durum === sekme);
+    liste.replaceChildren(...(gor.length ? gor.map((x) => el('button', { type: 'button', 'aria-pressed': String(x.id === secili), onclick: () => ac(x.id),
+      style: `width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${x.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer` },
+      el('strong', { style: 'color: var(--head)' }, x.baslik),
+      el('span', { style: 'font-size: 12px; color: var(--tx2)' }, adlar.gorunurluk[x.gorunurluk] + ' · ' + once(x.guncelleme)),
+      el('span', { style: 'display: flex; gap: 6px; align-items: center' }, el('span', { class: 'cip ' + CIP[x.durum] }, x.durum), x.bekleyen_yorum ? el('span', { class: 'cip gorusme' }, x.bekleyen_yorum + ' yorum bekliyor') : null)))
+      : [el('div', { class: 'bos' }, tum.length ? 'Bu bölümde içerik yok.' : 'Henüz içerik yok. “Yeni içerik” ile başlayın.')]));
+  }
+  async function yenileListe() { const r = await api('icerikler'); tum = r.icerikler; adlar = { gorunurluk: r.gorunurluk, etkilesim: r.etkilesim }; listeCiz(); api('ozet').then(sayacGuncelle).catch(() => {}); }
+  async function ac(id) { secili = id; history.replaceState(null, '', id ? '?id=' + encodeURIComponent(id) : location.pathname); listeCiz(); await duzenCiz(id); }
+
+  async function duzenCiz(id) {
+    let v = { icerik: { baslik: '', kisa_ad: '', ozet: '', govde: '', kategori: '', gorunurluk: 'gizli', etkilesim: 'kimse', arama: 0, arsiv: 0, yayin_zamani: null, durum: 'Gizli' }, erisim: [], yorumlar: [], kayitlar: [] };
+    if (id) { duzen.replaceChildren(el('div', { class: 'bos' }, 'Yükleniyor…')); try { v = await api('icerikler/' + encodeURIComponent(id)); } catch (h) { duzen.replaceChildren(el('div', { class: 'uyari hata' }, 'İçerik yüklenemedi: ' + h.message)); return; } }
+    if (!uyeler) { [uyeler, gruplar] = await Promise.all([api('uye-secim').then((r) => r.uyeler), api('gruplar').then((r) => r.gruplar)]); }
+    const ic = v.icerik;
+    const giris = (ad, ozellik, alt) => el('label', { class: 'alan' }, ad, el('input', ozellik), alt ? el('span', { style: 'font-weight: 400; font-size: 12px; color: var(--tx2)' }, alt) : null);
+    const baslik = el('input', { value: ic.baslik, maxlength: 200 });
+    const kisa = el('input', { value: ic.kisa_ad, maxlength: 80, placeholder: 'boş bırakılırsa başlıktan oluşur' });
+    const ozet = el('textarea', { rows: 2, maxlength: 500 }); ozet.value = ic.ozet || '';
+    const kategori = el('input', { value: ic.kategori || '', maxlength: 60, placeholder: 'ör. Reklam' });
+    const govde = el('textarea', { rows: 14, style: 'font-family: inherit; line-height: 1.6' }); govde.value = ic.govde || '';
+    const onizleme = el('div', { class: 'icerik-metin', hidden: true, style: 'padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg)' });
+    const onizDugme = el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { const g = onizleme.hidden; onizleme.hidden = !g; govde.hidden = g; if (g) onizleme.innerHTML = metinHtml(govde.value) || '<p>Metin boş.</p>'; onizDugme.textContent = g ? 'Düzenle' : 'Önizle'; } }, 'Önizle');
+    let gor = ic.gorunurluk, etk = ic.etkilesim;
+    const secUye = new Set(v.erisim.filter((e) => e.tur === 'uye').map((e) => e.hedef_id)), secGrup = new Set(v.erisim.filter((e) => e.tur === 'grup').map((e) => e.hedef_id));
+    const arama = el('input', { type: 'checkbox', checked: ic.arama === 1 });
+    const secAlan = el('div', { style: 'display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 12px; background: var(--card2)' });
+    const uyeAra = el('input', { type: 'search', placeholder: 'Üye ara…', 'aria-label': 'Üye ara', style: 'min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit' });
+    const uyeKutusu = el('div', { style: 'display: flex; flex-direction: column; gap: 2px; max-height: 220px; overflow: auto' });
+    const uyeCiz = () => { const q = uyeAra.value.trim().toLocaleLowerCase('tr-TR'); uyeKutusu.replaceChildren(...(uyeler.length ? uyeler.filter((u) => !q || (u.ad + ' ' + u.eposta).toLocaleLowerCase('tr-TR').includes(q)).map((u) => el('label', { style: 'display: flex; gap: 8px; align-items: center; font-size: 13px; padding: 4px 2px' }, el('input', { type: 'checkbox', checked: secUye.has(u.id), onchange: (o) => (o.currentTarget.checked ? secUye.add(u.id) : secUye.delete(u.id)) }), el('span', {}, u.ad, el('span', { style: 'color: var(--tx2)' }, ' · ' + u.eposta)))) : [el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Onaylı üye yok.')])); };
+    uyeAra.addEventListener('input', uyeCiz); uyeCiz();
+    secAlan.append(el('strong', { style: 'font-size: 13px; color: var(--head)' }, 'Gruplar'), gruplar.length ? el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap' }, gruplar.map((g) => el('label', { style: 'display: inline-flex; gap: 6px; align-items: center; padding: 4px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px' }, el('input', { type: 'checkbox', checked: secGrup.has(g.id), onchange: (o) => (o.currentTarget.checked ? secGrup.add(g.id) : secGrup.delete(g.id)) }), g.ad))) : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Grup yok. Üyeler sayfasından ekleyebilirsiniz.'), el('strong', { style: 'font-size: 13px; color: var(--head)' }, 'Üyeler'), uyeAra, uyeKutusu);
+    const secenek = (ad, deger, baslikMetin, aciklama, grup, secilen, degisti) => el('label', { style: 'display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer' },
+      el('input', { type: 'radio', name: grup, value: deger, checked: secilen === deger, style: 'margin-top: 3px', onchange: () => degisti(deger) }), el('span', { style: 'display: flex; flex-direction: column' }, el('strong', { style: 'color: var(--head)' }, baslikMetin), aciklama ? el('span', { style: 'font-size: 12px; color: var(--tx2)' }, aciklama) : null));
+    const aramaSatir = el('label', { style: 'display: flex; gap: 10px; align-items: flex-start; font-size: 13px' }, arama, el('span', {}, el('strong', {}, 'Arama motorlarında görünsün'), el('br'), el('span', { style: 'color: var(--tx2)' }, 'Yalnız “Herkese açık” içerikte seçilebilir. Site yayına alınana kadar tüm site arama motorlarına kapalıdır.')));
+    const gorDegisti = (d) => { gor = d; secAlan.hidden = d !== 'secili'; arama.disabled = d !== 'herkes'; if (d !== 'herkes') arama.checked = false; aramaSatir.style.opacity = d === 'herkes' ? '1' : '.55'; };
+    const zamanHemen = el('input', { type: 'radio', name: 'zaman', checked: !ic.yayin_zamani || ic.yayin_zamani <= new Date().toISOString() });
+    const zamanIleri = el('input', { type: 'radio', name: 'zaman', checked: !!ic.yayin_zamani && ic.yayin_zamani > new Date().toISOString() });
+    const zaman = el('input', { type: 'datetime-local', value: zamanIleri.checked ? yerel(ic.yayin_zamani) : '', 'aria-label': 'Yayın tarihi ve saati', style: 'min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit', onfocus: () => (zamanIleri.checked = true) });
+    const mesaj = el('div', { role: 'status', 'aria-live': 'polite', hidden: true, class: 'uyari' });
+    const bildir = (m, t = 'ok') => { mesaj.hidden = false; mesaj.className = 'uyari ' + t; mesaj.textContent = m; mesaj.scrollIntoView({ block: 'nearest' }); };
+    const kaydet = el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
+      if (zamanIleri.checked && !zaman.value) return bildir('İleri tarihli yayın için tarih ve saat seçin.', 'hata');
+      const g = { baslik: baslik.value, kisa_ad: kisa.value, ozet: ozet.value, govde: govde.value, kategori: kategori.value, gorunurluk: gor, etkilesim: etk, arama: arama.checked, yayin_zamani: zamanIleri.checked ? new Date(zaman.value).toISOString() : (ic.yayin_zamani && ic.yayin_zamani <= new Date().toISOString() ? ic.yayin_zamani : new Date().toISOString()), uyeler: [...secUye], gruplar: [...secGrup] };
+      o.currentTarget.disabled = true;
+      try { const r = await api(id ? 'icerikler/' + encodeURIComponent(id) : 'icerikler', g); await yenileListe(); await ac(r.id); duzen.querySelector('[role=status]').hidden = false; Object.assign(duzen.querySelector('[role=status]'), { className: 'uyari ok', textContent: 'Kaydedildi.' }); }
+      catch (h) { bildir(h.message, 'hata'); o.currentTarget.disabled = false; }
+    } }, id ? 'Kaydet' : 'Oluştur');
+    const arsiv = id ? el('button', { type: 'button', class: 'dugme', onclick: async () => {
+      if (!ic.arsiv && !confirm('İçerik yayından kalkacak ve kimse göremeyecek. Silinmez; istediğiniz an geri alabilirsiniz. Devam edilsin mi?')) return;
+      try { await api(`icerikler/${encodeURIComponent(id)}/arsiv`, { arsiv: !ic.arsiv }); await yenileListe(); await ac(id); } catch (h) { bildir(h.message, 'hata'); }
+    } }, ic.arsiv ? 'Arşivden çıkar' : 'Arşive al') : null;
+    const bolum = (t, ...c) => el('section', { style: 'display: flex; flex-direction: column; gap: 8px' }, el('h3', { style: 'margin: 0; font-size: 15px; color: var(--head)' }, t), ...c);
+    duzen.replaceChildren(
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center' }, el('strong', { style: 'font-size: 18px; color: var(--head)' }, id ? ic.baslik : 'Yeni içerik'),
+        el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap' }, id ? el('span', { class: 'cip ' + CIP[ic.durum] }, ic.durum) : null, id ? el('a', { class: 'dugme kucuk', href: '/icerik/' + ic.kisa_ad, target: '_blank', rel: 'noopener' }, 'Sayfayı aç ↗') : null)),
+      ic.arsiv ? el('div', { class: 'uyari hata' }, 'Bu içerik arşivde: kimse göremez. Ayarları değiştirebilirsiniz; yayına dönmesi için “Arşivden çıkar”a basın.') : '',
+      mesaj,
+      el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px' }, el('label', { class: 'alan', style: 'grid-column: 1 / -1' }, 'Başlık', baslik), el('label', { class: 'alan' }, 'Kısa ad (adres)', kisa), el('label', { class: 'alan' }, 'Kategori', kategori), el('label', { class: 'alan', style: 'grid-column: 1 / -1' }, 'Özet', ozet)),
+      el('div', { style: 'display: flex; flex-direction: column; gap: 6px' }, el('div', { style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap' }, el('span', { style: 'font-size: 13px; font-weight: 600; color: var(--head)' }, 'Metin'), onizDugme),
+        el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Biçim: “## Ara başlık”, “**kalın**”, “_eğik_”, “- madde”, “> alıntı”, “[bağlantı metni](https://...)”. Paragraflar arasında boş satır bırakın.'), govde, onizleme),
+      bolum('Kim görsün?', ...Object.entries(adlar.gorunurluk).map(([k, a]) => secenek(a, k, a, ACIKLAMA[k], 'gor', gor, gorDegisti)), secAlan),
+      bolum('Kim yorum yapabilsin?', ...Object.entries(adlar.etkilesim).map(([k, a]) => secenek(a, k, a, k === 'uyeler' ? '“Üyelere özel içerikler” bölümünde “kullan” yetkisi olanlar veya erişim listesindekiler. Üye yorumları hemen yayınlanır.' : k === 'herkes' ? 'Ziyaretçi yorumları sizin onayınızdan sonra yayınlanır.' : '', 'etk', etk, (d) => (etk = d)))),
+      bolum('Arama motorları', aramaSatir),
+      bolum('Ne zaman yayınlansın?', el('label', { style: 'display: flex; gap: 8px; align-items: center' }, zamanHemen, 'Kaydedince (görünürlük “Gizli” değilse)'), el('label', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap' }, zamanIleri, 'İleri bir tarihte', zaman)),
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; padding-top: 4px; border-top: 1px solid var(--line); padding-top: 14px' }, kaydet, arsiv),
+      id ? bolum('Yorumlar', ...(v.yorumlar.length ? v.yorumlar.map((y) => el('div', { style: 'display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px' },
+        el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 13px' }, el('span', {}, el('strong', {}, y.ad), ' · ' + (y.uye_id ? 'Üye' : 'Ziyaretçi') + (y.eposta ? ' · ' + y.eposta : '')), el('span', { style: 'color: var(--tx2)' }, tarih(y.zaman))),
+        el('span', { style: 'white-space: pre-wrap; overflow-wrap: anywhere' }, y.metin),
+        el('div', { style: 'display: flex; gap: 6px; align-items: center' }, el('span', { class: 'cip ' + ({ bekliyor: 'gorusme', yayinda: 'kazanildi', gizlendi: 'kaybedildi' }[y.durum]) }, { bekliyor: 'Onay bekliyor', yayinda: 'Yayında', gizlendi: 'Gizlendi' }[y.durum]),
+          y.durum !== 'yayinda' ? el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { await api(`yorumlar/${encodeURIComponent(y.id)}/yayinla`, {}); await yenileListe(); ac(id); } }, 'Yayınla') : null,
+          y.durum !== 'gizlendi' ? el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { await api(`yorumlar/${encodeURIComponent(y.id)}/gizle`, {}); await yenileListe(); ac(id); } }, 'Gizle') : null)))
+        : [el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Yorum yok.')])) : '',
+      id ? bolum('Geçmiş', ...v.kayitlar.map((k) => el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--line); font-size: 13px' }, el('span', {}, el('strong', {}, ISLEM[k.islem] || k.islem), k.detay && !k.islem.startsWith('yorum') && k.islem !== 'icerik_olustur' ? ' · ' + k.detay : ''), el('span', { style: 'color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim)))) : ''
+    );
+    gorDegisti(gor);
+  }
+  $('[data-yeni]').addEventListener('click', () => ac(null));
+  (async () => {
+    try { await yenileListe(); if (!secili && tum.length) secili = tum[0].id; await ac(secili); }
+    catch (h) { genelHata('İçerikler yüklenemedi: ' + h.message); }
+  })();
+</script>
+</Yonetim>

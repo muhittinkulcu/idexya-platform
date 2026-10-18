@@ -1,0 +1,26 @@
+---
+// Tek içerik sayfasının kabuğu. Sunucu (worker/icerik.js) erişimi denetler ve içeriği [data-icerik-alan] içine yerleştirir.
+// Bu adres doğrudan açılamaz (sunucu 404 verir).
+import Site from '../../layouts/Site.astro';
+import IcerikStil from '../../components/IcerikStil.astro';
+---
+<Site baslik="İçerik" aciklama="Idexya içerikleri" aramayaKapali>
+<IcerikStil />
+<article class="icerik-sayfa" data-icerik-alan></article>
+<script>
+  import { formBagla, durumYaz } from '../../scripts/uye-sayfa.js';
+  const f = document.querySelector('[data-yorum-form]');
+  if (f) {
+    const uye = f.dataset.uye === '1';
+    formBagla(f, '__yorum__', (v) => {
+      if (!v.metin || v.metin.trim().length < 2) return 'Yorumunuzu yazın.';
+      if (!uye && !v.ad.trim()) return 'Adınızı yazın.';
+      if (!uye && !v.kvkk) return 'Devam etmek için KVKK aydınlatma metnini onaylayın.';
+      return null;
+    }, (s) => {
+      if (s.durum === 'yayinda') location.reload();
+      else { f.reset(); durumYaz(f, 'Teşekkürler. Yorumunuz onaylandıktan sonra yayınlanacak.', 'ok'); }
+    }, '/api/icerik/' + f.dataset.kisa + '/yorum');
+  }
+</script>
+</Site>

@@ -1,0 +1,30 @@
+<style is:global>
+.icerik-sayfa{max-width:760px;margin:0 auto;padding:clamp(40px,7vw,80px) 24px 96px;box-sizing:border-box;display:flex;flex-direction:column;gap:18px}
+.icerik-sayfa h1{margin:0;font-size:clamp(32px,5vw,46px);line-height:1.1;letter-spacing:-.02em;color:var(--head)}
+.icerik-sayfa h2{margin:28px 0 0;font-size:26px;color:var(--head);letter-spacing:-.01em}
+.icerik-sayfa h3{margin:20px 0 0;font-size:20px;color:var(--head)}
+.icerik-ust{margin:0;font-size:14px;color:var(--tx2)}
+.icerik-etiket{display:inline-block;padding:1px 10px;border-radius:999px;background:var(--tint);color:var(--tintx);font-weight:600}
+.icerik-ozet{margin:0;font-size:20px;color:var(--tx2);line-height:1.5}
+.icerik-metin{display:flex;flex-direction:column;gap:14px;font-size:18px;line-height:1.7}
+.icerik-metin p,.icerik-metin ul,.icerik-metin ol{margin:0}
+@media (min-width:640px){.icerik-metin p{text-align:justify;hyphens:auto}}
+.icerik-metin blockquote{margin:0;padding:6px 0 6px 18px;border-left:3px solid var(--brand);color:var(--tx2)}
+.icerik-kilit,.icerik-yorum-form{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.icerik-kilit p{margin:0;color:var(--tx2)}
+.icerik-dugme{min-height:48px;display:inline-flex;align-items:center;justify-content:center;padding:0 20px;border:0;border-radius:12px;background:var(--fill);color:#FFFFFF!important;font:inherit;font-weight:600;text-decoration:none;cursor:pointer}
+.icerik-dugme.ikincil{background:transparent;border:1px solid var(--line);color:var(--head)!important}
+.icerik-yorumlar{display:flex;flex-direction:column;gap:12px;padding-top:24px;border-top:1px solid var(--line);margin-top:20px}
+.icerik-yorum{padding:14px 16px;border-radius:14px;background:var(--bg2)}.icerik-yorum p{margin:0}
+.icerik-yorum-ust{font-size:14px;color:var(--tx2);margin-bottom:4px!important}
+.icerik-sessiz{margin:0;color:var(--tx2)}
+.icerik-yorum-form label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--head)}
+.icerik-yorum-form input:not([type=checkbox]),.icerik-yorum-form textarea{min-height:46px;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:16px;font-weight:400;box-sizing:border-box;width:100%}
+.icerik-yorum-form label.icerik-onay{flex-direction:row;align-items:flex-start;gap:10px;font-weight:400;color:var(--tx2)}
+.icerik-yorum-form [data-form-durum]{margin:0;padding:12px 14px;border-radius:10px}
+.icerik-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.icerik-kart{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s;min-width:0}
+.icerik-kart:hover{transform:translateY(-3px);box-shadow:0 18px 40px var(--shadow)}
+.icerik-kart h2{margin:0;font-size:21px;color:var(--head)}
+.icerik-kart p{margin:0;color:var(--tx2)}
+</style>

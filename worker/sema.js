@@ -37,5 +37,16 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS giris_denemeleri (id TEXT PRIMARY KEY, zaman TEXT NOT NULL, eposta TEXT, ip_ozet TEXT NOT NULL, basarili INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS giris_eposta ON giris_denemeleri (eposta, zaman)`,
   `CREATE INDEX IF NOT EXISTS giris_ip ON giris_denemeleri (ip_ozet, zaman)`,
-  `CREATE TABLE IF NOT EXISTS sifre_yenileme (ozet TEXT PRIMARY KEY, uye_id TEXT NOT NULL, olusturma TEXT NOT NULL, bitis TEXT NOT NULL, kullanildi TEXT, olusturan TEXT NOT NULL)`
+  `CREATE TABLE IF NOT EXISTS sifre_yenileme (ozet TEXT PRIMARY KEY, uye_id TEXT NOT NULL, olusturma TEXT NOT NULL, bitis TEXT NOT NULL, kullanildi TEXT, olusturan TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS icerikler (
+    id TEXT PRIMARY KEY, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, yazar TEXT NOT NULL,
+    baslik TEXT NOT NULL, kisa_ad TEXT NOT NULL UNIQUE, ozet TEXT, govde TEXT, kategori TEXT,
+    gorunurluk TEXT NOT NULL DEFAULT 'gizli', etkilesim TEXT NOT NULL DEFAULT 'kimse', arama INTEGER NOT NULL DEFAULT 0,
+    arsiv INTEGER NOT NULL DEFAULT 0, yayin_zamani TEXT)`,
+  `CREATE INDEX IF NOT EXISTS icerik_yayin ON icerikler (arsiv, gorunurluk, yayin_zamani)`,
+  `CREATE TABLE IF NOT EXISTS icerik_erisim (icerik_id TEXT NOT NULL, tur TEXT NOT NULL, hedef_id TEXT NOT NULL, PRIMARY KEY (icerik_id, tur, hedef_id))`,
+  `CREATE TABLE IF NOT EXISTS yorumlar (
+    id TEXT PRIMARY KEY, icerik_id TEXT NOT NULL, zaman TEXT NOT NULL, uye_id TEXT, ad TEXT NOT NULL, eposta TEXT,
+    metin TEXT NOT NULL, durum TEXT NOT NULL DEFAULT 'bekliyor', ip_ozet TEXT, karar_veren TEXT, karar_zamani TEXT)`,
+  `CREATE INDEX IF NOT EXISTS yorum_icerik ON yorumlar (icerik_id, durum, zaman)`
 ];

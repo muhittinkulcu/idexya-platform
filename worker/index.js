@@ -2,6 +2,7 @@
 // Statik sayfalar Workers Static Assets'ten gelir; bu dosya yalnız /api/* ve /yonetim* için çalışır.
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { uyeApi, yonetimUyeApi } from './uye.js';
+import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
 import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz } from './ortak.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -80,14 +81,15 @@ async function yonetimApi(istek, env, yol, kim) {
   const govde = yontem === 'POST' ? await istek.json().catch(() => ({})) : {};
 
   if (yol === 'ozet' && yontem === 'GET') {
-    const [t, m, a, k, u] = await db.batch([
+    const [t, m, a, k, u, yo] = await db.batch([
       db.prepare("SELECT durum, COUNT(*) AS n FROM talepler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler"),
       db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler GROUP BY asama"),
       db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12"),
-      db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum")
+      db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum"),
+      db.prepare("SELECT COUNT(*) AS n FROM yorumlar WHERE durum = 'bekliyor'")
     ]);
-    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results });
+    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n });
   }
   if (yol === 'talepler' && yontem === 'GET') {
     const r = await db.prepare("SELECT * FROM talepler ORDER BY olusturma DESC LIMIT 200").all();
@@ -193,7 +195,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = await yonetimUyeApi(db, yontem, yol, govde, kim);
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -207,6 +209,14 @@ export default {
         if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
         return await talepAl(istek, env);
       }
+      if (yol === '/api/icerik' || yol.startsWith('/api/icerik/')) {
+        await semaKur(env.DB);
+        return await icerikApi(istek, env, yol.slice('/api/icerik'.length).replace(/^\/|\/$/g, ''));
+      }
+      if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
+      if (yol.startsWith('/uye/')) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
+      const icerikEslesme = yol.match(/^\/icerik\/([a-z0-9-]{1,80})\/?$/);
+      if (icerikEslesme) { await semaKur(env.DB); return await icerikSayfasi(istek, env, icerikEslesme[1]); }
       if (yol.startsWith('/api/uye/')) {
         await semaKur(env.DB);
         return await uyeApi(istek, env, yol.slice('/api/uye/'.length).replace(/\/$/, ''));

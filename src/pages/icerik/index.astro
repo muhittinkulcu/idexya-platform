@@ -1,0 +1,31 @@
+---
+import Site from '../../layouts/Site.astro';
+import IcerikStil from '../../components/IcerikStil.astro';
+---
+<Site baslik="İçerikler" aciklama="Reklam, e-ticaret ve ölçüm üzerine yazılar ve üyelere özel kaynaklar.">
+<IcerikStil />
+<section style="max-width: 1240px; margin: 0 auto; padding: clamp(40px, 7vw, 80px) 24px 96px; box-sizing: border-box; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px; max-width: 720px">
+<h1 style="margin: 0; font-size: clamp(32px, 5vw, 46px); line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">İçerikler</h1>
+<p style="margin: 0; font-size: 18px; color: var(--tx2)" data-alt>Yazılar, rehberler ve üyelere özel kaynaklar.</p>
+</div>
+<div class="icerik-liste" data-liste aria-live="polite"><p class="icerik-sessiz">Yükleniyor…</p></div>
+</section>
+<script>
+  const kap = document.querySelector('[data-liste]');
+  const el = (t, o = {}, ...c) => { const e = document.createElement(t); Object.entries(o).forEach(([k, v]) => (k === 'class' ? (e.className = v) : e.setAttribute(k, v))); c.forEach((x) => x != null && e.append(x)); return e; };
+  (async () => {
+    try {
+      const r = await fetch('/api/icerik', { credentials: 'same-origin' });
+      const s = await r.json();
+      if (!s.ok) throw new Error(s.hata);
+      if (s.uye) document.querySelector('[data-alt]').textContent = `Hoş geldiniz ${s.uye.ad}. Size açık içerikler aşağıda.`;
+      kap.replaceChildren(...(s.icerikler.length ? s.icerikler.map((i) => el('a', { class: 'icerik-kart', href: '/icerik/' + i.kisa_ad },
+        el('span', { class: 'icerik-ust' }, [i.kategori, new Date(i.tarih).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })].filter(Boolean).join(' · ')),
+        el('h2', {}, i.baslik), i.ozet ? el('p', {}, i.ozet) : null,
+        i.ozel ? el('span', { class: 'icerik-etiket', style: 'align-self: flex-start; font-size: 13px' }, i.kilitli ? 'Üyelere özel · giriş gerekli' : 'Üyelere özel') : null))
+        : [el('p', { class: 'icerik-sessiz' }, 'Henüz yayınlanmış içerik yok.')]));
+    } catch (e) { kap.replaceChildren(el('p', { class: 'icerik-sessiz' }, 'İçerikler şu anda yüklenemedi. Biraz sonra tekrar deneyin.')); }
+  })();
+</script>
+</Site>

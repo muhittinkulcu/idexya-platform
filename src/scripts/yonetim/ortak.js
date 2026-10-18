@@ -64,6 +64,7 @@ export function sayacGuncelle(ozet) {
   const say = (liste, d) => (liste ? (liste.find((t) => t.durum === d) || { n: 0 }).n : null);
   yaz('talep', ozet ? say(ozet.talepler, 'yeni') : null);
   yaz('uye', ozet ? say(ozet.uyeler, 'bekliyor') : null);
+  yaz('yorum', ozet && ozet.bekleyenYorum !== undefined ? ozet.bekleyenYorum : null);
 }
 
 export function kabuk() {
