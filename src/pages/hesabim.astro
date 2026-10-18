@@ -1,0 +1,61 @@
+---
+import UyeCerceve from '../components/UyeCerceve.astro';
+---
+<UyeCerceve baslik="Hesabım" genis>
+<div data-yukleniyor class="uye-kart" role="status">Hesabınız yükleniyor…</div>
+<div data-icerik hidden style="display: flex; flex-direction: column; gap: 22px">
+<div class="uye-kart" style="flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px">
+<div style="display: flex; flex-direction: column; gap: 4px; min-width: 0"><strong data-ad style="font-size: 20px; color: var(--head)"></strong><span data-eposta style="color: var(--tx2); overflow-wrap: anywhere"></span></div>
+<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"><span data-durum style="padding: 4px 12px; border-radius: 999px; font-size: 14px; font-weight: 600"></span><button type="button" class="uye-dugme ikincil" data-cikis style="min-height: 44px; font-size: 15px">Çıkış yap</button></div>
+</div>
+<div data-bekliyor hidden class="uye-kart" role="status" style="background: var(--tint); border-color: transparent; box-shadow: none">
+<strong style="color: var(--tintx)">Üyelik talebiniz inceleniyor</strong>
+<span style="color: var(--tx)">Onaylandığında size açılan bölümler burada görünecek. Sorunuz varsa <a href="/tr/iletisim">bize yazın</a>.</span>
+</div>
+<section aria-label="Size açılan bölümler" style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 22px; color: var(--head)">Size açılan bölümler</h2>
+<div data-moduller style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px"></div>
+</section>
+<details class="uye-kart" style="gap: 0">
+<summary style="cursor: pointer; font-weight: 600; color: var(--head); min-height: 32px; display: flex; align-items: center">Şifremi değiştir</summary>
+<form data-uye-form novalidate style="display: flex; flex-direction: column; gap: 14px; padding-top: 14px; max-width: 460px">
+<label class="uye-alan">Mevcut şifre<input name="eski" type="password" autocomplete="current-password"></label>
+<label class="uye-alan">Yeni şifre<input name="yeni" type="password" autocomplete="new-password"><small>En az 10 karakter; en az bir harf ve bir rakam. Diğer cihazlardaki oturumlarınız kapanır.</small></label>
+<p data-form-durum class="uye-durum" role="status" aria-live="polite" hidden></p>
+<button type="submit" class="uye-dugme" style="align-self: flex-start">Şifreyi değiştir</button>
+</form>
+</details>
+</div>
+<script>
+  import { uyeIstek, formBagla, durumYaz } from '../scripts/uye-sayfa.js';
+  const $ = (s) => document.querySelector(s);
+  const RENK = { onayli: ['var(--okb)', 'var(--ok)'], bekliyor: ['var(--tint)', 'var(--tintx)'] };
+  (async () => {
+    let s;
+    try { s = await uyeIstek('ben'); } catch (h) { $('[data-yukleniyor]').textContent = 'Hesap bilgileri alınamadı: ' + h.message; return; }
+    if (!s.uye) { location.replace('/giris'); return; }
+    $('[data-yukleniyor]').hidden = true; $('[data-icerik]').hidden = false;
+    $('[data-ad]').textContent = s.uye.ad; $('[data-eposta]').textContent = s.uye.eposta;
+    const d = $('[data-durum]'); d.textContent = s.uye.durumAd; const r = RENK[s.uye.durum] || RENK.bekliyor; d.style.background = r[0]; d.style.color = r[1];
+    $('[data-bekliyor]').hidden = s.uye.durum !== 'bekliyor';
+    const kap = $('[data-moduller]');
+    if (!s.moduller.length) {
+      const p = document.createElement('p'); p.style.cssText = 'margin: 0; color: var(--tx2); grid-column: 1 / -1';
+      p.textContent = s.uye.durum === 'bekliyor' ? 'Henüz açılan bölüm yok.' : 'Size henüz bir bölüm açılmadı. Ekibimiz ihtiyacınıza göre açacak.';
+      kap.append(p);
+    }
+    s.moduller.forEach((m) => {
+      const k = document.createElement(m.hazir ? 'a' : 'div');
+      k.className = 'uye-kart'; k.style.cssText = 'gap: 8px; text-decoration: none; color: inherit; box-shadow: none';
+      if (m.hazir) k.href = '/uye/' + m.k;
+      const b = document.createElement('strong'); b.style.cssText = 'color: var(--head); font-size: 17px'; b.textContent = m.ad;
+      const a = document.createElement('span'); a.style.color = 'var(--tx2)'; a.textContent = m.aciklama;
+      const y = document.createElement('span'); y.style.cssText = 'font-size: 13px; font-weight: 600; color: ' + (m.hazir ? 'var(--acc)' : 'var(--tx2)'); y.textContent = m.hazir ? m.yetkiAd : 'Yakında açılacak';
+      k.append(b, a, y); kap.append(k);
+    });
+  })();
+  $('[data-cikis]').addEventListener('click', async () => { try { await uyeIstek('cikis', {}); } catch (e) {} location.href = '/'; });
+  const f = document.querySelector('[data-uye-form]');
+  formBagla(f, 'sifre-degistir', (v) => (!v.eski || !v.yeni ? 'İki alanı da doldurun.' : null), () => { f.reset(); durumYaz(f, 'Şifreniz değişti.', 'ok'); });
+</script>
+</UyeCerceve>

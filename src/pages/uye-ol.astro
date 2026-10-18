@@ -1,0 +1,38 @@
+---
+import UyeCerceve from '../components/UyeCerceve.astro';
+---
+<UyeCerceve baslik="Üye olun" aciklama="Üyelik talebiniz ekibimize ulaşır. Onaylandığında size açılan bölümleri hesabınızda görürsünüz.">
+<form class="uye-kart" data-uye-form novalidate>
+<label class="uye-alan">Ad soyad<input name="ad" autocomplete="name" required></label>
+<label class="uye-alan">E-posta<input name="eposta" type="email" autocomplete="email" required></label>
+<div style="display: flex; gap: 16px; flex-wrap: wrap">
+<label class="uye-alan" style="flex: 1 1 200px">Firma <small>(isteğe bağlı)</small><input name="firma" autocomplete="organization"></label>
+<label class="uye-alan" style="flex: 1 1 200px">Telefon <small>(isteğe bağlı)</small><input name="telefon" type="tel" autocomplete="tel"></label>
+</div>
+<label class="uye-alan">Şifre<input name="sifre" type="password" autocomplete="new-password" minlength="10" required><small>En az 10 karakter; en az bir harf ve bir rakam.</small></label>
+<label class="uye-alan">Neden üye olmak istiyorsunuz? <small>(isteğe bağlı)</small><textarea name="neden" rows="3"></textarea></label>
+<label class="uye-onay"><input type="checkbox" name="kvkk"><span><a href="/tr/sayfa/kvkk-aydinlatma-metni" target="_blank" rel="noopener">KVKK aydınlatma metnini</a> okudum, üyelik için bilgilerimin işlenmesini kabul ediyorum.</span></label>
+<label class="uye-onay"><input type="checkbox" name="iys"><span>Kampanya ve duyuru e-postaları almak istiyorum. <small>(İsteğe bağlı; istediğiniz an vazgeçebilirsiniz.)</small></span></label>
+<label aria-hidden="true" style="position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden">Bu alanı boş bırakın<input type="text" name="web_adresi_tekrar" tabindex="-1" autocomplete="off"></label>
+<div data-turnstile></div>
+<p data-form-durum class="uye-durum" role="status" aria-live="polite" hidden></p>
+<button type="submit" class="uye-dugme">Üyelik talebi gönder</button>
+<p class="uye-alt" style="margin: 0">Zaten üye misiniz? <a href="/giris">Giriş yapın</a></p>
+</form>
+<div class="uye-kart" data-tamam hidden role="status">
+<strong style="font-size: 20px; color: var(--head)">Talebiniz alındı</strong>
+<p style="margin: 0; color: var(--tx2)">Ekibimiz talebinizi inceleyecek. Onaylandığında e-posta adresiniz ve şifrenizle giriş yaparak size açılan bölümleri görebilirsiniz.</p>
+<a href="/giris" class="uye-dugme ikincil" style="align-self: flex-start">Giriş sayfasına git</a>
+</div>
+<script>
+  import { formBagla } from '../scripts/uye-sayfa.js';
+  const form = document.querySelector('[data-uye-form]');
+  formBagla(form, 'kayit', (v) => {
+    if (!v.ad.trim()) return 'Adınızı ve soyadınızı yazın.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.eposta.trim())) return 'Geçerli bir e-posta adresi yazın.';
+    if (v.sifre.length < 10 || !/\d/.test(v.sifre) || !/\p{L}/u.test(v.sifre)) return 'Şifre en az 10 karakter olmalı ve en az bir harf ile bir rakam içermeli.';
+    if (!v.kvkk) return 'Devam etmek için KVKK aydınlatma metnini onaylayın.';
+    return null;
+  }, () => { form.hidden = true; document.querySelector('[data-tamam]').hidden = false; });
+</script>
+</UyeCerceve>

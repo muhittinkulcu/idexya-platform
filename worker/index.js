@@ -1,37 +1,12 @@
 // Idexya Platform sunucu tarafı: talep formu ve yönetim paneli API'si.
 // Statik sayfalar Workers Static Assets'ten gelir; bu dosya yalnız /api/* ve /yonetim* için çalışır.
 import { jwtVerify, createRemoteJWKSet } from 'jose';
-import { SEMA } from './sema.js';
+import { uyeApi, yonetimUyeApi } from './uye.js';
+import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz } from './ortak.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
 const ALAN_ADI = { firma: 'Firma', ad: 'Yetkili kişi', eposta: 'E-posta', telefon: 'Telefon', sektor: 'Sektör', paket: 'Paket', deger: 'Tahmini değer' };
-const GUVENLIK_BASLIKLARI = {
-  'X-Content-Type-Options': 'nosniff',
-  'X-Frame-Options': 'DENY',
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  'X-Robots-Tag': 'noindex, nofollow',
-  'Cache-Control': 'no-store'
-};
-
-const json = (veri, durum = 200) => new Response(JSON.stringify(veri), { status: durum, headers: { 'Content-Type': 'application/json; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
-const hata = (mesaj, durum) => json({ ok: false, hata: mesaj }, durum);
-const simdi = () => new Date().toISOString();
-const kimlik = () => crypto.randomUUID();
-const kirp = (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : '');
-
-let semaHazir = false;
-async function semaKur(db) {
-  if (semaHazir) return;
-  await db.batch(SEMA.map((s) => db.prepare(s)));
-  semaHazir = true;
-}
-
-async function ozet(metin) {
-  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(metin));
-  return [...new Uint8Array(b)].slice(0, 12).map((x) => x.toString(16).padStart(2, '0')).join('');
-}
-
 // --- Kimlik doğrulama (Cloudflare Access) ---
 // Varsayılan kapalıdır: TEAM_DOMAIN ve POLICY_AUD tanımlı değilse yönetim paneli açılmaz.
 // Yerel geliştirmede yalnız localhost'ta ve YEREL_GIRIS=evet iken açılır.
@@ -52,10 +27,6 @@ async function yonetici(istek, env) {
   } catch (e) {
     return null;
   }
-}
-
-async function islemYaz(db, kim, islem, hedef, detay) {
-  await db.prepare('INSERT INTO islem_kaydi (id, zaman, kim, islem, hedef, detay) VALUES (?, ?, ?, ?, ?, ?)').bind(kimlik(), simdi(), kim, islem, hedef || null, detay || null).run();
 }
 
 // --- Herkese açık: talep formu ---
@@ -109,13 +80,14 @@ async function yonetimApi(istek, env, yol, kim) {
   const govde = yontem === 'POST' ? await istek.json().catch(() => ({})) : {};
 
   if (yol === 'ozet' && yontem === 'GET') {
-    const [t, m, a, k] = await db.batch([
+    const [t, m, a, k, u] = await db.batch([
       db.prepare("SELECT durum, COUNT(*) AS n FROM talepler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler"),
       db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler GROUP BY asama"),
-      db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12")
+      db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12"),
+      db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum")
     ]);
-    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results });
+    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results });
   }
   if (yol === 'talepler' && yontem === 'GET') {
     const r = await db.prepare("SELECT * FROM talepler ORDER BY olusturma DESC LIMIT 200").all();
@@ -221,6 +193,8 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
+  const uyeYaniti = await yonetimUyeApi(db, yontem, yol, govde, kim);
+  if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
 
@@ -232,6 +206,10 @@ export default {
       if (yol === '/api/talep') {
         if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
         return await talepAl(istek, env);
+      }
+      if (yol.startsWith('/api/uye/')) {
+        await semaKur(env.DB);
+        return await uyeApi(istek, env, yol.slice('/api/uye/'.length).replace(/\/$/, ''));
       }
       if (yol.startsWith('/api/yonetim/') || yol === '/yonetim' || yol.startsWith('/yonetim/')) {
         const kim = await yonetici(istek, env);

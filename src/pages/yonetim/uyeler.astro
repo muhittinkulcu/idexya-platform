@@ -1,0 +1,132 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Üyeler ve yetkiler" aktif="uyeler" yol="Üyelik" aciklama="Siteden gelen üyelik talepleri burada onaylanır. Her üyeye hangi bölümün hangi yetkiyle açılacağını tek tek seçersiniz; onaysız üye hiçbir bölüm görmez. Üyelik yönetim paneline ve IDOS'a erişim vermez.">
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<div role="tablist" aria-label="Üye durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); flex-wrap: wrap"></div>
+<label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Üye ara</span><input type="search" data-ara placeholder="Ad, e-posta veya firma ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
+</div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<section aria-label="Üye listesi" class="kart" data-liste style="flex: 2 1 340px; overflow: hidden"></section>
+<section aria-label="Üye ayrıntısı" class="kart" data-ayrinti style="flex: 3 1 480px; padding: 18px; display: flex; flex-direction: column; gap: 16px"></section>
+</div>
+<section class="kart" aria-label="Üye grupları" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; color: var(--head)">Üye grupları</h2>
+<span style="font-size: 13px; color: var(--tx2)">Gruplar, içerikleri "yalnız bu gruptakiler görsün" diye paylaşmak için kullanılır (ör. "Eğitim katılımcıları").</span>
+<div data-gruplar style="display: flex; gap: 8px; flex-wrap: wrap"></div>
+<form data-grup-form style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end">
+<label class="alan" style="flex: 1 1 200px">Yeni grup adı<input name="ad" maxlength="80"></label>
+<label class="alan" style="flex: 2 1 260px">Açıklama (isteğe bağlı)<input name="aciklama" maxlength="300"></label>
+<button type="submit" class="dugme ana">Grup ekle</button>
+</form>
+<p data-grup-durum role="status" hidden class="uyari hata" style="margin: 0"></p>
+</section>
+<script>
+  import { api, el, tarih, once, genelHata, sayacGuncelle } from '../../scripts/yonetim/ortak.js';
+  const $ = (s) => document.querySelector(s);
+  const liste = $('[data-liste]'), ayr = $('[data-ayrinti]'), sekmeler = $('[data-sekmeler]'), ara = $('[data-ara]');
+  let tum = [], katalog = null, gruplar = [], sekme = 'bekliyor', secili = new URLSearchParams(location.search).get('id');
+  const BOLUM = [['bekliyor', 'Onay bekleyen'], ['onayli', 'Onaylı'], ['askida', 'Askıda'], ['reddedildi', 'Reddedilen'], ['hepsi', 'Tümü']];
+  const CIP = { bekliyor: 'yeni', onayli: 'kazanildi', askida: 'gorusme', reddedildi: 'kaybedildi' };
+  const ISLEM = { uye_kayit: 'Üyelik talebi gönderdi', uye_durum: 'Durum değişti', uye_modul: 'Bölüm yetkileri değişti', uye_grup: 'Gruplar değişti', uye_sifre_baglantisi: 'Şifre yenileme bağlantısı oluşturuldu', uye_sifre_yenilendi: 'Şifresini yeniledi', uye_sifre_degisti: 'Şifresini değiştirdi', uye_oturum_kapat: 'Tüm oturumları kapatıldı' };
+
+  function listeCiz() {
+    sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
+      const n = k === 'hepsi' ? tum.length : tum.filter((u) => u.durum === k).length, s = k === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; listeCiz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+    }));
+    const q = ara.value.trim().toLocaleLowerCase('tr-TR');
+    const gor = tum.filter((u) => (sekme === 'hepsi' || u.durum === sekme) && (!q || [u.ad, u.eposta, u.firma].some((x) => x && x.toLocaleLowerCase('tr-TR').includes(q))));
+    liste.replaceChildren(...(gor.length ? gor.map((u) => el('button', {
+      type: 'button', 'aria-pressed': String(u.id === secili), onclick: () => { secili = u.id; history.replaceState(null, '', '?id=' + encodeURIComponent(u.id)); listeCiz(); ayrintiYukle(); },
+      style: `width: 100%; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${u.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer`
+    }, el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('strong', { style: 'color: var(--head)' }, u.ad), el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(u.olusturma))),
+      el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [u.eposta, u.firma].filter(Boolean).join(' · ')),
+      el('span', { style: 'display: flex; gap: 6px; align-items: center' }, el('span', { class: 'cip ' + CIP[u.durum] }, katalog.durumlar[u.durum]), u.modul_sayisi ? el('span', { style: 'font-size: 12px; color: var(--tx2)' }, u.modul_sayisi + ' bölüm açık') : null)))
+      : [el('div', { class: 'bos' }, sekme === 'bekliyor' ? 'Onay bekleyen üyelik talebi yok.' : 'Bu bölümde üye yok.')]));
+  }
+
+  async function ayrintiYukle() {
+    if (!secili) { ayr.replaceChildren(el('div', { class: 'bos' }, 'Soldan bir üye seçin.')); return; }
+    ayr.replaceChildren(el('div', { class: 'bos' }, 'Yükleniyor…'));
+    let v;
+    try { v = await api('uyeler/' + encodeURIComponent(secili)); } catch (h) { ayr.replaceChildren(el('div', { class: 'uyari hata' }, h.durum === 404 ? 'Bu üye bulunamadı.' : 'Üye yüklenemedi: ' + h.message)); return; }
+    const u = v.uye, mesaj = el('div', { role: 'status', 'aria-live': 'polite', hidden: true, class: 'uyari' });
+    const bildir = (m, tur = 'ok') => { mesaj.hidden = false; mesaj.className = 'uyari ' + tur; mesaj.textContent = m; };
+    const yenile = async (m) => { tum = (await api('uyeler')).uyeler; listeCiz(); await ayrintiYukle(); if (m) ayr.querySelector('[role=status]').hidden = false, Object.assign(ayr.querySelector('[role=status]'), { className: 'uyari ok', textContent: m }); api('ozet').then(sayacGuncelle).catch(() => {}); };
+    const durumDugme = (d, ad, ana) => el('button', { type: 'button', class: 'dugme' + (ana ? ' ana' : ''), onclick: async (o) => {
+      o.currentTarget.disabled = true;
+      try { await api(`uyeler/${encodeURIComponent(u.id)}/durum`, { durum: d }); await yenile(`Durum: ${katalog.durumlar[d]}.`); } catch (h) { bildir('Değiştirilemedi: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+    } }, ad);
+    const dugmeler = { bekliyor: [durumDugme('onayli', 'Onayla', true), durumDugme('reddedildi', 'Reddet')], onayli: [durumDugme('askida', 'Askıya al')], askida: [durumDugme('onayli', 'Yeniden etkinleştir', true), durumDugme('reddedildi', 'Reddet')], reddedildi: [durumDugme('onayli', 'Onayla', true)] }[u.durum] || [];
+    const atanan = Object.fromEntries(v.moduller.map((m) => [m.modul, m]));
+    const secimler = {};
+    const modulSatir = katalog.moduller.map((md) => {
+      const sec = el('select', { 'aria-label': md.ad + ' yetkisi', style: 'min-height: 36px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; max-width: 100%' },
+        el('option', { value: '' }, 'Kapalı'), Object.entries(katalog.yetkiler).map(([k, ad]) => el('option', { value: k, selected: atanan[md.k] && atanan[md.k].yetki === k }, ad)));
+      secimler[md.k] = sec;
+      return el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line)' },
+        el('span', { style: 'display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px' }, el('strong', { style: 'color: var(--head)' }, md.ad, md.hazir ? '' : el('span', { style: 'margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--tx2)' }, 'Yakında')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, md.aciklama + (atanan[md.k] ? ` · ${tarih(atanan[md.k].verildi)} tarihinde açıldı` : ''))), sec);
+    });
+    const modulKaydet = el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
+      const istek = Object.fromEntries(Object.entries(secimler).map(([k, s]) => [k, s.value || null]));
+      o.currentTarget.disabled = true;
+      try { const r = await api(`uyeler/${encodeURIComponent(u.id)}/moduller`, { moduller: istek }); await yenile(r.degisen.length ? 'Yetkiler kaydedildi.' : 'Değişiklik yok.'); } catch (h) { bildir('Kaydedilemedi: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+    } }, 'Yetkileri kaydet');
+    const grupSec = gruplar.map((g) => el('label', { style: 'display: inline-flex; gap: 6px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; cursor: pointer' }, el('input', { type: 'checkbox', value: g.id, checked: v.gruplar.includes(g.id) }), g.ad));
+    const grupKaydet = el('button', { type: 'button', class: 'dugme', onclick: async (o) => {
+      const ids = grupSec.map((l) => l.querySelector('input')).filter((i) => i.checked).map((i) => i.value);
+      try { await api(`uyeler/${encodeURIComponent(u.id)}/gruplar`, { gruplar: ids }); await grupYukle(); await yenile('Gruplar kaydedildi.'); } catch (h) { bildir('Kaydedilemedi: ' + h.message, 'hata'); }
+    } }, 'Grupları kaydet');
+    const baglantiKutu = el('div', { hidden: true, style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' });
+    const sifreDugme = el('button', { type: 'button', class: 'dugme', onclick: async () => {
+      try {
+        const r = await api(`uyeler/${encodeURIComponent(u.id)}/sifre-baglantisi`, {});
+        const adres = location.origin + r.yol;
+        const kutu = el('input', { readonly: true, value: adres, 'aria-label': 'Şifre yenileme bağlantısı', style: 'flex: 1 1 260px; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit; font-size: 12px' });
+        baglantiKutu.replaceChildren(kutu, el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { try { await navigator.clipboard.writeText(adres); bildir('Bağlantı kopyalandı. Yalnız üyeye, güvenli bir kanaldan gönderin.'); } catch (e) { kutu.select(); } } }, 'Kopyala'), el('span', { style: 'font-size: 12px; color: var(--tx2); flex: 1 1 100%' }, '24 saat ve bir kez geçerli. Bu sayfadan ayrılınca yeniden gösterilmez.'));
+        baglantiKutu.hidden = false;
+      } catch (h) { bildir('Oluşturulamadı: ' + h.message, 'hata'); }
+    } }, 'Şifre yenileme bağlantısı oluştur');
+    const oturumDugme = el('button', { type: 'button', class: 'dugme', disabled: !v.acikOturum, onclick: async () => { try { await api(`uyeler/${encodeURIComponent(u.id)}/oturumlari-kapat`, {}); await yenile('Tüm oturumlar kapatıldı.'); } catch (h) { bildir(h.message, 'hata'); } } }, `Oturumları kapat (${v.acikOturum})`);
+    const bilgiler = [['E-posta', u.eposta], ['Telefon', u.telefon], ['Firma', u.firma], ['Başvuru', tarih(u.olusturma)], ['Son giriş', u.son_giris ? tarih(u.son_giris) : 'Hiç giriş yapmadı'], ['Ticari ileti izni', u.iys_izni ? 'Var' : 'Yok'], u.karar_zamani ? ['Son karar', tarih(u.karar_zamani) + ' · ' + u.karar_veren] : null].filter((a) => a && a[1]);
+    const baslik = (t) => el('h3', { style: 'margin: 0; font-size: 15px; color: var(--head)' }, t);
+    ayr.replaceChildren(
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap' }, el('strong', { style: 'font-size: 18px; color: var(--head)' }, u.ad), el('span', { class: 'cip ' + CIP[u.durum], style: 'align-self: flex-start' }, katalog.durumlar[u.durum])),
+      el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; font-size: 13px' }, bilgiler.map(([a, d]) => el('div', { style: 'padding: 10px 12px; border-radius: 10px; background: var(--card2); display: flex; flex-direction: column; min-width: 0' }, el('span', { style: 'font-size: 11px; color: var(--tx2)' }, a), el('span', { style: 'font-weight: 600; overflow-wrap: anywhere' }, d)))),
+      u.neden ? el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere' }, el('span', { style: 'display: block; font-size: 11px; color: var(--tx2)' }, 'Üyelik nedeni'), u.neden) : '',
+      dugmeler.length ? el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, dugmeler) : '',
+      mesaj,
+      el('div', { style: 'display: flex; flex-direction: column' }, baslik('Açık bölümler ve yetkiler'), u.durum !== 'onayli' ? el('span', { style: 'font-size: 12px; color: var(--warn); padding-top: 4px' }, 'Üye onaylanmadan seçilen bölümler ona görünmez.') : '', modulSatir, el('div', { style: 'padding-top: 10px' }, modulKaydet)),
+      el('div', { style: 'display: flex; flex-direction: column; gap: 8px' }, baslik('Gruplar'), gruplar.length ? el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap' }, grupSec) : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Henüz grup yok. Aşağıdan ekleyebilirsiniz.'), gruplar.length ? el('div', {}, grupKaydet) : ''),
+      el('div', { style: 'display: flex; flex-direction: column; gap: 8px' }, baslik('Güvenlik'), el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, sifreDugme, oturumDugme), baglantiKutu),
+      el('div', { style: 'display: flex; flex-direction: column' }, baslik('Geçmiş'), v.kayitlar.length ? v.kayitlar.map((k) => el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px' }, el('span', {}, el('strong', {}, ISLEM[k.islem] || k.islem), k.detay && k.islem !== 'uye_kayit' ? ' · ' + k.detay : ''), el('span', { style: 'color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim))) : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Kayıt yok.'))
+    );
+  }
+
+  async function grupYukle() {
+    gruplar = (await api('gruplar')).gruplar;
+    $('[data-gruplar]').replaceChildren(...(gruplar.length ? gruplar.map((g) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 6px 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px' },
+      el('span', {}, el('strong', {}, g.ad), ` · ${g.uye_sayisi} üye`), el('button', { type: 'button', class: 'dugme kucuk', 'aria-label': g.ad + ' grubunu sil', onclick: async () => {
+        if (!confirm(`“${g.ad}” grubu silinsin mi? Üyeler silinmez, yalnız bu gruptan çıkar.`)) return;
+        try { await api(`gruplar/${encodeURIComponent(g.id)}/sil`, {}); await grupYukle(); ayrintiYukle(); } catch (h) { genelHata(h.message); }
+      } }, 'Sil'))) : [el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Henüz grup yok.')]));
+  }
+  $('[data-grup-form]').addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const f = o.currentTarget, d = $('[data-grup-durum]');
+    try { await api('gruplar', Object.fromEntries(new FormData(f))); f.reset(); d.hidden = true; await grupYukle(); ayrintiYukle(); } catch (h) { d.hidden = false; d.textContent = h.message; }
+  });
+  ara.addEventListener('input', listeCiz);
+  (async () => {
+    try {
+      [katalog, tum] = await Promise.all([api('moduller'), api('uyeler').then((r) => r.uyeler)]);
+      await grupYukle();
+      if (secili) { const u = tum.find((x) => x.id === secili); if (u) sekme = u.durum; }
+      else if (!tum.some((u) => u.durum === 'bekliyor') && tum.length) sekme = 'hepsi';
+      if (!secili) { const ilk = tum.find((u) => sekme === 'hepsi' || u.durum === sekme); secili = ilk ? ilk.id : null; }
+      listeCiz(); ayrintiYukle();
+    } catch (h) { genelHata('Üyeler yüklenemedi: ' + h.message); liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); ayr.replaceChildren(); }
+  })();
+</script>
+</Yonetim>

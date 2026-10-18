@@ -1,0 +1,24 @@
+---
+import UyeCerceve from '../components/UyeCerceve.astro';
+---
+<UyeCerceve baslik="Yeni şifre belirleyin" aciklama="Bu bağlantı bir kez ve 24 saat içinde kullanılabilir.">
+<form class="uye-kart" data-uye-form novalidate>
+<label class="uye-alan">Yeni şifre<input name="sifre" type="password" autocomplete="new-password" minlength="10" required><small>En az 10 karakter; en az bir harf ve bir rakam.</small></label>
+<label class="uye-alan">Yeni şifre (tekrar)<input name="tekrar" type="password" autocomplete="new-password" required></label>
+<p data-form-durum class="uye-durum" role="status" aria-live="polite" hidden></p>
+<button type="submit" class="uye-dugme">Şifreyi kaydet</button>
+</form>
+<script>
+  import { formBagla, durumYaz } from '../scripts/uye-sayfa.js';
+  const form = document.querySelector('[data-uye-form]');
+  const jeton = location.hash.slice(1);
+  // Jeton adres çubuğundan silinir: ekran paylaşımında veya geçmişte görünmesin.
+  if (jeton) history.replaceState(null, '', location.pathname);
+  if (!jeton) durumYaz(form, 'Bağlantı eksik. Size gönderilen bağlantıyı eksiksiz açın.', 'hata');
+  formBagla(form, 'sifre-yenile', (v) => {
+    if (!jeton) return 'Bağlantı eksik. Size gönderilen bağlantıyı eksiksiz açın.';
+    if (v.sifre !== v.tekrar) return 'İki şifre aynı değil.';
+    v.jeton = jeton; delete v.tekrar; return null;
+  }, () => { form.innerHTML = ''; const p = document.createElement('p'); p.className = 'uye-durum'; p.style.cssText = 'background: var(--okb); color: var(--ok)'; p.textContent = 'Şifreniz değişti. Şimdi yeni şifrenizle giriş yapabilirsiniz.'; const a = document.createElement('a'); a.href = '/giris'; a.className = 'uye-dugme'; a.textContent = 'Giriş yap'; form.append(p, a); });
+</script>
+</UyeCerceve>

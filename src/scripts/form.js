@@ -22,6 +22,22 @@ function durum(form, metin, tur) {
   d.style.color = tur === 'ok' ? 'var(--ok, #1E6B3E)' : 'var(--err, #7A1F2B)';
 }
 
+// Bir forma robot doğrulaması bağlar; odaklanınca yüklenir. Döndürülen işlev jetonu verir ('' = yok).
+export function robotBagla(form) {
+  const kutu = form.querySelector('[data-turnstile]');
+  let widget = null;
+  form.addEventListener('focusin', async () => {
+    if (widget !== null || !kutu) return;
+    widget = false;
+    if (await turnstileYukle() && window.turnstile) widget = window.turnstile.render(kutu, { sitekey: ANAHTAR, language: 'tr' });
+  });
+  return {
+    gerekli: !!ANAHTAR,
+    jeton: () => { const t = form.querySelector('[name="cf-turnstile-response"]'); return t ? t.value : ''; },
+    sifirla: () => { if (widget && window.turnstile) window.turnstile.reset(widget); }
+  };
+}
+
 export function formlar() {
   document.querySelectorAll('form[data-talep]').forEach((form) => {
     const kutu = form.querySelector('[data-turnstile]');

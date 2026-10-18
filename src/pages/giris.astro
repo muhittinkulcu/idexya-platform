@@ -1,0 +1,18 @@
+---
+import UyeCerceve from '../components/UyeCerceve.astro';
+---
+<UyeCerceve baslik="Giriş yapın" aciklama="Üyeliğinize size açılan bölümleri görmek için giriş yapın.">
+<form class="uye-kart" data-uye-form novalidate>
+<label class="uye-alan">E-posta<input name="eposta" type="email" autocomplete="username" required></label>
+<label class="uye-alan">Şifre<input name="sifre" type="password" autocomplete="current-password" required></label>
+<div data-turnstile></div>
+<p data-form-durum class="uye-durum" role="status" aria-live="polite" hidden></p>
+<button type="submit" class="uye-dugme">Giriş yap</button>
+<p class="uye-alt" style="margin: 0">Hesabınız yok mu? <a href="/uye-ol">Üye olun</a></p>
+<p class="uye-alt" style="margin: 0; font-size: 14px">Şifrenizi mi unuttunuz? <a href="mailto:info@idexya.com?subject=%C5%9Eifre%20yenileme">info@idexya.com</a> adresine yazın; size yenileme bağlantısı gönderelim.</p>
+</form>
+<script>
+  import { formBagla } from '../scripts/uye-sayfa.js';
+  formBagla(document.querySelector('[data-uye-form]'), 'giris', (v) => (!v.eposta.trim() || !v.sifre ? 'E-posta ve şifrenizi yazın.' : null), () => { location.href = '/hesabim'; });
+</script>
+</UyeCerceve>

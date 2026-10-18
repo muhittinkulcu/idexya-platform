@@ -94,7 +94,7 @@ function yasla() {
   let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(isle, 150); });
 }
 
-export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); formlar(); efektler(); }
+export function baslat() { tema(); cerez(); suzgecler(); menu(); yasla(); formlar(); efektler(); uyeBaglantisi(); }
 
 // Kaydırınca üst menü yarı saydam ve gölgeli olur; süreç adımları sırayla görününce yanar; koyu bölümdeki kartlarda imleci izleyen ışık.
 function efektler() {
@@ -117,4 +117,10 @@ function efektler() {
     k.classList.add('isik');
     k.addEventListener('pointermove', (o) => { const r = k.getBoundingClientRect(); k.style.setProperty('--x', o.clientX - r.left + 'px'); k.style.setProperty('--y', o.clientY - r.top + 'px'); });
   });
+}
+
+// Oturum açık üyeye "Giriş" yerine "Hesabım" gösterilir (idx_uye yalnız görünüm ipucudur; yetki sunucuda denetlenir).
+function uyeBaglantisi() {
+  if (!/(?:^|;\s*)idx_uye=1/.test(document.cookie)) return;
+  document.querySelectorAll('[data-uye-baglanti]').forEach((a) => { a.href = '/hesabim'; a.textContent = 'Hesabım'; });
 }

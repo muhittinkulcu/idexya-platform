@@ -59,12 +59,11 @@ export function genelHata(metin) {
 }
 
 export function sayacGuncelle(ozet) {
-  const rozet = document.querySelector('[data-sayac="talep"]');
-  if (!rozet) return;
-  const yeni = ozet && ozet.talepler ? (ozet.talepler.find((t) => t.durum === 'yeni') || { n: 0 }).n : null;
   // Bilinmiyorsa veya sıfırsa gizli; yalnız bilinen ve sıfırdan büyük sayı görünür.
-  rozet.hidden = !(yeni > 0);
-  rozet.textContent = yeni > 0 ? String(yeni) : '';
+  const yaz = (ad, n) => { const r = document.querySelector(`[data-sayac="${ad}"]`); if (!r) return; r.hidden = !(n > 0); r.textContent = n > 0 ? String(n) : ''; };
+  const say = (liste, d) => (liste ? (liste.find((t) => t.durum === d) || { n: 0 }).n : null);
+  yaz('talep', ozet ? say(ozet.talepler, 'yeni') : null);
+  yaz('uye', ozet ? say(ozet.uyeler, 'bekliyor') : null);
 }
 
 export function kabuk() {
