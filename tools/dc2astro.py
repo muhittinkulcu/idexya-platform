@@ -12,7 +12,7 @@ import re, sys, json, argparse
 
 ROTALAR = {
     'Main.dc.html': '/', 'Hizmetler.dc.html': '/tr/hizmetler', 'HizmetDetay.dc.html': '/tr/hizmet/google-ads-yonetimi',
-    'Paketler.dc.html': '/tr/paketler', 'Referanslar.dc.html': '/tr/referanslar', 'ProjeDetay.dc.html': '/tr/proje/marco-polo-chocolate',
+    'Paketler.dc.html': '/tr/paketler', 'Referanslar.dc.html': '/tr/hizmetler', 'ProjeDetay.dc.html': '/tr/hizmetler',
     'Idos.dc.html': '/tr/idos', 'Iletisim.dc.html': '/tr/iletisim', 'Hakkimizda.dc.html': '/tr/sayfa/hakkimizda',
     'Blog.dc.html': '/tr/haberler', 'BlogYazi.dc.html': '/tr/haber/ornek-yazi', 'Yasal.dc.html': '/tr/sayfa/kvkk-aydinlatma-metni',
     'TeklifOnay.dc.html': '/tr/teklif/ornek',

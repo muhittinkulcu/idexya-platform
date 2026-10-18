@@ -4,7 +4,7 @@ Muhittin'in istekleri ve sıralama. IDOS bu platformdan tamamen ayrıdır: sited
 yalnız tanıtım sayfası vardır (arama motorlarına kapalı). IDOS'a müşteri hesapları kendi gizli bağlantısıyla girer.
 
 ## Bitti
-- Site (TR), 301 yönlendirmeler, efektler · Referanslar şimdilik gizli
+- Site (TR), 301 yönlendirmeler, efektler · Referanslar kaldırıldı: mevcut müşterilere ait hiçbir bilgi sistemde tutulmaz (19 Eki 2026)
 - Yönetim paneli 1-2: Cloudflare Access girişi, talepler, CRM, müşteri kartı ve günlük
 
 ## Sıradaki

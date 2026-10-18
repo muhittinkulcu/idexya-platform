@@ -9,9 +9,8 @@ const calistir = (dosya, durum = {}) => {
 };
 const h = calistir('design/Hizmetler.dc.html');
 writeFileSync('src/data/hizmetler.json', JSON.stringify(h.gruplar.map((g) => ({ id: g.id, ad: g.ad, aciklama: g.aciklama, hizmetler: g.hizmetler })), null, 2));
-const r = calistir('design/Referanslar.dc.html', { filtre: 'tumu' });
-writeFileSync('src/data/projeler.json', JSON.stringify(r.gorunenProjeler.map((p) => ({ ad: p.ad, kat: p.kat, kategoriAd: p.kategoriAd, sektor: p.sektor, hizmet: p.hizmet, basHarf: p.basHarf })), null, 2));
-console.log('hizmet', h.gruplar.reduce((a, g) => a + g.hizmetler.length, 0), 'proje', r.gorunenProjeler.length);
+// Referans/proje verisi yok: mevcut müşteri bilgisi sistemde tutulmaz (Muhittin, 19 Eki 2026).
+console.log('hizmet', h.gruplar.reduce((a, g) => a + g.hizmetler.length, 0));
 // Paket sihirbazı mantığı istemcide aynı kodla çalışsın diye modül olarak yazılır.
 {
   const s = readFileSync('design/Paketler.dc.html', 'utf8');
