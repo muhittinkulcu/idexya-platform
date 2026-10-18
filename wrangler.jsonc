@@ -17,5 +17,7 @@
   "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform" }],
   // Yönetim paneli girişi: Cloudflare Access. Değerler Cloudflare panelinden "Variables" olarak girilir.
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
+  // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
+  "keep_vars": true,
   "observability": { "enabled": true }
 }
