@@ -82,12 +82,25 @@ function menu() {
   const ac = document.querySelector('[data-cekmece-ac]');
   if (!c || !ac || typeof c.showModal !== 'function') return;
   const kapat = () => c.close();
-  ac.addEventListener('click', () => { c.showModal(); ac.setAttribute('aria-expanded', 'true'); });
+  const baglantilar = [...c.querySelectorAll('[data-onizle]')];
+  const goster = (k) => {
+    baglantilar.forEach((a) => a.classList.toggle('etkin', a.dataset.onizle === k));
+    c.querySelectorAll('[data-pano]').forEach((p) => { p.hidden = p.dataset.pano !== k; });
+  };
+  baglantilar.forEach((a) => { a.addEventListener('mouseenter', () => goster(a.dataset.onizle)); a.addEventListener('focus', () => goster(a.dataset.onizle)); });
+  ac.addEventListener('click', () => {
+    const etkin = baglantilar.find((a) => a.getAttribute('aria-current') === 'page') || baglantilar[0];
+    if (etkin) goster(etkin.dataset.onizle);
+    c.showModal(); ac.setAttribute('aria-expanded', 'true');
+  });
   c.addEventListener('close', () => { ac.setAttribute('aria-expanded', 'false'); ac.focus(); });
   c.querySelector('[data-cekmece-kapat]').addEventListener('click', kapat);
-  // Karartılmış alana tıklayınca kapanır.
-  c.addEventListener('click', (o) => { if (o.target === c) kapat(); });
-  c.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { if (a.getAttribute('href').startsWith('/tr/hizmetler#')) kapat(); }));
+  c.querySelector('[data-cekmece-ara]').addEventListener('click', () => { kapat(); document.querySelector('.arama-dugme')?.click(); });
+  c.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { const h = a.getAttribute('href') || ''; if (h.includes('#') && h.split('#')[0] === location.pathname.replace(/\/$/, '')) kapat(); }));
+  if (matchMedia('(pointer: fine) and (prefers-reduced-motion: no-preference)').matches) {
+    let b = false;
+    c.addEventListener('pointermove', (o) => { if (b) return; b = true; requestAnimationFrame(() => { c.style.setProperty('--mx', (o.clientX / innerWidth * 100).toFixed(1) + '%'); c.style.setProperty('--my', (o.clientY / innerHeight * 100).toFixed(1) + '%'); b = false; }); });
+  }
 }
 
 // Site içi arama (Spotlight gibi): boşken öneriler ve kısayollar, yazınca gruplu sonuçlar. Ctrl/⌘+K veya "/" ile açılır.

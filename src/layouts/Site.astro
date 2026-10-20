@@ -7,12 +7,12 @@ const { baslik = '', aciklama = '', aktif = '', dil = 'tr', aramayaKapali = fals
 const YAYIN_ONCESI = true;
 const kapali = YAYIN_ONCESI || aramayaKapali;
 const MENU = [
-  { ad: 'Hizmetler', href: '/tr/hizmetler', ust: true, alt: '27 hizmet, beş alan' },
-  { ad: 'Paketler', href: '/tr/paketler', ust: true, alt: 'Sihirbazla paketinizi seçin' },
-  { ad: 'IDOS', href: '/tr/idos', ust: true, alt: 'Ajans operasyon panelimiz' },
-  { ad: 'Blog', href: '/tr/haberler', ust: true, alt: 'Reklam, e-ticaret ve ölçüm' },
-  { ad: 'Hakkımızda', href: '/tr/sayfa/hakkimizda', ust: false, alt: 'Kim olduğumuz' },
-  { ad: 'İletişim', href: '/tr/iletisim', ust: true, alt: 'Ücretsiz analiz isteyin' }
+  { k: 'hizmetler', ad: 'Hizmetler', href: '/tr/hizmetler', ust: true, alt: '27 hizmet, beş alan' },
+  { k: 'paketler', ad: 'Paketler', href: '/tr/paketler', ust: true, alt: 'Sihirbazla paketinizi seçin' },
+  { k: 'idos', ad: 'IDOS', href: '/tr/idos', ust: true, alt: 'Ajans operasyon panelimiz' },
+  { k: 'blog', ad: 'Blog', href: '/tr/haberler', ust: true, alt: 'Reklam, e-ticaret ve ölçüm' },
+  { k: 'hakkimizda', ad: 'Hakkımızda', href: '/tr/sayfa/hakkimizda', ust: false, alt: 'Kim olduğumuz' },
+  { k: 'iletisim', ad: 'İletişim', href: '/tr/iletisim', ust: true, alt: 'Ücretsiz analiz isteyin' }
 ];
 const tamBaslik = baslik ? `${baslik} | Idexya | Good Things` : 'Idexya | Good Things · 360° dijital performans ajansı';
 const kanonik = new URL(Astro.url.pathname, Astro.site);
@@ -20,6 +20,7 @@ const kanonik = new URL(Astro.url.pathname, Astro.site);
 const turnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 import gruplar from '../data/hizmetler.json';
+import yazilar from '../data/yazilar.json';
 ---
 <!doctype html>
 <html lang={dil} data-turnstile={turnstile || undefined}>
@@ -69,25 +70,72 @@ main p{max-width:76ch}
 @media (max-width:1280px){.arama-dugme{min-width:0}.arama-dugme .arama-yazi,.arama-dugme kbd{display:none}}
 @media (max-width:1100px){.ust-menu{display:none}}
 @media (max-width:760px){.ust-eylem .ust-giris,.ust-eylem .ust-cta,.ust-eylem [data-tema-dugme]{display:none}.menu-yazi{display:none}.ust{min-height:64px}}
-/* Yandan açılan menü */
-.cekmece{margin:0 0 0 auto;padding:0;border:0;height:100dvh;max-height:100dvh;width:min(480px,100vw);max-width:100vw;background:var(--bg);color:var(--tx);box-shadow:-30px 0 80px rgba(0,0,0,.25)}
-.cekmece::backdrop{background:rgba(0,20,48,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.cekmece-ic{min-height:100%;box-sizing:border-box;padding:18px clamp(20px,5vw,40px) 32px;display:flex;flex-direction:column;gap:28px}
-.cekmece-bas{display:flex;align-items:center;justify-content:space-between}
-.cekmece-ana{display:flex;flex-direction:column}
-.cekmece-ana a{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:11px 0;border-bottom:1px solid var(--line);text-decoration:none;color:var(--head)}
-.cekmece-ana a span{font-size:clamp(19px,2.2vw,22px);font-weight:650;letter-spacing:-.01em;line-height:1.2;transition:color .2s,transform .25s}
-.cekmece-ana a small{font-size:13px;color:var(--tx2);text-align:right}
-.cekmece-ana a:hover span,.cekmece-ana a[aria-current=page] span{color:var(--acc);transform:translateX(6px)}
-.cekmece-hizmet{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:20px 24px}
-.cekmece-grup{display:block;font-weight:700;color:var(--head);text-decoration:none;margin-bottom:6px}
-.cekmece-hizmet ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
-.cekmece-hizmet li a{display:block;padding:4px 0;color:var(--tx2);text-decoration:none;font-size:14px}
-.cekmece-hizmet li a:hover{color:var(--acc)}
-.cekmece-alt{margin-top:auto;display:flex;flex-direction:column;gap:16px;padding-top:20px;border-top:1px solid var(--line)}
-.cekmece-iletisim{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:15px}.cekmece-iletisim a{color:var(--head);font-weight:600}.cekmece-iletisim span{color:var(--tx2)}
-.cekmece-eylem{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+/* Menü (Muhittin, 20 Eki 2026): tam ekran açılır; üstte sabit çubuk, solda bölümler, sağda üzerine gelinen bölümün önizlemesi. */
+.cekmece{margin:0;padding:0;border:0;width:100vw;max-width:100vw;height:100dvh;max-height:100dvh;background:var(--bg);color:var(--tx);overflow:hidden;display:none;flex-direction:column}
+.cekmece[open]{display:flex}
+.cekmece::backdrop{background:transparent}
+.cekmece::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(800px 520px at var(--mx,70%) var(--my,40%),rgba(240,122,35,.13),transparent 62%),linear-gradient(rgba(0,37,89,.05) 1px,transparent 1px) 0 0/64px 64px,linear-gradient(90deg,rgba(0,37,89,.05) 1px,transparent 1px) 0 0/64px 64px}
+.koyu .cekmece::before{background:radial-gradient(800px 520px at var(--mx,70%) var(--my,40%),rgba(240,122,35,.18),transparent 62%),linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px) 0 0/64px 64px,linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/64px 64px}
+.cekmece>*{position:relative;z-index:1}
+.cekmece .kap{width:100%}
+.cm-ust{position:sticky;top:0;flex:none;border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.cm-ust-ic{display:flex;align-items:center;gap:16px 28px;min-height:76px}
+.cm-ara{flex:1 1 auto;min-width:0;max-width:520px;min-height:46px;display:flex;align-items:center;gap:10px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--tx2);font:inherit;font-size:15px;cursor:pointer;text-align:left}
+.cm-ara span{flex:1}.cm-ara kbd{padding:1px 6px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:12px}
+.cm-ara:hover{border-color:var(--brand)}
+.cm-ust-eylem{display:flex;align-items:center;gap:8px;margin-left:auto}
+.cm-kapat span{font-size:14px}
+.cm-govde{flex:1 1 auto;min-height:0;overflow-y:auto;display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:clamp(24px,5vw,80px);padding-top:clamp(24px,5vh,56px);padding-bottom:24px;align-content:start}
+.cm-liste{display:flex;flex-direction:column}
+.cm-liste a{position:relative;display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;padding:14px 16px;border-radius:14px;text-decoration:none;color:var(--head);transition:background-color .2s}
+.cm-ad{font-size:clamp(20px,1.7vw,24px);font-weight:650;letter-spacing:-.01em}
+.cm-alt{grid-column:1;font-size:13px;color:var(--tx2)}
+.cm-ok{grid-row:1 / span 2;grid-column:2;color:var(--acc);opacity:0;transform:translateX(-6px);transition:opacity .2s,transform .25s}
+.cm-liste a.etkin,.cm-liste a:focus-visible{background:var(--card);box-shadow:0 10px 30px var(--shadow)}
+.cm-liste a.etkin .cm-ok{opacity:1;transform:none}
+.cm-liste a[aria-current=page] .cm-ad{color:var(--acc)}
+.cm-liste a.etkin::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:3px;background:var(--brand)}
+.cm-sahne{min-width:0}
+.cm-pano{display:flex;flex-direction:column;gap:18px}
+.cm-pano-bas{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.cm-pano-bas strong{font-size:15px;color:var(--tx2);font-weight:600}.cm-pano-bas a{font-size:14px;font-weight:600}
+.cm-hizmet{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.cm-kutu{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.cm-kutu:hover{transform:translateY(-3px);box-shadow:0 18px 40px var(--shadow);border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
+.cm-kutu-bas{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--head);text-decoration:none;font-size:17px}
+.cm-kutu-bas span{min-width:26px;height:26px;border-radius:999px;background:var(--tint);color:var(--tintx);font-size:12px;display:flex;align-items:center;justify-content:center}
+.cm-kutu ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.cm-kutu li a{display:block;padding:5px 0;color:var(--tx2);text-decoration:none;font-size:14px}
+.cm-kutu li a:hover{color:var(--acc)}.cm-daha{font-weight:600;color:var(--acc)!important}
+.cm-vurgu{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;border-radius:18px;background:linear-gradient(120deg,#002559,#0A3270);color:#FFFFFF!important;text-decoration:none}
+.cm-vurgu span{display:flex;flex-direction:column;gap:4px;color:#C6D2E3}.cm-vurgu strong{color:#FFFFFF;font-size:19px}
+.cm-vurgu svg{color:#FF9A4D}
+.cm-cizelge{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.cm-cizelge>a,.cm-cizelge>div{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--head);font-weight:600;transition:border-color .2s,transform .2s}
+.cm-cizelge>a:hover{border-color:var(--brand);transform:translateY(-2px)}
+.cm-cizelge span{font-weight:400;color:var(--tx2);font-size:14px}.cm-cizelge small{font-size:12px;color:var(--acc);font-weight:600}
+.cm-tek{grid-template-columns:1fr}
+.cm-metin{margin:0;font-size:19px;line-height:1.6;color:var(--tx);max-width:60ch}
+.cm-dip{flex:none;width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:14px;padding-bottom:14px;border-top:1px solid var(--line);font-size:14px;color:var(--tx2)}
+.cm-dip-sag{display:flex;gap:8px;align-items:center}
 .dil-sec{display:flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.dil-sec a{min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;color:var(--tx);font-size:14px}.dil-sec a[aria-current=true]{background:var(--tint);color:var(--tintx);font-weight:600}
+@media (max-width:900px){
+  .cm-govde{grid-template-columns:1fr}
+  .cm-sahne{display:none}
+  .cm-liste a{padding:14px 4px;border-radius:0;border-bottom:1px solid var(--line)}.cm-liste a.etkin{box-shadow:none;background:transparent}.cm-liste a.etkin::before{display:none}
+  .cm-ok{opacity:1;transform:none}
+  .cm-ara span{font-size:14px}.cm-ara kbd{display:none}
+}
+.cm-mobil{display:none}
+@media (max-width:640px){.cm-mobil{display:flex;gap:10px;align-items:center;padding-top:8px}.cm-mobil .ust-cta{flex:1;justify-content:center;min-height:50px}.cm-ara span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cm-ust-eylem .ust-giris,.cm-ust-eylem .ust-cta{display:none}.cm-kapat span{display:none}.cm-ust-ic{gap:10px}}
+@media (prefers-reduced-motion:no-preference){
+  .cekmece[open]{animation:cmGir .55s cubic-bezier(.7,0,.2,1) both}
+  .cekmece[open] .cm-liste a{animation:yuksel .55s calc(.05s * var(--s) + .25s) cubic-bezier(.2,.7,.2,1) both}
+  .cekmece[open] .cm-sahne{animation:yuksel .6s .35s cubic-bezier(.2,.7,.2,1) both}
+  .cm-pano:not([hidden]) .cm-kutu{animation:yuksel .45s calc(.04s * var(--s)) cubic-bezier(.2,.7,.2,1) both}
+  .cm-pano:not([hidden]){animation:belir .3s ease both}
+}
+@keyframes cmGir{from{clip-path:circle(0 at calc(100% - 70px) 38px)}to{clip-path:circle(150% at calc(100% - 70px) 38px)}}
 /* Arama: Spotlight gibi — panel parlak, sayfanın geri kalanı soluk. */
 .arama{margin:min(14vh,140px) auto auto;padding:0;border:0;width:min(680px,calc(100vw - 24px));max-height:min(72vh,640px);border-radius:20px;background:#FFFFFF;color:#1F2733;box-shadow:0 0 0 1px rgba(255,255,255,.6) inset,0 0 0 1px rgba(0,0,0,.08),0 50px 140px rgba(0,0,0,.45);overflow:hidden;backdrop-filter:saturate(1.8) blur(30px);-webkit-backdrop-filter:saturate(1.8) blur(30px)}
 .arama::backdrop{background:rgba(10,14,22,.55);backdrop-filter:blur(3px) saturate(.6) brightness(.8);-webkit-backdrop-filter:blur(3px) saturate(.6) brightness(.8)}
@@ -119,13 +167,9 @@ main p{max-width:76ch}
 .koyu .arama-ikon{background:rgba(240,122,35,.18);color:#FFB58A}.koyu .arama-alt{background:rgba(255,255,255,.03);color:#AEB9C7}.koyu .arama-alt kbd{background:transparent;border-color:rgba(255,255,255,.2)}
 @media (max-width:640px){.arama{margin-top:12px;max-height:calc(100dvh - 24px)}.arama-alt{display:none}.arama-sonuc small{display:none}}
 @media (prefers-reduced-motion:no-preference){
-  .cekmece[open]{animation:cekmeceGir .42s cubic-bezier(.2,.8,.2,1)}
-  .cekmece[open]::backdrop{animation:belir .3s ease}
-  .cekmece[open] .cekmece-ana a{animation:yuksel .5s calc(.06s * var(--s) + .12s) cubic-bezier(.2,.7,.2,1) both}
   .arama[open]{animation:aramaGir .28s cubic-bezier(.2,.8,.2,1)}
   .arama[open]::backdrop{animation:belir .25s ease}
 }
-@keyframes cekmeceGir{from{transform:translateX(100%)}to{transform:none}}
 @keyframes aramaGir{from{opacity:0;transform:translateY(-12px) scale(.98)}to{opacity:1;transform:none}}
 body:has(dialog[open]){overflow:hidden}
 /* Ana sayfa açılışı: açık temada krem sahne, koyu temada lacivert; ızgara ve imleci izleyen turuncu ışık. */
@@ -232,34 +276,68 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </header>
 <dialog id="cekmece" class="cekmece" aria-label="Site menüsü">
-<div class="cekmece-ic">
-<div class="cekmece-bas">
-<a href="/" class="ust-logo" aria-label="Idexya ana sayfa"><svg viewBox="0 0 1000 1000" width="34" height="34" role="img" aria-hidden="true"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg><span style="font-weight: 700; font-size: 20px">Idexya</span></a>
-<button type="button" class="ikon-dugme" data-cekmece-kapat aria-label="Menüyü kapat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<div class="cm-ust">
+<div class="kap cm-ust-ic">
+<a href="/" class="ust-logo" aria-label="Idexya ana sayfa"><svg viewBox="0 0 1000 1000" width="34" height="34" role="img" aria-hidden="true"><path fill="#F07A23" fill-rule="evenodd" d="M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z"></path></svg><span style="display: flex; flex-direction: column; line-height: 1.1"><span style="font-weight: 700; font-size: 20px">Idexya</span><span style="font-size: 12px; color: var(--tx2); letter-spacing: 0.08em">GOOD THINGS</span></span></a>
+<button type="button" class="cm-ara" data-cekmece-ara><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span>Hizmet, paket veya yazı arayın</span><kbd>⌘K</kbd></button>
+<div class="cm-ust-eylem">
+<a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a>
+<a href="/tr/iletisim#form" class="ust-cta">Ücretsiz analiz iste</a>
+<button type="button" class="ikon-dugme cm-kapat" data-cekmece-kapat aria-label="Menüyü kapat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg><span>Kapat</span></button>
 </div>
-<nav aria-label="Site menüsü" class="cekmece-ana">
-{MENU.map((m, i) => <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined} style={`--s:${i}`}><span>{m.ad}</span><small>{m.alt}</small></a>)}
+</div>
+</div>
+<div class="kap cm-govde">
+<nav aria-label="Site menüsü" class="cm-liste">
+{MENU.map((m, i) => <a href={m.href} data-onizle={m.k} aria-current={aktif === m.ad ? 'page' : undefined} style={`--s:${i}`}><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>)}
 </nav>
-<div class="cekmece-hizmet">
-{gruplar.map((g) => (
-  <div>
-    <a href={`/tr/hizmetler#${g.id}`} class="cekmece-grup">{g.ad}</a>
-    <ul>{g.hizmetler.map((h) => <li><a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a></li>)}</ul>
+<div class="cm-mobil"><a href="/tr/iletisim#form" class="ust-cta">Ücretsiz analiz iste</a><a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a></div>
+<div class="cm-sahne" aria-live="polite">
+<section data-pano="hizmetler" class="cm-pano">
+<div class="cm-pano-bas"><strong>Beş alan, 27 hizmet</strong><a href="/tr/hizmetler">Tümünü gör</a></div>
+<div class="cm-hizmet">
+{gruplar.map((g, i) => (
+  <div class="cm-kutu" style={`--s:${i}`}>
+    <a href={`/tr/hizmetler#${g.id}`} class="cm-kutu-bas">{g.ad}<span>{g.hizmetler.length}</span></a>
+    <ul>{g.hizmetler.slice(0, 5).map((h) => <li><a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a></li>)}{g.hizmetler.length > 5 && <li><a href={`/tr/hizmetler#${g.id}`} class="cm-daha">+{g.hizmetler.length - 5} hizmet daha</a></li>}</ul>
   </div>
 ))}
 </div>
-<div class="cekmece-alt">
-<div class="cekmece-iletisim">
-<a href="mailto:info@idexya.com">info@idexya.com</a>
-<a href="https://wa.me/905078700629">WhatsApp'tan yazın</a>
-<span>Ankara</span>
+</section>
+<section data-pano="paketler" class="cm-pano" hidden>
+<div class="cm-pano-bas"><strong>Paketler</strong><a href="/tr/paketler">Tüm paketler</a></div>
+<a href="/tr/paketler#sihirbaz" class="cm-vurgu"><span><strong>Paket sihirbazı</strong>Birkaç soruyla size uygun paketi bulun.</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+<div class="cm-cizelge">{['Google Ads yönetimi', 'Birleşik reklam yönetimi', 'Meta Ads yönetimi', 'SEO paketleri', 'Sosyal medya içerik paketleri', 'ikas e-ticaret paketleri'].map((p) => <a href="/tr/paketler">{p}</a>)}</div>
+</section>
+<section data-pano="idos" class="cm-pano" hidden>
+<div class="cm-pano-bas"><strong>IDOS · ajans operasyon panelimiz</strong><a href="/tr/idos">Tanıyın</a></div>
+<div class="cm-cizelge cm-uc">
+<div><strong>Tek ekran</strong><span>Reklam ve analiz verileriniz bir arada.</span></div>
+<div><strong>Yapay zekâ önerileri</strong><span>Hesaplar taranır, öneriler sıralanır.</span></div>
+<div><strong>Onaylı değişiklik</strong><span>Hiçbir değişiklik onayınız olmadan yapılmaz.</span></div>
 </div>
-<div class="cekmece-eylem">
-<nav aria-label="Dil seçimi" class="dil-sec"><a href="/" hreflang="tr" aria-current={dil === 'tr' ? 'true' : undefined}>TR</a><a href="/en/" hreflang="en" aria-current={dil === 'en' ? 'true' : undefined}>EN</a></nav>
-<a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a>
-<a href="/tr/iletisim#form" class="ust-cta">Ücretsiz analiz iste</a>
+</section>
+<section data-pano="blog" class="cm-pano" hidden>
+<div class="cm-pano-bas"><strong>Son yazılar</strong><a href="/tr/haberler">Blog</a></div>
+<div class="cm-cizelge cm-tek">{yazilar.map((y) => <a href={`/tr/haber/${y.slug}`}><small>{y.kategori}</small>{y.baslik}</a>)}<a href="/icerik/"><small>Platform</small>Üyelere özel içerikler ve rehberler</a></div>
+</section>
+<section data-pano="hakkimizda" class="cm-pano" hidden>
+<div class="cm-pano-bas"><strong>Idexya | Good Things</strong><a href="/tr/sayfa/hakkimizda">Hakkımızda</a></div>
+<p class="cm-metin">Reklam, e-ticaret, SEO ve yazılımı tek ekipte yönetiyoruz. Her kararı gerçek veriyle gösteriyor, hiçbir değişikliği onayınız olmadan yapmıyoruz.</p>
+</section>
+<section data-pano="iletisim" class="cm-pano" hidden>
+<div class="cm-pano-bas"><strong>Bize ulaşın</strong><a href="/tr/iletisim">İletişim sayfası</a></div>
+<div class="cm-cizelge cm-uc">
+<a href="/tr/iletisim#form"><strong>Ücretsiz analiz</strong><span>Formu doldurun, size dönelim.</span></a>
+<a href="https://wa.me/905078700629"><strong>WhatsApp</strong><span>0507 870 06 29</span></a>
+<a href="mailto:info@idexya.com"><strong>E-posta</strong><span>info@idexya.com</span></a>
+</div>
+</section>
 </div>
 </div>
+<div class="kap cm-dip">
+<span>Ankara · <a href="mailto:info@idexya.com">info@idexya.com</a></span>
+<span class="cm-dip-sag"><nav aria-label="Dil seçimi" class="dil-sec"><a href="/" hreflang="tr" aria-current={dil === 'tr' ? 'true' : undefined}>TR</a><a href="/en/" hreflang="en" aria-current={dil === 'en' ? 'true' : undefined}>EN</a></nav><button type="button" class="ikon-dugme" data-tema-dugme aria-label="Temayı değiştir"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button></span>
 </div>
 </dialog>
 <dialog id="arama" class="arama" aria-label="Sitede ara">
