@@ -1,0 +1,44 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Asistan sohbetleri" aktif="asistan" yol="Müşteri ilişkileri" aciklama="Sitedeki yapay zekâ asistanıyla yapılan sohbetler. Asistan talep kaydetmez; ziyaretçi onay kartını kendisi gönderirse talep, Talepler sayfasına düşer.">
+<div data-ozet class="uyari bilgi" hidden></div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<section aria-label="Sohbet listesi" class="kart" data-liste style="flex: 1 1 320px; overflow: hidden"></section>
+<section aria-label="Sohbet" class="kart" data-sohbet style="flex: 2 1 460px; padding: 18px; display: flex; flex-direction: column; gap: 10px"></section>
+</div>
+<script>
+  import { api, el, tarih, once, genelHata } from '../../scripts/yonetim/ortak.js';
+  const liste = document.querySelector('[data-liste]'), alan = document.querySelector('[data-sohbet]');
+  let tum = [], secili = new URLSearchParams(location.search).get('id');
+  function listeCiz() {
+    liste.replaceChildren(...(tum.length ? tum.map((s) => el('button', { type: 'button', 'aria-pressed': String(s.sohbet_id === secili), onclick: () => ac(s.sohbet_id),
+      style: `width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${s.sohbet_id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer` },
+      el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('strong', { style: 'color: var(--head); overflow: hidden; text-overflow: ellipsis; white-space: nowrap' }, s.ilk || '—'), el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(s.son))),
+      el('span', { style: 'display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--tx2)' }, `${s.mesaj} mesaj`, s.sayfa ? ' · ' + s.sayfa : '', s.kart ? el('span', { class: 'cip kazanildi' }, 'Talep kartı açıldı') : null)))
+      : [el('div', { class: 'bos' }, 'Henüz asistan sohbeti yok.')]));
+  }
+  async function ac(id) {
+    secili = id; history.replaceState(null, '', id ? '?id=' + encodeURIComponent(id) : location.pathname); listeCiz();
+    if (!id) { alan.replaceChildren(el('div', { class: 'bos' }, 'Soldan bir sohbet seçin.')); return; }
+    try {
+      const r = await api('asistan/' + encodeURIComponent(id));
+      alan.replaceChildren(...r.mesajlar.map((m) => {
+        const ek = (() => { try { return JSON.parse(m.ek || 'null'); } catch (e) { return null; } })();
+        return el('div', { style: `align-self: ${m.rol === 'ziyaretci' ? 'flex-end' : 'flex-start'}; max-width: 85%; display: flex; flex-direction: column; gap: 4px` },
+          el('span', { style: 'font-size: 11px; color: var(--tx2)' }, (m.rol === 'ziyaretci' ? 'Ziyaretçi' : 'Asistan') + ' · ' + tarih(m.zaman)),
+          el('div', { style: `padding: 10px 12px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; ${m.rol === 'ziyaretci' ? 'background: var(--tint); color: var(--tintx)' : 'background: var(--card2)'}` }, m.metin),
+          ek && ek.kart ? el('div', { class: 'uyari bilgi', style: 'font-size: 13px' }, 'Talep kartı gösterildi: ' + [ek.kart.ad, ek.kart.eposta, ek.kart.telefon, ek.kart.konu].filter(Boolean).join(' · ')) : null);
+      }));
+    } catch (h) { alan.replaceChildren(el('div', { class: 'uyari hata' }, 'Sohbet yüklenemedi: ' + h.message)); }
+  }
+  (async () => {
+    try {
+      const r = await api('asistan'); tum = r.sohbetler;
+      const o = document.querySelector('[data-ozet]'); o.hidden = false; o.textContent = `Bu ay ${r.buAy} mesaj. Aylık sınıra ulaşılırsa asistan kendiliğinden ekibe yönlendirme moduna geçer.`;
+      if (!secili && tum.length) secili = tum[0].sohbet_id;
+      listeCiz(); ac(secili);
+    } catch (h) { genelHata('Sohbetler yüklenemedi: ' + h.message); }
+  })();
+</script>
+</Yonetim>

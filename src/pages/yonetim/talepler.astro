@@ -36,7 +36,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   function ayrinti(t) {
     if (!t) { ayr.replaceChildren(el('div', { class: 'bos' }, 'Soldan bir talep seçin.')); return; }
     const ek = (() => { try { return JSON.parse(t.ek || '{}'); } catch (e) { return {}; } })();
-    const alanlar = [['E-posta', t.eposta], ['Telefon', t.telefon], ['Firma', t.firma], ['Konu', t.konu], ['Web sitesi', ek.site], ['Seçilen paket', ek.paket], ['Gönderildiği sayfa', t.sayfa], ['Robot doğrulaması', { gecti: 'Geçti', yapilandirilmadi: 'Kurulmadı (Turnstile anahtarı yok)' }[t.dogrulama] || t.dogrulama]].filter((a) => a[1]);
+    const alanlar = [['E-posta', t.eposta], ['Telefon', t.telefon], ['Firma', t.firma], ['Konu', t.konu], ['Web sitesi', ek.site], ['Seçilen paket', ek.paket],  ['Gönderildiği sayfa', t.sayfa], ['Robot doğrulaması', { gecti: 'Geçti', yapilandirilmadi: 'Kurulmadı (Turnstile anahtarı yok)' }[t.dogrulama] || t.dogrulama]].filter((a) => a[1]);
     const durumYaz = el('div', { role: 'status', 'aria-live': 'polite', hidden: !(mesaj && sabit === t.id), class: 'uyari ok' }, mesaj && sabit === t.id ? mesaj : '');
     const islem = async (yol, d) => {
       d.disabled = true; durumYaz.hidden = true;
@@ -58,6 +58,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     } else if (t.musteri_id) {
       dugmeler.push(el('a', { class: 'dugme ana', href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id) }, 'Müşteri kartını aç'));
     }
+    if (ek.sohbet) dugmeler.push(el('a', { class: 'dugme', href: '/yonetim/asistan/?id=' + encodeURIComponent(ek.sohbet) }, 'Asistan sohbetini oku'));
     if (t.eposta) dugmeler.push(el('a', { class: 'dugme', href: 'mailto:' + t.eposta }, 'E-postayla yanıtla'));
     if (t.telefon) dugmeler.push(el('a', { class: 'dugme', href: 'tel:' + t.telefon.replace(/[^\d+]/g, '') }, 'Ara'));
     ayr.replaceChildren(

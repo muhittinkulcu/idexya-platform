@@ -48,5 +48,8 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS yorumlar (
     id TEXT PRIMARY KEY, icerik_id TEXT NOT NULL, zaman TEXT NOT NULL, uye_id TEXT, ad TEXT NOT NULL, eposta TEXT,
     metin TEXT NOT NULL, durum TEXT NOT NULL DEFAULT 'bekliyor', ip_ozet TEXT, karar_veren TEXT, karar_zamani TEXT)`,
-  `CREATE INDEX IF NOT EXISTS yorum_icerik ON yorumlar (icerik_id, durum, zaman)`
+  `CREATE INDEX IF NOT EXISTS yorum_icerik ON yorumlar (icerik_id, durum, zaman)`,
+  `CREATE TABLE IF NOT EXISTS asistan_mesajlari (id TEXT PRIMARY KEY, sohbet_id TEXT NOT NULL, zaman TEXT NOT NULL, rol TEXT NOT NULL, metin TEXT NOT NULL, ek TEXT, ip_ozet TEXT, sayfa TEXT)`,
+  `CREATE INDEX IF NOT EXISTS asistan_sohbet ON asistan_mesajlari (sohbet_id, zaman)`,
+  `CREATE INDEX IF NOT EXISTS asistan_ip ON asistan_mesajlari (ip_ozet, zaman)`
 ];

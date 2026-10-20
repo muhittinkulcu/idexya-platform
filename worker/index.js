@@ -3,6 +3,7 @@
 import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
+import { asistanApi, yonetimAsistanApi } from './asistan.js';
 import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz } from './ortak.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -63,8 +64,8 @@ async function talepAl(istek, env) {
     dogrulama = 'gecti';
   }
   const ek = {};
-  ['site', 'alan', 'paket', 'sihirbaz', 'not'].forEach((k) => { if (g[k]) ek[k] = typeof g[k] === 'string' ? kirp(g[k], 1000) : JSON.stringify(g[k]).slice(0, 2000); });
-  const kaynak = ['iletisim', 'analiz', 'paket', 'sihirbaz'].includes(g.kaynak) ? g.kaynak : 'form';
+  ['site', 'alan', 'paket', 'sihirbaz', 'not', 'sohbet'].forEach((k) => { if (g[k]) ek[k] = typeof g[k] === 'string' ? kirp(g[k], 1000) : JSON.stringify(g[k]).slice(0, 2000); });
+  const kaynak = ['iletisim', 'analiz', 'paket', 'sihirbaz', 'asistan'].includes(g.kaynak) ? g.kaynak : 'form';
   await env.DB.prepare(`INSERT INTO talepler (id, olusturma, kaynak, sayfa, ad, firma, eposta, telefon, konu, mesaj, ek, iys_izni, ip_ozet, dogrulama)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(kimlik(), simdi(), kaynak, kirp(g.sayfa, 200), ad, kirp(g.firma, 160), eposta || null, telefon || null,
     kirp(g.konu, 120), kirp(g.mesaj, 4000), JSON.stringify(ek), g.iys === true ? 1 : 0, ipOzet, dogrulama).run();
@@ -203,7 +204,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim));
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -221,6 +222,7 @@ export default {
         await semaKur(env.DB);
         return await icerikApi(istek, env, yol.slice('/api/icerik'.length).replace(/^\/|\/$/g, ''));
       }
+      if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
       if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
       if (yol.startsWith('/uye/')) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
       const icerikEslesme = yol.match(/^\/icerik\/([a-z0-9-]{1,80})\/?$/);

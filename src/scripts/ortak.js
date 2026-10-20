@@ -1,3 +1,4 @@
+import { asistan } from './asistan.js';
 import { formlar } from './form.js';
 // Ortak istemci davranışları: tema, çerez onayı, sekme ve süzgeçler.
 const oku = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
@@ -225,7 +226,7 @@ function yasla() {
   let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(isle, 150); });
 }
 
-export function baslat() { tema(); cerez(); suzgecler(); menu(); arama(); yasla(); formlar(); efektler(); uyeBaglantisi(); }
+export function baslat() { tema(); cerez(); suzgecler(); menu(); arama(); yasla(); formlar(); efektler(); uyeBaglantisi(); asistan(); }
 
 // Kaydırınca üst menü yarı saydam ve gölgeli olur; süreç adımları sırayla görününce yanar; koyu bölümdeki kartlarda imleci izleyen ışık.
 function efektler() {
