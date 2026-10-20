@@ -10,14 +10,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <script>
   import { api, el, tarih, once, KAYNAK, TALEP_DURUM, genelHata } from '../../scripts/yonetim/ortak.js';
   const liste = document.querySelector('[data-liste]'), ayr = document.querySelector('[data-ayrinti]'), sekmeler = document.querySelector('[data-sekmeler]');
-  let tum = [], sekme = 'yeni', secili = null, sabit = null, mesaj = null;
+  let tum = [], sekme = (['yeni', 'crm', 'spam', 'hepsi'].includes(new URLSearchParams(location.search).get('sekme')) ? new URLSearchParams(location.search).get('sekme') : 'yeni'), secili = null, sabit = null, mesaj = null;
   const BOLUM = [['yeni', 'Yeni'], ['crm', 'CRM’e alınan'], ['spam', 'Spam'], ['hepsi', 'Tümü']];
 
   function ciz() {
     sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
       const n = k === 'hepsi' ? tum.length : tum.filter((t) => t.durum === k).length;
       const s = k === sekme;
-      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; secili = null; sabit = null; mesaj = null; ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; try { history.replaceState(null, '', '?sekme=' + k); } catch (e) {} secili = null; sabit = null; mesaj = null; ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
     }));
     const gor = tum.filter((t) => sekme === 'hepsi' || t.durum === sekme);
     // İşlem yapılan talep, sekmeden çıksa da sonucu görülsün diye ayrıntıda kalır.
