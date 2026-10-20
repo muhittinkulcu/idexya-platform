@@ -38,7 +38,7 @@ print('formlar bağlandı')
 # Referanslar ve IDOS tanıtımı şimdilik gizli (Muhittin, 19 Eki 2026): bu sayfalara giden bağlantılar kaldırılır.
 p = 'src/pages/tr/sayfa/hakkimizda.astro'
 s = open(p, encoding='utf-8').read()
-s, n = re.subn(r'<a href="/tr/referanslar"[^>]*>Çalışmalarımız</a>', '', s)
+s, n = re.subn(r'<a href="[^"]*"[^>]*>Çalışmalarımız</a>', '', s)
 assert n == 1, 'hakkımızda çalışmalarımız bağlantısı'
 open(p, 'w', encoding='utf-8').write(s)
 p = 'src/pages/index.astro'
@@ -61,3 +61,13 @@ s = s.replace('<Site baslik="IDOS"', '<Site aramayaKapali baslik="IDOS"')
 assert 'idos.idexya' not in s and 'aramayaKapali' in s
 open(p, 'w', encoding='utf-8').write(s)
 print('IDOS tanıtım sayfası temizlendi')
+
+# Ana sayfa (Muhittin, 20 Eki 2026): gerçek veri gelene kadar örnek müşteri yorumları ve boş Instagram kutuları gösterilmez
+# (uydurma yorum gerçek gibi sunulmaz; "otomatik gelir" denen akış henüz bağlı değil).
+p = 'src/pages/index.astro'
+s = open(p, encoding='utf-8').read()
+for kimlik in ('yorumlar', 'instagram'):
+    s, n = re.subn(r'<section id="' + kimlik + r'".*?</section>\n?', '', s, count=1, flags=re.S)
+    assert n == 1, kimlik
+open(p, 'w', encoding='utf-8').write(s)
+print('ana sayfa örnek bölümler kaldırıldı')

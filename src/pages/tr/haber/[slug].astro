@@ -2,11 +2,7 @@
 // Eski siteden gelen yazı adresleri korunur; içerikler taşınana kadar başlık ve özetle yayınlanır.
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
-const YAZILAR = [
-  { slug: 'performans-ve-hiz-odakli-reklam-optimizasyon-modeli', baslik: 'Performans ve hız odaklı reklam optimizasyon modeli', kategori: 'Reklam' },
-  { slug: 'donusum-degeri-odakli-e-ticaret-donusum-modeli', baslik: 'Dönüşüm değeri odaklı e-ticaret dönüşüm modeli', kategori: 'E-ticaret' },
-  { slug: 'e-ticaret-danismanligi-ile-dogru-karari-verin', baslik: 'E-ticaret danışmanlığı ile doğru kararı verin', kategori: 'E-ticaret' }
-];
+import YAZILAR from '../../../data/yazilar.json';
 export function getStaticPaths() {
   return [
     'performans-ve-hiz-odakli-reklam-optimizasyon-modeli', 'donusum-degeri-odakli-e-ticaret-donusum-modeli', 'e-ticaret-danismanligi-ile-dogru-karari-verin'
