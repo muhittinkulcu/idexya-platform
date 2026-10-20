@@ -90,13 +90,32 @@ function menu() {
   c.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => { if (a.getAttribute('href').startsWith('/tr/hizmetler#')) kapat(); }));
 }
 
-// Site içi arama: derlemede üretilen dizin + herkese açık içerikler. Ctrl/⌘+K veya "/" ile açılır.
+// Site içi arama (Spotlight gibi): boşken öneriler ve kısayollar, yazınca gruplu sonuçlar. Ctrl/⌘+K veya "/" ile açılır.
 const sade = (t) => String(t || '').toLocaleLowerCase('tr-TR').replace(/[çğıöşüâî]/g, (h) => ({ ç: 'c', ğ: 'g', ı: 'i', ö: 'o', ş: 's', ü: 'u', â: 'a', î: 'i' })[h]);
+const IKON = {
+  Sayfa: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path>',
+  Hizmet: '<path d="M12 2l10 5-10 5L2 7z"></path><path d="M2 17l10 5 10-5M2 12l10 5 10-5"></path>',
+  Blog: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path>',
+  İçerik: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"></path>',
+  Üyelik: '<circle cx="12" cy="8" r="4"></circle><path d="M4 21v-1a7 7 0 0 1 16 0v1"></path>',
+  Yasal: '<path d="M12 3v18M5 7h14M7 7l-3 7a3 3 0 0 0 6 0zM17 7l-3 7a3 3 0 0 0 6 0z"></path>',
+  Eylem: '<path d="M13 2L3 14h9l-1 8 10-12h-9z"></path>'
+};
+const GRUP = ['Eylem', 'Sayfa', 'Hizmet', 'İçerik', 'Blog', 'Üyelik', 'Yasal'];
+const GRUP_AD = { Eylem: 'Hızlı işlemler', Sayfa: 'Sayfalar', Hizmet: 'Hizmetler', İçerik: 'İçerikler', Blog: 'Blog', Üyelik: 'Üyelik', Yasal: 'Yasal' };
+const ONERI = ['/tr/hizmet/google-ads-yonetimi', '/tr/hizmet/meta-business-ads-yonetimi', '/tr/paketler', '/tr/hizmetler', '/tr/idos'];
 function arama() {
   const d = document.getElementById('arama');
   if (!d || typeof d.showModal !== 'function') return;
-  const girdi = d.querySelector('[data-arama-girdi]'), liste = d.querySelector('#arama-sonuc'), ipucu = d.querySelector('[data-arama-ipucu]');
-  let dizin = null, sonuclar = [], secili = 0;
+  const girdi = d.querySelector('[data-arama-girdi]'), liste = d.querySelector('#arama-sonuc');
+  let dizin = null, secili = 0;
+  const uye = () => /(?:^|;\s*)idx_uye=1/.test(document.cookie);
+  const eylemler = () => [
+    { t: 'Ücretsiz analiz iste', u: '/tr/iletisim#form', d: 'Formu doldurun, size dönelim', k: 'Eylem', a: 'analiz teklif iletisim form' },
+    { t: "WhatsApp'tan yaz", u: 'https://wa.me/905078700629', d: '0507 870 06 29', k: 'Eylem', a: 'whatsapp mesaj telefon' },
+    uye() ? { t: 'Hesabım', u: '/hesabim', d: 'Size açılan bölümler', k: 'Eylem', a: 'hesap uyelik' } : { t: 'Üye ol', u: '/uye-ol', d: 'Üyelik talebi gönderin', k: 'Eylem', a: 'kayit uyelik hesap' },
+    { t: document.body.classList.contains('koyu') ? 'Açık temaya geç' : 'Koyu temaya geç', u: '#tema', d: 'Görünümü değiştir', k: 'Eylem', a: 'tema karanlik gece koyu acik', is: () => document.querySelector('[data-tema-dugme]')?.click() }
+  ].map((x) => ({ ...x, st: sade(x.t), sd: sade(x.d + ' ' + x.a) }));
   const yukle = async () => {
     if (dizin) return dizin;
     const [a, b] = await Promise.all([
@@ -106,62 +125,80 @@ function arama() {
     dizin = [...a, ...b].map((x) => ({ ...x, st: sade(x.t), sd: sade(x.d + ' ' + x.k) }));
     return dizin;
   };
+  const tur = (x) => x.k.split(' · ')[0];
   const vurgula = (metin, sozcukler) => {
-    const f = document.createDocumentFragment(), s = sade(metin);
+    const f = document.createDocumentFragment(), s = sade(metin), ar = [];
+    sozcukler.forEach((w) => { let j = s.indexOf(w); while (j > -1) { ar.push([j, j + w.length]); j = s.indexOf(w, j + w.length); } });
     let i = 0;
-    const araliklar = [];
-    sozcukler.forEach((w) => { let j = s.indexOf(w); while (j > -1) { araliklar.push([j, j + w.length]); j = s.indexOf(w, j + w.length); } });
-    araliklar.sort((x, y) => x[0] - y[0]).forEach(([b, e]) => { if (b < i) return; f.append(metin.slice(i, b)); const m = document.createElement('mark'); m.textContent = metin.slice(b, e); f.append(m); i = e; });
-    f.append(metin.slice(i));
-    return f;
+    ar.sort((x, y) => x[0] - y[0]).forEach(([b, e]) => { if (b < i) return; f.append(metin.slice(i, b)); const m = document.createElement('mark'); m.textContent = metin.slice(b, e); f.append(m); i = e; });
+    f.append(metin.slice(i)); return f;
+  };
+  let gorunen = [];
+  const yaz = (gruplar) => {
+    gorunen = []; secili = 0;
+    const parcalar = [];
+    gruplar.forEach(([ad, ogeler, s]) => {
+      if (!ogeler.length) return;
+      const h = document.createElement('li'); h.className = 'arama-baslik'; h.setAttribute('role', 'presentation'); h.textContent = ad; parcalar.push(h);
+      ogeler.forEach((x) => {
+        const i = gorunen.length; gorunen.push(x);
+        const li = document.createElement('li'), a = document.createElement('a');
+        a.href = x.u; a.id = 'arama-s' + i; a.setAttribute('role', 'option'); a.setAttribute('aria-selected', String(i === 0));
+        if (x.u.startsWith('http')) { a.target = '_blank'; a.rel = 'noopener'; }
+        const ik = document.createElement('span'); ik.className = 'arama-ikon'; ik.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[tur(x)] || IKON.Sayfa}</svg>`;
+        const m = document.createElement('span'); m.className = 'arama-metin';
+        const b = document.createElement('strong'); b.append(s ? vurgula(x.t, s) : x.t);
+        const t = document.createElement('span'); t.className = 'aciklama'; t.textContent = x.d;
+        m.append(b, t);
+        const k = document.createElement('small'); k.textContent = x.k.includes(' · ') ? x.k.split(' · ')[1] : '';
+        a.append(ik, m, k);
+        a.addEventListener('mouseenter', () => sec(i, false));
+        if (x.is) a.addEventListener('click', (o) => { o.preventDefault(); x.is(); d.close(); });
+        li.append(a); parcalar.push(li);
+      });
+    });
+    liste.replaceChildren(...parcalar);
+    if (gorunen.length) girdi.setAttribute('aria-activedescendant', 'arama-s0');
   };
   const ciz = async () => {
     const q = sade(girdi.value.trim());
-    ipucu.hidden = !!q;
-    if (!q) { liste.replaceChildren(); return; }
-    const s = q.split(/\s+/).filter(Boolean);
     const idx = await yukle();
-    sonuclar = idx.map((x) => {
+    if (!q) { yaz([['Hızlı işlemler', eylemler().slice(0, 3)], ['Önerilenler', ONERI.map((u) => idx.find((x) => x.u === u)).filter(Boolean)]]); return; }
+    const s = q.split(/\s+/).filter(Boolean);
+    const puanla = (x) => {
       if (!s.every((w) => x.st.includes(w) || x.sd.includes(w))) return null;
       let p = 0;
       s.forEach((w) => { if (x.st.startsWith(w)) p += 6; else if (x.st.split(/[\s-]+/).some((k) => k.startsWith(w))) p += 4; else if (x.st.includes(w)) p += 3; else p += 1; });
-      if (x.k === 'Sayfa') p += 0.5;
       return { x, p };
-    }).filter(Boolean).sort((a, b) => b.p - a.p).slice(0, 12).map((o) => o.x);
-    secili = 0;
-    if (!sonuclar.length) { const li = document.createElement('li'); li.className = 'arama-bos'; li.textContent = `“${girdi.value.trim()}” için sonuç yok. Farklı bir sözcük deneyin veya bize yazın: info@idexya.com`; liste.replaceChildren(li); return; }
-    liste.replaceChildren(...sonuclar.map((x, i) => {
-      const li = document.createElement('li'), a = document.createElement('a');
-      a.href = x.u; a.setAttribute('role', 'option'); a.setAttribute('aria-selected', String(i === secili)); a.id = 'arama-s' + i;
-      const k = document.createElement('small'); k.textContent = x.k;
-      const b = document.createElement('strong'); b.append(vurgula(x.t, s));
-      const t = document.createElement('span'); t.textContent = x.d;
-      a.append(k, b, t); li.append(a); return li;
-    }));
+    };
+    const bulunan = [...eylemler(), ...idx].map(puanla).filter(Boolean).sort((a, b) => b.p - a.p).slice(0, 14).map((o) => o.x);
+    if (!bulunan.length) { const li = document.createElement('li'); li.className = 'arama-bos'; li.textContent = `“${girdi.value.trim()}” için sonuç yok. Farklı bir sözcük deneyin veya info@idexya.com adresine yazın.`; liste.replaceChildren(li); gorunen = []; return; }
+    const enIyi = bulunan[0];
+    yaz([['En iyi eşleşme', [enIyi], s], ...GRUP.map((g) => [GRUP_AD[g], bulunan.slice(1).filter((x) => tur(x) === g), s])]);
   };
-  const sec = (n) => {
+  const sec = (n, kaydir = true) => {
     const a = liste.querySelectorAll('a'); if (!a.length) return;
     secili = (n + a.length) % a.length;
     a.forEach((x, i) => x.setAttribute('aria-selected', String(i === secili)));
-    a[secili].scrollIntoView({ block: 'nearest' }); girdi.setAttribute('aria-activedescendant', a[secili].id);
+    if (kaydir) a[secili].scrollIntoView({ block: 'nearest' });
+    girdi.setAttribute('aria-activedescendant', a[secili].id);
   };
-  const ac = () => { if (d.open) return; const c = document.getElementById('cekmece'); if (c && c.open) c.close(); d.showModal(); girdi.focus(); girdi.select(); yukle(); };
+  const ac = () => { if (d.open) return; const c = document.getElementById('cekmece'); if (c && c.open) c.close(); d.showModal(); girdi.value = ''; girdi.focus(); ciz(); };
   document.querySelectorAll('[data-arama-ac]').forEach((b) => b.addEventListener('click', ac));
   d.querySelector('[data-arama-kapat]').addEventListener('click', () => d.close());
   d.addEventListener('click', (o) => { if (o.target === d) d.close(); });
-  d.querySelectorAll('[data-oneri]').forEach((b) => b.addEventListener('click', () => { girdi.value = b.textContent; ciz(); girdi.focus(); }));
   girdi.addEventListener('input', ciz);
   girdi.addEventListener('keydown', (o) => {
     if (o.key === 'ArrowDown') { o.preventDefault(); sec(secili + 1); }
     else if (o.key === 'ArrowUp') { o.preventDefault(); sec(secili - 1); }
-    else if (o.key === 'Enter') { const a = liste.querySelectorAll('a')[secili]; if (a) { o.preventDefault(); location.href = a.href; } }
+    else if (o.key === 'Enter') { const a = liste.querySelectorAll('a')[secili]; if (a) { o.preventDefault(); a.click(); } }
   });
   addEventListener('keydown', (o) => {
-    const yaziyor = /^(INPUT|TEXTAREA|SELECT)$/.test((document.activeElement || {}).tagName || '') || (document.activeElement || {}).isContentEditable;
+    const e = document.activeElement || {}, yaziyor = /^(INPUT|TEXTAREA|SELECT)$/.test(e.tagName || '') || e.isContentEditable;
     if ((o.key === 'k' || o.key === 'K') && (o.metaKey || o.ctrlKey)) { o.preventDefault(); ac(); }
     else if (o.key === '/' && !yaziyor && !d.open) { o.preventDefault(); ac(); }
   });
-  if (!/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) d.ownerDocument.querySelectorAll('.arama-dugme kbd').forEach((k) => (k.textContent = 'Ctrl K'));
+  if (!/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) document.querySelectorAll('.arama-dugme kbd').forEach((k) => (k.textContent = 'Ctrl K'));
 }
 
 // Üç satır ve üzeri paragraflar iki yana yaslanır; kısa giriş metinlerinde boşluk açılmaz.

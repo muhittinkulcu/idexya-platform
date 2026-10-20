@@ -3,6 +3,14 @@
 Muhittin'in istekleri ve sıralama. IDOS bu platformdan tamamen ayrıdır: sitede IDOS paneline bağlantı yoktur,
 yalnız tanıtım sayfası vardır (arama motorlarına kapalı). IDOS'a müşteri hesapları kendi gizli bağlantısıyla girer.
 
+## Temel ilke (Muhittin, 20 Eki 2026)
+Bu bir web sitesi değil, **çok amaçlı bir dijital ajans platformu**. Her yeni parça şu üç katmandan birine oturur:
+- **Herkese açık katman:** tanıtım, hizmetler, paketler, blog, arama (Ctrl/⌘+K). Ziyaretçiyi talebe ve üyeliğe taşır.
+- **Üye katmanı:** hesabım, üyelere özel içerikler, eğitimler, araçlar, ileride ücretli yazılımlar ve mağaza.
+  Her bölüm kişi bazında açılır (yetki: görüntüle / kullan), görünürlük ayarı her içerikte geçerlidir.
+- **Yönetim katmanı:** talepler, CRM, üyeler, içerikler, teklif/belge, muhasebe, entegrasyonlar.
+Arama ve hızlı işlemler üç katmanda da ortak çalışır (komut paleti mantığı). Tema varsayılan açık, koyu isteğe bağlı.
+
 ## Bitti
 - Site (TR), 301 yönlendirmeler, efektler · Referanslar kaldırıldı: mevcut müşterilere ait hiçbir bilgi sistemde tutulmaz (19 Eki 2026)
 - Yönetim paneli 1-2: Cloudflare Access girişi, talepler, CRM, müşteri kartı ve günlük
