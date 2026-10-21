@@ -95,7 +95,9 @@ export function kabuk() {
     yan.classList.toggle('gizli', t.yanMod === 'gizli');
     yan.classList.toggle('sabit', !!t.yanSabit);
     $('[data-yan-ac]').hidden = t.yanMod !== 'gizli';
-    const ys = $('[data-yan-sabitle]'); if (ys) ys.textContent = t.yanSabit ? 'Menü sabit · çöz' : 'Menüyü sabitle';
+    const ys = $('[data-yan-sabitle]');
+    if (ys) { ys.setAttribute('aria-pressed', String(!!t.yanSabit)); ys.title = t.yanSabit ? 'Menü sabit · çözmek için tıkla' : 'Menüyü sabitle'; }
+    ucanKapat();
     ust.hidden = !t.ustAcik; ustAc.hidden = !!t.ustAcik;
     ust.classList.toggle('sabit', !!t.ustSabit);
     ust.classList.toggle('ince', t.ustBoy === 'ince');
@@ -122,6 +124,52 @@ export function kabuk() {
     $$('[data-segment]').forEach((g) => $$('button', g).forEach((b) => b.setAttribute('aria-pressed', String(t[g.dataset.segment] === b.dataset.v))));
   }
   const kaydet = () => { tercihYaz(t); uygula(); };
+
+  // Dar menü: modülün üzerine gelince (veya klavyeyle odaklanınca) adı ve alt sayfaları yanda açılır.
+  // Fare menüden listeye geçerken kapanmasın diye kapanış kısa bir gecikmeyle yapılır.
+  let ucanZaman;
+  function ucanKapat() { clearTimeout(ucanZaman); if (ucan) ucan.hidden = true; }
+  const ucanPlanla = () => { clearTimeout(ucanZaman); ucanZaman = setTimeout(ucanKapat, 180); };
+  function ucanAc(m) {
+    if (!ucan || !yan.classList.contains('dar') || matchMedia('(max-width: 860px)').matches) return;
+    clearTimeout(ucanZaman);
+    const altlar = $$('[data-alt] [data-ad]', m);
+    const sayac = $('[data-sayac]', m);
+    const yakinda = !m.dataset.href && !$$('[data-alt-link]', m).length;
+    const ek = [sayac && !sayac.hidden ? el('span', { class: 'rozet' }, sayac.textContent) : null, yakinda ? el('small', {}, 'Yakında') : null];
+    ucan.replaceChildren(
+      m.dataset.href ? el('a', { class: 'ucan-bas', href: m.dataset.href }, el('span', {}, m.dataset.ad), ...ek) : el('span', { class: 'ucan-bas' }, el('span', {}, m.dataset.ad), ...ek),
+      ...(altlar.length ? [el('div', { class: 'ucan-cizgi' })] : []),
+      ...altlar.map((a) => a.tagName === 'A'
+        ? el('a', { class: 'alt-ln', href: a.getAttribute('href'), 'aria-current': a.getAttribute('aria-current') || undefined }, a.dataset.ad)
+        : el('span', { class: 'alt-ln' }, a.dataset.ad, el('small', {}, 'Yakında'))));
+    ucan.hidden = false;
+    const r = m.getBoundingClientRect();
+    ucan.style.left = Math.round(yan.getBoundingClientRect().right + 8) + 'px';
+    ucan.style.top = Math.round(Math.max(8, Math.min(r.top, innerHeight - ucan.offsetHeight - 8))) + 'px';
+  }
+  const ucan = $('[data-ucan]');
+  if (ucan) {
+    // Liste açıkken fare sağa (listeye doğru) gidiyorsa, yoldaki başka modüle hemen geçme: çapraz giderken liste değişmesin.
+    let onceki = { x: 0, y: 0 }, son = { x: 0, y: 0 }, gecis;
+    yan.addEventListener('mousemove', (o) => { onceki = son; son = { x: o.clientX, y: o.clientY }; });
+    $$('[data-modul]').forEach((m) => {
+      m.addEventListener('mouseenter', () => {
+        clearTimeout(gecis);
+        if (!ucan.hidden && son.x > onceki.x) { clearTimeout(ucanZaman); gecis = setTimeout(() => { if (m.matches(':hover')) ucanAc(m); }, 260); }
+        else ucanAc(m);
+      });
+      m.addEventListener('mouseleave', ucanPlanla);
+      m.addEventListener('focusin', () => ucanAc(m));
+    });
+    ucan.addEventListener('mouseenter', () => { clearTimeout(ucanZaman); clearTimeout(gecis); });
+    ucan.addEventListener('mouseleave', ucanPlanla);
+    document.addEventListener('focusin', (o) => { if (!ucan.contains(o.target) && !o.target.closest('[data-modul]')) ucanKapat(); });
+    document.addEventListener('keydown', (o) => { if (o.key === 'Escape') ucanKapat(); });
+    addEventListener('resize', ucanKapat);
+    addEventListener('scroll', ucanKapat, { passive: true });
+    const govde = $('#yan-govde'); if (govde) govde.addEventListener('scroll', ucanKapat, { passive: true });
+  }
 
   // Menü: modül aç/kapat. Kendi sayfası olan modülde başka sayfadaysan önce oraya gider.
   $$('[data-ac]').forEach((b) => b.addEventListener('click', () => {
