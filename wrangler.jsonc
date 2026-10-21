@@ -19,5 +19,8 @@
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
   "keep_vars": true,
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // Dal önizlemeleri (wrangler preview) için gerekli. Boş bırakıldı: D1 ve değişkenler önizlemeye aktarılmaz,
+  // böylece önizleme canlı veritabanına erişemez; yönetim paneli de önizlemede kapalı kalır.
+  "previews": {}
 }

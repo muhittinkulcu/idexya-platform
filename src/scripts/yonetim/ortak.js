@@ -67,21 +67,171 @@ export function sayacGuncelle(ozet) {
   yaz('yorum', ozet && ozet.bekleyenYorum !== undefined ? ozet.bekleyenYorum : null);
 }
 
+const TERCIH_ANAHTAR = 'idx-panel';
+const VARSAYILAN = { ustAcik: true, ustSabit: true, ustBoy: 'normal', u: { tarih: true, arama: true, hizli: true }, yanMod: 'genis', yanSabit: true, idosKart: true, acik: {}, favori: [], gizli: [] };
+function tercihOku() {
+  try { const s = JSON.parse(localStorage.getItem(TERCIH_ANAHTAR) || '{}'); return { ...VARSAYILAN, ...s, u: { ...VARSAYILAN.u, ...(s.u || {}) } }; }
+  catch (e) { return JSON.parse(JSON.stringify(VARSAYILAN)); }
+}
+function tercihYaz(t) { try { localStorage.setItem(TERCIH_ANAHTAR, JSON.stringify(t)); } catch (e) {} }
+const kucuk = (s) => String(s || '').toLocaleLowerCase('tr');
+
 export function kabuk() {
-  const yan = document.getElementById('yan');
-  const ac = document.querySelector('[data-menu-ac]');
-  if (ac) ac.addEventListener('click', () => { const a = yan.classList.toggle('acik-menu'); ac.setAttribute('aria-expanded', String(a)); });
-  const t = document.querySelector('[data-tema-dugme]');
-  if (t) t.addEventListener('click', () => {
+  const $ = (s, k = document) => k.querySelector(s);
+  const $$ = (s, k = document) => [...k.querySelectorAll(s)];
+  const yan = $('#yan'), ust = $('#ust'), ustAc = $('[data-ust-ac]');
+  let t = tercihOku();
+
+  // Tarih (TDK: 20 Ekim 2026, Salı)
+  const tr = $('[data-tarih]');
+  if (tr) tr.textContent = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' }).format(new Date()) + ' ·';
+
+  // Aktif alt sayfayı işaretle
+  const burasi = location.pathname + location.search;
+  $$('[data-alt-link]').forEach((a) => { if (a.getAttribute('href') === burasi) a.setAttribute('aria-current', 'page'); });
+
+  function uygula() {
+    yan.classList.toggle('dar', t.yanMod === 'dar');
+    yan.classList.toggle('gizli', t.yanMod === 'gizli');
+    yan.classList.toggle('sabit', !!t.yanSabit);
+    $('[data-yan-ac]').hidden = t.yanMod !== 'gizli';
+    const ys = $('[data-yan-sabitle]'); if (ys) ys.textContent = t.yanSabit ? 'Menü sabit · çöz' : 'Menüyü sabitle';
+    ust.hidden = !t.ustAcik; ustAc.hidden = !!t.ustAcik;
+    ust.classList.toggle('sabit', !!t.ustSabit);
+    ust.classList.toggle('ince', t.ustBoy === 'ince');
+    $('[data-ust-serit]').hidden = t.ustBoy !== 'genis';
+    const us = $('[data-ust-sabitle]'); if (us) us.setAttribute('aria-pressed', String(!!t.ustSabit));
+    $$('[data-u]').forEach((e) => { e.hidden = t.u[e.dataset.u] === false; });
+    const ik = $('[data-idos-kart]'); if (ik) ik.hidden = !t.idosKart || t.yanMod !== 'genis';
+    // Menüde gizlenen modüller
+    $$('[data-modul]').forEach((m) => { m.hidden = !m.dataset.sabit && t.gizli.includes(m.dataset.modul); });
+    // Açık modüller (aktif sayfanın modülü her zaman açık gelir)
+    $$('[data-ac]').forEach((b) => {
+      const aktif = b.getAttribute('aria-current') === 'page';
+      const acik = b.dataset.ac in t.acik ? !!t.acik[b.dataset.ac] : aktif;
+      b.setAttribute('aria-expanded', String(acik));
+      const alt = $(`[data-alt="${b.dataset.ac}"]`); if (alt) alt.hidden = !acik;
+    });
+    // Sık kullanılanlar
+    const fav = $('[data-favoriler]');
+    fav.replaceChildren(...t.favori.map((k) => $(`[data-modul="${k}"]`)).filter(Boolean).map((m) => el(m.dataset.href ? 'a' : 'span', { class: 'mo' + (m.dataset.href ? '' : ' yakinda'), href: m.dataset.href || undefined }, el('span', { style: 'color: #F07A23' }, '★'), el('span', { class: 'etiket' }, m.dataset.ad))));
+    $('[data-favori-blok]').hidden = !t.favori.length;
+    // Çekmece kontrolleri
+    $$('[data-t]').forEach((c) => { c.checked = !!t[c.dataset.t]; });
+    $$('[data-u-t]').forEach((c) => { c.checked = t.u[c.dataset.uT] !== false; });
+    $$('[data-segment]').forEach((g) => $$('button', g).forEach((b) => b.setAttribute('aria-pressed', String(t[g.dataset.segment] === b.dataset.v))));
+  }
+  const kaydet = () => { tercihYaz(t); uygula(); };
+
+  // Menü: modül aç/kapat. Kendi sayfası olan modülde başka sayfadaysan önce oraya gider.
+  $$('[data-ac]').forEach((b) => b.addEventListener('click', () => {
+    if (t.yanMod === 'dar' && b.dataset.git) { location.href = b.dataset.git; return; }
+    if (b.dataset.git && b.getAttribute('aria-current') !== 'page') { t.acik[b.dataset.ac] = true; tercihYaz(t); location.href = b.dataset.git; return; }
+    const simdi = b.getAttribute('aria-expanded') === 'true';
+    t.acik[b.dataset.ac] = !simdi;
+    kaydet();
+  }));
+  // Menü araması
+  const menuAra = $('[data-menu-ara]');
+  if (menuAra) menuAra.addEventListener('input', () => {
+    const q = kucuk(menuAra.value.trim());
+    $$('[data-grup]').forEach((g) => {
+      let gorunen = 0;
+      $$('[data-modul]', g).forEach((m) => {
+        if (!m.dataset.sabit && t.gizli.includes(m.dataset.modul)) { m.hidden = true; return; }
+        const altlar = $$('[data-alt] [data-ad]', m);
+        const adUyar = kucuk(m.dataset.ad).includes(q);
+        const altUyar = altlar.filter((a) => kucuk(a.dataset.ad).includes(q));
+        const gor = !q || adUyar || altUyar.length > 0;
+        m.hidden = !gor; if (gor) gorunen++;
+        const alt = $('[data-alt]', m);
+        if (alt && q) { alt.hidden = !(adUyar || altUyar.length); altlar.forEach((a) => { a.hidden = !(adUyar || kucuk(a.dataset.ad).includes(q)); }); }
+        if (alt && !q) { altlar.forEach((a) => { a.hidden = false; }); }
+      });
+      g.hidden = !gorunen;
+    });
+    if (!q) uygula();
+  });
+
+  // Panel araması (üst çubuk): modül ve alt sayfalara gider
+  const pa = $('[data-panel-ara]'), sonuc = $('[data-ara-sonuc]');
+  const hedefler = () => $$('[data-modul]').flatMap((m) => {
+    const liste = [];
+    if (m.dataset.href) liste.push({ ad: m.dataset.ad, alt: '', href: m.dataset.href });
+    $$('[data-alt-link]', m).forEach((a) => liste.push({ ad: a.dataset.ad, alt: m.dataset.ad, href: a.getAttribute('href') }));
+    return liste;
+  });
+  let secim = 0;
+  const araCiz = () => {
+    const q = kucuk(pa.value.trim());
+    if (!q) { sonuc.hidden = true; return; }
+    const bul = hedefler().filter((h) => kucuk(h.ad + ' ' + h.alt).includes(q)).slice(0, 8);
+    secim = Math.min(secim, Math.max(0, bul.length - 1));
+    sonuc.replaceChildren(...(bul.length ? bul.map((h, i) => el('a', { href: h.href, role: 'option', class: i === secim ? 'secili' : '' }, el('span', {}, h.ad), el('span', { style: 'color: var(--tx2); font-size: 12px' }, h.alt))) : [el('div', { class: 'bos', style: 'padding: 12px' }, 'Eşleşen modül yok')]));
+    sonuc.hidden = false;
+  };
+  if (pa) {
+    pa.addEventListener('input', () => { secim = 0; araCiz(); });
+    pa.addEventListener('keydown', (o) => {
+      const linkler = $$('a', sonuc);
+      if (o.key === 'ArrowDown') { secim = Math.min(secim + 1, linkler.length - 1); araCiz(); o.preventDefault(); }
+      if (o.key === 'ArrowUp') { secim = Math.max(secim - 1, 0); araCiz(); o.preventDefault(); }
+      if (o.key === 'Enter' && linkler[secim]) location.href = linkler[secim].getAttribute('href');
+      if (o.key === 'Escape') { pa.value = ''; sonuc.hidden = true; }
+    });
+    pa.addEventListener('blur', () => setTimeout(() => { sonuc.hidden = true; }, 150));
+    document.addEventListener('keydown', (o) => { if ((o.metaKey || o.ctrlKey) && o.key.toLowerCase() === 'k') { o.preventDefault(); if (!t.ustAcik) { t.ustAcik = true; kaydet(); } pa.focus(); } });
+  }
+
+  // Üst ve yan menü düğmeleri
+  $('[data-ust-kapat]').addEventListener('click', () => { t.ustAcik = false; kaydet(); });
+  ustAc.addEventListener('click', () => { t.ustAcik = true; kaydet(); });
+  const us = $('[data-ust-sabitle]'); if (us) us.addEventListener('click', () => { t.ustSabit = !t.ustSabit; kaydet(); });
+  $('[data-yan-daralt]').addEventListener('click', () => { t.yanMod = t.yanMod === 'genis' ? 'dar' : 'genis'; kaydet(); });
+  $('[data-yan-ac]').addEventListener('click', () => { t.yanMod = 'genis'; kaydet(); });
+  const ysb = $('[data-yan-sabitle]'); if (ysb) ysb.addEventListener('click', () => { t.yanSabit = !t.yanSabit; kaydet(); });
+  const mac = $('[data-menu-ac]');
+  if (mac) mac.addEventListener('click', () => { const a = yan.classList.toggle('acik-menu'); mac.setAttribute('aria-expanded', String(a)); });
+
+  // Özelleştir çekmecesi
+  const cek = $('[data-cekmece]'), perde = $('[data-perde]'), cekAc = $('[data-ozellestir]');
+  const cekmece = (ac) => { cek.hidden = !ac; perde.hidden = !ac; if (ac) { modulAyarCiz(); const k = $('[data-cekmece-kapat]', cek); if (k) k.focus(); } else if (cekAc) cekAc.focus(); };
+  if (cekAc) cekAc.addEventListener('click', () => cekmece(true));
+  $$('[data-cekmece-kapat]').forEach((b) => b.addEventListener('click', () => cekmece(false)));
+  perde.addEventListener('click', () => cekmece(false));
+  document.addEventListener('keydown', (o) => { if (o.key === 'Escape' && !cek.hidden) cekmece(false); });
+  $$('[data-t]').forEach((c) => c.addEventListener('change', () => { t[c.dataset.t] = c.checked; kaydet(); }));
+  $$('[data-u-t]').forEach((c) => c.addEventListener('change', () => { t.u[c.dataset.uT] = c.checked; kaydet(); }));
+  $$('[data-segment]').forEach((g) => $$('button', g).forEach((b) => b.addEventListener('click', () => { t[g.dataset.segment] = b.dataset.v; kaydet(); })));
+  $('[data-sifirla]').addEventListener('click', () => { t = JSON.parse(JSON.stringify(VARSAYILAN)); kaydet(); modulAyarCiz(); });
+  function modulAyarCiz() {
+    const kutu = $('[data-modul-ayar]');
+    kutu.replaceChildren(...$$('[data-modul]').filter((m) => !m.dataset.sabit).map((m) => {
+      const k = m.dataset.modul, fav = t.favori.includes(k);
+      return el('div', { style: 'display: flex; align-items: center; gap: 10px' },
+        el('button', { type: 'button', class: 'yildiz', 'aria-pressed': String(fav), 'aria-label': m.dataset.ad + ' sık kullanılanlarda', onclick: () => { t.favori = fav ? t.favori.filter((x) => x !== k) : [...t.favori, k]; kaydet(); modulAyarCiz(); } }, '★'),
+        el('label', { class: 'sat', style: 'flex: 1' }, el('span', {}, m.dataset.ad), el('input', { type: 'checkbox', checked: !t.gizli.includes(k), onchange: (o) => { t.gizli = o.currentTarget.checked ? t.gizli.filter((x) => x !== k) : [...t.gizli, k]; kaydet(); } })));
+    }));
+  }
+
+  // Tema
+  const td = $('[data-tema-dugme]');
+  if (td) td.addEventListener('click', () => {
     const yeni = document.documentElement.dataset.tema === 'koyu' ? 'acik' : 'koyu';
     document.documentElement.dataset.tema = yeni;
     document.getElementById('kabuk').className = 'kabuk ' + yeni;
     try { localStorage.setItem('idx-tema', yeni); } catch (e) {}
   });
+
+  uygula();
+
   api('ozet').then((o) => {
     sayacGuncelle(o);
-    const k = document.querySelector('[data-kim]');
-    if (k && o.kim) k.textContent = o.kim;
+    const say = (liste, d) => (liste.find((x) => x.durum === d) || { n: 0 }).n;
+    const yaz = (k, v) => { const e = $(`[data-s="${k}"]`); if (e) e.textContent = String(v); };
+    yaz('talep', say(o.talepler, 'yeni')); yaz('musteri', o.musteri.n || 0); yaz('uye', say(o.uyeler, 'bekliyor')); yaz('yorum', o.bekleyenYorum || 0);
+    const k = $('[data-kim]'); if (k && o.kim) k.textContent = o.kim;
+    const av = $('[data-kim-avatar]'); if (av && o.kim) { av.textContent = o.kim.slice(0, 2).toUpperCase(); av.title = o.kim + ' · çıkış yap'; }
   }).catch((h) => {
     sayacGuncelle(null);
     if (h.durum === 401) genelHata('Oturumunuz kapanmış. Sayfayı yenileyip yeniden giriş yapın.');
