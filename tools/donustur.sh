@@ -18,3 +18,4 @@ for x in kvkk:kvkk-aydinlatma-metni:"KVKK aydınlatma metni" cerez:cerez-politik
   $C design/Yasal.dc.html src/pages/tr/sayfa/$d.astro --kok ../../../layouts/Site.astro --baslik "$b" --durum "{\"sekme\":\"$k\"}"
 done
 python3 tools/sonislem.py
+python3 tools/yayin_icerik.py
