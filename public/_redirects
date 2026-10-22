@@ -1,15 +1,27 @@
 # Eski site adresleri (301). Var olan adresler aynı kalır; yalnız taşınan sayfalar yönlendirilir.
 /tr                      /                          301
 /tr/                     /                          301
-/tr/sayfa/vizyonumuz     /tr/sayfa/hakkimizda       301
-/tr/sayfa/misyonumuz     /tr/sayfa/hakkimizda       301
-/tr/urun/*               /tr/paketler               301
-/tr/urun-gruplari        /tr/paketler               301
-/tr/urun-gruplari/*      /tr/paketler               301
+/tr/sayfa/vizyonumuz     /tr/sayfa/hakkimizda/      301
+/tr/sayfa/misyonumuz     /tr/sayfa/hakkimizda/      301
+/tr/urun/*               /tr/paketler/              301
+/tr/urun-gruplari        /tr/paketler/              301
+/tr/urun-gruplari/*      /tr/paketler/              301
 
 # Referanslar ve proje sayfaları kaldırıldı: mevcut müşteri bilgisi sistemde tutulmaz (Muhittin, 19 Eki 2026).
 # 301 (Muhittin, 22 Eki 2026: tüm eski adresler kalıcı yönlenir). İleride referans sayfası açılırsa bu satırlar güncellenir.
-/tr/referanslar          /tr/hizmetler              301
-/tr/projeler             /tr/hizmetler              301
-/tr/projeler/*           /tr/hizmetler              301
-/tr/proje/*              /tr/hizmetler              301
+/tr/referanslar          /tr/hizmetler/             301
+/tr/projeler             /tr/hizmetler/             301
+/tr/projeler/*           /tr/hizmetler/             301
+/tr/proje/*              /tr/hizmetler/             301
+
+# Eski site adresleri sonda "/" olmadan yazılıyordu; yeni sayfalar "/" ile yayında (kanonik adres de öyle).
+# Platformun kendi düzeltmesi 307 (geçici) olduğu için bu adresler açıkça 301 ile kalıcı yönlendirilir.
+/tr/hizmet/:ad           /tr/hizmet/:ad/            301
+/tr/haber/:ad            /tr/haber/:ad/             301
+/tr/sayfa/:ad            /tr/sayfa/:ad/             301
+/tr/hizmetler            /tr/hizmetler/             301
+/tr/paketler             /tr/paketler/              301
+/tr/haberler             /tr/haberler/              301
+/tr/iletisim             /tr/iletisim/              301
+/tr/idos                 /tr/idos/                  301
+/en                      /en/                       301
