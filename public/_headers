@@ -1,6 +1,7 @@
-# Deneme ortami: arama motorlarina kapali. Canliya gecerken kaldirilacak.
+# Güvenlik başlıkları. Site idexya.com'da arama motorlarına açıktır; kapalı kalması gereken sayfalar
+# (IDOS tanıtımı, üye ve yönetim sayfaları) kendi noindex etiketini ve robots.txt kuralını taşır.
+# workers.dev deneme adresindeki kopyalar kanonik etiketle idexya.com'u gösterir.
 /*
-  X-Robots-Tag: noindex, nofollow
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin

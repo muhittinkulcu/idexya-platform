@@ -3,7 +3,7 @@
   "name": "idexya-platform",
   "main": "worker/index.js",
   "compatibility_date": "2026-09-01",
-  // Deneme adresi: idexya-platform.<hesap>.workers.dev (arama motorlarına kapalı, bkz. public/_headers)
+  // Deneme adresi: idexya-platform.<hesap>.workers.dev. Canlı alan adı (idexya.com) Cloudflare panelinden Custom Domain olarak bağlanır.
   "workers_dev": true,
   "preview_urls": true,
   "assets": {
