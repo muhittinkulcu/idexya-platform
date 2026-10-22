@@ -6,6 +6,7 @@ import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
 import { asistanApi, yonetimAsistanApi } from './asistan.js';
 import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz } from './ortak.js';
 import { yonetimReklamApi, reklamCek, reklamKurulu } from './reklam.js';
+import { saklamaUygula } from './saklama.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -267,10 +268,11 @@ export default {
       return hata('Beklenmeyen bir hata oluştu', 500);
     }
   },
-  // Günlük zamanlayıcı (wrangler.jsonc triggers): IDOS reklam özetini çeker. Ayar yoksa hiçbir şey yapmaz.
+  // Günlük zamanlayıcı (wrangler.jsonc triggers): saklama süresi dolan kişisel veriyi siler; IDOS reklam özetini
+  // çeker (IDOS ayarı yoksa bu adım atlanır).
   async scheduled(olay, env, ctx) {
-    if (!reklamKurulu(env)) return;
     await semaKur(env.DB);
-    ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
+    ctx.waitUntil(saklamaUygula(env.DB).catch((e) => console.error('saklama', e && e.message)));
+    if (reklamKurulu(env)) ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
   }
 };
