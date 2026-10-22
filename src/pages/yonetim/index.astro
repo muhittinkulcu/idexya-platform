@@ -6,18 +6,67 @@ import Yonetim from '../../layouts/Yonetim.astro';
   @keyframes nabiz{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
   @keyframes yuz{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   @media (prefers-reduced-motion: reduce){.kure-halka,.kure-top{animation:none!important}}
+  /* Talep kaynağı renkleri: sabit sıra, iki tema ayrı doğrulandı (dataviz validate_palette). Açık temada 3. ve 5. renk 3:1 altında; tablo görünümü bunun için var. */
+  .acik{--s1:#eb6834;--s2:#2a78d6;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4}
+  .koyu{--s1:#d95926;--s2:#3987e5;--s3:#199e70;--s4:#9085e9;--s5:#d55181}
   .pano{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch}
   .pano>.modul{grid-column:span 1;padding:22px;display:flex;flex-direction:column;gap:14px}
   .pano>.modul.tam{grid-column:span 2}
   .pano.duzen>.modul{border:2px dashed var(--btnline)}
   .modul-bas{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .modul-bas h2{margin:0;font-size:19px;font-weight:700;color:var(--head)}
+  .modul-bas small{font-size:12px;color:var(--tx2)}
   .modul-arac{display:flex;gap:6px}
   .modul-arac button{min-width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--head);cursor:pointer;font:inherit;font-size:12px}
-  .kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit}
+  .kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
   .kpi:hover{border-color:var(--btnline);color:inherit}
-  .kpi b{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--head)}
+  .kpi b{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--head);line-height:1.15}
+  .kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .degisim{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+  .degisim .ok-u{color:var(--ok);font-weight:700}.degisim .ok-a{color:var(--err);font-weight:700}
+  .kivilcim{display:block;width:100%;height:34px;margin-top:4px}
+  .uyari-serit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:var(--warnb);color:var(--tx);border:1px solid var(--line)}
+  .uyari-serit .simge{width:26px;height:26px;border-radius:8px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:var(--warn);color:#FFFFFF;font-weight:800}
+  .segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg)}
+  .segment-kucuk button{height:30px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  .segment-kucuk button[aria-pressed=true]{background:var(--card);color:var(--head);box-shadow:0 1px 3px var(--shadow)}
+  .lejant{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--tx)}
+  .lejant span{display:inline-flex;align-items:center;gap:6px}
+  .lejant i{width:10px;height:10px;border-radius:3px;display:inline-block}
+  .lejant .onceki{width:16px;height:0;border-top:2px dashed var(--tx2);border-radius:0}
+  .cubuk-alan{position:relative;height:220px;margin-left:34px}
+  .cubuk-izgara{position:absolute;inset:0;pointer-events:none}
+  .cubuk-izgara div{position:absolute;left:0;right:0;border-top:1px solid var(--track)}
+  .cubuk-izgara span{position:absolute;left:-34px;width:28px;text-align:right;transform:translateY(-50%);font-size:11px;color:var(--tx2)}
+  .cubuklar{position:absolute;inset:0;display:flex;align-items:flex-end;gap:2px}
+  .cubuk{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;cursor:default;outline-offset:0}
+  .cubuk:hover .yigin,.cubuk:focus-visible .yigin{filter:brightness(1.08)}
+  .cubuk:hover{background:color-mix(in oklab,var(--track) 55%,transparent)}
+  .yigin{display:flex;flex-direction:column-reverse;gap:2px;min-height:2px;border-radius:4px 4px 0 0;overflow:hidden}
+  .onceki-cizgi{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+  .x-eksen{position:relative;height:18px;margin-left:34px;font-size:11px;color:var(--tx2)}
+  .x-eksen span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+  .bos-not{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 20px;color:var(--tx2);font-size:14px;pointer-events:none}
+  .isi{display:grid;grid-template-columns:34px repeat(24,minmax(0,1fr));gap:2px;font-size:11px;color:var(--tx2)}
+  .isi span{display:flex;align-items:center}
+  .isi i{display:block;aspect-ratio:1;border-radius:3px;background:var(--track);min-height:8px}
+  .isi i[data-n]:hover{outline:2px solid var(--head);outline-offset:-1px}
+  .yatay{display:flex;flex-direction:column;gap:8px}
+  .yatay-sat{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:10px;align-items:center;font-size:13px}
+  .yatay-sat .ad{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .yatay-sat .ad i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+  .yatay-iz{height:12px;border-radius:0 4px 4px 0;background:var(--track);overflow:hidden}
+  .yatay-iz div{height:100%;border-radius:0 4px 4px 0}
+  .yatay-sat b{color:var(--head);font-variant-numeric:tabular-nums}
+  .tablo-sar{overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:14px}
+  .tablo-sar table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+  .tablo-sar th,.tablo-sar td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tablo-sar th:first-child,.tablo-sar td:first-child{text-align:left}
+  .tablo-sar thead th{position:sticky;top:0;background:var(--card2);color:var(--tx2);font-weight:600}
+  .ipucu{position:fixed;z-index:50;pointer-events:none;background:var(--head);color:var(--bg);padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.45;white-space:pre-line;box-shadow:0 10px 30px -12px var(--shadow);max-width:240px}
+  .bekleyen-kutu{flex:1;min-height:120px;border:2px dashed var(--line);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;color:var(--tx2)}
   @media (max-width:900px){.pano{grid-template-columns:minmax(0,1fr)}.pano>.modul,.pano>.modul.tam{grid-column:auto}}
+  @media (max-width:600px){.isi{grid-template-columns:30px repeat(24,minmax(0,1fr));gap:1px}.cubuk-alan,.x-eksen{margin-left:28px}}
 </style>
 
 <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: -8px">
@@ -27,9 +76,36 @@ import Yonetim from '../../layouts/Yonetim.astro';
     <span>Modülleri düzenle</span>
   </button>
 </div>
+<div class="uyari-serit" data-uyari hidden role="status"></div>
 <div class="uyari" data-duzen-not hidden style="background: var(--tint); color: var(--tintx)"><b>Düzenleme modu.</b> Modülleri taşı, genişliğini değiştir ya da gizle. Ayarlar bu tarayıcıda saklanır.</div>
 
 <div class="pano" data-pano>
+  <section class="kart modul" data-m="kpi" aria-label="Temel sayılar">
+    <div class="modul-bas"><h2>Temel sayılar</h2><small>Gerçek veriler · spam sayılmaz</small></div>
+    <div class="kpi-sira" data-kpi></div>
+  </section>
+
+  <section class="kart modul" data-m="trend" aria-label="Talep grafiği">
+    <div class="modul-bas">
+      <h2>Gelen talepler</h2>
+      <span style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+        <span class="segment-kucuk" role="group" aria-label="Dönem" data-donem>
+          <button type="button" data-g="7">7 gün</button><button type="button" data-g="30">30 gün</button><button type="button" data-g="90">90 gün</button>
+        </span>
+        <span class="segment-kucuk" role="group" aria-label="Görünüm" data-gorunum>
+          <button type="button" data-v="grafik">Grafik</button><button type="button" data-v="tablo">Tablo</button>
+        </span>
+      </span>
+    </div>
+    <div class="lejant" data-lejant></div>
+    <div data-trend-grafik>
+      <div class="cubuk-alan" data-cubuk-alan></div>
+      <div class="x-eksen" data-x-eksen></div>
+    </div>
+    <div class="tablo-sar" data-trend-tablo hidden></div>
+    <span style="font-size: 12px; color: var(--tx2)" data-trend-not></span>
+  </section>
+
   <section class="kart modul" data-m="kure" aria-label="Talep küresi">
     <div class="modul-bas"><h2>Bekleyen talepler</h2></div>
     <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px">
@@ -57,19 +133,36 @@ import Yonetim from '../../layouts/Yonetim.astro';
     </div>
   </section>
 
-  <section class="kart modul" data-m="sayilar" aria-label="Temel sayılar">
-    <div class="modul-bas"><h2>Temel sayılar</h2></div>
-    <div data-kpi style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px"></div>
-  </section>
-
   <section class="kart modul" data-m="huni" aria-label="Satış hunisi">
     <div class="modul-bas"><h2>Satış hunisi</h2><a href="/yonetim/crm/" style="font-size: 13px; font-weight: 600">CRM panosu →</a></div>
     <div data-huni style="display: flex; flex-direction: column; gap: 8px; align-items: center"></div>
+    <div data-huni-alt style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"></div>
+  </section>
+
+  <section class="kart modul" data-m="isi" aria-label="Talepler hangi saatte geliyor">
+    <div class="modul-bas"><h2>Talepler hangi saatte geliyor</h2><small>Son 90 gün · İstanbul saati</small></div>
+    <div class="isi" data-isi role="img"></div>
+    <span style="font-size: 13px; color: var(--tx2)" data-isi-not></span>
+  </section>
+
+  <section class="kart modul" data-m="kaynak" aria-label="Talepler nereden geliyor">
+    <div class="modul-bas"><h2>Talepler nereden geliyor</h2><small>Son 30 gün</small></div>
+    <div class="yatay" data-kaynaklar></div>
+    <h3 style="margin: 6px 0 0; font-size: 13px; color: var(--tx2); font-weight: 600">Talep getiren sayfalar</h3>
+    <div class="yatay" data-sayfalar></div>
   </section>
 
   <section class="kart modul" data-m="hareket" aria-label="Son hareketler">
     <div class="modul-bas"><h2>Son hareketler</h2></div>
     <div data-hareket style="display: flex; flex-direction: column"></div>
+  </section>
+
+  <section class="kart modul" data-m="reklam" aria-label="Reklam performansı">
+    <div class="modul-bas"><h2>Reklam performansı</h2><span class="cip gorusme">IDOS bağlantısı bekleniyor</span></div>
+    <div class="bekleyen-kutu">
+      <b style="color: var(--head)">Harcama ve sonuçlar IDOS’tan gelecek</b>
+      <span style="max-width: 560px">Meta ve Google Ads verisi IDOS’un BigQuery özetinden yalnız okunarak, günde bir kez alınacak. Bağlantı kurulunca burada toplam ve müşteri bazında görünür. Şu an hiçbir rakam gösterilmiyor.</span>
+    </div>
   </section>
 
   <section class="kart modul" data-m="hizli" aria-label="Hızlı işlemler">
@@ -84,17 +177,21 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 
 <div data-gizliler hidden style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 16px; border-radius: 18px; border: 1px dashed var(--line)"></div>
+<div class="ipucu" data-ipucu hidden></div>
 
 <script>
   import { api, el, ASAMALAR, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { kpiKart, trendCiz, isiCiz, yatayCiz, ipucuKur, gunler, KAYNAK_GRUP } from '../../scripts/yonetim/grafik.js';
   const $ = (s, k = document) => k.querySelector(s);
+  const $$ = (s, k = document) => [...k.querySelectorAll(s)];
   const pano = $('[data-pano]');
-  const AD = { kure: 'Bekleyen talepler', sayilar: 'Temel sayılar', huni: 'Satış hunisi', hareket: 'Son hareketler', hizli: 'Hızlı işlemler' };
-  const VARS = { sira: ['kure', 'sayilar', 'huni', 'hareket', 'hizli'], tam: ['hizli'], gizli: [] };
-  let d; try { d = { ...VARS, ...JSON.parse(localStorage.getItem('idx-pano') || '{}') }; } catch (e) { d = { ...VARS }; }
-  Object.keys(AD).forEach((k) => { if (!d.sira.includes(k)) d.sira.push(k); });
+  const AD = { kpi: 'Temel sayılar', trend: 'Gelen talepler', kure: 'Bekleyen talepler', huni: 'Satış hunisi', isi: 'Talep saatleri', kaynak: 'Talep kaynakları', hareket: 'Son hareketler', reklam: 'Reklam performansı', hizli: 'Hızlı işlemler' };
+  // Yerleşim anahtarı yeni modüllerle değişti; eski kayıt (idx-pano) yeni varsayılanı bozmasın diye okunmaz.
+  const VARS = { sira: ['kpi', 'trend', 'kure', 'huni', 'isi', 'kaynak', 'hareket', 'reklam', 'hizli'], tam: ['kpi', 'trend', 'reklam', 'hizli'], gizli: [], donem: 30, gorunum: 'grafik' };
+  let d; try { d = { ...VARS, ...JSON.parse(localStorage.getItem('idx-pano-2') || '{}') }; } catch (e) { d = { ...VARS }; }
+  d.sira = d.sira.filter((k) => k in AD); Object.keys(AD).forEach((k) => { if (!d.sira.includes(k)) d.sira.push(k); });
   let duzen = false;
-  const kaydet = () => { try { localStorage.setItem('idx-pano', JSON.stringify(d)); } catch (e) {} };
+  const kaydet = () => { try { localStorage.setItem('idx-pano-2', JSON.stringify(d)); } catch (e) {} };
 
   function yerlestir() {
     d.sira.forEach((k) => { const m = $(`[data-m="${k}"]`, pano); if (m) pano.append(m); });
@@ -121,36 +218,82 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const db = $('[data-duzenle]');
   db.addEventListener('click', () => { duzen = !duzen; db.setAttribute('aria-pressed', String(duzen)); $('span', db).textContent = duzen ? 'Bitti' : 'Modülleri düzenle'; db.classList.toggle('ana', duzen); $('[data-duzen-not]').hidden = !duzen; yerlestir(); });
   yerlestir();
+  ipucuKur($('[data-ipucu]'));
 
   const saat = new Date().getHours();
   const selam = saat < 6 ? 'İyi geceler' : saat < 12 ? 'Günaydın' : saat < 18 ? 'İyi günler' : 'İyi akşamlar';
   const selamYaz = (alt) => { const p = $('[data-selam]'); p.replaceChildren(selam + '.', el('br'), el('span', { style: 'color: var(--acc)' }, alt)); };
   selamYaz('Panel verileri yükleniyor…');
-
-  const kpi = (ad, deger, alt, href) => el('a', { class: 'kart kpi', href }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ad), el('b', {}, deger), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, alt));
   const v = (k, metin) => { const e = $(`[data-v="${k}"]`); if (e) e.textContent = metin; };
 
+  // Talep grafiği: dönem ve görünüm seçimi bu tarayıcıda hatırlanır.
+  let g = null;
+  function trend() {
+    if (!g) return;
+    $$('[data-donem] button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.g) === d.donem)));
+    $$('[data-gorunum] button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.v === d.gorunum)));
+    trendCiz(g, d.donem, d.gorunum, { alan: $('[data-cubuk-alan]'), x: $('[data-x-eksen]'), lejant: $('[data-lejant]'), tablo: $('[data-trend-tablo]'), grafik: $('[data-trend-grafik]'), not: $('[data-trend-not]') });
+  }
+  $$('[data-donem] button').forEach((b) => b.addEventListener('click', () => { d.donem = Number(b.dataset.g); kaydet(); trend(); }));
+  $$('[data-gorunum] button').forEach((b) => b.addEventListener('click', () => { d.gorunum = b.dataset.v; kaydet(); trend(); }));
+
   (async () => { try {
-    const o = await api('ozet');
+    const [o, gr] = await Promise.all([api('ozet'), api('grafik')]);
+    g = gr;
     const t = Object.fromEntries(o.talepler.map((x) => [x.durum, x.n]));
-    const u = Object.fromEntries((o.uyeler || []).map((x) => [x.durum, x.n]));
     const acik = o.asamalar.filter((a) => !['kazanildi', 'kaybedildi'].includes(a.asama)).reduce((s, a) => s + a.n, 0);
     const bekleyen = t.yeni || 0;
     selamYaz(bekleyen ? `Yanıt bekleyen ${bekleyen} talep var.` : 'Yanıt bekleyen talep yok, her şey yolunda.');
     v('bekleyen', String(bekleyen)); v('firsat', o.musteri.n ? para(o.musteri.hat || 0) : '—'); v('musteri', String(o.musteri.n || 0)); v('acikFirsat', String(acik));
-    $('[data-kpi]').append(
-      kpi('Yeni talep', String(bekleyen), 'Ayıklanmayı bekliyor', '/yonetim/talepler/?sekme=yeni'),
-      kpi('CRM’e alınan', String(t.crm || 0), 'Müşteri kartına dönüşen', '/yonetim/talepler/?sekme=crm'),
-      kpi('Bekleyen üye', String(u.bekliyor || 0), 'Onayını bekliyor', '/yonetim/uyeler/'),
-      kpi('Bekleyen yorum', String(o.bekleyenYorum || 0), 'İçeriklerde onay bekliyor', '/yonetim/icerikler/'),
-      kpi('Spam', String(t.spam || 0), 'Robot ve geçersiz talepler', '/yonetim/talepler/?sekme=spam')
+
+    // 24 saatten eski, hâlâ yanıtlanmamış talep varsa uyarı şeridi
+    const b24 = gr.bekleyen24 || { n: 0 };
+    const us = $('[data-uyari]');
+    if (b24.n > 0) {
+      us.hidden = false;
+      us.replaceChildren(el('span', { class: 'simge', 'aria-hidden': 'true' }, '!'),
+        el('span', { style: 'flex: 1; min-width: 200px' }, el('b', {}, `Uyarı: ${b24.n} talep 24 saattir yanıtlanmadı.`), ' En eskisi ', once(b24.en_eski), ' geldi.'),
+        el('a', { class: 'dugme kucuk', href: '/yonetim/talepler/?sekme=yeni' }, 'Talepleri aç →'));
+    }
+
+    // Temel sayılar: son 7 gün ve önceki 7 gün; kıvılcım son 30 günün günlük toplamı
+    const gunT = {}; gr.gunluk.forEach((r) => { gunT[r.gun] = (gunT[r.gun] || 0) + r.n; });
+    const gunM = Object.fromEntries(gr.musteriGunluk.map((r) => [r.gun, r.n]));
+    const g30 = gunler(gr.bugun, 30), g14 = gunler(gr.bugun, 14);
+    const topla = (harita, liste) => liste.reduce((s, x) => s + (harita[x] || 0), 0);
+    const dn = Object.fromEntries(['simdi', 'once'].map((p) => [p, Object.fromEntries(gr.donem.filter((r) => r.donem === p).map((r) => [r.durum, r.n]))]));
+    const oran = (p) => { const x = dn[p] || {}; const tum = (x.yeni || 0) + (x.crm || 0); return tum ? (x.crm || 0) / tum : null; };
+    const kaz = gr.asamalar.find((a) => a.asama === 'kazanildi') || { n: 0, deger: 0 };
+    const yuzde = (x) => (x === null ? '—' : '%' + Math.round(x * 100));
+    $('[data-kpi]').replaceChildren(
+      kpiKart({ ad: 'Yeni talep · 7 gün', deger: topla(gunT, g14.slice(7)), onceki: topla(gunT, g14.slice(0, 7)), seri: g30.map((x) => gunT[x] || 0), href: '/yonetim/talepler/?sekme=hepsi', alt: 'önceki 7 güne göre' }),
+      kpiKart({ ad: 'CRM’e alınan · 7 gün', deger: topla(gunM, g14.slice(7)), onceki: topla(gunM, g14.slice(0, 7)), seri: g30.map((x) => gunM[x] || 0), href: '/yonetim/crm/', alt: 'önceki 7 güne göre' }),
+      kpiKart({ ad: 'Talepten müşteriye · 30 gün', metin: yuzde(oran('simdi')), oncekiMetin: 'Önceki 30 gün: ' + yuzde(oran('once')), aciklama: 'CRM’e alınan ÷ spam olmayan talep', href: '/yonetim/talepler/?sekme=crm' }),
+      kpiKart({ ad: 'Yanıt bekleyen', metin: String(bekleyen), aciklama: b24.n ? `${b24.n} tanesi 24 saati geçti` : 'Ayıklanmayı bekliyor', href: '/yonetim/talepler/?sekme=yeni' }),
+      kpiKart({ ad: 'Açık fırsat değeri', metin: o.musteri.n ? para(o.musteri.hat || 0) : '—', aciklama: `${acik} açık fırsat · tahmini aylık`, href: '/yonetim/crm/' }),
+      kpiKart({ ad: 'Kazanılan', metin: kaz.n ? para(kaz.deger) : '—', aciklama: `${kaz.n} müşteri · tüm zamanlar`, href: '/yonetim/crm/' })
     );
+
+    trend();
+
+    // Satış hunisi: aşamadaki mevcut müşteri sayısı ve payı (kohort dönüşümü değildir)
     const say = Object.fromEntries(o.asamalar.map((a) => [a.asama, a.n]));
+    const toplam = o.asamalar.reduce((s, a) => s + a.n, 0);
     const renk = ['#F07A23', '#E2691A', '#C9560E', '#B84406', '#13804F', '#5E6166'];
     const genislik = [100, 88, 76, 64, 52, 52];
     ASAMALAR.forEach((a, i) => $('[data-huni]').append(el('div', {
-      style: `width: ${genislik[i]}%; min-width: 150px; height: 42px; border-radius: 14px; background: ${renk[i]}; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; box-sizing: border-box; font-size: 13px`
-    }, el('span', {}, a.ad), el('b', {}, String(say[a.k] || 0)))));
+      style: `width: ${genislik[i]}%; min-width: 150px; height: 42px; border-radius: 14px; background: ${renk[i]}; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 16px; box-sizing: border-box; font-size: 13px`
+    }, el('span', {}, a.ad), el('span', { style: 'display: flex; gap: 10px; align-items: baseline' }, toplam ? el('span', { style: 'font-size: 12px; opacity: .85' }, '%' + Math.round((say[a.k] || 0) / toplam * 100)) : null, el('b', {}, String(say[a.k] || 0))))));
+    const kapanan = (say.kazanildi || 0) + (say.kaybedildi || 0);
+    $('[data-huni-alt]').append(
+      el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Kazanma oranı'), el('b', { style: 'font-size: 22px' }, kapanan ? '%' + Math.round((say.kazanildi || 0) / kapanan * 100) : '—'), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `Kapanan ${kapanan} fırsattan kazanılan`)),
+      el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Açık fırsat'), el('b', { style: 'font-size: 22px' }, String(acik)), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Henüz kapanmamış müşteri')));
+
+    isiCiz(gr.isi, $('[data-isi]'), $('[data-isi-not]'));
+    const kayToplam = {}; gr.gunluk.filter((r) => g30.includes(r.gun)).forEach((r) => { const k = KAYNAK_GRUP[r.kaynak] || KAYNAK_GRUP.form; kayToplam[k.ad] = (kayToplam[k.ad] || { ...k, n: 0 }); kayToplam[k.ad].n += r.n; });
+    yatayCiz($('[data-kaynaklar]'), Object.values(kayToplam).sort((a, b) => b.n - a.n), 'Son 30 günde talep yok.');
+    yatayCiz($('[data-sayfalar]'), gr.sayfalar.map((s) => ({ ad: s.sayfa, n: s.n, renk: 'var(--brand)' })), 'Son 30 günde sayfa bilgisi olan talep yok.');
+
     const har = $('[data-hareket]');
     if (!o.sonKayitlar.length) har.append(el('div', { class: 'bos' }, 'Henüz hareket yok. Siteden gelen ilk talep CRM’e alındığında burada görünür.'));
     o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid var(--line); text-decoration: none; color: inherit' },
@@ -160,7 +303,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   } catch (h) {
     genelHata('Özet yüklenemedi: ' + h.message);
     selamYaz('Veriler şu an alınamadı.');
-    $('[data-kpi]').append(el('div', { class: 'bos' }, 'Veri alınamadı; rakamlar gösterilmiyor.'));
+    $('[data-kpi]').replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı; rakamlar gösterilmiyor.'));
   } })();
 </script>
 </Yonetim>
