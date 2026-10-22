@@ -100,6 +100,21 @@ async function yonetimApi(istek, env, yol, kim) {
     ]);
     return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n });
   }
+  if (yol === 'grafik' && yontem === 'GET') {
+    // Genel bakış grafikleri; yalnız okuma. Gün ve saatler İstanbul saatine göre (UTC+3, Türkiye yaz saati uygulamıyor). Spam sayılmaz.
+    const once = (gun) => new Date(Date.now() - gun * 86400000).toISOString();
+    const [gun, isi, sayfa, donem, mgun, asama, bekleyen] = await db.batch([
+      db.prepare("SELECT date(olusturma, '+3 hours') AS gun, kaynak, COUNT(*) AS n FROM talepler WHERE durum != 'spam' AND olusturma >= ? GROUP BY gun, kaynak").bind(once(181)),
+      db.prepare("SELECT CAST(strftime('%w', olusturma, '+3 hours') AS INTEGER) AS hg, CAST(strftime('%H', olusturma, '+3 hours') AS INTEGER) AS saat, COUNT(*) AS n FROM talepler WHERE durum != 'spam' AND olusturma >= ? GROUP BY hg, saat").bind(once(90)),
+      db.prepare("SELECT COALESCE(NULLIF(sayfa, ''), '(bilinmiyor)') AS sayfa, COUNT(*) AS n FROM talepler WHERE durum != 'spam' AND olusturma >= ? GROUP BY 1 ORDER BY n DESC LIMIT 8").bind(once(30)),
+      db.prepare("SELECT CASE WHEN olusturma >= ? THEN 'simdi' ELSE 'once' END AS donem, durum, COUNT(*) AS n FROM talepler WHERE olusturma >= ? GROUP BY donem, durum").bind(once(30), once(60)),
+      db.prepare("SELECT date(olusturma, '+3 hours') AS gun, COUNT(*) AS n FROM musteriler WHERE olusturma >= ? GROUP BY gun").bind(once(61)),
+      db.prepare("SELECT asama, COUNT(*) AS n, COALESCE(SUM(deger), 0) AS deger FROM musteriler GROUP BY asama"),
+      db.prepare("SELECT COUNT(*) AS n, MIN(olusturma) AS en_eski FROM talepler WHERE durum = 'yeni' AND olusturma < ?").bind(once(1))
+    ]);
+    return json({ ok: true, bugun: new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10), gunluk: gun.results, isi: isi.results, sayfalar: sayfa.results,
+      donem: donem.results, musteriGunluk: mgun.results, asamalar: asama.results, bekleyen24: bekleyen.results[0] });
+  }
   if (yol === 'talepler' && yontem === 'GET') {
     const r = await db.prepare("SELECT * FROM talepler ORDER BY olusturma DESC LIMIT 200").all();
     return json({ ok: true, talepler: r.results });
