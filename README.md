@@ -35,6 +35,15 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
   - `YONETICILER` boşsa panel kapalı kalır
   - Gizli: `ANTHROPIC_API_KEY` — sitedeki yapay zekâ asistanı (Claude Haiku 5.5). Yoksa asistan ekibe yönlendirme modunda çalışır.
     İsteğe bağlı: `ASISTAN_AYLIK_SINIR` (aylık mesaj sınırı, varsayılan 3000), `ASISTAN_MODEL`.
+- IDOS reklam özeti (`worker/reklam.js`): her gün 10.00'da (İstanbul) IDOS'un BigQuery **yetkili görünümünden** son 28 gün
+  yalnız okunur, `reklam_ozet` tablosuna yazılır; panel yalnız bu tabloyu okur. Sorgu başına en fazla 100 MB işlenir.
+  Ayarlar girilmeden hiçbir şey çalışmaz:
+  - Gizli: `IDOS_BQ_ANAHTAR` — IDP'ye özel servis hesabının JSON anahtarı (yetki: yalnız `idexya_share` üzerinde Data Viewer + proje düzeyinde Job User)
+  - `IDOS_BQ_GORUNUM` — `idexya-agency-os.idexya_share.<görünüm>`; `IDOS_BQ_KONUM` (varsayılan `europe-west1`)
+  - Görünümde zorunlu sütunlar: `metric_date, platform, account_id, currency, spend`; isteğe bağlı `client_id, brand_name, impressions, clicks`.
+    Diğer sayısal sütunlar sonuç türü sayılır (ör. `messaging_conversations`). Toplamlar yalnız TRY hesaplardan yapılır.
+  - Test: `node tools/sahte/bigquery.mjs 8998` + `wrangler dev --test-scheduled` (`IDOS_BQ_API`, `IDOS_BQ_TOKEN_URL` sahte sunucuya),
+    zamanlayıcı: `/cdn-cgi/handler/scheduled`
 - Asistan testi: `node tools/sahte/anthropic.mjs 8999` (sahte API) + `wrangler dev --var ANTHROPIC_API_KEY:sahte --var ASISTAN_API_URL:http://127.0.0.1:8999/`,
   sonra `node tools/test-asistan.mjs <anahtarsız-adres> <sahte-anahtarlı-adres>`
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,

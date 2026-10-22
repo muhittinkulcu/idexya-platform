@@ -49,15 +49,16 @@ export function ipucuKur(k) {
 }
 
 // Sayı kartı: değer, önceki döneme göre değişim (ok + metin, yalnız renk değil) ve son 30 günün kıvılcım çizgisi
-export function kpiKart({ ad, deger, onceki, metin, oncekiMetin, aciklama, seri, href, alt }) {
+// notr: artış/azalış iyi ya da kötü sayılmaz (ör. reklam harcaması); ok ve yüzde renksiz yazılır.
+export function kpiKart({ ad, deger, onceki, metin, oncekiMetin, aciklama, seri, href, alt, notr }) {
   const satirlar = [el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ad), el('b', {}, metin ?? sayi(deger))];
   if (deger !== undefined && onceki !== undefined) {
     let d;
     if (onceki === 0 && deger === 0) d = el('span', { class: 'degisim' }, 'Önceki dönemle aynı (0)');
-    else if (onceki === 0) d = el('span', { class: 'degisim' }, el('span', { class: 'ok-u' }, '▲ yeni'), `önceki dönemde 0 · ${alt}`);
+    else if (onceki === 0) d = el('span', { class: 'degisim' }, el('span', { class: notr ? '' : 'ok-u' }, '▲ yeni'), `önceki dönemde 0 · ${alt}`);
     else {
       const f = Math.round((deger - onceki) / onceki * 100);
-      d = el('span', { class: 'degisim' }, f === 0 ? el('span', {}, '= %0') : el('span', { class: f > 0 ? 'ok-u' : 'ok-a' }, (f > 0 ? '▲ %' : '▼ %') + Math.abs(f)), `${alt} (${sayi(onceki)})`);
+      d = el('span', { class: 'degisim' }, f === 0 ? el('span', {}, '= %0') : el('span', { class: notr ? '' : f > 0 ? 'ok-u' : 'ok-a', style: notr ? 'font-weight: 700; color: var(--head)' : undefined }, (f > 0 ? '▲ %' : '▼ %') + Math.abs(f)), `${alt} (${sayi(onceki)})`);
     }
     satirlar.push(d);
   }
@@ -156,3 +157,24 @@ export function yatayCiz(kutuEl, liste, bosMetin) {
     el('div', { class: 'yatay-iz' }, el('div', { style: `width: ${(x.n / en) * 100}%; background: ${x.renk}` })),
     el('span', {}, el('b', {}, sayi(x.n)), el('span', { style: 'color: var(--tx2)' }, ` · %${Math.round(x.n / top * 100)}`)))));
 }
+
+// Genel yığılmış günlük çubuk grafiği (ör. reklam harcaması): seriler [{ ad, renk, degerler: { gun: sayi } }], bicim sayıyı yazar
+export function yiginCiz(alan, xEl, liste, seriler, bicim) {
+  const toplam = (gun) => seriler.reduce((s, sr) => s + (sr.degerler[gun] || 0), 0);
+  const { ust, adim } = olcek(Math.max(...liste.map(toplam)));
+  const izgara = el('div', { class: 'cubuk-izgara', 'aria-hidden': 'true' });
+  for (let v = 0; v <= ust; v += adim) izgara.append(el('div', { style: `bottom: ${(v / ust) * 100}%` }, el('span', {}, kisa(v))));
+  const cubuklar = el('div', { class: 'cubuklar', role: 'list', 'aria-label': `Günlük, son ${liste.length} gün` });
+  liste.forEach((gun) => {
+    const t = toplam(gun);
+    const dolu = seriler.filter((sr) => sr.degerler[gun]);
+    const ip = [gunTam(gun), ...dolu.map((sr) => `${sr.ad}: ${bicim(sr.degerler[gun])}`), `Toplam: ${bicim(t)}`].join('\n');
+    cubuklar.append(el('div', { class: 'cubuk', role: 'listitem', tabindex: '0', 'data-ip': ip, 'aria-label': ip.replace(/\n/g, ', ') },
+      t ? el('div', { class: 'yigin', style: `height: ${(t / ust) * 100}%` }, ...dolu.map((sr) => el('div', { style: `flex: ${sr.degerler[gun]} 1 0; min-height: 2px; background: ${sr.renk}` }))) : null));
+  });
+  alan.replaceChildren(izgara, cubuklar);
+  const n = Math.min(6, liste.length);
+  xEl.replaceChildren(...Array.from({ length: n }, (_, j) => { const i = Math.round(j * (liste.length - 1) / (n - 1)); return el('span', { style: `left: ${((i + 0.5) / liste.length) * 100}%` }, gunYaz(liste[i])); }));
+}
+// Eksen etiketi: 1.500 → 1,5 B; 12.000 → 12 B
+const kisa = (v) => (v >= 1000 ? new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 }).format(v / 1000) + ' B' : sayi(v));

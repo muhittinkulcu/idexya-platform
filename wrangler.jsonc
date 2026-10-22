@@ -20,6 +20,8 @@
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
   "keep_vars": true,
   "observability": { "enabled": true },
+  // Her gün 07.00 UTC (İstanbul 10.00): IDOS reklam özeti çekilir (worker/reklam.js). IDOS_BQ_* ayarları yoksa hiçbir şey yapmaz.
+  "triggers": { "crons": ["0 7 * * *"] },
   // Dal önizlemeleri (wrangler preview) için gerekli. Boş bırakıldı: D1 ve değişkenler önizlemeye aktarılmaz,
   // böylece önizleme canlı veritabanına erişemez; yönetim paneli de önizlemede kapalı kalır.
   "previews": {}

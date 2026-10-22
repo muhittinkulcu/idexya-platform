@@ -5,6 +5,7 @@ import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
 import { asistanApi, yonetimAsistanApi } from './asistan.js';
 import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz } from './ortak.js';
+import { yonetimReklamApi, reklamCek, reklamKurulu } from './reklam.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -219,7 +220,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol));
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -265,5 +266,11 @@ export default {
       console.error('hata', yol, e && e.message);
       return hata('Beklenmeyen bir hata oluştu', 500);
     }
+  },
+  // Günlük zamanlayıcı (wrangler.jsonc triggers): IDOS reklam özetini çeker. Ayar yoksa hiçbir şey yapmaz.
+  async scheduled(olay, env, ctx) {
+    if (!reklamKurulu(env)) return;
+    await semaKur(env.DB);
+    ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
   }
 };
