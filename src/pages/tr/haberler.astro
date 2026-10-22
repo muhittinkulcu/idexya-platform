@@ -1,50 +1,11 @@
 ---
+// Blog listesi: yalnız gerçek yazılar (src/data/yazilar.json). Tasarım dosyasındaki örnek yazılar, öne çıkan kart ve
+// henüz bağlı olmayan e-posta aboneliği yayında gösterilmez (Muhittin, 22 Eki 2026); bu sayfa tools/donustur.sh ile üretilmez.
 import Site from '../../layouts/Site.astro';
-// Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
-class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
-class Component extends DCLogic {
-  constructor(props) {
-    super(props);
-    this.state = { koyu: null, kat: 'tumu' };
-  }
-  renderVals() {
-    const self = this;
-    const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
-    const Z = { reklam: 'linear-gradient(135deg, #F07A23, #B84406)', eticaret: 'linear-gradient(135deg, #1F4E8C, #002559)', olcum: 'linear-gradient(135deg, #2F7D5B, #174B36)', seo: 'linear-gradient(135deg, #6B5BA8, #3C3170)', idos: 'linear-gradient(135deg, #0B1B33, #24406B)' };
-    const AD = { reklam: 'Reklam', eticaret: 'E-ticaret', olcum: 'Ölçüm', seo: 'SEO', idos: 'IDOS' };
-    const Y = [
-      ['reklam', 'Meta reklamlarında “sonuç” neden yanıltır?', 'Mesaj, form ve satış aynı sayıya karışınca maliyet doğru okunmaz. Ayrı izlemenin yolu.', '[Tarih]', '6 dk'],
-      ['eticaret', 'ikas’a geçerken SEO’yu korumanın kontrol listesi', 'Adres eşleştirme, 301 yönlendirme ve geçiş sonrası ilk 30 gün.', '[Tarih]', '9 dk'],
-      ['olcum', 'Dönüşüm API (CAPI) kurulu mu, çalışıyor mu?', 'Bağlı görünmesi verinin geldiği anlamına gelmez. Beş dakikalık kontrol.', '[Tarih]', '5 dk'],
-      ['seo', 'Yapay zekâ aramalarında görünür olmak', 'Google’ın yapay zekâ özetlerinde ve sohbet asistanlarında markanızın geçmesi için.', '[Tarih]', '7 dk'],
-      ['reklam', 'Performance Max’e ne zaman geçilmeli?', 'Ölçüm, ürün akışı ve bütçe hazır değilse beklemek daha kârlı olabilir.', '[Tarih]', '6 dk'],
-      ['idos', 'IDOS ile müşteri raporlarını otomatikleştirmek', 'Raporun oluşturulması ile teslim edilmesi neden ayrı izlenir?', '[Tarih]', '4 dk']
-    ];
-    const kat = this.state.kat;
-    const yazilar = Y.filter(function (y) { return kat === 'tumu' || y[0] === kat; }).map(function (y) { return { anahtar: y[0], kategori: AD[y[0]], baslik: y[1], ozet: y[2], tarih: y[3], sure: y[4] + ' okuma', zemin: Z[y[0]] }; });
-    const kategoriler = [['tumu', 'Tümü']].concat(Object.keys(AD).map(function (k) { return [k, AD[k]]; })).map(function (k) { const s = k[0] === kat;
-      return { ad: k[1], secili: s, sec: function () { self.setState({ kat: k[0] }); }, stil: 'min-height: 44px; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; ' + (s ? 'border: 1px solid var(--head); background: var(--head); color: var(--bg)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') }; });
-    return {
-      temaSinifi: koyu ? 'koyu' : 'acik',
-      temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',
-      temaDegistir: () => this.setState({ koyu: !koyu }),
-      kategoriler: kategoriler, yazilar: yazilar, bos: yazilar.length === 0,
-      oneCikan: { baslik: 'Reklam bütçesini artırmadan önce kontrol etmeniz gereken 7 şey', ozet: 'Yanlış ölçülen bir hesapta bütçeyi büyütmek, hatayı büyütmektir. Dönüşüm takibinden ürün akışına kadar sırayla.' }
-    };
-  }
-}
-const __c = new Component({}); Object.assign(__c.state, {});
-const __v = __c.renderVals();
-const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
-const bos = __v.bos;
-const kategoriler = __v.kategoriler;
-const oneCikan = __v.oneCikan;
-const yazilar = __v.yazilar;
-const __sz0 = __suz('kat', ["tumu", "reklam", "eticaret", "olcum", "seo", "idos"], 'kategoriler');
+import YAZILAR from '../../data/yazilar.json';
+const ZEMIN = { 'Reklam': 'linear-gradient(135deg, #F07A23, #B84406)', 'E-ticaret': 'linear-gradient(135deg, #1F4E8C, #002559)', 'Ölçüm': 'linear-gradient(135deg, #2F7D5B, #174B36)', 'SEO': 'linear-gradient(135deg, #6B5BA8, #3C3170)' };
 ---
 <Site baslik="Blog" aciklama="Reklam, e-ticaret ve ölçüm üzerine notlar." aktif="Blog">
-
 
 <section style="position: relative">
 <svg aria-hidden="true" viewBox="0 0 1440 420" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0"><path d="M820 0 C 1000 110 1120 50 1440 120 L1440 0 Z" fill="var(--blob2)"></path></svg>
@@ -52,46 +13,22 @@ const __sz0 = __suz('kat', ["tumu", "reklam", "eticaret", "olcum", "seo", "idos"
 <nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: var(--head); font-weight: 600">Blog</span></nav>
 <div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">BLOG</span></div>
 <h1 style="margin: 0; font-size: clamp(36px, 7vw, 58px); line-height: 1.06; letter-spacing: -0.03em; color: var(--head); max-width: 860px">Reklam, e-ticaret ve ölçüm üzerine notlar</h1>
-<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between">
-<div role="group" aria-label="Kategori" style="display: flex; flex-wrap: wrap; gap: 8px">{(kategoriler || []).map((k, __i) => (<Fragment><button data-grup="blog" data-deger={__sz0[__i].deger} data-sec-stil={__sz0[__i].sec} data-normal-stil={__sz0[__i].nor} type="button" aria-pressed={String(k.secili)} style={k.stil}>{k.ad}</button></Fragment>))}</div>
-<label style="display: flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card); min-width: 260px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4-4"></path></svg><input type="search" placeholder="Yazılarda ara" aria-label="Yazılarda ara" style="flex: 1; border: 0; background: transparent; color: var(--tx); font: inherit; outline: none"></label>
 </div>
-</div>
-</section>
-
-<section style="padding: 0 24px 40px">
-<a href="/tr/haber/ornek-yazi" style="max-width: 1192px; margin: 0 auto; box-sizing: border-box; display: flex; flex-wrap: wrap; border-radius: 28px; overflow: hidden; background: var(--card); border: 1px solid var(--line); box-shadow: 0 24px 60px var(--shadow); text-decoration: none; color: var(--tx)">
-<div aria-hidden="true" style="flex: 1 1 460px; min-height: 320px; background: #002559; position: relative; overflow: hidden"><svg viewBox="0 0 500 340" preserveAspectRatio="xMidYMid slice" style="position: absolute; inset: 0; width: 100%; height: 100%"><path d="M40 270 L140 210 L230 230 L330 140 L460 90" fill="none" stroke="#F07A23" stroke-width="5" stroke-linecap="round"></path><circle cx="460" cy="90" r="10" fill="#F07A23"></circle><path d="M40 300 H460" stroke="#1C3F7A" stroke-width="2"></path></svg></div>
-<div style="flex: 1 1 460px; min-width: 0; padding: 40px; display: flex; flex-direction: column; gap: 14px; justify-content: center">
-<span style="display: flex; gap: 10px; font-size: 13px; color: var(--tx2)"><b style="color: var(--acc)">ÖNE ÇIKAN · ÖLÇÜM</b>· 8 dk okuma</span>
-<h2 style="margin: 0; font-size: 34px; line-height: 1.15; color: var(--head)">{oneCikan.baslik}</h2>
-<p style="margin: 0; color: var(--tx2); font-size: 17px">{oneCikan.ozet}</p>
-<span style="font-weight: 600; color: var(--acc)">Yazıyı oku →</span>
-</div>
-</a>
 </section>
 
 <section style="padding: 0 24px 88px">
 <div style="max-width: 1192px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px">
-{(yazilar || []).map((y) => (<Fragment>
-<a data-grup-icerik="blog" data-etiket={y.anahtar} href="/tr/haber/ornek-yazi" style="display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--card); border: 1px solid var(--line); text-decoration: none; color: var(--tx)">
-<div aria-hidden="true" style={`height: 170px; background: ${y.zemin}; position: relative`}><span style="position: absolute; left: 18px; bottom: 14px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #002559; font-size: 12px; font-weight: 700">{y.kategori}</span></div>
+{YAZILAR.map((y) => (
+<a href={`/tr/haber/${y.slug}`} style="display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--card); border: 1px solid var(--line); text-decoration: none; color: var(--tx)">
+<div aria-hidden="true" style={`height: 170px; background: ${ZEMIN[y.kategori] || ZEMIN['Reklam']}; position: relative`}><span style="position: absolute; left: 18px; bottom: 14px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #002559; font-size: 12px; font-weight: 700">{y.kategori}</span></div>
 <div style="padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1">
-<h3 style="margin: 0; font-size: 20px; line-height: 1.3; color: var(--head)">{y.baslik}</h3>
+<h2 style="margin: 0; font-size: 20px; line-height: 1.3; color: var(--head)">{y.baslik}</h2>
 <p style="margin: 0; color: var(--tx2); font-size: 15px">{y.ozet}</p>
-<span style="margin-top: auto; font-size: 13px; color: var(--tx2)">{y.tarih} · {y.sure}</span>
+<span style="margin-top: auto; font-weight: 600; color: var(--acc)">Yazıyı oku →</span>
 </div>
 </a>
-</Fragment>))}
-</div>
-{(bos) && (<Fragment><p style="max-width: 1192px; margin: 0 auto; padding: 40px 0; color: var(--tx2); text-align: center">Bu kategoride henüz yazı yok.</p></Fragment>)}
-<div style="max-width: 1192px; margin: 40px auto 0; padding: 32px; box-sizing: border-box; border-radius: 24px; background: var(--card); border: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between">
-<div style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 4px"><strong style="font-size: 22px; color: var(--head)">Ayda bir e-posta, gereksiz bir şey yok</strong><span style="color: var(--tx2)">Platform değişiklikleri ve kontrol listeleri. İstediğiniz an çıkabilirsiniz.</span></div>
-<div style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; gap: 8px"><div style="display: flex; gap: 8px"><input type="email" placeholder="E-posta adresiniz" aria-label="E-posta adresiniz" style="flex: 1; min-width: 0; min-height: 48px; padding: 0 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit"><button type="button" style="min-height: 48px; padding: 0 18px; border: 0; border-radius: 10px; background: var(--fill); color: #FFFFFF; font: inherit; font-weight: 600; cursor: pointer">Abone ol</button></div><span style="font-size: 12px; color: var(--tx2)">Abone olarak ticari ileti onayı vermiş olursunuz; onay İYS’ye kaydedilir.</span></div>
+))}
 </div>
 </section>
-
-
-
 
 </Site>

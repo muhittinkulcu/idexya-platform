@@ -22,8 +22,8 @@ class Component extends DCLogic {
       ],
       uzmanlik: ['Google Ads', 'Meta reklamları', 'E-ticaret', 'Ölçümleme ve GTM', 'BigQuery ve raporlama', 'Otomasyon'],
       tarihce: [
-        { yil: '[Yıl]', ad: 'İlk adım', metin: 'E-ticaret ve dijital pazarlamada çalışmaya başlangıç.' },
-        { yil: '[Yıl]', ad: 'Idexya kuruldu', metin: 'Ajans olarak markalara 360° hizmet.' },
+        { yil: '2018', ad: 'İlk adım', metin: 'E-ticaret ve dijital pazarlamada çalışmaya başlangıç.' },
+        { yil: '2026', ad: 'Idexya kuruldu', metin: 'Haziran 2026’da resmî olarak kuruldu; markalara 360° hizmet.' },
         { yil: '2026', ad: 'IDOS', metin: 'Çok müşterili ajans operasyon paneli ve yapay zekâ destekli öneriler.' },
         { yil: '2026', ad: 'Yeni site ve platform', metin: 'Paketler, teklif, CRM ve eğitim modülleriyle tek platform.' }
       ]
@@ -69,15 +69,10 @@ const uzmanlik = __v.uzmanlik;
 
 <section>
 <div style="max-width: 1240px; margin: 0 auto; padding: 88px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
-<div role="img" aria-label="Kurucu fotoğrafı alanı" style="flex: 1 1 340px; min-width: 0; aspect-ratio: 4 / 5; max-height: 520px; border-radius: 28px; background: #002559; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 24px; box-sizing: border-box">
-<svg aria-hidden="true" viewBox="0 0 400 500" style="position: absolute; inset: 0; width: 100%; height: 100%"><circle cx="300" cy="120" r="160" fill="none" stroke="#F07A23" stroke-width="1.5" opacity=".5"></circle><circle cx="300" cy="120" r="100" fill="none" stroke="#F07A23" stroke-width="1.5" opacity=".3"></circle></svg>
-<span style="position: relative; color: #C6D2E3; font-size: 13px">[Kurucu fotoğrafı]</span>
-</div>
 <div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 18px">
 <span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">KURUCU</span>
 <h2 style="margin: 0; font-size: 40px; line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">Muhittin Külcü</h2>
 <p style="margin: 0; font-size: 18px; color: var(--tx2)">E-ticaret ve dijital pazarlamada 10 yılı aşkın süredir çalışıyor. Google Ads, Meta reklamları, ölçümleme ve otomasyonu bir arada yöneten Idexya’yı ve ajans operasyon paneli IDOS’u kurdu.</p>
-<p style="margin: 0; font-size: 18px; color: var(--tx2)">[Kurucunun kendi anlatımıyla kısa bir paragraf: neden bu işi yapıyor, müşteriye ne söz veriyor.]</p>
 <div style="display: flex; gap: 8px; flex-wrap: wrap">{(uzmanlik || []).map((u) => (<Fragment><span style="padding: 6px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); font-size: 14px; font-weight: 600; color: var(--head)">{u}</span></Fragment>))}</div>
 </div>
 </div>

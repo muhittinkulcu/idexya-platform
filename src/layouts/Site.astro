@@ -2,9 +2,9 @@
 // Ortak yerleşim: üst menü, alt kısım, tema, çerez onayı.
 interface Props { baslik?: string; aciklama?: string; aktif?: string; dil?: 'tr' | 'en'; aramayaKapali?: boolean; }
 const { baslik = '', aciklama = '', aktif = '', dil = 'tr', aramayaKapali = false } = Astro.props;
-// Yayın öncesi: tüm site arama motorlarına kapalı. idexya.com yayına alınınca false yapılır;
+// Yayın öncesi: true iken tüm site arama motorlarına kapalıdır. idexya.com yayında olduğu için false;
 // aramayaKapali olan sayfalar (ör. IDOS tanıtımı, Muhittin 19 Eki 2026) yine kapalı kalır.
-const YAYIN_ONCESI = true;
+const YAYIN_ONCESI = false;
 const kapali = YAYIN_ONCESI || aramayaKapali;
 const MENU = [
   { k: 'hizmetler', ad: 'Hizmetler', href: '/tr/hizmetler', ust: true, alt: '27 hizmet, beş alan' },
