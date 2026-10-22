@@ -5,3 +5,4 @@ Disallow: /kabuk/
 Disallow: /hesabim
 Disallow: /giris
 Disallow: /sifre-yenile
+Sitemap: https://idexya.com/sitemap.xml
