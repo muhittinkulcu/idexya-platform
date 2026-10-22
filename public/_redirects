@@ -4,6 +4,8 @@
 /tr/sayfa/vizyonumuz     /tr/sayfa/hakkimizda       301
 /tr/sayfa/misyonumuz     /tr/sayfa/hakkimizda       301
 /tr/urun/*               /tr/paketler               301
+/tr/urun-gruplari        /tr/paketler               301
+/tr/urun-gruplari/*      /tr/paketler               301
 
 # Referanslar ve proje sayfaları kaldırıldı: mevcut müşteri bilgisi sistemde tutulmaz (Muhittin, 19 Eki 2026).
 # 302 kullanılır; ileride müşteri izniyle referans sayfası açılırsa bu satırlar güncellenir.
