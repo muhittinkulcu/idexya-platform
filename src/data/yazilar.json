@@ -2,16 +2,68 @@
   {
     "slug": "performans-ve-hiz-odakli-reklam-optimizasyon-modeli",
     "baslik": "Performans ve hız odaklı reklam optimizasyon modeli",
-    "kategori": "Reklam"
+    "kategori": "Reklam",
+    "ozet": "Reklam hesabını iyileştirmek tek seferlik bir ayar değil, düzenli tekrarlanan bir döngüdür. Ölçümden teste, karardan rapora kadar adım adım çalışma modelimiz.",
+    "govde": [
+      ["p", "Reklam hesaplarında en sık gördüğümüz sorun, kararların sezgiyle ve dağınık zamanlarda alınmasıdır. Bir gün bütçe artırılır, ertesi gün kampanya kapatılır, bir hafta sonra yeni bir kitle denenir. Hangi değişikliğin neyi etkilediği anlaşılmaz. Performans ve hız odaklı optimizasyon modeli bu dağınıklığı düzenli bir döngüye çevirir: önce doğru ölçülür, sonra küçük ve ölçülebilir adımlarla hızlı ilerlenir."],
+      ["h2", "1. Önce ölçüm: yanlış veriyle hızlı olmak zarardır"],
+      ["p", "Optimizasyonun ilk adımı reklam değil, ölçümdür. Dönüşüm takibi eksik ya da hatalıysa reklam platformunun algoritması yanlış sinyalle öğrenir ve bütçe yanlış yöne akar. Bu yüzden her çalışmaya şu kontrollerle başlarız:"],
+      ["ul", ["Dönüşümler (satın alma, form, arama, mesaj) doğru tanımlanmış ve birbirine karışmıyor mu?", "Aynı dönüşüm iki kez sayılıyor mu?", "Google Ads, Meta ve analitik aracındaki rakamlar makul ölçüde örtüşüyor mu?", "Sunucu taraflı ölçüm (Dönüşüm API'si, gelişmiş dönüşümler) gerekiyorsa kurulu ve çalışıyor mu?"]],
+      ["h2", "2. Tek bir ana hedef belirleyin"],
+      ["p", "Her kampanyanın tek bir ana başarı ölçütü olmalıdır: satış, nitelikli talep, randevu ya da mesaj. Tıklama ve gösterim gibi ara ölçütler yön gösterir ama karar vermek için yeterli değildir. Hedef belirlenirken işletmenin gerçek ticari hedefi esas alınır: bir talebin satışa dönüşme oranı düşükse ucuz talep, pahalı bir hatadır."],
+      ["h2", "3. Sade bir hesap yapısı"],
+      ["p", "Çok parçalı hesap yapıları bütçeyi böler ve algoritmanın öğrenmesini yavaşlatır. Kampanyaları amaç, ürün grubu ve kitle aşamasına göre sade tutmak hem yönetimi kolaylaştırır hem de her kampanyanın yeterli veri toplamasını sağlar."],
+      ["h2", "4. Hipotez, test, karar"],
+      ["p", "Hız, rastgele değişiklik yapmak değil; kontrollü testleri sık ve düzenli yapmaktır. Her test bir hipotezle başlar: \"Bu kreatif mesajı, mevcut olana göre daha düşük maliyetle talep getirir\" gibi. Ardından:"],
+      ["ul", ["Aynı anda tek bir değişken test edilir; kreatif, kitle ve teklif aynı anda değiştirilmez.", "Testin süresi ve karar ölçütü baştan belirlenir.", "Platformun öğrenme dönemi hesaba katılır; yeterli veri birikmeden kazanan ilan edilmez.", "Sonuç ne olursa olsun kayda geçer; başarısız test de bir öğrenmedir."]],
+      ["h2", "5. Bütçe kararlarında kademeli ilerleyin"],
+      ["p", "İyi giden bir kampanyanın bütçesini bir anda katlamak çoğu zaman öğrenme dengesini bozar ve maliyeti yükseltir. Bütçe artışları küçük adımlarla yapılır ve her adımın etkisi izlenir. Aynı ilke kampanya kapatma kararları için de geçerlidir: kısa bir dönemin kötü sonucu, kalıcı bir sorun olduğu anlamına gelmeyebilir."],
+      ["h2", "6. Düzenli ritim ve şeffaf rapor"],
+      ["p", "Modelin hızı düzenli bir çalışma ritminden gelir: günlük kontroller anormal durumları yakalar, haftalık değerlendirmede test sonuçları ve bütçe kararları ele alınır, aylık raporda ise ticari sonuçlar konuşulur. Raporda yalnızca ne olduğu değil, neden olduğu ve bir sonraki adımın ne olacağı da yer alır."],
+      ["h2", "Sonuç"],
+      ["p", "Performans ve hız odaklı optimizasyon; doğru ölçüm, net hedef, sade yapı ve kontrollü testlerin birleşimidir. Hesabınızın bu döngüye ne kadar yakın olduğunu birlikte değerlendirmek isterseniz ücretsiz analiz talebinde bulunabilirsiniz."]
+    ]
   },
   {
     "slug": "donusum-degeri-odakli-e-ticaret-donusum-modeli",
     "baslik": "Dönüşüm değeri odaklı e-ticaret dönüşüm modeli",
-    "kategori": "E-ticaret"
+    "kategori": "E-ticaret",
+    "ozet": "Her satış aynı değerde değildir. Reklam platformlarına yalnızca satış sayısını değil, satışın gerçek değerini öğretmek bütçenin daha kârlı yere akmasını sağlar.",
+    "govde": [
+      ["p", "E-ticaret reklamlarında başarı çoğu zaman satış sayısıyla ölçülür. Oysa düşük sepetli bir satış ile yüksek kârlı bir satış aynı şekilde sayıldığında, reklam platformu ikisini de aynı değerde kabul eder ve bütçeyi buna göre dağıtır. Dönüşüm değeri odaklı model, platforma \"kaç satış\" değil \"ne kadar değerli satış\" sorusunu öğretir."],
+      ["h2", "Satış sayısı neden yetmez?"],
+      ["p", "Sayı odaklı optimizasyonda algoritma en kolay elde edilen dönüşümü arar. Bu genellikle düşük fiyatlı, indirimli ya da iade oranı yüksek ürünlerdir. Sonuçta satış sayısı artarken ciro ve kâr aynı hızda artmayabilir."],
+      ["h2", "Doğru değeri göndermek"],
+      ["p", "Değer odaklı modelin temeli, her dönüşümle birlikte doğru değerin platforma iletilmesidir. Bunun için şu sorular yanıtlanmalıdır:"],
+      ["ul", ["Gönderilen değer KDV ve kargo dahil mi, hariç mi? Tüm kanallarda aynı kural mı uygulanıyor?", "Para birimi doğru mu iletiliyor?", "İndirim ve kupon sonrası tutar mı, liste fiyatı mı gönderiliyor?", "İptal ve iadeler ölçüme nasıl yansıyor?"]],
+      ["p", "Daha ileri bir adım olarak ciro yerine brüt kâra yakın bir değer göndermek mümkündür. Bu, ürün maliyetlerinin bilinmesini ve değerin güvenli şekilde hesaplanmasını gerektirir; kâr marjı gibi hassas bilgiler doğrudan sayfa koduna yazılmaz."],
+      ["h2", "Ölçümün sağlamlığı"],
+      ["p", "Tarayıcı kısıtlamaları ve çerez onayları nedeniyle tarayıcı taraflı ölçüm tek başına eksik kalabilir. Meta Dönüşüm API'si ve Google'ın gelişmiş dönüşümleri gibi sunucu taraflı yöntemler, kullanıcı izinleri çerçevesinde ölçümü güçlendirir. Kurulumdan sonra verinin gerçekten ulaştığı ve tekrar sayılmadığı mutlaka kontrol edilmelidir: bağlı görünmek, çalışıyor olmak anlamına gelmez."],
+      ["h2", "Değer odaklı teklif stratejisine geçiş"],
+      ["p", "Doğru değer akmaya başladığında hedef ROAS veya dönüşüm değerini en üst düzeye çıkarma gibi stratejiler kullanılabilir. Bu stratejilerin sağlıklı çalışması için kampanyanın yeterli dönüşüm geçmişine sahip olması gerekir. Geçiş tek seferde değil, kontrollü bir testle yapılmalı ve öğrenme dönemi boyunca sonuçlar sabırla izlenmelidir."],
+      ["h2", "Hangi ölçütlere bakılmalı?"],
+      ["ul", ["Reklam harcamasının getirisi (ROAS), ama tek başına değil", "Sipariş başına ortalama değer ve yeni müşteri oranı", "İade ve iptal sonrası net ciro", "Mümkünse ürün maliyetleri düşüldükten sonra kalan kâr"]],
+      ["h2", "Sonuç"],
+      ["p", "Dönüşüm değeri odaklı model, reklam bütçesini en çok satış getiren yere değil, işletmeye en çok değer katan satışa yönlendirir. Ölçüm altyapınızın bu modele hazır olup olmadığını öğrenmek için ücretsiz analiz talebinde bulunabilirsiniz."]
+    ]
   },
   {
     "slug": "e-ticaret-danismanligi-ile-dogru-karari-verin",
     "baslik": "E-ticaret danışmanlığı ile doğru kararı verin",
-    "kategori": "E-ticaret"
+    "kategori": "E-ticaret",
+    "ozet": "Shopify, ikas, Ticimax, WooCommerce… Doğru altyapı, işletmenizin bugünkü ihtiyaçlarına ve yarınki büyümesine göre seçilmelidir. E-ticaret altyapı danışmanlığımızda kararı birlikte veriyoruz.",
+    "govde": [
+      ["p", "E-ticarete başlarken ya da mevcut sitenizi taşımayı düşünürken en zor kararlardan biri altyapı seçimidir. Shopify, ikas, Ticimax ve WooCommerce gibi platformların her birinin güçlü ve zayıf yönleri vardır. Yanlış seçim; yüksek taşıma maliyetine, entegrasyon sorunlarına ve kaybedilen arama motoru sıralamasına yol açabilir. E-ticaret altyapı danışmanlığı hizmetimiz bu kararı verileriniz ve hedeflerinizle birlikte vermenizi sağlar."],
+      ["h2", "Altyapı seçerken neye bakılmalı?"],
+      ["ul", ["Toplam maliyet: Aylık ücretin yanında komisyon, tema, eklenti, ödeme altyapısı ve geliştirme maliyetleri.", "Entegrasyonlar: Pazaryerleri, ERP veya ön muhasebe yazılımı, kargo firmaları ve ödeme altyapıları ile uyum.", "Arama motoru uyumu: Adres yapısının yönetilebilmesi, 301 yönlendirme, site haritası ve hız.", "Ölçüm: Google Analytics, Google Ads, Meta ve sunucu taraflı ölçümün kurulabilmesi.", "Ölçeklenebilirlik: Ürün sayısı, trafik ve satış arttığında performans ve maliyet.", "Destek ve bağımsızlık: Teknik destek kalitesi, verilerinizi dışa aktarabilme ve başka platforma geçebilme kolaylığı."]],
+      ["h2", "Tek doğru platform yok"],
+      ["p", "Hazır ve hızlı başlamak isteyen bir marka için uygun olan altyapı, karmaşık stok ve muhasebe süreçleri olan bir işletme için yetersiz kalabilir. Bu yüzden önerimiz ürün yapınıza, satış kanallarınıza, ekibinizin teknik kapasitesine ve bütçenize göre şekillenir."],
+      ["h2", "Danışmanlık süreci nasıl ilerler?"],
+      ["ul", ["İhtiyaç analizi: Ürünler, satış kanalları, mevcut sistemler ve hedefler konuşulur.", "Gereksinim listesi: Olmazsa olmazlar ve olsa iyi olur özellikleri ayrılır.", "Karşılaştırma: Uygun platformlar maliyet, entegrasyon ve risk açısından yan yana konur.", "Karar ve yol haritası: Seçilen altyapı için kurulum ya da taşıma planı hazırlanır.", "Taşıma güvencesi: Mevcut siteden geçişte adres eşleştirme ve 301 yönlendirmeleri planlanır, arama motoru sıralamaları korunur."]],
+      ["h2", "Taşıma yapıyorsanız"],
+      ["p", "Mevcut bir siteden yeni altyapıya geçişte en büyük risk arama motoru trafiğinin kaybıdır. Eski adreslerin tamamı listelenmeli, her biri yeni karşılığına kalıcı (301) yönlendirmeyle bağlanmalı ve geçişten sonraki haftalarda hatalı sayfalar izlenmelidir."],
+      ["h2", "Birlikte karar verelim"],
+      ["p", "Altyapı seçiminde kararsız kaldıysanız ya da mevcut platformunuzun işinizi yavaşlattığını düşünüyorsanız bizimle iletişime geçin. İhtiyaçlarınızı dinleyip size uygun seçenekleri gerekçeleriyle birlikte sunalım."]
+    ]
   }
 ]
