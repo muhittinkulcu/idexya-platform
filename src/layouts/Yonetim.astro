@@ -94,13 +94,13 @@ a{color:var(--acc)}a:hover{color:var(--tintx)}
 .kabuk{background:var(--bg);color:var(--tx);font-family:'Geist',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh;display:flex;align-items:flex-start}
 .baslik-font,.sayfa h1,.sayfa h2{font-family:'Bricolage Grotesque','Geist',sans-serif;letter-spacing:-.02em}
 /* Yan menü */
-.yan{flex:0 0 268px;width:268px;box-sizing:border-box;background:var(--side);border-right:1px solid var(--line);padding:0 12px;display:flex;flex-direction:column;gap:16px;min-height:100vh;align-self:stretch;transition:flex-basis .2s ease,width .2s ease}
+.yan{flex:0 0 288px;width:288px;box-sizing:border-box;background:var(--side);border-right:1px solid var(--line);padding:0 12px;display:flex;flex-direction:column;gap:16px;min-height:100vh;align-self:stretch;transition:flex-basis .2s ease,width .2s ease}
 /* Sabit menü ekran boyundadır ve yalnız modül listesi kendi içinde kayar; logo ve çıkış hep görünür.
    Sabit değilken menü sayfayla kayar, logo üstte ve çıkış altta yapışık kalır. */
 .yan.sabit{position:sticky;top:0;height:100vh;align-self:flex-start}
 .yan.sabit .yan-govde{flex:1 1 0;min-height:0;overflow-y:auto;scrollbar-width:thin;margin:0 -12px;padding:0 12px}
 .yan.dar{flex-basis:76px;width:76px}
-.yan.dar .etiket,.yan.dar .ok,.yan.dar .rozet,.yan.dar .alt,.yan.dar .mg>.grup-ad,.yan.dar [data-ara-kutu],.yan.dar [data-favori-blok]{display:none!important}
+.yan.dar .etiket,.yan.dar .ok,.yan.dar .ok-yer,.yan.dar .rozet,.yan.dar .alt,.yan.dar .mg>.grup-ad,.yan.dar [data-ara-kutu],.yan.dar [data-favori-blok]{display:none!important}
 .yan.dar .mo{justify-content:center}
 .yan.gizli{display:none}
 .yan-govde{display:flex;flex-direction:column;gap:16px;flex:1}
@@ -130,9 +130,11 @@ a.ucan-bas:hover{background:var(--card2);color:var(--head)}
 .mo{width:100%;min-height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:var(--tx);font:inherit;font-size:14px;text-align:left;text-decoration:none;cursor:pointer;box-sizing:border-box}
 .mo:hover{background:var(--card2);color:var(--tx)}
 .mo[aria-current=page]{background:var(--tint);color:var(--tintx);font-weight:600}
-.mo .etiket{flex:1;min-width:0}
+.mo .etiket{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* Sağ sütun hizası: ok işareti olmayan satırlarda da aynı genişlikte boş yer ayrılır, etiketler aynı çizgide durur. */
+.ok-yer{width:14px;flex:0 0 14px}
 .mo.yakinda{color:var(--tx2)}
-.mo small,.alt small{padding:0 6px;border:1px solid var(--line);border-radius:6px;font-size:10px;color:var(--tx2);white-space:nowrap}
+.mo small,.alt small{padding:0 5px;border:1px solid var(--line);border-radius:6px;font-size:9.5px;line-height:16px;color:var(--tx2);white-space:nowrap}
 .ok{transition:transform .2s ease;color:var(--tx2)}
 .mo[aria-expanded=true] .ok{transform:rotate(90deg)}
 .alt{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px 20px;padding-left:12px;border-left:2px solid var(--track)}
@@ -247,7 +249,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
             return (
               <div data-modul={o.k} data-ad={o.ad} data-href={o.href || ''} data-sabit={o.sabit ? '1' : undefined}>
                 {o.href && !altVar ? (
-                  <a class="mo" href={o.href} aria-label={o.ad} aria-current={aktifMi ? 'page' : undefined}><Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span>{o.sayac && <span class="rozet" data-sayac={o.sayac} hidden></span>}</a>
+                  <a class="mo" href={o.href} aria-label={o.ad} aria-current={aktifMi ? 'page' : undefined}><Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span>{o.sayac && <span class="rozet" data-sayac={o.sayac} hidden></span>}<span class="ok-yer" aria-hidden="true"></span></a>
                 ) : altVar ? (
                   <button type="button" class="mo" aria-label={o.ad} aria-expanded={aktifMi ? 'true' : 'false'} aria-current={aktifMi ? 'page' : undefined} data-ac={o.k} data-git={o.href || ''}>
                     <Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span>
@@ -256,7 +258,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
                     <svg class="ok" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
                   </button>
                 ) : (
-                  <span class="mo yakinda" aria-label={o.ad + ' · yakında'} aria-disabled="true"><Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span><small class="etiket" style="flex: 0 0 auto">Yakında</small></span>
+                  <span class="mo yakinda" aria-label={o.ad + ' · yakında'} aria-disabled="true"><Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span><small class="etiket" style="flex: 0 0 auto">Yakında</small><span class="ok-yer" aria-hidden="true"></span></span>
                 )}
                 {altVar && (
                   <div class="alt" data-alt={o.k} hidden={!aktifMi}>
