@@ -8,8 +8,8 @@
 /tr/urun-gruplari/*      /tr/paketler               301
 
 # Referanslar ve proje sayfaları kaldırıldı: mevcut müşteri bilgisi sistemde tutulmaz (Muhittin, 19 Eki 2026).
-# 302 kullanılır; ileride müşteri izniyle referans sayfası açılırsa bu satırlar güncellenir.
-/tr/referanslar          /tr/hizmetler              302
-/tr/projeler             /tr/hizmetler              302
-/tr/projeler/*           /tr/hizmetler              302
-/tr/proje/*              /tr/hizmetler              302
+# 301 (Muhittin, 22 Eki 2026: tüm eski adresler kalıcı yönlenir). İleride referans sayfası açılırsa bu satırlar güncellenir.
+/tr/referanslar          /tr/hizmetler              301
+/tr/projeler             /tr/hizmetler              301
+/tr/projeler/*           /tr/hizmetler              301
+/tr/proje/*              /tr/hizmetler              301
