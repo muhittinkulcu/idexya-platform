@@ -171,14 +171,23 @@ export function kabuk() {
     const govde = $('#yan-govde'); if (govde) govde.addEventListener('scroll', ucanKapat, { passive: true });
   }
 
-  // Menü: modül aç/kapat. Kendi sayfası olan modülde başka sayfadaysan önce oraya gider.
+  // Menü: başlık yalnız kendi alt menüsünü açar/kapatır (sayfa değiştirmez, diğerlerine dokunmaz). Sayfalara alt bağlantılardan gidilir.
+  // Dar menüde alt liste görünmediği için başlık doğrudan sayfaya gider.
   $$('[data-ac]').forEach((b) => b.addEventListener('click', () => {
     if (t.yanMod === 'dar' && b.dataset.git) { location.href = b.dataset.git; return; }
-    if (b.dataset.git && b.getAttribute('aria-current') !== 'page') { t.acik[b.dataset.ac] = true; tercihYaz(t); location.href = b.dataset.git; return; }
-    const simdi = b.getAttribute('aria-expanded') === 'true';
-    t.acik[b.dataset.ac] = !simdi;
+    t.acik[b.dataset.ac] = b.getAttribute('aria-expanded') !== 'true';
     kaydet();
   }));
+  // Tümünü aç / kapat: açık olan varsa hepsini kapatır, yoksa hepsini açar
+  const tumu = $('[data-tumu]');
+  const tumuCiz = () => { if (!tumu) return; const hepsi = $$('[data-ac]').every((b) => b.getAttribute('aria-expanded') === 'true'); tumu.setAttribute('aria-pressed', String(hepsi)); tumu.setAttribute('aria-label', hepsi ? 'Tüm alt menüleri kapat' : 'Tüm alt menüleri aç'); };
+  if (tumu) tumu.addEventListener('click', () => {
+    const ac = tumu.getAttribute('aria-pressed') !== 'true';
+    $$('[data-ac]').forEach((b) => { t.acik[b.dataset.ac] = ac; });
+    kaydet(); tumuCiz();
+  });
+  $$('[data-ac]').forEach((b) => b.addEventListener('click', () => setTimeout(tumuCiz)));
+  tumuCiz();
   // Menü araması
   const menuAra = $('[data-menu-ara]');
   if (menuAra) menuAra.addEventListener('input', () => {
