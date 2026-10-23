@@ -37,7 +37,7 @@ const MENU = [
       { ad: 'Yeni', href: '/yonetim/talepler/?sekme=yeni' }, { ad: 'CRM’e alınan', href: '/yonetim/talepler/?sekme=crm' },
       { ad: 'Spam', href: '/yonetim/talepler/?sekme=spam' }, { ad: 'Tümü', href: '/yonetim/talepler/?sekme=hepsi' }] },
     { k: 'crm', ad: 'Müşteriler (CRM)', href: '/yonetim/crm/', i: 'crm', altlar: [
-      { ad: 'Satış panosu', href: '/yonetim/crm/' }, { ad: 'IDOS eşitleme' }, { ad: 'Çakışmalar' }] },
+      { ad: 'Satış panosu', href: '/yonetim/crm/' }, { ad: 'IDOS eşitleme', href: '/yonetim/crm-idos/' }, { ad: 'Çakışmalar', href: '/yonetim/crm-cakisma/' }] },
     { k: 'teklif', ad: 'Teklifler', i: 'teklif', altlar: [{ ad: 'Taslaklar' }, { ad: 'Gönderilenler' }, { ad: 'Kabul edilenler' }] },
     { k: 'asistan', ad: 'Asistan sohbetleri', href: '/yonetim/asistan/', i: 'asistan' },
     { k: 'gorev', ad: 'Görevler ve takvim', i: 'gorev' },
@@ -53,7 +53,7 @@ const MENU = [
   ] },
   { grup: 'ÜYELİK', ogeler: [
     { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/yonetim/uyeler/', i: 'uye', sayac: 'uye' },
-    { k: 'portal', ad: 'Müşteri alanı', i: 'portal', altlar: [{ ad: 'Erişimler' }, { ad: 'Davetler' }] }
+    { k: 'portal', ad: 'Müşteri alanı', href: '/yonetim/portal/', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/yonetim/portal/?sekme=erisim' }, { ad: 'Davetler', href: '/yonetim/portal/?sekme=davet' }] }
   ] },
   { grup: 'SİTE', ogeler: [
     { k: 'seo', ad: 'SEO ve GEO', i: 'seo' },

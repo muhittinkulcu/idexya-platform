@@ -2,6 +2,7 @@
 // Üye oturumu yönetim paneline hiçbir zaman erişim vermez; panel yalnız Cloudflare Access ile açılır.
 import { json, hata, simdi, kimlik, kirp, ozet, islemYaz, EPOSTA_DESEN, ayniKaynak, govdeOku, ipAl, robotDogrula } from './ortak.js';
 import { MODULLER, YETKILER, UYE_DURUM } from './moduller.js';
+import { davetBul, davetSorgulari } from './portal.js';
 
 const OTURUM_CEREZ = '__Host-idx_oturum';
 const OTURUM_GUN = 30;
@@ -80,6 +81,12 @@ export async function uyeApi(istek, env, yol) {
   const { g, hata: h } = await govdeOku(istek);
   if (h) return h;
 
+  // Davet bağlantısı kontrolü (üye ol sayfası e-postayı doldurmak için çağırır). Jetonu bilen kişiye yalnız davetin e-postası döner.
+  if (yol === 'davet') {
+    const d = await davetBul(db, g.davet);
+    return json({ ok: true, gecerli: !!d, eposta: d ? d.eposta : null });
+  }
+
   if (yol === 'kayit') {
     if (g.web_adresi_tekrar) return json({ ok: true });
     const ad = kirp(g.ad, 120), eposta = kirp(g.eposta, 160).toLowerCase();
@@ -92,6 +99,33 @@ export async function uyeApi(istek, env, yol) {
     const robot = await robotDogrula(env, g.turnstile, ip);
     if (robot === 'kaldi') return hata('Robot doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.', 403);
     const var_ = await db.prepare('SELECT id FROM uyeler WHERE eposta = ?').bind(eposta).first();
+    // Davetle kayıt: jeton geçerli, kullanılmamış, süresi dolmamışsa ve e-posta davetle aynıysa üyelik onaylı açılır,
+    // davetteki bölümler verilir ve üye müşteriye bağlanır. Davet jetonu yoksa aşağıdaki olağan akış aynen çalışır.
+    if (g.davet !== undefined && g.davet !== null && g.davet !== '') {
+      const d = await davetBul(db, g.davet);
+      if (!d) { await islemYaz(db, 'Web sitesi', 'uye_kayit', null, ipOzet); return hata('Davet bağlantısı geçersiz, süresi dolmuş ya da daha önce kullanılmış. Yeni davet isteyin ya da davetsiz üyelik talebi gönderin.', 410); }
+      if (d.eposta.toLowerCase() !== eposta) return hata('Bu davet başka bir e-posta adresi için oluşturuldu. Davetin gönderildiği adresi yazın.', 422);
+      if (var_) return hata('Bu e-posta adresiyle zaten bir üyelik var. Giriş yapın; davet kullanılmadı.', 409);
+      const z = simdi(), id = kimlik(), tuz = rastgele(16);
+      const sifre = await sifreOzet(g.sifre, tuz);
+      // Önce davet tek seferlik olarak ayrılır (aynı anda iki kayıt aynı daveti kullanamasın).
+      const ayir = await db.prepare('UPDATE davetler SET kullanildi = ? WHERE ozet = ? AND kullanildi IS NULL AND iptal IS NULL AND bitis > ?').bind(z, d.ozet, z).run();
+      if (!ayir.meta || !ayir.meta.changes) return hata('Davet bağlantısı geçersiz, süresi dolmuş ya da daha önce kullanılmış.', 410);
+      try {
+        await db.batch([
+          db.prepare(`INSERT INTO uyeler (id, olusturma, guncelleme, ad, eposta, telefon, firma, neden, sifre_ozet, sifre_tuz, sifre_tur, durum, karar_zamani, karar_veren, kvkk_zamani, iys_izni)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'onayli', ?, ?, ?, ?)`).bind(id, z, z, ad, eposta, kirp(g.telefon, 40) || null, kirp(g.firma, 160) || null, kirp(g.neden, 1000) || null,
+            sifre, tuz, TUR, z, 'Davet · ' + d.olusturan, z, g.iys === true ? 1 : 0),
+          ...(await davetSorgulari(db, d, id, z))
+        ]);
+      } catch (e) {
+        await db.prepare('UPDATE davetler SET kullanildi = NULL WHERE ozet = ? AND uye_id IS NULL').bind(d.ozet).run();
+        throw e;
+      }
+      await islemYaz(db, 'Web sitesi', 'uye_kayit', id, ipOzet);
+      await islemYaz(db, 'Web sitesi', 'davet_kullanildi', id, d.id);
+      return json({ ok: true, onayli: true });
+    }
     // Aynı e-posta zaten kayıtlıysa da aynı yanıt verilir: hangi adreslerin üye olduğu dışarıdan öğrenilemez.
     if (!var_) {
       const tuz = rastgele(16), z = simdi(), id = kimlik();

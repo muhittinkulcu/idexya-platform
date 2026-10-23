@@ -67,5 +67,18 @@ export const SEMA = [
   // Sitede gösterilen Instagram gönderileri (worker/instagram.js): yöneticinin seçtiği bağlantı, açıklama ve küçültülmüş görsel.
   `CREATE TABLE IF NOT EXISTS instagram (
     id TEXT PRIMARY KEY, baglanti TEXT NOT NULL, aciklama TEXT, gorsel TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0,
-    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`
+    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  // IDOS eşitleme (worker/crm.js): IDOS reklam hesabı (platform + hesap) ↔ IDP CRM müşterisi. Yönetici elle eşleştirir.
+  `CREATE TABLE IF NOT EXISTS reklam_eslesme (
+    platform TEXT NOT NULL, hesap TEXT NOT NULL, musteri_id TEXT NOT NULL, eslestiren TEXT NOT NULL, zaman TEXT NOT NULL,
+    PRIMARY KEY (platform, hesap))`,
+  `CREATE INDEX IF NOT EXISTS reklam_eslesme_musteri ON reklam_eslesme (musteri_id)`,
+  // Çakışmalar (worker/crm.js): "Bunlar farklı" denen müşteri çiftleri (a < b) bir daha önerilmez.
+  `CREATE TABLE IF NOT EXISTS cakisma_ayri (a TEXT NOT NULL, b TEXT NOT NULL, isaretleyen TEXT NOT NULL, zaman TEXT NOT NULL, PRIMARY KEY (a, b))`,
+  // Müşteri alanı (worker/portal.js): üye ↔ CRM müşterisi bağlantısı ve davetle üyelik. Davet jetonunun yalnız özeti saklanır.
+  `CREATE TABLE IF NOT EXISTS uye_musteri (uye_id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, baglayan TEXT NOT NULL, zaman TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS uye_musteri_musteri ON uye_musteri (musteri_id)`,
+  `CREATE TABLE IF NOT EXISTS davetler (
+    ozet TEXT PRIMARY KEY, id TEXT NOT NULL UNIQUE, eposta TEXT NOT NULL, musteri_id TEXT, moduller TEXT NOT NULL DEFAULT '{}',
+    olusturma TEXT NOT NULL, bitis TEXT NOT NULL, olusturan TEXT NOT NULL, kullanildi TEXT, uye_id TEXT, iptal TEXT, iptal_eden TEXT)`
 ];

@@ -1,0 +1,71 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Çakışmalar" aktif="crm" yol="Müşteri ilişkileri › CRM" aciklama="Aynı e-posta, aynı telefon (ülke kodu ve baştaki 0 yok sayılır) ya da aynı firma adına (Ltd. Şti., A.Ş. gibi ekler yok sayılır) sahip olası mükerrer müşteri kartları. Tutulacak kartı seçip birleştirin; günlük, talepler ve bağlı tüm kayıtlar tutulan karta taşınır, boş alanları öteki karttan doldurulur.">
+<div data-uyari></div>
+<div data-alan style="display: flex; flex-direction: column; gap: 14px"></div>
+<script>
+  import { api, el, tarih, asamaAdi, genelHata } from '../../scripts/yonetim/ortak.js';
+  const alan = document.querySelector('[data-alan]'), uyari = document.querySelector('[data-uyari]');
+  const NEDEN = { eposta: 'Aynı e-posta', telefon: 'Aynı telefon', firma: 'Aynı firma adı' };
+  const ad = (m) => m.firma || m.ad || m.eposta || m.telefon || 'Adsız müşteri';
+  const bildir = (metin, tur = 'ok') => uyari.replaceChildren(metin ? el('div', { class: 'uyari ' + tur, role: 'status' }, metin) : '');
+
+  function grupCiz(g, sira) {
+    let tut = g.musteriler[0].id;
+    const dahil = Object.fromEntries(g.musteriler.map((m) => [m.id, true]));
+    const kutu = el('section', { class: 'kart', 'aria-label': `Olası mükerrer grup ${sira + 1}`, style: 'padding: 16px; display: flex; flex-direction: column; gap: 12px' });
+    const govde = el('div', { style: 'display: flex; flex-direction: column; gap: 8px' });
+    const ciz = () => {
+      govde.replaceChildren(...g.musteriler.map((m) => {
+        const secili = m.id === tut;
+        return el('div', { style: `display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; padding: 12px; border-radius: 14px; border: 1px solid ${secili ? 'var(--brand)' : 'var(--line)'}; background: ${secili ? 'var(--tint)' : 'transparent'}` },
+          el('label', { style: 'display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; cursor: pointer; flex: none' },
+            el('input', { type: 'radio', name: 'tut-' + sira, checked: secili, onchange: () => { tut = m.id; ciz(); } }), 'Bunu tut'),
+          el('div', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 220px' },
+            el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(m.id), style: 'font-weight: 700; overflow-wrap: anywhere' }, ad(m)),
+            el('span', { style: 'font-size: 13px; color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.eposta, m.telefon].filter(Boolean).join(' · ') || 'İletişim bilgisi yok'),
+            el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `Aşama: ${asamaAdi(m.asama)} · oluşturma ${tarih(m.olusturma, false)} · son hareket ${tarih(m.guncelleme)}`)),
+          secili ? el('span', { class: 'cip kazanildi', style: 'flex: none' }, 'Tutulacak')
+            : el('label', { style: 'display: flex; gap: 6px; align-items: center; font-size: 13px; cursor: pointer; flex: none' },
+              el('input', { type: 'checkbox', checked: dahil[m.id], onchange: (o) => { dahil[m.id] = o.currentTarget.checked; } }), 'Birleştir'));
+      }));
+    };
+    const birlestir = el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
+      const tutulan = g.musteriler.find((m) => m.id === tut);
+      const gidecek = g.musteriler.filter((m) => m.id !== tut && dahil[m.id]);
+      if (!gidecek.length) { bildir('Birleştirilecek en az bir kart işaretleyin.', 'hata'); return; }
+      const metin = `“${ad(tutulan)}” kartı tutulacak.\n\n${gidecek.map((m) => '• ' + ad(m) + (m.eposta ? ' <' + m.eposta + '>' : '')).join('\n')}\n\nbu karta birleştirilip SİLİNECEK. Günlük, talepler ve bağlı kayıtlar taşınır; boş alanlar doldurulur. Bu işlem geri alınamaz. Devam edilsin mi?`;
+      if (!confirm(metin)) return;
+      o.currentTarget.disabled = true;
+      try {
+        const r = await api('crm/cakisma/birlestir', { tut, birlestir: gidecek.map((m) => m.id) });
+        const tas = Object.values(r.tasinan || {}).reduce((s, n) => s + n, 0);
+        await yukle();
+        bildir(`Birleştirildi: ${gidecek.length} kart “${ad(tutulan)}” kartına alındı; ${tas} bağlı kayıt taşındı${r.doldurulan.length ? ', doldurulan alanlar: ' + r.doldurulan.join(', ') : ''}.`);
+      } catch (h) { bildir('Birleştirilemedi: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+    } }, 'Seçili kartta birleştir');
+    const farkli = el('button', { type: 'button', class: 'dugme', onclick: async (o) => {
+      if (!confirm('Bu kartlar farklı müşteriler olarak işaretlensin mi? Bu grup bir daha çakışma olarak gösterilmez.')) return;
+      o.currentTarget.disabled = true;
+      try { await api('crm/cakisma/ayri', { idler: g.musteriler.map((m) => m.id) }); await yukle(); bildir('Farklı olarak işaretlendi; bu grup artık gösterilmeyecek.'); }
+      catch (h) { bildir('İşaretlenemedi: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+    } }, 'Bunlar farklı');
+    ciz();
+    kutu.append(
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, el('strong', { style: 'color: var(--head)' }, `${g.musteriler.length} kart`), ...g.nedenler.map((n) => el('span', { class: 'cip gorusme' }, NEDEN[n] || n))),
+      govde,
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, birlestir, farkli));
+    return kutu;
+  }
+
+  async function yukle() {
+    let r;
+    try { r = await api('crm/cakisma'); genelHata(''); }
+    catch (h) { genelHata('Çakışmalar yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); return; }
+    alan.replaceChildren(...(r.gruplar.length ? r.gruplar.map(grupCiz)
+      : [el('div', { class: 'kart bos' }, 'Olası mükerrer müşteri kartı yok.' + (r.ayriSayisi ? ` Daha önce “farklı” olarak işaretlenen ${r.ayriSayisi} kart çifti gösterilmiyor.` : ''))]));
+  }
+  yukle();
+</script>
+</Yonetim>
