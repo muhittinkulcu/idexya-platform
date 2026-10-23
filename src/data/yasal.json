@@ -61,7 +61,8 @@
       {
         "baslik": "Kullandığımız çerez türleri",
         "metin": [
-          "Zorunlu çerezler sitenin çalışması için gereklidir ve kapatılamaz. Analitik ve pazarlama çerezleri yalnız onay verirseniz çalışır; onay vermezseniz Google ve Meta araçları çerez bırakmaz."
+          "Zorunlu çerezler sitenin çalışması için gereklidir ve kapatılamaz. Analitik ve pazarlama çerezleri yalnız onay verirseniz çalışır; onay vermezseniz Google ve Meta araçları çerez bırakmaz.",
+          "Ayrıca sayfaların ne kadar ziyaret edildiğini ve ne kadar hızlı açıldığını çerez kullanmadan ölçüyoruz: yalnızca sayfa adresi, gelinen sitenin alan adı, cihaz türü ve sayfa hızı değerleri toplu sayılar olarak kaydedilir; IP adresi, tarayıcı bilgisi veya sizi tanımlayan bir kimlik saklanmaz. Tarayıcınızda “İzlenmeyi engelle” (Do Not Track) ya da Global Privacy Control açıksa bu ölçüm yapılmaz."
         ]
       },
       {
