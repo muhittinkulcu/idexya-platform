@@ -1,0 +1,42 @@
+---
+// Yöneticinin panelden seçtiği Instagram gönderileri (/api/instagram). Gönderi yoksa bölüm görünmez.
+interface Props { baslik?: string; }
+const { baslik = 'Instagram’dan son paylaşımlar' } = Astro.props;
+---
+<div class="ia" data-instagram hidden>
+  <div class="ia-bas">
+    <h3>{baslik}</h3>
+    <a href="https://www.instagram.com/idexya.goodthings" rel="noopener" target="_blank">@idexya.goodthings <span class="ia-sr">(yeni sekmede açılır)</span>→</a>
+  </div>
+  <ul class="ia-izgara" data-izgara></ul>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-instagram]').forEach(async (kok) => {
+    try {
+      const r = await fetch('/api/instagram');
+      const s = await r.json();
+      if (!r.ok || !s.ok || !s.gonderiler.length) return;
+      kok.querySelector('[data-izgara]')!.replaceChildren(...s.gonderiler.map((g: { id: string; baglanti: string; aciklama: string | null }) => {
+        const li = document.createElement('li'), a = document.createElement('a'), img = document.createElement('img');
+        a.href = g.baglanti; a.target = '_blank'; a.rel = 'noopener';
+        a.setAttribute('aria-label', (g.aciklama || 'Instagram gönderisi') + ' (Instagram’da açılır)');
+        img.src = `/api/instagram/${encodeURIComponent(g.id)}/gorsel`; img.alt = g.aciklama || ''; img.loading = 'lazy'; img.decoding = 'async';
+        a.append(img); li.append(a); return li;
+      }));
+      kok.hidden = false;
+    } catch (e) { /* Gönderiler yüklenemezse bölüm gizli kalır */ }
+  });
+</script>
+<style>
+  .ia{display:flex;flex-direction:column;gap:16px}
+  .ia[hidden]{display:none}
+  .ia-bas{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px}
+  .ia-bas h3{margin:0;font-size:22px;color:var(--head)}
+  .ia-bas a{font-weight:700}
+  .ia-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .ia-izgara{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .ia-izgara :global(a){display:block;border-radius:14px;overflow:hidden;aspect-ratio:1;background:var(--card2);border:1px solid var(--line)}
+  .ia-izgara :global(img){width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
+  .ia-izgara :global(a:hover img){transform:scale(1.04)}
+  @media (max-width:640px){.ia-izgara{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>

@@ -1,0 +1,31 @@
+---
+// Hizmetler sayfası: her alanın solunda temsilî görsel, "neden önemli" ve "dikkat ettiklerimiz" (src/data/hizmet-alan.ts).
+import MenuGorsel from './MenuGorsel.astro';
+import { ALAN } from '../data/hizmet-alan';
+interface Props { id: string; }
+const a = ALAN[Astro.props.id];
+---
+{a && (
+  <div class="hae">
+    <figure class="hae-gorsel"><MenuGorsel id={Astro.props.id} /><figcaption>Temsilî görsel</figcaption></figure>
+    <details class="hae-detay">
+      <summary>Neden önemli?</summary>
+      <p>{a.neden}</p>
+      <b>Neye dikkat ediyoruz?</b>
+      <ul>{a.dikkat.map((x) => <li>{x}</li>)}</ul>
+    </details>
+  </div>
+)}
+<style>
+  .hae{display:flex;flex-direction:column;gap:14px}
+  .hae-gorsel{margin:0;padding:16px;border-radius:20px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+  .hae-gorsel figcaption{font-size:11.5px;color:var(--tx2);text-align:right}
+  .hae-detay{border:1px solid var(--line);border-radius:16px;background:var(--card)}
+  .hae-detay summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;font-weight:700;color:var(--head)}
+  .hae-detay summary::-webkit-details-marker{display:none}
+  .hae-detay summary::after{content:"+";width:26px;height:26px;border-radius:50%;background:var(--tint);color:var(--tintx);display:flex;align-items:center;justify-content:center;transition:transform .2s}
+  .hae-detay[open] summary::after{transform:rotate(45deg)}
+  .hae-detay p{margin:0;padding:0 18px 12px;font-size:15px;line-height:1.6;color:var(--tx);text-align:left}
+  .hae-detay b{display:block;padding:0 18px 8px;color:var(--head);font-size:14px}
+  .hae-detay ul{margin:0;padding:0 18px 16px 36px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--tx2)}
+</style>

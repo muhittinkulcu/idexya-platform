@@ -3,6 +3,7 @@
 // Cevaplar yalnızca Muhittin'in doğruladığı bilgilere dayanır (hesap sahipliği, 1 iş günü, en az 3 ay, IDOS).
 import Baslik from './Baslik.astro';
 import Bulten from './Bulten.astro';
+import InstagramAkis from '../InstagramAkis.astro';
 import yazilar from '../../data/yazilar.json';
 const SSS = [
   ['Ücretsiz analizde neye bakıyorsunuz?', 'Reklam hesaplarınızı, ölçüm altyapınızı (GA4, etiketler, dönüşümler) ve sitenizi inceleriz. Nereden başlamanız gerektiğini gerekçesiyle anlatırız. Formu gönderdikten sonra 1 iş günü içinde dönüş yaparız.'],
@@ -24,13 +25,14 @@ const son = yazilar.slice(0, 3);
       {son.map((y) => (
         <a class="bs-yazi" href={`/tr/haber/${y.slug}/`}><span class="bs-kat">{y.kategori}</span><h3>{y.baslik}</h3><p>{y.ozet}</p><span class="bs-oku">Yazıyı oku →</span></a>
       ))}
-      <a class="bs-ig" href="https://www.instagram.com/idexya.ads" rel="noopener" target="_blank">
+      <a class="bs-ig" href="https://www.instagram.com/idexya.goodthings" rel="noopener" target="_blank">
         <span class="bs-ig-ikon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"></rect><circle cx="12" cy="12" r="4"></circle><circle cx="17.5" cy="6.5" r="0.5"></circle></svg></span>
         <h3>Instagram’da kısa ipuçları</h3>
         <p>Reklam, e-ticaret ve ölçüm üzerine kısa içerikler için bizi takip edin.</p>
-        <span class="bs-oku">@idexya.ads <span class="bs-sr">(yeni sekmede açılır)</span>→</span>
+        <span class="bs-oku">@idexya.goodthings <span class="bs-sr">(yeni sekmede açılır)</span>→</span>
       </a>
     </div>
+    <InstagramAkis />
     <Bulten />
   </div>
 </section>
