@@ -1,8 +1,19 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Instagram gönderileri" aktif="instagram" yol="İçerik" aciklama="Ana sayfadaki Instagram bölümünde gösterilecek gönderileri buradan seçin. İlk 8 görünür gönderi sitede yer alır; sıralamayı oklarla değiştirebilirsiniz.">
-<div class="uyari bilgi">Hesap: <b>@idexya.goodthings</b>. Instagram’a bağlanılmaz; eklediğiniz görsel sitenin kendi adresinden gösterilir ve tıklayan kişi gönderinin Instagram sayfasına gider. Yalnızca hesabınıza ait ve paylaşma hakkınız olan görselleri ekleyin.</div>
+<Yonetim baslik="Instagram gönderileri" aktif="instagram" yol="İçerik" aciklama="Ana sayfadaki Instagram şeridi. Hesap bağlıysa son gönderiler kendiliğinden gelir; bağlı değilse aşağıdan elle seçtiğiniz gönderiler gösterilir.">
+<section class="kart" data-akis style="padding: 18px; display: flex; flex-direction: column; gap: 12px"></section>
+<details class="kart" style="padding: 14px 18px">
+<summary style="cursor: pointer; font-weight: 700">Otomatik akış nasıl bağlanır?</summary>
+<ol style="margin: 10px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; line-height: 1.55">
+<li>@idexya.goodthings hesabı Instagram uygulamasında <b>profesyonel hesap</b> (İşletme veya İçerik üreticisi) olmalı.</li>
+<li><a href="https://developers.facebook.com/apps" target="_blank" rel="noopener">Meta for Developers</a>’ta bir uygulama oluşturup <b>Instagram</b> ürününü ekleyin (“API setup with Instagram login”).</li>
+<li>Hesabı uygulamaya ekleyip <b>instagram_business_basic</b> izniyle bir <b>uzun ömürlü erişim anahtarı</b> (long-lived access token) oluşturun.</li>
+<li>Cloudflare’de Workers › idexya-platform › Ayarlar › Değişkenler bölümüne <code>INSTAGRAM_TOKEN</code> adıyla <b>gizli değer (Secret)</b> olarak girin. Anahtarı bu sohbete veya panele yazmayın.</li>
+<li>Bu sayfaya dönüp “Şimdi çek”e basın. Sonrasında akış en geç 3 saatte bir kendiliğinden yenilenir; anahtar 30 günde bir kendiliğinden uzatılır.</li>
+</ol>
+</details>
+<h2 style="margin: 8px 0 0; font-size: 18px">Elle seçilen gönderiler <small style="font-weight: 400; color: var(--tx2); font-size: 14px">(otomatik akış yokken gösterilir)</small></h2>
 <form class="kart" data-form style="padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 16px; align-items: start">
 <div style="display: flex; flex-direction: column; gap: 12px">
 <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Gönderi bağlantısı<input name="baglanti" type="url" required placeholder="https://www.instagram.com/p/…" style="min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
@@ -45,9 +56,26 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (ne === 'sil' && !confirm('Gönderi siteden ve bu listeden kaldırılsın mı? (Instagram’daki gönderiye dokunulmaz.)')) return;
     try { await api(`instagram/${encodeURIComponent(id)}/${ne}`, {}); await yukle(); } catch (h) { genelHata('İşlem yapılamadı: ' + h.message); }
   }
+  function akisCiz(r) {
+    const a = r.akis, k = document.querySelector('[data-akis]');
+    const dugme = el('button', { type: 'button', class: 'dugme ana', disabled: !a.kurulu, onclick: async (o) => {
+      const d = o.currentTarget; d.disabled = true; d.textContent = 'Çekiliyor…';
+      try { await api('instagram/akis-cek', {}); genelHata(''); await yukle(); } catch (h) { genelHata(h.message); d.disabled = false; d.textContent = 'Şimdi çek'; }
+    } }, 'Şimdi çek');
+    k.replaceChildren(...[
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center' },
+        el('div', { style: 'display: flex; flex-direction: column; gap: 4px' },
+          el('b', { style: 'font-size: 17px' }, 'Otomatik akış'),
+          el('span', { style: 'color: var(--tx2); font-size: 14px' }, !a.kurulu ? 'Bağlı değil: INSTAGRAM_TOKEN tanımlanınca hesabın son gönderileri kendiliğinden gelir.'
+            : `${a.kullanici ? '@' + a.kullanici + ' · ' : ''}${a.adet} gönderi · son çekim ${a.sonCekim ? tarih(a.sonCekim) : 'henüz yok'}`)),
+        el('span', { style: 'display: flex; gap: 8px; align-items: center' }, el('span', { class: 'cip ' + (a.kurulu && !a.hata ? 'kazanildi' : a.kurulu ? 'kaybedildi' : 'yeni') }, a.kurulu ? (a.hata ? 'Hata' : 'Bağlı') : 'Kapalı'), dugme)),
+      a.hata ? el('div', { class: 'uyari hata' }, 'Son çekim başarısız: ' + a.hata) : null,
+      r.akisGonderiler.length ? el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px' }, ...r.akisGonderiler.map((g) => el('a', { href: g.permalink, target: '_blank', rel: 'noopener', title: g.aciklama || '' },
+        el('img', { src: `/api/instagram/akis/${encodeURIComponent(g.id)}/gorsel`, alt: '', loading: 'lazy', style: 'width: 100%; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 8px; display: block' })))) : null].filter(Boolean));
+  }
   async function yukle() {
     try {
-      const r = await api('instagram'); genelHata('');
+      const r = await api('instagram'); genelHata(''); akisCiz(r);
       let gorunurSira = 0;
       liste.replaceChildren(...(r.gonderiler.length ? r.gonderiler.map((g) => {
         const sitede = g.gorunur && gorunurSira++ < 8;
