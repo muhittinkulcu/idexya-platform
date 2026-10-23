@@ -13,6 +13,6 @@ import UyeCerceve from '../components/UyeCerceve.astro';
 </form>
 <script>
   import { formBagla } from '../scripts/uye-sayfa.js';
-  formBagla(document.querySelector('[data-uye-form]'), 'giris', (v) => (!v.eposta.trim() || !v.sifre ? 'E-posta ve şifrenizi yazın.' : null), () => { location.href = '/hesabim'; });
+  formBagla(document.querySelector('[data-uye-form]'), 'giris', (v) => (!v.eposta.trim() || !v.sifre ? 'E-posta ve şifrenizi yazın.' : null), () => { const s = new URLSearchParams(location.search).get('sonra') || ''; location.href = /^\/(uye\/[a-z-]+\/?|hesabim)$/.test(s) ? s : '/hesabim'; });
 </script>
 </UyeCerceve>

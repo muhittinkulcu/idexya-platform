@@ -66,6 +66,10 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM teklifler WHERE durum = 'gonderildi' AND gecerlilik IS NOT NULL AND gecerlilik < ?").bind(new Date().toISOString().slice(0, 10)).first();
       if (g && g.n) onay.push({ tur: 'teklif', baslik: `${g.n} gönderilen teklifin geçerlilik süresi doldu`, detay: 'Müşteriyle görüşüp kabul ya da red olarak işaretleyin.', href: '/yonetim/teklifler/?sekme=gonderildi', onem: 'normal' });
     }
+    if (await tabloVar(db, 'destek_talepleri')) {
+      const g = await db.prepare("SELECT COUNT(*) AS n, MIN(guncelleme) AS en_eski FROM destek_talepleri WHERE durum = 'acik'").first();
+      if (g && g.n) onay.push({ tur: 'destek', baslik: `${g.n} destek talebi yanıt bekliyor`, detay: 'Müşteri alanından gelen talepleri yanıtlayın.', zaman: g.en_eski, href: '/yonetim/destek/', onem: 'normal' });
+    }
     if (await tabloVar(db, 'muhasebe')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM muhasebe WHERE tur = 'gelir' AND durum = 'bekliyor' AND vade IS NOT NULL AND vade < ?").bind(new Date().toISOString().slice(0, 10)).first();
       if (g && g.n) onay.push({ tur: 'muhasebe', baslik: `${g.n} alacağın vadesi geçti`, detay: 'Tahsilatı takip edin.', href: '/yonetim/muhasebe/', onem: 'kritik' });

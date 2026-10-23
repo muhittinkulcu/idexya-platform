@@ -1,0 +1,118 @@
+---
+import UyeCerceve from '../../components/UyeCerceve.astro';
+---
+<UyeCerceve baslik="Destek talepleri" aciklama="Ekibimize talep açın, yanıtları buradan izleyin. Yanıt geldiğinde e-posta gönderilmez; bu sayfayı kontrol edin." genis>
+<a href="/hesabim" style="align-self: flex-start; font-weight: 600" data-geri>← Hesabım</a>
+<div data-durum class="uye-kart" role="status">Yükleniyor…</div>
+
+<div data-liste-gorunum hidden style="display: flex; flex-direction: column; gap: 22px">
+<details data-yeni class="uye-kart" style="gap: 0">
+<summary style="cursor: pointer; font-weight: 700; color: var(--head); font-size: 18px; min-height: 32px; display: flex; align-items: center">+ Yeni talep aç</summary>
+<form data-yeni-form novalidate style="display: flex; flex-direction: column; gap: 14px; padding-top: 16px">
+<label class="uye-alan">Konu<input name="konu" maxlength="160" required placeholder="Örn. Kampanya raporu hakkında"></label>
+<label class="uye-alan">Mesajınız<textarea name="metin" rows="6" maxlength="4000" required placeholder="Talebinizi ayrıntılı yazın. Şifre, kart bilgisi gibi gizli bilgileri yazmayın."></textarea></label>
+<p data-form-durum class="uye-durum" role="status" aria-live="polite" hidden></p>
+<button type="submit" class="uye-dugme" style="align-self: flex-start">Talebi gönder</button>
+</form>
+</details>
+<section aria-labelledby="tl" style="display: flex; flex-direction: column; gap: 12px">
+<h2 id="tl" style="margin: 0; font-size: 22px; color: var(--head)">Taleplerim</h2>
+<div data-liste class="uye-kart" style="padding: 6px clamp(14px, 3vw, 24px); gap: 0"></div>
+</section>
+</div>
+
+<div data-talep-gorunum hidden style="display: flex; flex-direction: column; gap: 16px">
+<div class="uye-kart" style="gap: 6px; box-shadow: none">
+<span data-t-no style="font-size: 13px; color: var(--tx2)"></span>
+<h2 data-t-konu style="margin: 0; font-size: 22px; color: var(--head); overflow-wrap: anywhere"></h2>
+<span data-t-durum></span>
+</div>
+<ol data-mesajlar style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px"></ol>
+<form data-yanit-form novalidate class="uye-kart" style="gap: 14px">
+<label class="uye-alan">Yanıtınız<textarea name="metin" rows="4" maxlength="4000" required></textarea></label>
+<p data-form-durum class="uye-durum" role="status" aria-live="polite" hidden></p>
+<div style="display: flex; gap: 10px; flex-wrap: wrap"><button type="submit" class="uye-dugme">Gönder</button><button type="button" class="uye-dugme ikincil" data-kapat>Talebi kapat</button></div>
+</form>
+</div>
+<script>
+  import { uyeIstek, durumYaz } from '../../scripts/uye-sayfa.js';
+  const $ = (s) => document.querySelector(s);
+  const durum = $('[data-durum]');
+  const zaman = (v) => new Date(v).toLocaleString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const RENK = { acik: ['var(--tint)', 'var(--tintx)'], yanitlandi: ['var(--okb)', 'var(--ok)'], kapali: ['var(--card2, var(--bg))', 'var(--tx2)'] };
+  function el(ad, ozellik = {}, ...cocuk) {
+    const e = document.createElement(ad);
+    for (const [k, v] of Object.entries(ozellik)) { if (k === 'style') e.style.cssText = v; else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v); }
+    e.append(...cocuk.flat().filter((c) => c != null && c !== false));
+    return e;
+  }
+  const cip = (d, ad) => el('span', { style: `align-self: flex-start; padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; background: ${(RENK[d] || RENK.acik)[0]}; color: ${(RENK[d] || RENK.acik)[1]}` }, ad);
+  const hataIse = (h) => { if (h.durum === 401) { location.replace('/giris?sonra=' + encodeURIComponent('/uye/destek/')); return true; } durum.hidden = false; durum.textContent = h.message; return false; };
+  let yetki = 'gor', acikId = null;
+
+  async function liste() {
+    let s; try { s = await uyeIstek('destek'); } catch (h) { hataIse(h); return; }
+    yetki = s.yetki; durum.hidden = true;
+    const g = $('[data-geri]'); g.href = '/hesabim'; g.textContent = '← Hesabım';
+    $('[data-talep-gorunum]').hidden = true; $('[data-liste-gorunum]').hidden = false;
+    $('[data-yeni]').hidden = yetki !== 'kullan';
+    $('[data-liste]').replaceChildren(...(s.talepler.length ? s.talepler.map((t) => el('a', { class: 'ds-satir', href: '?t=' + encodeURIComponent(t.id) },
+      el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' },
+        el('strong', { style: 'color: var(--head); overflow-wrap: anywhere' }, t.konu),
+        el('span', { style: 'font-size: 14px; color: var(--tx2)' }, `${t.no} · son hareket ${zaman(t.guncelleme)}`)),
+      cip(t.durum, t.durum === 'yanitlandi' && t.son_yazan === 'ekip' ? 'Yeni yanıt' : s.durumlar[t.durum] || t.durum))) : [el('p', { style: 'margin: 14px 0; color: var(--tx2)' }, yetki === 'kullan' ? 'Henüz talebiniz yok. Yukarıdan yeni talep açabilirsiniz.' : 'Henüz talep yok.')]));
+  }
+
+  async function talep(id) {
+    let s; try { s = await uyeIstek('destek/' + encodeURIComponent(id)); } catch (h) { if (!hataIse(h)) $('[data-liste-gorunum]').hidden = true; return; }
+    yetki = s.yetki; acikId = id; durum.hidden = true;
+    $('[data-liste-gorunum]').hidden = true; $('[data-talep-gorunum]').hidden = false;
+    const g = $('[data-geri]'); g.href = '/uye/destek/'; g.textContent = '← Tüm talepler';
+    $('[data-t-no]').textContent = `${s.talep.no} · ${zaman(s.talep.olusturma)}`;
+    $('[data-t-konu]').textContent = s.talep.konu;
+    $('[data-t-durum]').replaceChildren(cip(s.talep.durum, s.durumlar[s.talep.durum]));
+    $('[data-mesajlar]').replaceChildren(...s.mesajlar.map((m) => el('li', { class: 'ds-mesaj' + (m.yazan === 'ekip' ? ' ekip' : '') },
+      el('span', { style: 'font-size: 13px; color: var(--tx2)' }, `${m.yazan === 'ekip' ? 'Idexya ekibi' : m.ad || 'Siz'} · ${zaman(m.zaman)}`),
+      el('div', { style: 'white-space: pre-wrap; overflow-wrap: anywhere' }, m.metin))));
+    const f = $('[data-yanit-form]');
+    f.hidden = yetki !== 'kullan';
+    $('[data-kapat]').hidden = s.talep.durum === 'kapali';
+    f.querySelector('label').firstChild.textContent = s.talep.durum === 'kapali' ? 'Yeniden açmak için yazın' : 'Yanıtınız';
+  }
+
+  const yeni = $('[data-yeni-form]');
+  yeni.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const v = { konu: yeni.konu.value.trim(), metin: yeni.metin.value.trim() };
+    if (!v.konu || !v.metin) return durumYaz(yeni, 'Konu ve mesaj gerekli.', 'hata');
+    const d = yeni.querySelector('button'); d.disabled = true;
+    try { const s = await uyeIstek('destek', v); yeni.reset(); history.pushState(null, '', '?t=' + encodeURIComponent(s.id)); await talep(s.id); }
+    catch (h) { durumYaz(yeni, h.message, 'hata'); } finally { d.disabled = false; }
+  });
+  const yanit = $('[data-yanit-form]');
+  yanit.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const metin = yanit.metin.value.trim();
+    if (!metin) return durumYaz(yanit, 'Mesajınızı yazın.', 'hata');
+    const d = yanit.querySelector('button[type=submit]'); d.disabled = true;
+    try { await uyeIstek(`destek/${encodeURIComponent(acikId)}/mesaj`, { metin }); yanit.reset(); durumYaz(yanit, ''); await talep(acikId); }
+    catch (h) { durumYaz(yanit, h.message, 'hata'); } finally { d.disabled = false; }
+  });
+  $('[data-kapat]').addEventListener('click', async (o) => {
+    if (!confirm('Talep kapatılsın mı? Daha sonra yazarak yeniden açabilirsiniz.')) return;
+    const d = o.currentTarget; d.disabled = true;
+    try { await uyeIstek(`destek/${encodeURIComponent(acikId)}/kapat`, {}); await talep(acikId); }
+    catch (h) { durumYaz(yanit, h.message, 'hata'); } finally { d.disabled = false; }
+  });
+  const ac = () => { const t = new URLSearchParams(location.search).get('t'); return t ? talep(t) : liste(); };
+  addEventListener('popstate', ac);
+  ac();
+</script>
+<style is:global>
+.ds-satir{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;text-decoration:none;color:inherit;border-top:1px solid var(--line)}
+.ds-satir:first-child{border-top:0}
+.ds-satir:hover strong{color:var(--acc)!important}
+.ds-mesaj{display:flex;flex-direction:column;gap:6px;padding:16px 18px;border-radius:16px;background:var(--card);border:1px solid var(--line);max-width:min(720px,92%);align-self:flex-end}
+.ds-mesaj.ekip{align-self:flex-start;background:var(--tint);border-color:transparent}
+</style>
+</UyeCerceve>

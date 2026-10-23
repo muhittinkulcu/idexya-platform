@@ -7,11 +7,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .bl-arac input,.bl-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
   .bl-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .bl-form .genis{grid-column:1/-1}
-  .bl-tablo{width:100%;min-width:760px;border-collapse:collapse;font-size:14px}
+  .bl-tablo{width:100%;min-width:880px;border-collapse:collapse;font-size:14px}
   .bl-tablo th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
   .bl-tablo td{padding:10px 14px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
 </style>
-<div class="uyari bilgi">Dosyalar bu panelde saklanmaz. Belge bulunduğu yerde (ör. Google Drive, OneDrive) kalır; burada yalnızca adı, türü, tarihi ve <b>https://</b> bağlantısı tutulur. Bağlantıyı silmek dosyayı silmez. Drive’da paylaşımı “bağlantıya sahip herkes” yerine yalnız ekibinize açık tutmanız önerilir.</div>
+<div class="uyari bilgi">Dosyalar bu panelde saklanmaz. Belge bulunduğu yerde (ör. Google Drive, OneDrive) kalır; burada yalnızca adı, türü, tarihi ve <b>https://</b> bağlantısı tutulur. Bağlantıyı silmek dosyayı silmez. Drive’da paylaşımı “bağlantıya sahip herkes” yerine yalnız ekibinize açık tutmanız önerilir. “Müşteri alanında paylaş” işaretlenen belge, o müşteriye bağlı üyelere görünür; bu durumda dosyayı Drive’da müşterinin e-postasıyla paylaşın.</div>
 <div class="bl-arac">
   <label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Belge ara</span><input type="search" data-ara placeholder="Ad, açıklama veya müşteri ara…" style="flex: 1"></label>
   <label><span style="position: absolute; left: -10000px">Türe göre süz</span><select data-tur-suz><option value="">Tüm türler</option></select></label>
@@ -71,6 +71,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try { await api(`belgeler/${encodeURIComponent(b.id)}/sil`, {}); genelHata(''); await yukle(); } catch (h) { genelHata('Silinemedi: ' + h.message); dugme.disabled = false; }
   }
 
+  let paylasilan = new Set();
+  async function paylas(b, kutu) {
+    const p = kutu.checked;
+    if (p && !confirm(`“${b.ad}” müşterinin üyelerine açılsın mı? Dosyanın bağlantısı (ör. Drive) müşteriye de açık olmalı.`)) { kutu.checked = false; return; }
+    kutu.disabled = true;
+    try { await api(`belgeler/${encodeURIComponent(b.id)}/paylas`, { paylas: p }); genelHata(''); p ? paylasilan.add(b.id) : paylasilan.delete(b.id); ciz(); }
+    catch (h) { genelHata('Paylaşım değiştirilemedi: ' + h.message); kutu.checked = !p; kutu.disabled = false; }
+  }
   function ciz() {
     const q = kucuk(ara.value.trim()), t = turSuz.value, mu = musSuz.value;
     const gor = tum.filter((b) => (!t || b.tur === t) && (!mu || (mu === '-' ? !b.musteri_id : b.musteri_id === mu))
@@ -79,7 +87,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (!gor.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Süzgeçlerle eşleşen belge yok.')); return; }
     liste.replaceChildren(el('div', { style: 'padding: 10px 14px 0; font-size: 12px; color: var(--tx2)' }, `${gor.length} belge` + (gor.length !== tum.length ? ` (toplam ${tum.length})` : '')),
       el('table', { class: 'bl-tablo' },
-        el('thead', {}, el('tr', {}, ['Belge', 'Tür', 'Müşteri', 'Tarih', 'Ekleyen', ''].map((b) => el('th', { scope: 'col' }, b)))),
+        el('thead', {}, el('tr', {}, ['Belge', 'Tür', 'Müşteri', 'Müşteri alanında', 'Tarih', 'Ekleyen', ''].map((b) => el('th', { scope: 'col' }, b)))),
         el('tbody', {}, gor.map((b) => el('tr', { 'data-belge': b.id },
           el('td', { style: 'max-width: 360px' },
             el('a', { href: b.baglanti, target: '_blank', rel: 'noopener noreferrer', style: 'font-weight: 600; overflow-wrap: anywhere' }, b.ad + ' ↗'),
@@ -87,6 +95,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
             b.aciklama ? el('div', { style: 'font-size: 13px; color: var(--tx2); white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px' }, b.aciklama) : null),
           el('td', {}, el('span', { class: 'cip ' + TUR_SINIF[b.tur], style: b.tur === 'diger' ? 'background: var(--card2); color: var(--tx2)' : '' }, TUR[b.tur] || b.tur)),
           el('td', {}, musteriBag(b) || el('span', { style: 'color: var(--tx2)' }, '—')),
+          el('td', {}, b.musteri_id ? el('label', { style: 'display: inline-flex; gap: 6px; align-items: center; cursor: pointer; white-space: nowrap', title: 'Açıksa müşterinin üyesi bu belgeyi “Teklif ve belgelerim” bölümünde görür' },
+            el('input', { type: 'checkbox', checked: paylasilan.has(b.id), onchange: (o) => paylas(b, o.currentTarget) }), paylasilan.has(b.id) ? 'Paylaşıldı' : 'Paylaş') : el('span', { style: 'color: var(--tx2)' }, '—')),
           el('td', { style: 'white-space: nowrap' }, gun(b.tarih)),
           el('td', { style: 'font-size: 12px; color: var(--tx2)' }, el('div', { style: 'overflow-wrap: anywhere' }, b.ekleyen), el('div', {}, zaman(b.olusturma))),
           el('td', { style: 'white-space: nowrap; text-align: right' },
@@ -95,7 +105,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   }
   [ara, turSuz, musSuz].forEach((e) => e.addEventListener(e === ara ? 'input' : 'change', ciz));
   async function yukle() {
-    try { tum = (await api('belgeler')).belgeler; genelHata(''); ciz(); }
+    try { const [b, p] = await Promise.all([api('belgeler'), api('belge-paylasim')]); tum = b.belgeler; paylasilan = new Set(p.paylasilan); genelHata(''); ciz(); }
     catch (h) { genelHata('Belgeler yüklenemedi: ' + h.message); if (!tum.length) liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); }
   }
   musterileriDoldur([[document.querySelector('[data-musteri]'), 'Müşteri yok'], [musSuz, 'Tüm müşteriler']]).then(() => {

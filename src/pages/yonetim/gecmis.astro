@@ -20,14 +20,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
   function ciz() {
     const g = suz();
     if (!g.length) { liste.replaceChildren(el('div', { class: 'bos' }, tum.length ? 'Bu süzgeçte kayıt yok.' : 'Henüz kayıtlı işlem yok.')); return; }
-    liste.replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+    liste.replaceChildren(...[el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
       el('thead', {}, el('tr', {}, ...['Zaman', 'Kim', 'İşlem', 'Ayrıntı'].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
       el('tbody', {}, ...g.slice(0, 500).map((k) => el('tr', {},
         el('td', { style: hucre + '; white-space: nowrap' }, tarih(k.zaman)),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, k.kim),
         el('td', { style: hucre + '; font-weight: 600' }, ad(k.islem)),
         el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, [k.detay, k.hedef].filter(Boolean).join(' · ') || '—'))))),
-      g.length > 500 ? el('p', { style: 'padding: 10px 14px; color: var(--tx2); font-size: 13px' }, `İlk 500 kayıt gösteriliyor (toplam ${g.length}). Süzgeci daraltın ya da CSV indirin.`) : null);
+      g.length > 500 ? el('p', { style: 'padding: 10px 14px; color: var(--tx2); font-size: 13px' }, `İlk 500 kayıt gösteriliyor (toplam ${g.length}). Süzgeci daraltın ya da CSV indirin.`) : null].filter(Boolean));
   }
   ara.addEventListener('input', ciz); tur.addEventListener('change', ciz);
   document.querySelector('[data-csv]').addEventListener('click', () => {

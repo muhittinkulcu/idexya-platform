@@ -1,0 +1,88 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Destek talepleri" aktif="destek" yol="Üyelik ve erişim" aciklama="Müşteri alanındaki üyelerin açtığı talepler. Uygulama e-posta göndermez; yanıtınız üyenin “Destek talepleri” sayfasında görünür.">
+<div class="ds-izgara">
+<section class="kart" aria-label="Talepler" style="display: flex; flex-direction: column; min-width: 0">
+<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 10px; border-bottom: 1px solid var(--line); flex-wrap: wrap"></div>
+<div data-liste style="display: flex; flex-direction: column"></div>
+</section>
+<section class="kart" data-detay aria-live="polite" style="padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0">
+<div class="bos">Soldan bir talep seçin.</div>
+</section>
+</div>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const liste = document.querySelector('[data-liste]'), sekmeKutu = document.querySelector('[data-sekmeler]'), detay = document.querySelector('[data-detay]');
+  const SEKME = { acik: 'Yanıt bekleyen', yanitlandi: 'Yanıtlanan', kapali: 'Kapanan', hepsi: 'Tümü' };
+  const CIP = { acik: 'yeni', yanitlandi: 'kazanildi', kapali: 'kaybedildi' };
+  let tum = [], durumlar = {}, sekme = new URLSearchParams(location.search).get('sekme') || 'acik', secili = new URLSearchParams(location.search).get('t');
+  if (!SEKME[sekme]) sekme = 'acik';
+
+  function ciz() {
+    sekmeKutu.replaceChildren(...Object.entries(SEKME).map(([k, ad]) => {
+      const n = k === 'hepsi' ? tum.length : tum.filter((x) => x.durum === k).length, s = k === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? '' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; ciz(); } }, `${ad} (${n})`);
+    }));
+    const gor = tum.filter((x) => sekme === 'hepsi' || x.durum === sekme);
+    liste.replaceChildren(...(gor.length ? gor.map((t) => el('button', { type: 'button', class: 'ds-satir' + (t.id === secili ? ' secili' : ''), onclick: () => ac(t.id) },
+      el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('b', { style: 'overflow-wrap: anywhere' }, t.konu), el('span', { class: 'cip ' + (CIP[t.durum] || 'yeni') }, durumlar[t.durum] || t.durum)),
+      el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${t.no} · ${t.musteri_firma || t.musteri_ad || t.uye_firma || t.uye_ad || t.uye_eposta || 'Üye'} · ${t.mesaj_sayisi} mesaj · ${tarih(t.guncelleme)}`)))
+      : [el('div', { class: 'bos' }, tum.length ? 'Bu sekmede talep yok.' : 'Henüz destek talebi yok. Üyelere “Destek talepleri” modülünü Üyeler ve yetkiler sayfasından açabilirsiniz.')]));
+  }
+
+  async function ac(id) {
+    secili = id; ciz();
+    const u = new URL(location.href); u.searchParams.set('t', id); history.replaceState(null, '', u);
+    try {
+      const s = await api('destek/' + encodeURIComponent(id)); genelHata('');
+      const t = s.talep, uye = s.uye || {};
+      const metin = el('textarea', { rows: '5', maxlength: '4000', required: true, placeholder: 'Yanıtınız üyeye görünür.', style: 'width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit; resize: vertical' });
+      const gonder = async (kapat, d) => {
+        if (!metin.value.trim()) { metin.focus(); return; }
+        d.disabled = true;
+        try { await api(`destek/${encodeURIComponent(t.id)}/yanit`, { metin: metin.value, kapat }); await yukle(); await ac(t.id); }
+        catch (h) { genelHata('Yanıt gönderilemedi: ' + h.message); d.disabled = false; }
+      };
+      const durumDegis = async (yeni, d) => {
+        d.disabled = true;
+        try { await api(`destek/${encodeURIComponent(t.id)}/durum`, { durum: yeni }); await yukle(); await ac(t.id); }
+        catch (h) { genelHata('Durum değiştirilemedi: ' + h.message); d.disabled = false; }
+      };
+      detay.replaceChildren(
+        el('div', { style: 'display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start' },
+          el('div', { style: 'display: flex; flex-direction: column; gap: 4px; min-width: 0' },
+            el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${t.no} · açıldı ${tarih(t.olusturma)}`),
+            el('h2', { style: 'margin: 0; font-size: 20px; overflow-wrap: anywhere' }, t.konu),
+            el('span', { style: 'font-size: 13px; color: var(--tx2); overflow-wrap: anywhere' }, [uye.ad, uye.firma, uye.eposta].filter(Boolean).join(' · ')),
+            t.musteri_id ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id), style: 'font-size: 13px' }, 'CRM kaydını aç') : el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Üye bir CRM müşterisine bağlı değil')),
+          el('span', { class: 'cip ' + (CIP[t.durum] || 'yeni') }, s.durumlar[t.durum] || t.durum)),
+        el('ol', { style: 'list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px' },
+          ...s.mesajlar.map((m) => el('li', { class: 'ds-mesaj' + (m.yazan === 'ekip' ? ' ekip' : '') },
+            el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${m.yazan === 'ekip' ? 'Idexya ekibi' : m.ad || 'Üye'} · ${tarih(m.zaman)}`),
+            el('div', { style: 'white-space: pre-wrap; overflow-wrap: anywhere' }, m.metin)))),
+        el('label', { style: 'display: flex; flex-direction: column; gap: 6px; font-weight: 600' }, 'Yanıt', metin),
+        el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' },
+          el('button', { type: 'button', class: 'dugme ana', onclick: (o) => gonder(false, o.currentTarget) }, 'Yanıtla'),
+          el('button', { type: 'button', class: 'dugme', onclick: (o) => gonder(true, o.currentTarget) }, 'Yanıtla ve kapat'),
+          t.durum === 'kapali' ? el('button', { type: 'button', class: 'dugme', onclick: (o) => durumDegis('acik', o.currentTarget) }, 'Yeniden aç')
+            : el('button', { type: 'button', class: 'dugme', onclick: (o) => durumDegis('kapali', o.currentTarget) }, 'Yanıtsız kapat')));
+    } catch (h) { detay.replaceChildren(el('div', { class: 'uyari hata' }, 'Talep açılamadı: ' + h.message)); }
+  }
+
+  async function yukle() {
+    try { const s = await api('destek'); tum = s.talepler; durumlar = s.durumlar; genelHata(''); ciz(); }
+    catch (h) { genelHata('Talepler yüklenemedi: ' + h.message); }
+  }
+  yukle().then(() => { if (secili) ac(secili); });
+</script>
+<style is:global>
+.ds-izgara{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.ds-izgara{grid-template-columns:1fr}}
+.ds-satir{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--tx);font:inherit;cursor:pointer}
+.ds-satir:hover{background:var(--card2)}
+.ds-satir.secili{background:var(--tint)}
+.ds-mesaj{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card2);max-width:92%}
+.ds-mesaj.ekip{align-self:flex-end;background:var(--tint);border-color:transparent}
+</style>
+</Yonetim>

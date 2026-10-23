@@ -65,6 +65,7 @@ export function sayacGuncelle(ozet) {
   yaz('talep', ozet ? say(ozet.talepler, 'yeni') : null);
   yaz('uye', ozet ? say(ozet.uyeler, 'bekliyor') : null);
   yaz('yorum', ozet && ozet.bekleyenYorum !== undefined ? ozet.bekleyenYorum : null);
+  yaz('destek', ozet && ozet.bekleyenDestek !== undefined ? ozet.bekleyenDestek : null);
 }
 
 const TERCIH_ANAHTAR = 'idx-panel';
