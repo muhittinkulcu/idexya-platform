@@ -1,0 +1,118 @@
+{
+  "ust": [
+    {
+      "k": "hizmetler",
+      "ad": "Hizmetler",
+      "href": "/tr/hizmetler",
+      "ust": true,
+      "alt": "27 hizmet, beş alan"
+    },
+    {
+      "k": "paketler",
+      "ad": "Paketler",
+      "href": "/tr/paketler",
+      "ust": true,
+      "alt": "Sihirbazla paketinizi seçin"
+    },
+    {
+      "k": "idos",
+      "ad": "IDOS",
+      "href": "/tr/idos",
+      "ust": true,
+      "alt": "Ajans operasyon panelimiz"
+    },
+    {
+      "k": "blog",
+      "ad": "Blog",
+      "href": "/tr/haberler",
+      "ust": true,
+      "alt": "Reklam, e-ticaret ve ölçüm"
+    },
+    {
+      "k": "hakkimizda",
+      "ad": "Hakkımızda",
+      "href": "/tr/sayfa/hakkimizda",
+      "ust": false,
+      "alt": "Kim olduğumuz"
+    },
+    {
+      "k": "iletisim",
+      "ad": "İletişim",
+      "href": "/tr/iletisim",
+      "ust": true,
+      "alt": "Ücretsiz analiz isteyin"
+    }
+  ],
+  "alt": [
+    {
+      "baslik": "Kurumsal",
+      "baglantilar": [
+        {
+          "ad": "Hakkımızda",
+          "href": "/tr/sayfa/hakkimizda"
+        },
+        {
+          "ad": "Blog",
+          "href": "/tr/haberler"
+        },
+        {
+          "ad": "İletişim",
+          "href": "/tr/iletisim"
+        }
+      ]
+    },
+    {
+      "baslik": "Hizmetler",
+      "baglantilar": [
+        {
+          "ad": "E-ticaret",
+          "href": "/tr/hizmetler#e-ticaret"
+        },
+        {
+          "ad": "Dijital reklam",
+          "href": "/tr/hizmetler#dijital-reklam"
+        },
+        {
+          "ad": "SEO",
+          "href": "/tr/hizmetler#seo"
+        },
+        {
+          "ad": "Web ve yazılım",
+          "href": "/tr/hizmetler#web-yazilim"
+        }
+      ]
+    },
+    {
+      "baslik": "Yasal",
+      "baglantilar": [
+        {
+          "ad": "KVKK aydınlatma metni",
+          "href": "/tr/sayfa/kvkk-aydinlatma-metni"
+        },
+        {
+          "ad": "Çerez politikası",
+          "href": "/tr/sayfa/cerez-politikasi"
+        },
+        {
+          "ad": "Gizlilik politikası",
+          "href": "/tr/sayfa/gizlilik-politikasi"
+        }
+      ]
+    }
+  ],
+  "sosyal": [
+    {
+      "ad": "Instagram",
+      "href": "https://www.instagram.com/idexya.goodthings"
+    },
+    {
+      "ad": "Facebook",
+      "href": "https://www.facebook.com/idexya.ads"
+    },
+    {
+      "ad": "X",
+      "href": "https://twitter.com/idexya_ads"
+    }
+  ],
+  "tanitim": "360° dijital performans ajansı. Reklam, e-ticaret, SEO ve yazılım tek ekipte."
+}

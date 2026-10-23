@@ -45,11 +45,13 @@ const MENU = [
   ] },
   { grup: 'İÇERİK', ogeler: [
     { k: 'icerikler', ad: 'İçerik yönetimi', href: '/yonetim/icerikler/', i: 'icerik', sayac: 'yorum', altlar: [
-      { ad: 'Yazılar ve kaynaklar', href: '/yonetim/icerikler/' }, { ad: 'Sayfalar' }, { ad: 'Hizmetler' }, { ad: 'Ürünler' },
-      { ad: 'Kategoriler' }, { ad: 'Paketler' }, { ad: 'Referanslar' }] },
+      { ad: 'Yazılar ve kaynaklar', href: '/yonetim/icerikler/' }, { ad: 'Sayfalar', href: '/yonetim/site-icerik/?dosya=yasal' },
+      { ad: 'Hizmetler', href: '/yonetim/site-icerik/?dosya=hizmetler' }, { ad: 'Ürünler', href: '/yonetim/site-icerik/?dosya=urunler#urunler' },
+      { ad: 'Kategoriler', href: '/yonetim/site-icerik/?dosya=urunler#kategoriler' }, { ad: 'Paketler', href: '/yonetim/site-icerik/?dosya=paketler' },
+      { ad: 'Referanslar', href: '/yonetim/site-icerik/?dosya=referanslar' }] },
     { k: 'instagram', ad: 'Instagram gönderileri', href: '/yonetim/instagram/', i: 'medya' },
     { k: 'medya', ad: 'Medya kütüphanesi', href: '/yonetim/medya/', i: 'medya' },
-    { k: 'menuler', ad: 'Menüler ve SSS', i: 'belge' }
+    { k: 'menuler', ad: 'Menüler ve SSS', href: '/yonetim/site-icerik/?dosya=site-menu', i: 'belge', altlar: [{ ad: 'Menüler', href: '/yonetim/site-icerik/?dosya=site-menu' }, { ad: 'Sık sorulan sorular', href: '/yonetim/site-icerik/?dosya=sss' }] }
   ] },
   { grup: 'ÜYELİK', ogeler: [
     { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/yonetim/uyeler/', i: 'uye', sayac: 'uye' },

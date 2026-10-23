@@ -1,20 +1,12 @@
 ---
 // Ana sayfa: son blog yazıları, Instagram kartı ve sık sorulan sorular (FAQPage yapılandırılmış verisiyle).
-// Cevaplar yalnızca Muhittin'in doğruladığı bilgilere dayanır (hesap sahipliği, 1 iş günü, en az 3 ay, IDOS).
+// SSS metinleri src/data/sss.json'dan gelir (panelde Menüler ve SSS'ten düzenlenir).
 import Baslik from './Baslik.astro';
 import Bulten from './Bulten.astro';
 import InstagramAkis from '../InstagramAkis.astro';
 import yazilar from '../../data/yazilar.json';
-const SSS = [
-  ['Ücretsiz analizde neye bakıyorsunuz?', 'Reklam hesaplarınızı, ölçüm altyapınızı (GA4, etiketler, dönüşümler) ve sitenizi inceleriz. Nereden başlamanız gerektiğini gerekçesiyle anlatırız. Formu gönderdikten sonra 1 iş günü içinde dönüş yaparız.'],
-  ['Reklam hesabı kime ait olur?', 'Hesap sizin adınıza açılır ve size aittir. Biz yönetici olarak erişiriz; çalışma bittiğinde erişimimiz kaldırılır, hesap ve tüm geçmiş veriler sizde kalır.'],
-  ['En az ne kadar süre çalışmamız gerekiyor?', 'Reklam ve SEO çalışmalarının öğrenme ve ölçüm dönemi olduğu için en az 3 ay ile başlamayı öneriyoruz; süre ihtiyacınıza göre görüşülebilir.'],
-  ['Sadece tek bir hizmet alabilir miyim?', 'Evet. Örneğin yalnızca Google Ads ya da yalnızca pazaryeri yönetimi ile başlayabilirsiniz. İhtiyaç oldukça diğer alanlar aynı ekip tarafından eklenebilir.'],
-  ['Sonuçları nasıl takip ederim?', 'Reklam ve analiz verileriniz kendi geliştirdiğimiz IDOS panelinde bir arada görünür. Satış, form, arama ve mesaj gibi sonuçlar ayrı ayrı izlenir.'],
-  ['Bütçe veya kampanya değişikliklerini kim onaylıyor?', 'Siz. Bütçe, teklif stratejisi ve kampanya açma-kapatma gibi kararlar size gerekçesiyle sunulur ve onayınızla uygulanır.'],
-  ['SEO çalışmasının sonuçları ne zaman görülür?', 'Teknik düzeltmelerin etkisi birkaç hafta içinde görülebilir; içerik ve otorite çalışmaları genellikle aylar sürer. Süre sektöre, rekabete ve sitenin mevcut durumuna bağlıdır, bu yüzden sıralama garantisi vermeyiz.'],
-  ['GEO nedir, SEO’dan farkı ne?', 'GEO (üretken arama optimizasyonu), sitenizin Google’ın yapay zekâ özetlerinde ve ChatGPT gibi asistanların cevaplarında kaynak gösterilmesini hedefler. SEO’nun üzerine kurulur: net cevap veren, güvenilir ve kaynak gösterilebilir içerik gerektirir.']
-];
+import sss from '../../data/sss.json';
+const SSS = sss.map((x) => [x.soru, x.cevap]);
 const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: SSS.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) };
 const son = yazilar.slice(0, 3);
 ---

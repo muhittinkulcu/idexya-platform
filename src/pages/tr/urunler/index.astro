@@ -1,0 +1,55 @@
+---
+// Ürün kataloğu (src/data/urunler.json; panelde İçerik yönetimi › Ürünler ve Kategoriler). Ürün yoksa sayfa aramaya kapalıdır.
+import Site from '../../../layouts/Site.astro';
+import CagriKutusu from '../../../components/CagriKutusu.astro';
+import veri from '../../../data/urunler.json';
+const urunler = veri.urunler.filter((u) => u.aktif !== false);
+const kategoriler = veri.kategoriler.filter((k) => urunler.some((u) => u.kategori === k.id));
+const kategorisiz = urunler.filter((u) => !veri.kategoriler.some((k) => k.id === u.kategori));
+const gruplar = [...kategoriler.map((k) => ({ ...k, urunler: urunler.filter((u) => u.kategori === k.id) })), ...(kategorisiz.length ? [{ id: 'diger', ad: 'Diğer ürünler', aciklama: '', urunler: kategorisiz }] : [])];
+---
+<Site baslik="Ürünler" aciklama="Idexya ürün kataloğu." aktif="Ürünler" aramayaKapali={urunler.length === 0}>
+<section class="ur-ust">
+  <div class="ur-ic">
+    <nav aria-label="Sayfa yolu" class="ur-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page">Ürünler</span></nav>
+    <h1>Ürünler</h1>
+    {gruplar.length > 1 && <nav aria-label="Kategoriler" class="ur-kat">{gruplar.map((g) => <a href={`#${g.id}`}>{g.ad}</a>)}</nav>}
+  </div>
+</section>
+{urunler.length === 0 && <section class="ur-ic ur-bos"><p>Ürün kataloğumuz hazırlanıyor. Bu arada <a href="/tr/paketler/">paketlerimize</a> göz atabilirsiniz.</p></section>}
+{gruplar.map((g) => (
+  <section id={g.id} class="ur-bolum">
+    <div class="ur-ic">
+      <h2>{g.ad}</h2>
+      {g.aciklama && <p class="ur-kat-acik">{g.aciklama}</p>}
+      <ul class="ur-liste">
+        {g.urunler.map((u) => (
+          <li><a href={`/tr/urunler/${u.slug}/`}>
+            <span class="ur-gorsel">{u.gorsel ? <img src={u.gorsel} alt="" loading="lazy" /> : <span aria-hidden="true">{u.ad.slice(0, 1)}</span>}</span>
+            <b>{u.ad}</b>{u.ozet && <span>{u.ozet}</span>}{u.fiyat && <strong>{u.fiyat}</strong>}
+          </a></li>
+        ))}
+      </ul>
+    </div>
+  </section>
+))}
+<CagriKutusu />
+</Site>
+<style>
+  .ur-ic{max-width:var(--kap);margin:0 auto;padding-left:var(--kenar);padding-right:var(--kenar);box-sizing:border-box}
+  .ur-ust{padding:36px 0 40px;border-bottom:1px solid var(--line)}
+  .ur-ust .ur-ic{display:flex;flex-direction:column;gap:18px}
+  .ur-yol{font-size:14px;color:var(--tx2);display:flex;gap:8px}.ur-yol a{color:var(--tx2);text-decoration:none}
+  h1{margin:0;font-size:clamp(36px,6vw,56px);letter-spacing:-.03em;color:var(--head)}
+  .ur-kat{display:flex;flex-wrap:wrap;gap:8px}.ur-kat a{padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--card);text-decoration:none;font-weight:600;color:var(--head)}
+  .ur-bos{padding-top:48px;padding-bottom:48px;font-size:18px}
+  .ur-bolum{padding:56px 0}
+  .ur-bolum h2{margin:0 0 8px;font-size:32px;color:var(--head)}
+  .ur-kat-acik{margin:0 0 20px;color:var(--tx2);max-width:70ch;text-align:left}
+  .ur-liste{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+  .ur-liste a{height:100%;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:18px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--tx);transition:transform .2s,box-shadow .2s}
+  .ur-liste a:hover{transform:translateY(-3px);box-shadow:0 18px 40px var(--shadow)}
+  .ur-gorsel{aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--bg2);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:var(--acc)}
+  .ur-gorsel img{width:100%;height:100%;object-fit:cover}
+  .ur-liste b{font-size:17px;color:var(--head)}.ur-liste span{color:var(--tx2);font-size:14.5px}.ur-liste strong{color:var(--acc);margin-top:auto}
+</style>

@@ -1,0 +1,55 @@
+---
+// Ürün sayfası (src/data/urunler.json). Fiyat serbest metindir ("Teklif alın" gibi); sayısal fiyat yapılandırılmış veriye eklenmez.
+import Site from '../../../layouts/Site.astro';
+import CagriKutusu from '../../../components/CagriKutusu.astro';
+import veri from '../../../data/urunler.json';
+export function getStaticPaths() {
+  return veri.urunler.filter((u) => u.aktif !== false).map((u) => ({ params: { slug: u.slug }, props: { u } }));
+}
+const { u } = Astro.props;
+const kat = veri.kategoriler.find((k) => k.id === u.kategori);
+const benzer = veri.urunler.filter((x) => x.aktif !== false && x.slug !== u.slug && x.kategori === u.kategori).slice(0, 4);
+const paragraflar = String(u.aciklama || '').split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean);
+const site = Astro.site ? Astro.site.toString().replace(/\/$/, '') : 'https://idexya.com';
+const ld = { '@context': 'https://schema.org', '@type': 'Product', name: u.ad, description: u.ozet || paragraflar[0] || u.ad, category: kat ? kat.ad : undefined, image: u.gorsel ? (u.gorsel.startsWith('http') ? u.gorsel : site + u.gorsel) : undefined, brand: { '@type': 'Brand', name: 'Idexya' } };
+---
+<Site baslik={u.ad} aciklama={u.ozet || u.ad} aktif="Ürünler">
+<section class="ud">
+  <div class="ud-ic">
+    <nav aria-label="Sayfa yolu" class="ud-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/urunler/">Ürünler</a>{kat && <><span aria-hidden="true">›</span><a href={`/tr/urunler/#${kat.id}`}>{kat.ad}</a></>}</nav>
+    <div class="ud-izgara">
+      <div class="ud-gorsel">{u.gorsel ? <img src={u.gorsel} alt={u.ad} /> : <span aria-hidden="true">{u.ad.slice(0, 1)}</span>}</div>
+      <div class="ud-metin">
+        {kat && <span class="ud-kat">{kat.ad}</span>}
+        <h1>{u.ad}</h1>
+        {u.ozet && <p class="ud-ozet">{u.ozet}</p>}
+        {u.fiyat && <p class="ud-fiyat">{u.fiyat}</p>}
+        <a class="ud-cta" href={`/tr/iletisim/?konu=${encodeURIComponent('Ürün: ' + u.ad)}#form`}>Teklif iste</a>
+        {(u.ozellikler || []).length > 0 && <ul class="ud-oz">{u.ozellikler.map((o) => <li>{o}</li>)}</ul>}
+      </div>
+    </div>
+    {paragraflar.length > 0 && <div class="ud-aciklama">{paragraflar.map((p) => <p>{p}</p>)}</div>}
+    {benzer.length > 0 && <div class="ud-benzer"><h2>Benzer ürünler</h2><ul>{benzer.map((x) => <li><a href={`/tr/urunler/${x.slug}/`}>{x.ad} →</a></li>)}</ul></div>}
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(ld)}></script>
+</section>
+<CagriKutusu />
+</Site>
+<style>
+  .ud-ic{max-width:var(--kap);margin:0 auto;padding:36px var(--kenar) 64px;box-sizing:border-box;display:flex;flex-direction:column;gap:32px}
+  .ud-yol{font-size:14px;color:var(--tx2);display:flex;gap:8px;flex-wrap:wrap}.ud-yol a{color:var(--tx2);text-decoration:none}
+  .ud-izgara{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+  .ud-gorsel{aspect-ratio:1;border-radius:24px;overflow:hidden;background:var(--bg2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:80px;font-weight:700;color:var(--acc)}
+  .ud-gorsel img{width:100%;height:100%;object-fit:cover}
+  .ud-metin{display:flex;flex-direction:column;gap:16px;align-items:flex-start}
+  .ud-kat{padding:4px 12px;border-radius:999px;background:var(--tint);color:var(--tintx);font-weight:700;font-size:13px}
+  h1{margin:0;font-size:clamp(32px,5vw,48px);letter-spacing:-.02em;color:var(--head)}
+  .ud-ozet{margin:0;font-size:19px;color:var(--tx2);text-align:left}
+  .ud-fiyat{margin:0;font-size:24px;font-weight:700;color:var(--acc)}
+  .ud-cta{min-height:52px;display:inline-flex;align-items:center;padding:0 26px;border-radius:12px;background:var(--fill);color:#FFFFFF;text-decoration:none;font-weight:700}
+  .ud-oz{margin:0;padding:0 0 0 20px;display:flex;flex-direction:column;gap:6px}
+  .ud-aciklama{max-width:75ch;font-size:17px;line-height:1.7}.ud-aciklama p{text-align:left}
+  .ud-benzer h2{font-size:24px;color:var(--head)}.ud-benzer ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:10px}
+  .ud-benzer a{display:block;padding:12px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);text-decoration:none;font-weight:600}
+  @media (max-width:860px){.ud-izgara{grid-template-columns:1fr}.ud-gorsel{max-width:480px}}
+</style>

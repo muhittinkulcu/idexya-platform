@@ -1,5 +1,6 @@
 ---
 import Site from '../../../layouts/Site.astro';
+import yasal from '../../../data/yasal.json';
 // Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
 class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
 class Component extends DCLogic {
@@ -11,38 +12,11 @@ class Component extends DCLogic {
     const self = this;
     const koyu = this.state.koyu === null ? (this.props.koyu ?? false) : this.state.koyu;
     const VS = 'Muhittin Külcü (Idexya | Good Things)';
-    const M = {
-      kvkk: { ad: 'KVKK aydınlatma metni', bolumler: [
-        ['Veri sorumlusu', ['6698 sayılı Kişisel Verilerin Korunması Kanunu (“Kanun”) uyarınca kişisel verileriniz veri sorumlusu sıfatıyla ' + VS + ' tarafından işlenmektedir. İletişim: info@idexya.com · Ankara.']],
-        ['İşlenen kişisel veriler', ['Kimlik (ad, soyad), iletişim (e-posta, telefon), müşteri işlem (firma, talep, teklif, sözleşme ve fatura bilgileri), pazarlama (ileti izni ve tercihleri), işlem güvenliği (IP adresi, oturum ve giriş kayıtları) ve müşteri adına yönetilen reklam ve analitik hesaplarına ait veriler.']],
-        ['İşleme amaçları', ['Talebinize yanıt vermek ve teklif hazırlamak; sözleşmenin kurulması ve ifası; faturalama ve tahsilat; hizmet kalitesinin ölçülmesi; bilgi güvenliğinin sağlanması; izniniz varsa ticari ileti gönderilmesi; yasal yükümlülüklerin yerine getirilmesi.']],
-        ['Hukuki sebepler', ['Kanun’un 5. maddesindeki sebepler: sözleşmenin kurulması veya ifası, hukuki yükümlülük, meşru menfaat ve bir hakkın tesisi. Ticari ileti, analitik ve pazarlama çerezleri yalnız açık rızanıza dayanır; rızanızı istediğiniz zaman geri alabilirsiniz.']],
-        ['Aktarım', ['Kişisel verileriniz hizmetin sağlanması için gerekli ölçüde barındırma, e-posta, ödeme ve muhasebe hizmeti aldığımız tedarikçilere, yetkili kamu kurumlarına ve hukuken zorunlu hâllerde ilgili kişilere aktarılabilir.', 'Kullandığımız bazı hizmet sağlayıcıların sunucuları yurt dışındadır (ör. Google, Meta, Cloudflare). Yurt dışına aktarım Kanun’un 9. maddesindeki şartlara uygun yapılır.']],
-        ['Saklama süresi', ['Veriler işleme amacının gerektirdiği süre ve ilgili mevzuattaki süreler boyunca saklanır, süre sonunda silinir, yok edilir veya anonim hâle getirilir.', 'Saklama süreleri: müşteriye dönüşmeyen talepler 2 yıl; müşteri, sözleşme ve fatura kayıtları 10 yıl; ticari elektronik ileti onay kayıtları onayın geri alınmasından itibaren 3 yıl; site erişim (IP) kayıtları 2 yıl; yapay zekâ asistanı sohbet kayıtları 1 yıl.']],
-        ['Haklarınız', ['Kanun’un 11. maddesi uyarınca verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini veya silinmesini isteme, aktarıldığı üçüncü kişileri bilme, itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz.', 'Başvurularınızı info@idexya.com adresine iletebilirsiniz; başvurunuz en geç 30 gün içinde yanıtlanır.']]
-      ] },
-      cerez: { ad: 'Çerez politikası', bolumler: [
-        ['Çerez nedir?', ['Çerezler, siteyi ziyaret ettiğinizde tarayıcınıza kaydedilen küçük dosyalardır. Sitenin çalışması, ziyaretlerin ölçülmesi ve reklamların ilgili kişilere gösterilmesi için kullanılır.']],
-        ['Kullandığımız çerez türleri', ['Zorunlu çerezler sitenin çalışması için gereklidir ve kapatılamaz. Analitik ve pazarlama çerezleri yalnız onay verirseniz çalışır; onay vermezseniz Google ve Meta araçları çerez bırakmaz.']],
-        ['Onay ve tercih yönetimi', ['İlk ziyaretinizde çıkan pencereden tümünü kabul edebilir, reddedebilir veya türlere göre seçebilirsiniz. Tercihiniz 6 ay hatırlanır; sayfanın altındaki bağlantıdan istediğiniz zaman değiştirebilirsiniz.']]
-      ] },
-      gizlilik: { ad: 'Gizlilik politikası', bolumler: [
-        ['Kapsam', ['Bu politika idexya.com, IDOS paneli ve müşteri teklif sayfaları için geçerlidir.']],
-        ['Müşteri reklam hesapları', ['Müşterilerimiz adına yönettiğimiz reklam ve analitik hesaplarındaki veriler yalnız hizmetin sunulması ve raporlanması için kullanılır, başka bir müşteriyle paylaşılmaz ve sözleşme sona erdiğinde erişimimiz kaldırılır.']],
-        ['Güvenlik', ['Veriler şifreli bağlantı üzerinden taşınır; panel erişimi iki adımlı doğrulama ve rol bazlı yetkiyle sınırlıdır. Erişim ve dışa aktarma işlemleri kayıt altındadır.']],
-        ['İletişim', ['Gizlilikle ilgili sorularınız için: info@idexya.com']]
-      ] }
-    };
+    const M = Object.fromEntries(['kvkk', 'cerez', 'gizlilik'].map((k) => [k, { ad: yasal[k].ad, bolumler: yasal[k].bolumler.map((b) => [b.baslik, b.metin]) }]));
     const sk = this.state.sekme; const x = M[sk];
     const sekmeler = Object.keys(M).map(function (k) { const s = k === sk; return { ad: M[k].ad, secili: s, sec: function () { self.setState({ sekme: k }); },
       stil: 'min-height: 44px; padding: 0 16px; border-radius: 999px; font: inherit; font-size: 15px; font-weight: 600; cursor: pointer; ' + (s ? 'border: 1px solid var(--head); background: var(--head); color: var(--bg)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') }; });
-    const cerezler = [
-      ['cerez_onay', 'idexya.com', 'Zorunlu', 'Çerez tercihinizi hatırlar', '6 ay'],
-      ['__cf_bm', 'Cloudflare', 'Zorunlu', 'Bot koruması', '30 dakika'],
-      ['_ga, _ga_*', 'Google Analytics', 'Analitik', 'Ziyaretleri ölçer', '2 yıl'],
-      ['_gcl_au', 'Google Ads', 'Pazarlama', 'Reklam dönüşümlerini ölçer', '90 gün'],
-      ['_fbp', 'Meta', 'Pazarlama', 'Reklam dönüşümlerini ölçer', '90 gün']
-    ].map(function (c) { return { ad: c[0], saglayici: c[1], tur: c[2], amac: c[3], sure: c[4] }; });
+    const cerezler = yasal.cerezler.map((c) => [c.ad, c.saglayici, c.tur, c.amac, c.sure]).map(function (c) { return { ad: c[0], saglayici: c[1], tur: c[2], amac: c[3], sure: c[4] }; });
     return {
       temaSinifi: koyu ? 'koyu' : 'acik',
       temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',

@@ -10,6 +10,7 @@ import { saklamaUygula } from './saklama.js';
 import { bultenApi, yonetimBultenApi } from './bulten.js';
 import { instagramApi, yonetimInstagramApi } from './instagram.js';
 import { medyaApi, yonetimSistemApi } from './sistem.js';
+import { yonetimYayinApi } from './yayin.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -224,7 +225,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim));
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }

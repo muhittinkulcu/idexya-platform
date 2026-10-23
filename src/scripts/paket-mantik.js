@@ -1,3 +1,4 @@
+import PAKETLER from '../data/paketler.json';
 // Üretilen dosya: tools/veri.mjs (kaynak design/Paketler.dc.html). Elle düzenlenmez.
 export default function olustur(DCLogic) {
 
@@ -7,45 +8,7 @@ class Component extends DCLogic {
     this.state = { koyu: null, filtre: 'tumu', secili: null, adim: 0, cevap: {} };
   }
   katalog() {
-    return [
-      { id: 'google-ads', tur: 'reklam', turEtiket: 'REKLAM · TEK KANAL', ad: 'Google Ads yönetimi', ozet: 'Google aramalarında, alışverişte ve YouTube’da satışa odaklı reklam.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
-        { ad: 'Başlangıç', kimIcin: 'Tek kampanya türüyle başlayanlar için.', maddeler: ['Hesap denetimi ve kurulum', 'Arama ağı kampanyaları', 'Anahtar ve negatif kelime yönetimi', 'GA4 ve Tag Manager dönüşüm kontrolü', 'Aylık rapor'] },
-        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Satışını ölçerek büyütmek isteyenler için.', maddeler: ['Başlangıç kapsamı', 'Alışveriş ve Performance Max', 'Yeniden pazarlama', 'Haftalık optimizasyon', 'Aylık rapor ve görüşme'] },
-        { ad: 'Kurumsal', kimIcin: 'Çoklu ürün, marka veya pazar için.', maddeler: ['Büyüme kapsamı', 'Görüntülü reklam ve YouTube', 'Rakip analizi', 'Çoklu hesap ve ülke yapısı', 'Aylık strateji toplantısı'] } ] },
-      { id: 'meta-ads', tur: 'reklam', turEtiket: 'REKLAM · TEK KANAL', ad: 'Meta Ads yönetimi', ozet: 'Facebook ve Instagram reklamlarıyla doğru kitleye ulaşın.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
-        { ad: 'Başlangıç', kimIcin: 'Mesaj, form veya trafik hedefiyle başlayanlar için.', maddeler: ['Business Manager ve piksel kurulumu', 'Hedef kitle yapısı', 'Ayda 4 reklam kreatifi', 'Aylık rapor'] },
-        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Satışa ve yeniden pazarlamaya odaklananlar için.', maddeler: ['Başlangıç kapsamı', 'Dönüşüm API (CAPI) kurulumu', 'Satış hunisi ve yeniden pazarlama', 'Ayda 8 reklam kreatifi ve A/B testi', 'Aylık rapor ve görüşme'] },
-        { ad: 'Kurumsal', kimIcin: 'Geniş ürün kataloğu olan markalar için.', maddeler: ['Büyüme kapsamı', 'Katalog ve dinamik reklamlar', 'Advantage+ kampanyaları', 'Ayda 16 reklam kreatifi', 'Aylık strateji toplantısı'] } ] },
-      { id: 'birlesik', tur: 'birlesik', turEtiket: 'BİRLEŞİK PAKETLER', ad: 'Birden fazla hizmet, tek plan', ozet: 'Kanallar birlikte çalışır: tek bütçe planı, tek rapor, tek ekip.', ucretNotu: 'Aylık · tek tek almaktan daha avantajlı', birlesik: true, kademeler: [
-        { ad: 'Reklam ikilisi', rozet: 'En çok önerilen', kimIcin: 'Google + Meta Ads', maddeler: ['İki kanalın Büyüme kapsamı', 'Tek bütçe planı', 'Kanallar arası sonuç karşılaştırması', 'Tüm kanallar tek panelde (IDOS)'] },
-        { ad: 'E-ticaret büyüme seti', kimIcin: 'E-ticaret yönetimi + Google + Meta', maddeler: ['Mağaza yönetimi Büyüme kapsamı', 'Google ve Meta reklamları', 'Ürün ve kampanya takvimi', 'Satış odaklı aylık rapor'] },
-        { ad: 'Pazaryeri satış seti', kimIcin: 'Pazaryeri yönetimi + pazaryeri reklamları', maddeler: ['2–3 pazaryerinde yönetim', 'Pazaryeri içi reklam yönetimi', 'Fiyat ve stok takibi', 'Haftalık rapor'] },
-        { ad: 'Dijital başlangıç seti', kimIcin: 'Kurumsal web sitesi + Google Ads + sosyal medya', maddeler: ['Kurumsal web sitesi kurulumu', 'Google Ads Başlangıç', 'Sosyal medya Başlangıç', 'İlk 3 ay yakın takip'] } ] },
-      { id: 'kurumsal-site', tur: 'web', turEtiket: 'WEB SİTESİ', ad: 'Kurumsal web sitesi', ozet: 'Hızlı, mobil uyumlu ve Google dostu kurumsal site. Kurulum tek seferlik, bakım isteğe bağlı aylık.', ucretNotu: 'Kurulum tek seferlik', kademeler: [
-        { ad: 'Tanıtım', kimIcin: 'Küçük işletmeler ve tek hizmet sunanlar için.', maddeler: ['5 sayfaya kadar', 'Mobil uyumlu tasarım', 'İletişim formu ve WhatsApp', 'Temel SEO ayarları', 'İlk yıl alan adı ve barındırma'] },
-        { ad: 'Kurumsal', rozet: 'Önerilen', kimIcin: 'Çok hizmetli firmalar için.', maddeler: ['15 sayfaya kadar', 'Blog ve referans bölümü', 'Kendi içerik yönetim paneli', 'GA4 ve Tag Manager kurulumu', 'Teslim sonrası 1 ay destek'] },
-        { ad: 'Çok dilli', kimIcin: 'Yurt dışına açılan firmalar için.', maddeler: ['Kurumsal kapsamı', 'İki veya daha fazla dil', 'Dile göre SEO yapısı', 'Özel modüller (bayi, kariyer vb.)', 'Aylık bakım seçeneği'] } ] },
-      { id: 'eticaret-site', tur: 'eticaret', turEtiket: 'E-TİCARET · KURULUM', ad: 'E-ticaret sitesi kurulumu (ikas)', ozet: 'ikas altyapısıyla satışa hazır mağaza. Platform lisansı ayrıca ikas’a ödenir.', ucretNotu: 'Kurulum tek seferlik', kademeler: [
-        { ad: 'Grow', kimIcin: 'E-ticarete başlangıç paketi.', maddeler: ['Tema kurulumu ve marka uyarlaması', '[X] ürün yükleme', 'Ödeme ve kargo ayarları', 'Temel SEO ayarları'] },
-        { ad: 'Scale', rozet: 'En çok tercih edilen', kimIcin: 'Büyüyen mağazalar için.', maddeler: ['Grow kapsamı', '[X] ürün yükleme', 'Banner tasarımları', 'E-posta otomasyonları', 'Pazaryeri entegrasyonu'] },
-        { ad: 'Scale Plus', kimIcin: 'E-ticaret büyüme paketi.', maddeler: ['Scale kapsamı', '[X] ürün yükleme', 'Eski siteden SEO taşıma', 'Gelişmiş ölçüm kurulumu'] } ] },
-      { id: 'eticaret-yonetim', tur: 'eticaret', turEtiket: 'E-TİCARET · YÖNETİM', ad: 'E-ticaret yönetimi', ozet: 'Mağazanızın günlük işleyişini biz yönetelim, siz işinize odaklanın.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
-        { ad: 'Başlangıç', kimIcin: 'Yeni açılan mağazalar için.', maddeler: ['Ürün ve kategori düzenleme', 'Kampanya takvimi', 'Fiyat ve stok kontrolü', 'Aylık rapor'] },
-        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Satışı artırmak isteyen mağazalar için.', maddeler: ['Başlangıç kapsamı', 'Ürün içerik ve SEO iyileştirme', 'Dönüşüm oranı analizi', 'Haftalık takip ve aylık görüşme'] },
-        { ad: 'Kurumsal', kimIcin: 'Geniş katalog ve çoklu kanal için.', maddeler: ['Büyüme kapsamı', 'Entegrasyon ve ERP bağlantıları', 'Kargo ve iade süreç tasarımı', 'Aylık strateji toplantısı'] } ] },
-      { id: 'pazaryeri', tur: 'pazaryeri', turEtiket: 'PAZARYERİ', ad: 'Pazaryeri yönetimi', ozet: 'Trendyol, Hepsiburada, Amazon, N11 ve diğer pazaryerlerinde mağaza yönetimi.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
-        { ad: 'Tek pazaryeri', kimIcin: 'Tek pazaryerinde başlayanlar için.', maddeler: ['1 pazaryeri', 'Ürün yükleme ve içerik', 'Soru ve yorumlara günlük yanıt', 'Aylık fiyat analizi', 'Aylık rapor'] },
-        { ad: 'Çoklu pazaryeri', rozet: 'Önerilen', kimIcin: 'Satışını yaymak isteyenler için.', maddeler: ['2–3 pazaryeri', 'Kampanya takvimi', 'Pazaryeri reklam yönetimi', 'Haftalık fiyat analizi', 'Haftalık rapor ve aylık görüşme'] },
-        { ad: 'Tam yönetim', kimIcin: 'Yüksek hacimli satıcılar için.', maddeler: ['5 ve üzeri pazaryeri', 'Tam reklam yönetimi', 'İade ve satıcı puanı yönetimi', 'Günlük fiyat ve stok takibi', 'Ürün bazında kârlılık raporu'] } ] },
-      { id: 'seo', tur: 'seo', turEtiket: 'SEO', ad: 'SEO paketleri', ozet: 'Google ve yapay zekâ aramalarında kalıcı görünürlük.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
-        { ad: 'Başlangıç', kimIcin: 'Sitesinin temelini düzeltmek isteyenler için.', maddeler: ['Teknik SEO denetimi', 'Anahtar kelime analizi', 'Ayda 2 içerik', 'Search Console takibi', 'Aylık rapor'] },
-        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Düzenli içerikle trafik artırmak isteyenler için.', maddeler: ['Başlangıç kapsamı', 'Ayda 4 içerik', 'Yerel SEO', 'Aylık bağlantı (backlink) planı', 'Aylık görüşme'] },
-        { ad: 'Otorite', kimIcin: 'Rekabetçi sektörlerde öne çıkmak isteyenler için.', maddeler: ['Büyüme kapsamı', 'Ayda 8 içerik', 'Dijital PR', 'Yapay zekâ aramalarında görünürlük', 'Çok dilli SEO'] } ] },
-      { id: 'sosyal-medya', tur: 'icerik', turEtiket: 'İÇERİK', ad: 'Sosyal medya yönetimi', ozet: 'Markanıza uygun, düzenli ve ölçülen içerik.', ucretNotu: 'Aylık · fiyat analizden sonra', kademeler: [
-        { ad: 'Başlangıç', kimIcin: 'Düzenli paylaşıma başlamak isteyenler için.', maddeler: ['Ayda 8 gönderi', 'Ayda 8 hikâye', 'Ayda 2 Reels', 'İçerik takvimi', 'Aylık rapor'] },
-        { ad: 'Büyüme', rozet: 'Önerilen', kimIcin: 'Etkileşimi ve takipçiyi büyütmek isteyenler için.', maddeler: ['Ayda 12 gönderi', 'Ayda 16 hikâye', 'Ayda 4 Reels', 'Mesaj ve yorum yönetimi', 'Meta reklam desteği'] },
-        { ad: 'Profesyonel', kimIcin: 'Profesyonel çekimle marka dili kuranlar için.', maddeler: ['Ayda 20 gönderi', 'Ayda 30 hikâye', 'Ayda 8 Reels', 'Profesyonel çekim günü', 'Influencer iş birliği planı'] } ] }
-    ];
+    return PAKETLER;
   }
   sorular() {
     return [

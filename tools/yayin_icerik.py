@@ -42,6 +42,8 @@ BLOK = {
 
 for p, liste in DEGISIM.items():
     s = open(p, encoding='utf-8').read()
+    if p in YASAL and 'yasal.json' in s:
+        continue  # metinler src/data/yasal.json'a taşındı (aşağıda); panelden düzenlenir
     for eski, yeni in liste:
         if eski in s:
             s = s.replace(eski, yeni, 1)
@@ -119,3 +121,50 @@ if '<HizmetAlanEk' not in s:
     s = s.replace("import Site from '../../layouts/Site.astro';", "import Site from '../../layouts/Site.astro';\nimport HizmetAlanEk from '../../components/HizmetAlanEk.astro';", 1)
     open(p, 'w', encoding='utf-8').write(s)
 print('Hizmetler sayfası alan görselleri uygulandı')
+
+# Panelden düzenlenen içerik (Muhittin, 23 Eki 2026): tasarımdan üretilen sayfalardaki gömülü veriler src/data/*.json'dan okunur.
+import json as _json
+def _blok_degistir(s, bas_metni, ac, kapa, yeni):
+    """bas_metni'nden sonraki ilk `ac` ile eşleşen `kapa`ya kadar olan bloğu `yeni` ile değiştirir."""
+    i = s.index(bas_metni); j = s.index(ac, i); d = 0; k = j
+    while True:
+        if s[k] == ac: d += 1
+        elif s[k] == kapa:
+            d -= 1
+            if d == 0: break
+        k += 1
+    return s[:j] + yeni + s[k + 1:]
+
+# Yasal sayfalar: metinler ve çerez tablosu src/data/yasal.json
+for p in YASAL:
+    s = open(p, encoding='utf-8').read()
+    if 'yasal.json' not in s:
+        s = _blok_degistir(s, 'const M = ', '{', '}', "Object.fromEntries(['kvkk', 'cerez', 'gizlilik'].map((k) => [k, { ad: yasal[k].ad, bolumler: yasal[k].bolumler.map((b) => [b.baslik, b.metin]) }]))")
+        s = _blok_degistir(s, 'const cerezler = ', '[', ']', 'yasal.cerezler.map((c) => [c.ad, c.saglayici, c.tur, c.amac, c.sure])')
+        s = s.replace("import Site from '../../../layouts/Site.astro';", "import Site from '../../../layouts/Site.astro';\nimport yasal from '../../../data/yasal.json';", 1)
+        open(p, 'w', encoding='utf-8').write(s)
+
+# Paketler: katalog src/data/paketler.json (sayfa ve sihirbaz aynı veriyi kullanır)
+for p, ithal in (('src/pages/tr/paketler.astro', "import PAKETLER from '../../data/paketler.json';"), ('src/scripts/paket-mantik.js', "import PAKETLER from '../data/paketler.json';")):
+    s = open(p, encoding='utf-8').read()
+    if 'paketler.json' not in s:
+        s = _blok_degistir(s, 'katalog() {', '[', ']', 'PAKETLER')
+        if p.endswith('.astro'):
+            s = s.replace("import Site from '../../layouts/Site.astro';", "import Site from '../../layouts/Site.astro';\n" + ithal, 1)
+        else:
+            s = ithal + '\n' + s
+        open(p, 'w', encoding='utf-8').write(s)
+
+# Ana sayfa referansları: src/data/referanslar.json (liste boşsa bölüm görünmez)
+p = 'src/pages/index.astro'
+s = open(p, encoding='utf-8').read()
+if 'referanslar.json' not in s:
+    assert s.count('const markaListesi = __v.markaListesi;') == 1 and s.count('const referansGoster = __v.referansGoster;') == 1
+    s = s.replace('const markaListesi = __v.markaListesi;', 'const markaListesi = referanslar.filter((r) => r.ad);', 1)
+    s = s.replace('const referansGoster = __v.referansGoster;', 'const referansGoster = markaListesi.length > 0;', 1)
+    eski = '<span style="font-weight: 700; color: var(--head)">{marka.ad}</span>'
+    assert s.count(eski) == 1, 'referans öğesi'
+    s = s.replace(eski, '{marka.logo ? <img src={marka.logo} alt={marka.ad} loading="lazy" style="max-height: 56px; max-width: 100%; object-fit: contain" /> : <span style="font-weight: 700; color: var(--head)">{marka.ad}</span>}', 1)
+    s = s.replace("import Site from '../layouts/Site.astro';", "import Site from '../layouts/Site.astro';\nimport referanslar from '../data/referanslar.json';", 1)
+    open(p, 'w', encoding='utf-8').write(s)
+print('panelden düzenlenen içerik bağlandı')
