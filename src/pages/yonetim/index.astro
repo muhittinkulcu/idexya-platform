@@ -23,7 +23,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .kpi b{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--head);line-height:1.15}
   .kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
   .degisim{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
-  .degisim .ok-u{color:var(--ok);font-weight:700}.degisim .ok-a{color:var(--err);font-weight:700}
+  .degisim .ok-u,.degisim-tablo .ok-u{color:var(--ok);font-weight:700}.degisim .ok-a,.degisim-tablo .ok-a{color:var(--err);font-weight:700}
   .kivilcim{display:block;width:100%;height:34px;margin-top:4px}
   .uyari-serit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:var(--warnb);color:var(--tx);border:1px solid var(--line)}
   .uyari-serit .simge{width:26px;height:26px;border-radius:8px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:var(--warn);color:#FFFFFF;font-weight:800}
@@ -158,11 +158,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 
   <section class="kart modul" data-m="reklam" aria-label="Reklam performansı">
-    <div class="modul-bas"><h2>Reklam performansı</h2><span class="cip gorusme">IDOS bağlantısı bekleniyor</span></div>
-    <div class="bekleyen-kutu">
-      <b style="color: var(--head)">Harcama ve sonuçlar IDOS’tan gelecek</b>
-      <span style="max-width: 560px">Meta ve Google Ads verisi IDOS’un BigQuery özetinden yalnız okunarak, günde bir kez alınacak. Bağlantı kurulunca burada toplam ve müşteri bazında görünür. Şu an hiçbir rakam gösterilmiyor.</span>
+    <div class="modul-bas">
+      <h2>Reklam performansı</h2>
+      <span style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="cip gorusme" data-reklam-durum>Yükleniyor…</span><button type="button" class="dugme kucuk" data-reklam-cek hidden>Şimdi çek</button></span>
     </div>
+    <div data-reklam-govde style="display: flex; flex-direction: column; gap: 14px"></div>
+    <span style="font-size: 12px; color: var(--tx2)" data-reklam-not></span>
   </section>
 
   <section class="kart modul" data-m="hizli" aria-label="Hızlı işlemler">
@@ -182,6 +183,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <script>
   import { api, el, ASAMALAR, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
   import { kpiKart, trendCiz, isiCiz, yatayCiz, ipucuKur, gunler, KAYNAK_GRUP } from '../../scripts/yonetim/grafik.js';
+  import { reklamBolumu } from '../../scripts/yonetim/reklam.js';
   const $ = (s, k = document) => k.querySelector(s);
   const $$ = (s, k = document) => [...k.querySelectorAll(s)];
   const pano = $('[data-pano]');
@@ -219,6 +221,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   db.addEventListener('click', () => { duzen = !duzen; db.setAttribute('aria-pressed', String(duzen)); $('span', db).textContent = duzen ? 'Bitti' : 'Modülleri düzenle'; db.classList.toggle('ana', duzen); $('[data-duzen-not]').hidden = !duzen; yerlestir(); });
   yerlestir();
   ipucuKur($('[data-ipucu]'));
+  reklamBolumu($('[data-m="reklam"]'));
 
   const saat = new Date().getHours();
   const selam = saat < 6 ? 'İyi geceler' : saat < 12 ? 'Günaydın' : saat < 18 ? 'İyi günler' : 'İyi akşamlar';
