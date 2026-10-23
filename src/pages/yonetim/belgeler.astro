@@ -1,0 +1,106 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Belgeler" aktif="belge" yol="Finans ve bağlantılar" aciklama="Sözleşme, teklif, fatura ve raporların listesi. Her belge türü, tarihi ve isteğe bağlı müşterisiyle kaydedilir; bağlantıya tıklayınca dosya bulunduğu yerde açılır.">
+<style is:global>
+  .bl-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .bl-arac input,.bl-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .bl-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
+  .bl-form .genis{grid-column:1/-1}
+  .bl-tablo{width:100%;min-width:760px;border-collapse:collapse;font-size:14px}
+  .bl-tablo th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
+  .bl-tablo td{padding:10px 14px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+</style>
+<div class="uyari bilgi">Dosyalar bu panelde saklanmaz. Belge bulunduğu yerde (ör. Google Drive, OneDrive) kalır; burada yalnızca adı, türü, tarihi ve <b>https://</b> bağlantısı tutulur. Bağlantıyı silmek dosyayı silmez. Drive’da paylaşımı “bağlantıya sahip herkes” yerine yalnız ekibinize açık tutmanız önerilir.</div>
+<div class="bl-arac">
+  <label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Belge ara</span><input type="search" data-ara placeholder="Ad, açıklama veya müşteri ara…" style="flex: 1"></label>
+  <label><span style="position: absolute; left: -10000px">Türe göre süz</span><select data-tur-suz><option value="">Tüm türler</option></select></label>
+  <label><span style="position: absolute; left: -10000px">Müşteriye göre süz</span><select data-musteri-suz style="max-width: 220px"><option value="">Tüm müşteriler</option></select></label>
+  <button type="button" class="dugme ana" data-yeni>+ Yeni belge</button>
+</div>
+<form class="kart bl-form" data-form hidden novalidate>
+  <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni belge</h2>
+  <label class="alan genis">Belge adı<input name="ad" maxlength="200" required autocomplete="off" placeholder="Ör. Hizmet sözleşmesi 2026"></label>
+  <label class="alan">Tür<select name="tur" data-tur></select></label>
+  <label class="alan">Belge tarihi<input name="tarih" type="date" required></label>
+  <label class="alan">Müşteri (isteğe bağlı)<select name="musteri_id" data-musteri><option value="">Müşteri yok</option></select></label>
+  <label class="alan genis">Bağlantı (https://)<input name="baglanti" type="url" maxlength="1000" required autocomplete="off" placeholder="https://drive.google.com/…"></label>
+  <label class="alan genis">Açıklama (isteğe bağlı)<textarea name="aciklama" rows="2" maxlength="2000"></textarea></label>
+  <div class="genis" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+    <button type="submit" class="dugme ana">Kaydet</button><button type="button" class="dugme" data-vazgec>Vazgeç</button>
+    <span role="status" data-form-durum style="font-size: 14px; color: var(--err)"></span>
+  </div>
+</form>
+<section class="kart" aria-label="Belgeler" data-liste style="overflow-x: auto"></section>
+<script>
+  import { api, el, tarih as zaman, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { bugunIst, gun, kucuk, musteriAdi, musteriBag, musterileriDoldur } from '../../scripts/yonetim/kayit.js';
+  const TUR = { sozlesme: 'Sözleşme', teklif: 'Teklif', fatura: 'Fatura', rapor: 'Rapor', diger: 'Diğer' };
+  const TUR_SINIF = { sozlesme: 'kazanildi', teklif: 'teklif', fatura: 'yeni', rapor: 'gorusme', diger: '' };
+  const liste = document.querySelector('[data-liste]'), form = document.querySelector('[data-form]'), fdurum = document.querySelector('[data-form-durum]');
+  const ara = document.querySelector('[data-ara]'), turSuz = document.querySelector('[data-tur-suz]'), musSuz = document.querySelector('[data-musteri-suz]');
+  turSuz.append(...Object.entries(TUR).map(([k, v]) => el('option', { value: k }, v)));
+  document.querySelector('[data-tur]').append(...Object.entries(TUR).map(([k, v]) => el('option', { value: k }, v)));
+  let tum = [], duzenlenen = null;
+  const host = (b) => { try { return new URL(b).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+
+  function formAc(b) {
+    duzenlenen = b || null; form.reset(); fdurum.textContent = '';
+    document.querySelector('[data-form-baslik]').textContent = b ? 'Belgeyi düzenle' : 'Yeni belge';
+    form.tarih.value = b ? b.tarih : bugunIst();
+    form.tur.value = b ? b.tur : 'sozlesme';
+    if (b) { form.ad.value = b.ad; form.musteri_id.value = b.musteri_id || ''; form.baglanti.value = b.baglanti; form.aciklama.value = b.aciklama || ''; }
+    else if (musSuz.value && musSuz.value !== '-') form.musteri_id.value = musSuz.value;
+    form.hidden = false; form.ad.focus(); form.scrollIntoView({ block: 'nearest' });
+  }
+  document.querySelector('[data-yeni]').addEventListener('click', () => formAc(null));
+  document.querySelector('[data-vazgec]').addEventListener('click', () => { form.hidden = true; duzenlenen = null; });
+  form.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const v = Object.fromEntries(new FormData(form));
+    v.baglanti = v.baglanti.trim();
+    if (!v.ad.trim()) { fdurum.textContent = 'Belge adı gerekli.'; form.ad.focus(); return; }
+    if (!/^https:\/\/\S+$/i.test(v.baglanti)) { fdurum.textContent = 'Bağlantı https:// ile başlamalı (ör. Google Drive paylaşım bağlantısı).'; form.baglanti.focus(); return; }
+    const d = form.querySelector('[type=submit]'); d.disabled = true; fdurum.textContent = '';
+    try { await api(duzenlenen ? 'belgeler/' + encodeURIComponent(duzenlenen.id) : 'belgeler', v); form.hidden = true; duzenlenen = null; await yukle(); }
+    catch (h) { fdurum.textContent = h.message; } finally { d.disabled = false; }
+  });
+  async function sil(b, dugme) {
+    if (!confirm(`“${b.ad}” belgesinin kaydı silinsin mi? Dosyanın kendisi (ör. Drive’daki) silinmez.`)) return;
+    dugme.disabled = true;
+    try { await api(`belgeler/${encodeURIComponent(b.id)}/sil`, {}); genelHata(''); await yukle(); } catch (h) { genelHata('Silinemedi: ' + h.message); dugme.disabled = false; }
+  }
+
+  function ciz() {
+    const q = kucuk(ara.value.trim()), t = turSuz.value, mu = musSuz.value;
+    const gor = tum.filter((b) => (!t || b.tur === t) && (!mu || (mu === '-' ? !b.musteri_id : b.musteri_id === mu))
+      && (!q || [b.ad, b.aciklama, musteriAdi(b), host(b.baglanti)].some((x) => x && kucuk(x).includes(q))));
+    if (!tum.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Henüz belge yok. Dosyayı Google Drive gibi bir yere yükleyin, paylaşım bağlantısını kopyalayın ve “+ Yeni belge” ile buraya ekleyin.')); return; }
+    if (!gor.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Süzgeçlerle eşleşen belge yok.')); return; }
+    liste.replaceChildren(el('div', { style: 'padding: 10px 14px 0; font-size: 12px; color: var(--tx2)' }, `${gor.length} belge` + (gor.length !== tum.length ? ` (toplam ${tum.length})` : '')),
+      el('table', { class: 'bl-tablo' },
+        el('thead', {}, el('tr', {}, ['Belge', 'Tür', 'Müşteri', 'Tarih', 'Ekleyen', ''].map((b) => el('th', { scope: 'col' }, b)))),
+        el('tbody', {}, gor.map((b) => el('tr', { 'data-belge': b.id },
+          el('td', { style: 'max-width: 360px' },
+            el('a', { href: b.baglanti, target: '_blank', rel: 'noopener noreferrer', style: 'font-weight: 600; overflow-wrap: anywhere' }, b.ad + ' ↗'),
+            el('div', { style: 'font-size: 12px; color: var(--tx2)' }, host(b.baglanti)),
+            b.aciklama ? el('div', { style: 'font-size: 13px; color: var(--tx2); white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px' }, b.aciklama) : null),
+          el('td', {}, el('span', { class: 'cip ' + TUR_SINIF[b.tur], style: b.tur === 'diger' ? 'background: var(--card2); color: var(--tx2)' : '' }, TUR[b.tur] || b.tur)),
+          el('td', {}, musteriBag(b) || el('span', { style: 'color: var(--tx2)' }, '—')),
+          el('td', { style: 'white-space: nowrap' }, gun(b.tarih)),
+          el('td', { style: 'font-size: 12px; color: var(--tx2)' }, el('div', { style: 'overflow-wrap: anywhere' }, b.ekleyen), el('div', {}, zaman(b.olusturma))),
+          el('td', { style: 'white-space: nowrap; text-align: right' },
+            el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(b) }, 'Düzenle'), ' ',
+            el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => sil(b, o.currentTarget) }, 'Sil')))))));
+  }
+  [ara, turSuz, musSuz].forEach((e) => e.addEventListener(e === ara ? 'input' : 'change', ciz));
+  async function yukle() {
+    try { tum = (await api('belgeler')).belgeler; genelHata(''); ciz(); }
+    catch (h) { genelHata('Belgeler yüklenemedi: ' + h.message); if (!tum.length) liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); }
+  }
+  musterileriDoldur([[document.querySelector('[data-musteri]'), 'Müşteri yok'], [musSuz, 'Tüm müşteriler']]).then(() => {
+    musSuz.insertBefore(el('option', { value: '-' }, 'Müşterisiz belgeler'), musSuz.options[1] || null);
+  });
+  yukle();
+</script>
+</Yonetim>

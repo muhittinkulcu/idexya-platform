@@ -67,5 +67,23 @@ export const SEMA = [
   // Sitede gösterilen Instagram gönderileri (worker/instagram.js): yöneticinin seçtiği bağlantı, açıklama ve küçültülmüş görsel.
   `CREATE TABLE IF NOT EXISTS instagram (
     id TEXT PRIMARY KEY, baglanti TEXT NOT NULL, aciklama TEXT, gorsel TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0,
-    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`
+    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  // Görevler ve takvim (worker/gorev.js): tarih İstanbul takvim günü (YYYY-AA-GG), saat isteğe bağlı (SS:DD).
+  `CREATE TABLE IF NOT EXISTS gorevler (
+    id TEXT PRIMARY KEY, baslik TEXT NOT NULL, aciklama TEXT, tarih TEXT NOT NULL, saat TEXT, musteri_id TEXT,
+    atanan TEXT NOT NULL, oncelik TEXT NOT NULL DEFAULT 'normal', durum TEXT NOT NULL DEFAULT 'acik',
+    olusturma TEXT NOT NULL, tamamlanma TEXT, olusturan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS gorev_tarih ON gorevler (durum, tarih)`,
+  // Belgeler (worker/belge.js): dosya bulunduğu yerde kalır (ör. Google Drive); yalnız bağlantı ve bilgileri saklanır.
+  `CREATE TABLE IF NOT EXISTS belgeler (
+    id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL, musteri_id TEXT, baglanti TEXT NOT NULL, tarih TEXT NOT NULL,
+    aciklama TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS belge_tarih ON belgeler (tarih)`,
+  // Basit gelir-gider defteri (worker/muhasebe.js); resmî muhasebe değildir. tutar: KDV dahil, kuruş cinsinden tam sayı.
+  `CREATE TABLE IF NOT EXISTS muhasebe (
+    id TEXT PRIMARY KEY, tur TEXT NOT NULL, tarih TEXT NOT NULL, tutar INTEGER NOT NULL, kdv_orani INTEGER NOT NULL DEFAULT 0,
+    aciklama TEXT NOT NULL, kategori TEXT, musteri_id TEXT, belge_no TEXT, durum TEXT NOT NULL DEFAULT 'bekliyor',
+    vade TEXT, odeme_tarihi TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS muhasebe_tarih ON muhasebe (tarih)`,
+  `CREATE INDEX IF NOT EXISTS muhasebe_vade ON muhasebe (durum, vade)`
 ];
