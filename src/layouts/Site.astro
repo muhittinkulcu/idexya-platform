@@ -21,9 +21,14 @@ const turnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '';
 
 import gruplar from '../data/hizmetler.json';
 import yazilar from '../data/yazilar.json';
+import menuAyar from '../data/menu.json';
+import { IKON } from '../data/hizmet-ikon';
+import MenuGorsel from '../components/MenuGorsel.astro';
+// Hizmetler menüsü görünümü (standart / orta / mega): src/data/menu.json. Simge kutusu ortak.
+const ikon = (id: string, b = 20) => `<svg width="${b}" height="${b}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[id] || ''}</svg>`;
 ---
 <!doctype html>
-<html lang={dil} data-turnstile={turnstile || undefined}>
+<html lang={dil} data-turnstile={turnstile || undefined} data-mk={menuAyar.kapali} data-ma={menuAyar.acik}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -72,25 +77,57 @@ main p{max-width:76ch}
 /* Hizmetler açılır menüsü: Hizmetler > ana kategori > alt hizmetler (masaüstü). Telefonda "Menü" çekmecesi kullanılır. */
 .ust-acilir{position:relative;display:flex;align-items:center;gap:2px}
 .ust-acilir-ok{width:24px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;padding:0;transition:transform .2s}
-.ust-acilir.acik .ust-acilir-ok{transform:rotate(180deg)}
-.ust-panel{position:absolute;top:calc(100% + 10px);left:-24px;width:min(680px,calc(100vw - 48px));display:none;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 60px -20px var(--shadow);padding:10px;z-index:60}
+.ust-acilir.acilmis .ust-acilir-ok{transform:rotate(180deg)}
+.ust-panel{position:absolute;top:calc(100% + 10px);left:-24px;width:min(720px,calc(100vw - 48px));display:none;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 60px -20px var(--shadow);padding:10px;z-index:60}
 .ust-panel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
-.ust-acilir.acik .ust-panel{display:flex}
-.ust-kat{list-style:none;margin:0;padding:0;position:relative;min-height:280px;width:240px}
+.ust-acilir.acilmis .ust-panel{display:flex}
+.ust-kat{list-style:none;margin:0;padding:0;position:relative;min-height:280px;width:260px}
 .ust-menu .ust-kat-bas{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;color:var(--head);font-weight:600}
-.ust-menu .ust-kat-bas::after,.ust-menu .ust-alt a::after,.ust-menu .ust-panel-dip::after{display:none}
+.ust-menu .ust-kat-bas::after,.ust-menu .ust-alt a::after,.ust-menu .ust-panel-dip a::after{display:none}
 .ust-kat-bas small{min-width:24px;height:24px;border-radius:999px;background:var(--bg);color:var(--tx2);font-size:12px;display:inline-flex;align-items:center;justify-content:center}
 .ust-kat li.etkin>.ust-kat-bas{background:var(--tint);color:var(--tintx)}
 .ust-kat li.etkin>.ust-kat-bas small{background:var(--card);color:var(--tintx)}
 /* Seçili olmayan alt listeler görünmez ama yer ölçülebilir (visibility); liste yüksekliği en uzun kategoriye göre ayarlanır. */
-.ust-alt{display:flex;visibility:hidden;pointer-events:none;position:absolute;top:0;left:252px;width:calc(min(680px,100vw - 48px) - 272px);flex-direction:column;gap:4px;padding:8px 6px}
+.ust-alt{display:flex;visibility:hidden;pointer-events:none;position:absolute;top:0;left:272px;width:calc(min(720px,100vw - 48px) - 292px);flex-direction:column;gap:4px;padding:8px 6px}
 .ust-kat li.etkin>.ust-alt{visibility:visible;pointer-events:auto}
 .ust-alt strong{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx2);padding:4px 10px 8px}
 .ust-alt ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 .ust-menu .ust-alt a{display:block;padding:9px 10px;border-radius:10px;color:var(--tx);font-weight:500}
 .ust-menu .ust-alt a:hover,.ust-menu .ust-alt a:focus-visible{background:var(--bg);color:var(--acc)}
 .ust-menu .ust-alt .ust-alt-tum{margin-top:6px;color:var(--acc);font-weight:600}
-.ust-menu .ust-panel-dip{display:flex;justify-content:space-between;margin-top:6px;padding:12px 14px;border-top:1px solid var(--line);color:var(--acc);font-weight:600}
+.ust-menu .ust-panel-dip{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:6px;padding:10px 6px 2px 14px;border-top:1px solid var(--line)}
+.ust-menu .ust-panel-dip a{color:var(--acc);font-weight:600;padding:8px 0}
+.ust-menu .ust-panel-dip .ust-dip-cta{padding:9px 16px;border-radius:10px;background:var(--fill);color:#FFFFFF;font-size:14px}
+/* Menü görünümleri (src/data/menu.json): standart = kategori > alt hizmet, simgeli; orta = beş sütunda tüm hizmetler;
+   mega = simge, kısa açıklama, temsilî görsel ve iki sütun alt hizmet. data-mk üst çubuk, data-ma tam ekran menü içindir. */
+.ust-menu .ust-kat-bas{justify-content:flex-start}
+.uk-ikon{flex:none;width:32px;height:32px;border-radius:9px;background:var(--bg);color:var(--acc);display:inline-flex;align-items:center;justify-content:center}
+.ust-kat li.etkin .uk-ikon{background:var(--card)}
+.uk-ad{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.uk-ad em,.ust-gorsel,.ust-ozet{display:none}
+[data-mk=orta] .ust,[data-mk=mega] .ust{position:relative}
+[data-mk=orta] .ust-acilir,[data-mk=mega] .ust-acilir{position:static}
+[data-mk=orta] .ust-panel,[data-mk=mega] .ust-panel{left:var(--kenar);right:var(--kenar);width:auto;top:calc(100% - 4px);padding:14px}
+[data-mk=orta] .ust-panel::before,[data-mk=mega] .ust-panel::before{top:-22px;height:22px}
+[data-mk=orta] .ust-kat{width:auto;min-height:0!important;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+[data-mk=orta] .ust-kat>li{display:flex;flex-direction:column;border-radius:14px;padding-bottom:6px;transition:background-color .2s}
+[data-mk=orta] .ust-kat>li:hover{background:var(--bg)}
+[data-mk=orta] .ust-kat li.etkin>.ust-kat-bas{background:transparent;color:var(--head)}
+[data-mk=orta] .ust-kat li>.ust-kat-bas small{display:none}
+[data-mk=orta] .ust-kat>li:hover .uk-ikon{background:var(--tint)}
+[data-mk=orta] .ust-alt{position:static;visibility:visible;pointer-events:auto;width:auto;padding:0 4px;gap:0}
+[data-mk=orta] .ust-alt>strong{display:none}
+[data-mk=orta] .ust-menu .ust-alt a{padding:7px 10px;font-size:14px}
+[data-mk=mega] .ust-kat{width:320px}
+[data-mk=mega] .uk-ad em{display:block;font-style:normal;font-size:12.5px;font-weight:400;color:var(--tx2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+[data-mk=mega] .ust-kat li.etkin .uk-ad em{color:var(--tintx);opacity:.85}
+[data-mk=mega] .ust-alt{left:336px;width:calc(min(var(--kap),100vw - 16px) - 2 * var(--kenar) - 364px);display:grid;grid-template-columns:minmax(220px,360px) minmax(0,1fr);grid-template-areas:"g s" "g o" "g u" "g t";column-gap:28px;align-content:start;padding:6px 8px}
+[data-mk=mega] .ust-gorsel{grid-area:g;display:flex;flex-direction:column;gap:6px;align-self:start;padding:14px;border-radius:16px;background:var(--bg)}
+[data-mk=mega] .ust-gorsel span{font-size:11px;color:var(--tx2);text-align:right}
+[data-mk=mega] .ust-alt>strong{grid-area:s;padding:2px 10px 4px;font-size:20px;letter-spacing:-.01em;text-transform:none;color:var(--head)}
+[data-mk=mega] .ust-ozet{grid-area:o;display:block;margin:0 10px 10px;font-size:14px;line-height:1.55;color:var(--tx2);max-width:62ch}
+[data-mk=mega] .ust-alt ul{grid-area:u;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:8px}
+[data-mk=mega] .ust-alt .ust-alt-tum{grid-area:t;justify-self:start}
 @media (max-width:1100px){.ust-menu{display:none}}
 @media (max-width:760px){.ust-eylem .ust-giris,.ust-eylem .ust-cta,.ust-eylem [data-tema-dugme]{display:none}.menu-yazi{display:none}.ust{min-height:64px}}
 /* Menü (Muhittin, 20 Eki 2026): tam ekran açılır; üstte sabit çubuk, solda bölümler, sağda üzerine gelinen bölümün önizlemesi. */
@@ -125,9 +162,24 @@ main p{max-width:76ch}
 .cm-hizmet{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
 .cm-kutu{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:transform .25s,box-shadow .25s,border-color .25s}
 .cm-kutu:hover{transform:translateY(-3px);box-shadow:0 18px 40px var(--shadow);border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
-.cm-kutu-bas{display:flex;justify-content:space-between;align-items:center;font-weight:700;color:var(--head);text-decoration:none;font-size:17px}
-.cm-kutu-bas span{min-width:26px;height:26px;border-radius:999px;background:var(--tint);color:var(--tintx);font-size:12px;display:flex;align-items:center;justify-content:center}
+.cm-kutu-bas{display:flex;gap:10px;align-items:center;font-weight:700;color:var(--head);text-decoration:none;font-size:17px}
+.cm-kutu-bas .cm-sayi{margin-left:auto;min-width:26px;height:26px;border-radius:999px;background:var(--tint);color:var(--tintx);font-size:12px;display:flex;align-items:center;justify-content:center}
 .cm-kutu ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.cm-ikon{flex:none;width:32px;height:32px;border-radius:9px;background:var(--tint);color:var(--tintx);display:inline-flex;align-items:center;justify-content:center}
+.cm-gorsel,.cm-ozet{display:none}
+[data-ma=orta] .cm-kutu li:nth-child(n+6):not(.cm-daha-li){display:none}
+[data-ma=standart] .cm-daha-li,[data-ma=mega] .cm-daha-li{display:none}
+[data-ma=standart] .cm-hizmet{grid-template-columns:1fr;gap:8px}
+[data-ma=standart] .cm-kutu{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);align-items:center;column-gap:24px;padding:12px 18px}
+[data-ma=standart] .cm-kutu ul{display:none}
+[data-ma=standart] .cm-ozet{display:block;margin:0;font-size:14px;color:var(--tx2);line-height:1.5}
+[data-ma=mega] .cm-sahne{container-type:inline-size}
+[data-ma=mega] .cm-hizmet{grid-template-columns:repeat(2,minmax(0,1fr))}
+@container (min-width:640px){[data-ma=mega] .cm-hizmet{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@container (min-width:960px){[data-ma=mega] .cm-hizmet{grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}[data-ma=mega] .cm-kutu{padding:14px}}
+[data-ma=mega] .cm-sayi{display:none}
+[data-ma=mega] .cm-gorsel{display:block;padding:10px;border-radius:12px;background:var(--bg)}
+[data-ma=mega] .cm-ozet{display:block;margin:0;font-size:13.5px;line-height:1.5;color:var(--tx2)}
 .cm-kutu li a{display:block;padding:5px 0;color:var(--tx2);text-decoration:none;font-size:14px}
 .cm-kutu li a:hover{color:var(--acc)}.cm-daha{font-weight:600;color:var(--acc)!important}
 .cm-vurgu{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px 24px;border-radius:18px;background:linear-gradient(120deg,#002559,#0A3270);color:#FFFFFF!important;text-decoration:none}
@@ -311,6 +363,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 @media print{header,footer,#cerez,[data-tema-dugme],nav[aria-label="Dil seçimi"]{display:none!important}body{background:#fff;color:#000}a{color:#000}}
 @media (max-width:640px){main h1{font-size:clamp(32px,9vw,44px)!important}main h2{font-size:clamp(24px,7vw,34px)!important}}
 </style>
+<script is:inline>try{var q=new URLSearchParams(location.search).get('menu'),t=['standart','orta','mega'];if(q==='varsayilan')sessionStorage.removeItem('idx-menu');else if(t.indexOf(q)>-1)sessionStorage.setItem('idx-menu',q);var m=sessionStorage.getItem('idx-menu');if(t.indexOf(m)>-1){document.documentElement.dataset.mk=m;document.documentElement.dataset.ma=m}}catch(e){}</script>
 <script is:inline>try{if(localStorage.getItem('idx-tema')==='koyu'){document.documentElement.dataset.tema='koyu'}}catch(e){}</script>
 </head>
 <body class="acik">
@@ -331,16 +384,18 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <ul class="ust-kat">
 {gruplar.map((g, i) => (
 <li class={i === 0 ? 'etkin' : undefined} data-kat>
-<a href={`/tr/hizmetler#${g.id}`} class="ust-kat-bas"><span>{g.ad}</span><small>{g.hizmetler.length}</small></a>
+<a href={`/tr/hizmetler#${g.id}`} class="ust-kat-bas"><span class="uk-ikon" set:html={ikon(g.id, 18)}></span><span class="uk-ad"><span>{g.ad}</span><em>{g.aciklama}</em></span><small>{g.hizmetler.length}</small></a>
 <div class="ust-alt">
+<div class="ust-gorsel"><MenuGorsel id={g.id} /><span>Temsilî görsel</span></div>
 <strong>{g.ad}</strong>
+<p class="ust-ozet">{g.aciklama}</p>
 <ul>{g.hizmetler.map((h) => <li><a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a></li>)}</ul>
 <a href={`/tr/hizmetler#${g.id}`} class="ust-alt-tum">{g.ad} hizmetlerinin tümü →</a>
 </div>
 </li>
 ))}
 </ul>
-<a href="/tr/hizmetler" class="ust-panel-dip">Bütün hizmetler <span aria-hidden="true">→</span></a>
+<div class="ust-panel-dip"><a href="/tr/hizmetler">Bütün hizmetler <span aria-hidden="true">→</span></a><a href="/tr/iletisim#form" class="ust-dip-cta">Ücretsiz analiz iste</a></div>
 </div>
 </div>
 ) : <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
@@ -357,21 +412,21 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </header>
 <script>
-  // Hizmetler açılır menüsü: fareyle üzerine gelince, ok düğmesiyle (klavye, dokunmatik) açılır; Esc veya dışarı tıklama kapatır.
+  // Hizmetler açılır menüsü (açıkken .acilmis; .acik açık tema sınıfıdır, karışmasın): fareyle üzerine gelince, ok düğmesiyle (klavye, dokunmatik) açılır; Esc veya dışarı tıklama kapatır.
   // Fare sağa (alt listeye) doğru giderken yoldaki başka kategoriye hemen geçilmez.
   document.querySelectorAll('[data-acilir]').forEach((k) => {
     const d = k.querySelector('[data-acilir-dugme]');
-    const ac = (v) => { k.classList.toggle('acik', v); d.setAttribute('aria-expanded', String(v)); };
+    const ac = (v) => { k.classList.toggle('acilmis', v); d.setAttribute('aria-expanded', String(v)); };
     let kapanis, gecis, onceki = 0, son = 0;
     k.addEventListener('mousemove', (o) => { onceki = son; son = o.clientX; });
     k.addEventListener('mouseenter', () => { clearTimeout(kapanis); ac(true); });
     k.addEventListener('mouseleave', () => { kapanis = setTimeout(() => ac(false), 180); });
-    d.addEventListener('click', () => ac(!k.classList.contains('acik')));
+    d.addEventListener('click', () => ac(!k.classList.contains('acilmis')));
     k.addEventListener('focusout', (o) => { if (!k.contains(o.relatedTarget)) ac(false); });
-    k.addEventListener('keydown', (o) => { if (o.key === 'Escape' && k.classList.contains('acik')) { ac(false); d.focus(); } });
+    k.addEventListener('keydown', (o) => { if (o.key === 'Escape' && k.classList.contains('acilmis')) { ac(false); d.focus(); } });
     const kategoriler = [...k.querySelectorAll('[data-kat]')];
     const liste = k.querySelector('.ust-kat');
-    new MutationObserver(() => { if (k.classList.contains('acik')) liste.style.minHeight = Math.max(...kategoriler.map((x) => x.querySelector('.ust-alt').offsetHeight)) + 'px'; }).observe(k, { attributes: true, attributeFilter: ['class'] });
+    new MutationObserver(() => { if (k.classList.contains('acilmis')) liste.style.minHeight = Math.max(...kategoriler.map((x) => x.querySelector('.ust-alt').offsetHeight)) + 'px'; }).observe(k, { attributes: true, attributeFilter: ['class'] });
     const sec = (li) => kategoriler.forEach((x) => x.classList.toggle('etkin', x === li));
     kategoriler.forEach((li) => {
       li.addEventListener('mouseenter', () => { clearTimeout(gecis); if (son > onceki) gecis = setTimeout(() => { if (li.matches(':hover')) sec(li); }, 220); else sec(li); });
@@ -403,8 +458,10 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div class="cm-hizmet">
 {gruplar.map((g, i) => (
   <div class="cm-kutu" style={`--s:${i}`}>
-    <a href={`/tr/hizmetler#${g.id}`} class="cm-kutu-bas">{g.ad}<span>{g.hizmetler.length}</span></a>
-    <ul>{g.hizmetler.slice(0, 5).map((h) => <li><a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a></li>)}{g.hizmetler.length > 5 && <li><a href={`/tr/hizmetler#${g.id}`} class="cm-daha">+{g.hizmetler.length - 5} hizmet daha</a></li>}</ul>
+    <div class="cm-gorsel"><MenuGorsel id={g.id} /></div>
+    <a href={`/tr/hizmetler#${g.id}`} class="cm-kutu-bas"><span class="cm-ikon" set:html={ikon(g.id, 18)}></span><b>{g.ad}</b><span class="cm-sayi">{g.hizmetler.length}</span></a>
+    <p class="cm-ozet">{g.aciklama}</p>
+    <ul>{g.hizmetler.map((h) => <li><a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a></li>)}{g.hizmetler.length > 5 && <li class="cm-daha-li"><a href={`/tr/hizmetler#${g.id}`} class="cm-daha">+{g.hizmetler.length - 5} hizmet daha</a></li>}</ul>
   </div>
 ))}
 </div>
