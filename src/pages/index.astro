@@ -1,5 +1,6 @@
 ---
 import Site from '../layouts/Site.astro';
+import HizmetAlanlari from '../components/HizmetAlanlari.astro';
 // Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
 class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
 class Component extends DCLogic {
@@ -108,43 +109,7 @@ WhatsApp'tan yaz</a>
 </div>
 <p style="margin: 0; font-size: 17px; color: var(--tx2); max-width: 400px">Beş alanda birbirine bağlı hizmetler. İhtiyacınız olanı seçin, gerisini biz birbirine bağlayalım. <a href="/tr/hizmetler" style="font-weight: 600">Tüm hizmetler →</a></p>
 </div>
-<div style="display: flex; flex-wrap: wrap; gap: 20px">
-<article style="flex: 2 1 560px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-wrap: wrap; gap: 28px; box-shadow: 0 1px 0 var(--line)">
-<div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 16px">
-<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6.2"></path><circle cx="9" cy="20" r="1.3"></circle><circle cx="17" cy="20" r="1.3"></circle></svg></span>
-<h3 style="margin: 0; font-size: 26px; color: var(--head)">E-ticaret</h3>
-<p style="margin: 0; color: var(--tx2)">Mağaza kurulumundan pazaryerine, kargodan entegrasyona kadar e-ticaretin tamamı.</p>
-<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
-</div>
-<ul style="flex: 1 1 220px; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; font-size: 15px">
-<li style="padding: 11px 0; border-bottom: 1px solid var(--line)">360° e-ticaret yönetimi</li><li style="padding: 11px 0; border-bottom: 1px solid var(--line)">Pazaryeri yönetimi</li><li style="padding: 11px 0; border-bottom: 1px solid var(--line)">Entegrasyon yönetimi</li><li style="padding: 11px 0; border-bottom: 1px solid var(--line)">Ürün ve kategori yönetimi</li><li style="padding: 11px 0">Kargo ve lojistik yönetimi</li>
-</ul>
-</article>
-<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
-<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"></circle><circle cx="12" cy="12" r="4.5"></circle><circle cx="12" cy="12" r="1"></circle></svg></span>
-<h3 style="margin: 0; font-size: 22px; color: var(--head)">Dijital reklam</h3>
-<p style="margin: 0; color: var(--tx2); font-size: 15px">Google Ads, Meta reklamları, e-posta ve SMS, influencer pazarlama.</p>
-<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
-</article>
-<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
-<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>
-<h3 style="margin: 0; font-size: 22px; color: var(--head)">SEO</h3>
-<p style="margin: 0; color: var(--tx2); font-size: 15px">Teknik SEO, site içi SEO, anahtar kelime analizi, yerel SEO ve backlink.</p>
-<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
-</article>
-<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
-<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16"></path></svg></span>
-<h3 style="margin: 0; font-size: 22px; color: var(--head)">Web ve yazılım</h3>
-<p style="margin: 0; color: var(--tx2); font-size: 15px">Web tasarım ile ERP, CRM ve ön muhasebe yazılım danışmanlığı.</p>
-<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
-</article>
-<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
-<span style="width: 52px; height: 52px; border-radius: 14px; background: var(--tint); color: var(--tintx); display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19l7-7 2 2-7 7z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18z"></path><circle cx="11" cy="11" r="2"></circle></svg></span>
-<h3 style="margin: 0; font-size: 22px; color: var(--head)">Tasarım ve içerik</h3>
-<p style="margin: 0; color: var(--tx2); font-size: 15px">Logo, kurumsal kimlik, grafik tasarım, Reels ve ürün çekimleri.</p>
-<a href="#analiz" style="margin-top: auto; font-weight: 600; font-size: 15px; padding: 8px 0">Bu alanda analiz iste →</a>
-</article>
-</div>
+<HizmetAlanlari />
 </div>
 </section>
 

@@ -51,3 +51,15 @@ for p, liste in DEGISIM.items():
         s = re.sub(BLOK[p], '', s, flags=re.S)
     open(p, 'w', encoding='utf-8').write(s)
 print('yayın içeriği uygulandı')
+
+# Ana sayfa hizmet kartları yerine hizmet vitrini (src/components/HizmetAlanlari.astro): neden önemli, temsilî görsel,
+# dikkat ettiklerimiz ve alt hizmetler (Muhittin, 23 Eki 2026).
+p = 'src/pages/index.astro'
+s = open(p, encoding='utf-8').read()
+if '<HizmetAlanlari />' not in s:
+    bas = s.index('<div style="display: flex; flex-wrap: wrap; gap: 20px">\n<article style="flex: 2 1 560px;')
+    son = s.index('</article>\n</div>\n</div>\n</section>', bas) + len('</article>\n</div>')
+    s = s[:bas] + '<HizmetAlanlari />' + s[son:]
+    s = s.replace("import Site from '../layouts/Site.astro';", "import Site from '../layouts/Site.astro';\nimport HizmetAlanlari from '../components/HizmetAlanlari.astro';", 1)
+    open(p, 'w', encoding='utf-8').write(s)
+print('ana sayfa hizmet vitrini uygulandı')
