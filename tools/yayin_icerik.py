@@ -16,6 +16,9 @@ DEGISIM['src/pages/tr/sayfa/hakkimizda.astro'] = [
     ("{ yil: '[Yıl]', ad: 'İlk adım'", "{ yil: '2018', ad: 'İlk adım'"),
     ("{ yil: '[Yıl]', ad: 'Idexya kuruldu', metin: 'Ajans olarak markalara 360° hizmet.' }",
      "{ yil: '2026', ad: 'Idexya kuruldu', metin: 'Haziran 2026’da resmî olarak kuruldu; markalara 360° hizmet.' }"),
+    # Rakamı doğrulanmamış iki kutu yerine sözleşmeye bağlı iki ilke
+    ("{ deger: '[X]', ad: 'yönetilen marka' }, { deger: '[X]', ad: 'yönetilen reklam bütçesi' }",
+     "{ deger: '360°', ad: 'reklam, mağaza, SEO ve yazılım tek planda' }, { deger: '%100', ad: 'reklam hesapları ve veriler sizde kalır' }"),
     ('<p style="margin: 0; font-size: 18px; color: var(--tx2)">[Kurucunun kendi anlatımıyla kısa bir paragraf: neden bu işi yapıyor, müşteriye ne söz veriyor.]</p>\n', ''),
 ]
 DEGISIM['src/pages/tr/iletisim.astro'] = [
@@ -142,6 +145,9 @@ for p in YASAL:
         s = _blok_degistir(s, 'const M = ', '{', '}', "Object.fromEntries(['kvkk', 'cerez', 'gizlilik'].map((k) => [k, { ad: yasal[k].ad, bolumler: yasal[k].bolumler.map((b) => [b.baslik, b.metin]) }]))")
         s = _blok_degistir(s, 'const cerezler = ', '[', ']', 'yasal.cerezler.map((c) => [c.ad, c.saglayici, c.tur, c.amac, c.sure])')
         s = s.replace("import Site from '../../../layouts/Site.astro';", "import Site from '../../../layouts/Site.astro';\nimport yasal from '../../../data/yasal.json';", 1)
+        open(p, 'w', encoding='utf-8').write(s)
+    if 'Son güncelleme: [tarih]' in s:
+        s = s.replace('Son güncelleme: [tarih]', 'Son güncelleme: {yasal.guncelleme}', 1)
         open(p, 'w', encoding='utf-8').write(s)
 
 # Paketler: katalog src/data/paketler.json (sayfa ve sihirbaz aynı veriyi kullanır)
