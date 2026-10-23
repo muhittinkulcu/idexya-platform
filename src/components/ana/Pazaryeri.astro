@@ -1,0 +1,66 @@
+---
+// Ana sayfa: pazaryeri yönetimi tanıtımı. Görsel temsilîdir, gerçek mağaza verisi veya rakam içermez.
+import Baslik from './Baslik.astro';
+const ISLER = [
+  { ad: 'Mağaza ve kategori eşleştirme', metin: 'Ürünleri her pazaryerinin kategori ve özellik yapısına doğru eşleştiririz; yanlış kategori görünürlüğü düşürür.' },
+  { ad: 'Satışa hazır ürün içeriği', metin: 'Başlık, açıklama, görsel ve varyantlar pazaryerinin kurallarına ve arama alışkanlıklarına göre düzenlenir.' },
+  { ad: 'Tek merkezden stok ve fiyat', metin: 'Entegrasyonla stok ve fiyat bütün kanallarda aynı anda güncellenir; olmayan ürünü satma riski azalır.' },
+  { ad: 'Kampanya ve pazaryeri reklamları', metin: 'İndirim takvimi ve mağaza içi reklamlar komisyon, kargo ve maliyetle birlikte değerlendirilir; kârsız satış büyütülmez.' },
+  { ad: 'Sipariş, kargo ve iade', metin: 'Gecikmeli gönderim ve iptal oranı takip edilir; bu oranlar mağaza puanını ve öne çıkmayı doğrudan etkiler.' },
+  { ad: 'Soru, yorum ve mağaza puanı', metin: 'Müşteri soruları zamanında, tutarlı bir dille cevaplanır; olumsuz yorumların arkasındaki sorun bulunur.' }
+];
+const KANALLAR = [['Trendyol', 'Stok eşit', 'Fiyat güncel'], ['Hepsiburada', 'Stok eşit', '2 soru bekliyor'], ['Amazon', 'Stok eşit', 'Fiyat güncel'], ['N11', 'Stok eşit', 'Kampanya hazır']];
+---
+<section class="py" aria-labelledby="py-baslik">
+  <div class="py-ic">
+    <Baslik id="py-baslik" etiket="Pazaryeri yönetimi" baslik="Pazaryerlerinde satış, yalnızca ürün yüklemek değil" aciklama="Trendyol, Hepsiburada, Amazon ve diğer pazaryerlerinde mağazanızı günlük olarak yönetiyoruz." baglanti={{ href: '/tr/hizmet/e-ticaret-pazaryeri-yonetimi/', ad: 'Pazaryeri yönetimi' }} />
+    <div class="py-govde">
+      <ol class="py-isler">
+        {ISLER.map((i, n) => (
+          <li><span class="py-no">{String(n + 1).padStart(2, '0')}</span><div><h3>{i.ad}</h3><p>{i.metin}</p></div></li>
+        ))}
+      </ol>
+      <figure class="py-gorsel">
+        <svg viewBox="0 0 420 380" role="img" aria-label="Pazaryeri kanallarının stok, fiyat ve soru durumunu tek ekranda gösteren temsilî panel">
+          <rect x="1" y="1" width="418" height="378" rx="22" class="pg-kart"/>
+          <text x="26" y="44" class="pg-baslik">Kanallar · bugün</text>
+          <rect x="300" y="26" width="94" height="26" rx="13" class="pg-tint"/><text x="347" y="44" text-anchor="middle" class="pg-kucuk pg-tintx">Tek merkez</text>
+          {KANALLAR.map(([ad, a, b], j) => (
+            <g transform={`translate(26 ${74 + j * 62})`}>
+              <rect width="368" height="50" rx="14" class="pg-zemin"/>
+              <circle cx="24" cy="25" r="5" class={b.includes('soru') ? 'pg-uyari' : 'pg-ok'}/>
+              <text x="40" y="30" class="pg-yazi">{ad}</text>
+              <rect x="166" y="13" width="86" height="24" rx="12" class="pg-etiket"/><text x="209" y="29" text-anchor="middle" class="pg-kucuk">{a}</text>
+              <rect x="260" y="13" width="96" height="24" rx="12" class={b.includes('soru') ? 'pg-etiket-uyari' : 'pg-etiket'}/><text x="308" y="29" text-anchor="middle" class="pg-kucuk">{b}</text>
+            </g>
+          ))}
+          <g transform="translate(26 330)">
+            {['Sipariş', 'Paket', 'Kargo', 'Teslim'].map((s, j) => (<g><circle cx={12 + j * 112} cy="8" r="6" class={j < 3 ? 'pg-vurgu' : 'pg-bos'}/><text x={12 + j * 112} y="34" text-anchor="middle" class="pg-kucuk">{s}</text>{j < 3 && <path d={`M${22 + j * 112} 8 H${102 + j * 112}`} class="pg-cizgi"/>}</g>))}
+          </g>
+        </svg>
+        <figcaption>Temsilî görsel</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+<style>
+  .py{background:var(--bg2)}
+  .py-ic{max-width:var(--kap);margin:0 auto;padding:96px var(--kenar);box-sizing:border-box;display:flex;flex-direction:column;gap:44px}
+  .py-govde{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:40px;align-items:start}
+  .py-isler{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .py-isler li{display:flex;gap:14px;padding:20px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+  .py-no{flex:none;width:36px;height:36px;border-radius:10px;background:var(--tint);color:var(--tintx);font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .py-isler h3{margin:0 0 6px;font-size:17px;color:var(--head)}
+  .py-isler p{margin:0;font-size:14.5px;line-height:1.55;color:var(--tx2)}
+  .py-gorsel{margin:0;position:sticky;top:100px;display:flex;flex-direction:column;gap:8px}
+  .py-gorsel svg{width:100%;height:auto;display:block;font-family:inherit}
+  .py-gorsel figcaption{font-size:12px;color:var(--tx2);text-align:right}
+  .pg-kart{fill:var(--card);stroke:var(--line);stroke-width:1.5}.pg-zemin{fill:var(--bg);stroke:var(--line)}
+  .pg-baslik{font-size:16px;font-weight:700;fill:var(--head)}.pg-yazi{font-size:14px;font-weight:600;fill:var(--head)}.pg-kucuk{font-size:11.5px;fill:var(--tx2)}
+  .pg-tint{fill:var(--tint)}.pg-tintx{fill:var(--tintx);font-weight:700}
+  .pg-etiket{fill:var(--card);stroke:var(--line)}.pg-etiket-uyari{fill:var(--tint);stroke:var(--brand)}
+  .pg-ok{fill:#1baf7a}.pg-uyari{fill:#F07A23}.pg-vurgu{fill:#F07A23}.pg-bos{fill:var(--line)}
+  .pg-cizgi{stroke:var(--tx2);stroke-width:2;stroke-dasharray:5 5}
+  @media (max-width:980px){.py-govde{grid-template-columns:1fr}.py-gorsel{position:static;max-width:520px}}
+  @media (max-width:640px){.py-isler{grid-template-columns:1fr}.py-ic{padding-top:64px;padding-bottom:64px}}
+</style>

@@ -63,3 +63,20 @@ if '<HizmetAlanlari />' not in s:
     s = s.replace("import Site from '../layouts/Site.astro';", "import Site from '../layouts/Site.astro';\nimport HizmetAlanlari from '../components/HizmetAlanlari.astro';", 1)
     open(p, 'w', encoding='utf-8').write(s)
 print('ana sayfa hizmet vitrini uygulandı')
+
+# Ana sayfa ek bölümleri (Muhittin, 23 Eki 2026): pazaryeri, ücretsiz araçlar, çalışma ilkeleri, sektörler,
+# platformlar, blog + Instagram ve SSS. Bileşenler src/components/ana/ altında.
+s = open(p, encoding='utf-8').read()
+if '<Pazaryeri />' not in s:
+    def ekle(bul, metin, sonra=True):
+        global s
+        assert s.count(bul) == 1, bul[:60]
+        s = s.replace(bul, (bul + metin) if sonra else (metin + bul), 1)
+    # Zemin sırası düz / açık gri dönüşümlü kalsın: Dört adım (düz) > Pazaryeri (gri) > Araçlar (düz) > IDOS
+    ekle('<section id="idos"', '<Pazaryeri />\n\n<Araclar />\n\n', sonra=False)
+    ekle('<section id="paketler"', '<Ilkeler />\n\n', sonra=False)
+    ekle('<section id="analiz"', '<Sektorler />\n\n<Platformlar />\n\n<BlogSss />\n\n', sonra=False)
+    ithal = "".join(f"\nimport {a} from '../components/ana/{a}.astro';" for a in ['Pazaryeri', 'Araclar', 'Ilkeler', 'Sektorler', 'Platformlar', 'BlogSss'])
+    s = s.replace("import HizmetAlanlari from '../components/HizmetAlanlari.astro';", "import HizmetAlanlari from '../components/HizmetAlanlari.astro';" + ithal, 1)
+    open(p, 'w', encoding='utf-8').write(s)
+print('ana sayfa ek bölümleri uygulandı')

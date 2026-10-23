@@ -1,0 +1,41 @@
+---
+// Ana sayfa: sektörlere göre örnek yaklaşımlar. Sektörleri Muhittin seçti (23 Eki 2026); metinler genel yaklaşımdır, müşteri sonucu iddia etmez.
+import Baslik from './Baslik.astro';
+const SEKTORLER = [
+  { id: 'moda', ad: 'Moda ve tekstil', sorun: 'Çok sayıda ürün ve varyant, sezonluk stok, yüksek iade oranı.', yaklasim: ['Ürün kataloğuyla çalışan alışveriş ve dinamik reklamlar', 'Beden tablosu ve gerçekçi ürün görselleriyle iadeyi azaltma', 'Sezon sonu stoğu için kontrollü indirim ve pazaryeri planı'], hizmetler: [['Pazaryeri yönetimi', 'e-ticaret-pazaryeri-yonetimi'], ['Meta reklam yönetimi', 'meta-business-ads-yonetimi'], ['Ürün fotoğraf ve video çekimleri', 'urun-fotograf-video-cekimleri']] },
+  { id: 'saglik', ad: 'Sağlık ve klinik', sorun: 'Sıkı reklam kuralları, güven ihtiyacı ve randevuya dönüşmeyen aramalar.', yaklasim: ['Reklam ve içeriklerin mevzuata ve platform politikalarına uygun hazırlanması; sonuç vaadi verilmez', 'Arama, WhatsApp ve form taleplerinin ayrı ölçülmesi', 'Yerel SEO ve Google İşletme Profili ile yakındaki hastalara görünürlük'], hizmetler: [['Google Ads yönetimi', 'google-ads-yonetimi'], ['Yerel SEO', 'yerel-seo-hizmeti'], ['Web tasarım', 'web-tasarim-hizmetleri']] },
+  { id: 'ev', ad: 'Ev, mobilya ve yapı', sorun: 'Uzun karar süreci, yüksek sepet tutarı, mağaza ve showroom ziyareti.', yaklasim: ['İlk ilgiden satın almaya kadar uzun süreli yeniden pazarlama', 'Ölçü, malzeme ve teslimat bilgisini net veren ürün sayfaları', 'Showroom ziyareti ve teklif taleplerinin ölçülmesi'], hizmetler: [['Dijital pazarlama yönetimi', 'dijital-pazarlama-yonetimi'], ['SEO içerik optimizasyonu', 'seo-icerik-optimizasyonu'], ['360° e-ticaret yönetimi', 'e-ticaret-yonetimi']] },
+  { id: 'b2b', ad: 'Hizmet ve B2B', sorun: 'Az ama değerli talep, satış ekibine düşen niteliksiz formlar.', yaklasim: ['Nitelikli talep için form ve hedefleme ayarı', 'Talebin satışa dönüşüp dönüşmediğini CRM ile takip', 'Uzmanlığı gösteren içerik ve aramada görünürlük'], hizmetler: [['CRM yazılım danışmanlığı', 'crm-yazilim-danismanligi'], ['Google Ads yönetimi', 'google-ads-yonetimi'], ['Anahtar kelime analizi', 'seo-anahtar-kelime-analizi']] }
+];
+---
+<section class="sk" aria-labelledby="sk-baslik">
+  <div class="sk-ic">
+    <Baslik id="sk-baslik" etiket="Sektörler" baslik="Sektörünüzün dilini biliyoruz" aciklama="Her sektörün sorunu farklı; yaklaşımımızı da ona göre kuruyoruz." />
+    <div class="sk-liste">
+      {SEKTORLER.map((s) => (
+        <article>
+          <h3>{s.ad}</h3>
+          <p class="sk-sorun"><b>Sık görülen sorun:</b> {s.sorun}</p>
+          <ul>{s.yaklasim.map((y) => <li>{y}</li>)}</ul>
+          <div class="sk-hiz">{s.hizmetler.map(([ad, slug]) => <a href={`/tr/hizmet/${slug}/`}>{ad}</a>)}</div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+<style>
+  .sk{background:var(--bg2)}
+  .sk-ic{max-width:var(--kap);margin:0 auto;padding:96px var(--kenar);box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+  .sk-liste{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .sk-liste article{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:14px}
+  .sk-liste h3{margin:0;font-size:20px;color:var(--head)}
+  .sk-sorun{margin:0;font-size:14.5px;line-height:1.55;color:var(--tx2)}.sk-sorun b{color:var(--tx)}
+  .sk-liste ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;flex:1}
+  .sk-liste li{position:relative;padding-left:22px;font-size:14.5px;line-height:1.5}
+  .sk-liste li::before{content:"";position:absolute;left:2px;top:8px;width:8px;height:8px;border-radius:50%;background:var(--brand)}
+  .sk-hiz{display:flex;flex-wrap:wrap;gap:6px;padding-top:12px;border-top:1px solid var(--line)}
+  .sk-hiz a{padding:6px 10px;border-radius:999px;background:var(--bg);font-size:13px;font-weight:600;text-decoration:none}
+  .sk-hiz a:hover{background:var(--tint)}
+  @media (max-width:1100px){.sk-liste{grid-template-columns:1fr 1fr}}
+  @media (max-width:640px){.sk-liste{grid-template-columns:1fr}.sk-ic{padding-top:64px;padding-bottom:64px}}
+</style>
