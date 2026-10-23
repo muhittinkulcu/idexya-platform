@@ -14,6 +14,8 @@ import { yonetimYayinApi } from './yayin.js';
 import { yonetimTeklifApi } from './teklif.js';
 import { yonetimCrmApi } from './crm.js';
 import { yonetimPortalApi } from './portal.js';
+import { denetimCalistir, yonetimDenetimApi } from './denetim.js';
+import { olcumAl, yonetimOlcumApi } from './olcum.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -228,7 +230,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim));
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -249,6 +251,7 @@ export default {
       if (yol.startsWith('/api/medya/')) { await semaKur(env.DB); return await medyaApi(istek, env, yol.slice('/api/medya/'.length).replace(/\/$/, '')); }
       if (yol === '/api/instagram' || yol.startsWith('/api/instagram/')) { await semaKur(env.DB); return await instagramApi(istek, env, yol.slice('/api/instagram'.length).replace(/^\/|\/$/g, '')); }
       if (yol === '/api/bulten' || yol.startsWith('/api/bulten/')) { await semaKur(env.DB); return await bultenApi(istek, env, yol.slice('/api/bulten'.length).replace(/^\/|\/$/g, '')); }
+      if (yol === '/api/olcum') { await semaKur(env.DB); return await olcumAl(istek, env); }
       if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
       if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
       if (yol.startsWith('/uye/')) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
@@ -279,10 +282,12 @@ export default {
     }
   },
   // Günlük zamanlayıcı (wrangler.jsonc triggers): saklama süresi dolan kişisel veriyi siler; IDOS reklam özetini
-  // çeker (IDOS ayarı yoksa bu adım atlanır).
+  // çeker (IDOS ayarı yoksa bu adım atlanır); pazartesileri site denetimini çalıştırır (worker/denetim.js).
   async scheduled(olay, env, ctx) {
     await semaKur(env.DB);
     ctx.waitUntil(saklamaUygula(env.DB).catch((e) => console.error('saklama', e && e.message)));
     if (reklamKurulu(env)) ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
+    // Haftalık site denetimi: pazartesi (UTC; zamanlayıcı 07.00 UTC'de çalışır).
+    if (new Date(olay.scheduledTime || Date.now()).getUTCDay() === 1) ctx.waitUntil(denetimCalistir(env, 'idexya.com', 'Zamanlayıcı').catch((e) => console.error('denetim', e && e.message)));
   }
 };

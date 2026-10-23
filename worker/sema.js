@@ -95,5 +95,14 @@ export const SEMA = [
   `CREATE INDEX IF NOT EXISTS uye_musteri_musteri ON uye_musteri (musteri_id)`,
   `CREATE TABLE IF NOT EXISTS davetler (
     ozet TEXT PRIMARY KEY, id TEXT NOT NULL UNIQUE, eposta TEXT NOT NULL, musteri_id TEXT, moduller TEXT NOT NULL DEFAULT '{}',
-    olusturma TEXT NOT NULL, bitis TEXT NOT NULL, olusturan TEXT NOT NULL, kullanildi TEXT, uye_id TEXT, iptal TEXT, iptal_eden TEXT)`
+    olusturma TEXT NOT NULL, bitis TEXT NOT NULL, olusturan TEXT NOT NULL, kullanildi TEXT, uye_id TEXT, iptal TEXT, iptal_eden TEXT)`,
+  // Site denetimi çalıştırmaları (worker/denetim.js): özet ve sayfa sonuçları JSON; son 20 çalıştırma saklanır.
+  `CREATE TABLE IF NOT EXISTS denetimler (id TEXT PRIMARY KEY, zaman TEXT NOT NULL, tetikleyen TEXT NOT NULL, ozet TEXT NOT NULL, sonuc TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS denetim_zaman ON denetimler (zaman)`,
+  // Çerezsiz ziyaret sayacı (worker/olcum.js): yalnız günlük toplamlar; IP, tarayıcı bilgisi ya da kimlik tutulmaz.
+  `CREATE TABLE IF NOT EXISTS ziyaret_gunluk (gun TEXT NOT NULL, sayfa TEXT NOT NULL, kaynak TEXT NOT NULL, cihaz TEXT NOT NULL, adet INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (gun, sayfa, kaynak, cihaz))`,
+  // Gerçek kullanıcı hız örnekleri (LCP ms, INP ms, CLS): sayfa başına günde en çok 500 örnek.
+  `CREATE TABLE IF NOT EXISTS hiz_olcum (gun TEXT NOT NULL, sayfa TEXT NOT NULL, cihaz TEXT NOT NULL, lcp REAL, inp REAL, cls REAL)`,
+  `CREATE INDEX IF NOT EXISTS hiz_gun_sayfa ON hiz_olcum (gun, sayfa)`
 ];
