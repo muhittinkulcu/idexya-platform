@@ -58,5 +58,10 @@ export const SEMA = [
     harcama REAL NOT NULL DEFAULT 0, gosterim INTEGER, tiklama INTEGER, sonuclar TEXT,
     PRIMARY KEY (gun, platform, hesap, para))`,
   `CREATE TABLE IF NOT EXISTS reklam_cekim (
-    id TEXT PRIMARY KEY, zaman TEXT NOT NULL, durum TEXT NOT NULL, satir INTEGER, baslangic TEXT, mesaj TEXT, tetikleyen TEXT NOT NULL)`
+    id TEXT PRIMARY KEY, zaman TEXT NOT NULL, durum TEXT NOT NULL, satir INTEGER, baslangic TEXT, mesaj TEXT, tetikleyen TEXT NOT NULL)`,
+  // Bülten ilgi listesi (worker/bulten.js): e-posta, ticari ileti onay kaydı ve abonelikten çıkma anahtarı.
+  `CREATE TABLE IF NOT EXISTS bulten (
+    id TEXT PRIMARY KEY, eposta TEXT NOT NULL UNIQUE, durum TEXT NOT NULL DEFAULT 'aktif', onay_zamani TEXT NOT NULL, onay_surum TEXT NOT NULL,
+    sayfa TEXT, ip_ozet TEXT, dogrulama TEXT NOT NULL, ayrilma_anahtari TEXT NOT NULL UNIQUE, ayrilma_zamani TEXT)`,
+  `CREATE INDEX IF NOT EXISTS bulten_ip ON bulten (ip_ozet, onay_zamani)`
 ];

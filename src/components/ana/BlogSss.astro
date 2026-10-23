@@ -2,6 +2,7 @@
 // Ana sayfa: son blog yazıları, Instagram kartı ve sık sorulan sorular (FAQPage yapılandırılmış verisiyle).
 // Cevaplar yalnızca Muhittin'in doğruladığı bilgilere dayanır (hesap sahipliği, 1 iş günü, en az 3 ay, IDOS).
 import Baslik from './Baslik.astro';
+import Bulten from './Bulten.astro';
 import yazilar from '../../data/yazilar.json';
 const SSS = [
   ['Ücretsiz analizde neye bakıyorsunuz?', 'Reklam hesaplarınızı, ölçüm altyapınızı (GA4, etiketler, dönüşümler) ve sitenizi inceleriz. Nereden başlamanız gerektiğini gerekçesiyle anlatırız. Formu gönderdikten sonra 1 iş günü içinde dönüş yaparız.'],
@@ -30,6 +31,7 @@ const son = yazilar.slice(0, 3);
         <span class="bs-oku">@idexya.ads <span class="gizli">(yeni sekmede açılır)</span>→</span>
       </a>
     </div>
+    <Bulten />
   </div>
 </section>
 <section class="bs bs-sss" aria-labelledby="bs-sss">
