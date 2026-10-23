@@ -35,6 +35,9 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
   - `YONETICILER` boşsa panel kapalı kalır
   - Gizli: `ANTHROPIC_API_KEY` — sitedeki yapay zekâ asistanı (Claude Haiku 5.5). Yoksa asistan ekibe yönlendirme modunda çalışır.
     İsteğe bağlı: `ASISTAN_AYLIK_SINIR` (aylık mesaj sınırı, varsayılan 3000), `ASISTAN_MODEL`.
+- Saklama süreleri (`worker/saklama.js`, KVKK metniyle aynı): her gün 10.00'da müşteriye dönüşmeyen talepler (2 yıl), asistan sohbetleri (1 yıl),
+  giriş denemeleri/IP özetleri (2 yıl), süresi dolan oturum ve şifre yenileme kayıtları silinir; özet işlem kaydına yazılır.
+  CRM'e alınan talepler ve müşteri kayıtları silinmez.
 - IDOS reklam özeti (`worker/reklam.js`): her gün 10.00'da (İstanbul) IDOS'un BigQuery **yetkili görünümünden** son 28 gün
   yalnız okunur, `reklam_ozet` tablosuna yazılır; panel yalnız bu tabloyu okur. Sorgu başına en fazla 100 MB işlenir.
   Ayarlar girilmeden hiçbir şey çalışmaz:
