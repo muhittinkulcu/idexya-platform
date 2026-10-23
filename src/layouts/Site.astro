@@ -68,6 +68,29 @@ main p{max-width:76ch}
 .menu-cizgi{display:inline-flex;flex-direction:column;gap:5px;width:18px}.menu-cizgi i{display:block;height:2px;border-radius:2px;background:currentColor;transition:transform .3s}.menu-cizgi i+i{width:12px}
 .menu-dugme:hover .menu-cizgi i+i{transform:translateX(6px)}
 @media (max-width:1280px){.arama-dugme{min-width:0}.arama-dugme .arama-yazi,.arama-dugme kbd{display:none}}
+.ust-menu{align-items:center}
+/* Hizmetler açılır menüsü: Hizmetler > ana kategori > alt hizmetler (masaüstü). Telefonda "Menü" çekmecesi kullanılır. */
+.ust-acilir{position:relative;display:flex;align-items:center;gap:2px}
+.ust-acilir-ok{width:24px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;padding:0;transition:transform .2s}
+.ust-acilir.acik .ust-acilir-ok{transform:rotate(180deg)}
+.ust-panel{position:absolute;top:calc(100% + 10px);left:-24px;width:min(680px,calc(100vw - 48px));display:none;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 60px -20px var(--shadow);padding:10px;z-index:60}
+.ust-panel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
+.ust-acilir.acik .ust-panel{display:flex}
+.ust-kat{list-style:none;margin:0;padding:0;position:relative;min-height:280px;width:240px}
+.ust-menu .ust-kat-bas{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;color:var(--head);font-weight:600}
+.ust-menu .ust-kat-bas::after,.ust-menu .ust-alt a::after,.ust-menu .ust-panel-dip::after{display:none}
+.ust-kat-bas small{min-width:24px;height:24px;border-radius:999px;background:var(--bg);color:var(--tx2);font-size:12px;display:inline-flex;align-items:center;justify-content:center}
+.ust-kat li.etkin>.ust-kat-bas{background:var(--tint);color:var(--tintx)}
+.ust-kat li.etkin>.ust-kat-bas small{background:var(--card);color:var(--tintx)}
+/* Seçili olmayan alt listeler görünmez ama yer ölçülebilir (visibility); liste yüksekliği en uzun kategoriye göre ayarlanır. */
+.ust-alt{display:flex;visibility:hidden;pointer-events:none;position:absolute;top:0;left:252px;width:calc(min(680px,100vw - 48px) - 272px);flex-direction:column;gap:4px;padding:8px 6px}
+.ust-kat li.etkin>.ust-alt{visibility:visible;pointer-events:auto}
+.ust-alt strong{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx2);padding:4px 10px 8px}
+.ust-alt ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.ust-menu .ust-alt a{display:block;padding:9px 10px;border-radius:10px;color:var(--tx);font-weight:500}
+.ust-menu .ust-alt a:hover,.ust-menu .ust-alt a:focus-visible{background:var(--bg);color:var(--acc)}
+.ust-menu .ust-alt .ust-alt-tum{margin-top:6px;color:var(--acc);font-weight:600}
+.ust-menu .ust-panel-dip{display:flex;justify-content:space-between;margin-top:6px;padding:12px 14px;border-top:1px solid var(--line);color:var(--acc);font-weight:600}
 @media (max-width:1100px){.ust-menu{display:none}}
 @media (max-width:760px){.ust-eylem .ust-giris,.ust-eylem .ust-cta,.ust-eylem [data-tema-dugme]{display:none}.menu-yazi{display:none}.ust{min-height:64px}}
 /* Menü (Muhittin, 20 Eki 2026): tam ekran açılır; üstte sabit çubuk, solda bölümler, sağda üzerine gelinen bölümün önizlemesi. */
@@ -233,7 +256,7 @@ body:has(#cerez:not(.gizli)) .as-dugme{display:none}
 .koyu #ust>div:nth-of-type(2)>div{background:rgba(255,255,255,.04)!important;border-color:rgba(255,255,255,.12)!important;color:#C6D2E3!important;backdrop-filter:blur(8px)}
 .koyu #ust>div:nth-of-type(2)>div [style*="color: var(--acc)"]{color:#FFB58A!important}
 .koyu .site-ust.ust-koyu:not(.kaydi){background:#00163A!important;border-color:rgba(255,255,255,.08)!important}
-.koyu .site-ust.ust-koyu:not(.kaydi) .ust-logo,.koyu .site-ust.ust-koyu:not(.kaydi) .ust-menu a,.koyu .site-ust.ust-koyu:not(.kaydi) .ust-giris,.koyu .site-ust.ust-koyu:not(.kaydi) .ikon-dugme{color:#FFFFFF}
+.koyu .site-ust.ust-koyu:not(.kaydi) .ust-logo,.koyu .site-ust.ust-koyu:not(.kaydi) .ust-menu>a,.koyu .site-ust.ust-koyu:not(.kaydi) .ust-acilir>a,.koyu .site-ust.ust-koyu:not(.kaydi) .ust-acilir-ok,.koyu .site-ust.ust-koyu:not(.kaydi) .ust-giris,.koyu .site-ust.ust-koyu:not(.kaydi) .ikon-dugme{color:#FFFFFF}
 .koyu .site-ust.ust-koyu:not(.kaydi) .ust-logo span span+span{color:#A9B9CF!important}
 .koyu .site-ust.ust-koyu:not(.kaydi) .ikon-dugme{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.05)}
 .koyu .site-ust.ust-koyu:not(.kaydi) .arama-dugme{color:#C6D2E3}.koyu .site-ust.ust-koyu:not(.kaydi) .arama-dugme kbd{border-color:rgba(255,255,255,.25);color:#C6D2E3}
@@ -300,7 +323,27 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <span style="display: flex; flex-direction: column; line-height: 1.1"><span style="font-weight: 700; font-size: 20px; letter-spacing: -0.01em">Idexya</span><span style="font-size: 12px; color: var(--tx2); letter-spacing: 0.08em">GOOD THINGS</span></span>
 </a>
 <nav aria-label="Ana menü" class="ust-menu">
-{MENU.filter((m) => m.ust).map((m) => <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
+{MENU.filter((m) => m.ust).map((m) => m.k === 'hizmetler' ? (
+<div class="ust-acilir" data-acilir>
+<a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
+<button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="hizmet-menu" aria-label="Hizmet kategorilerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<div class="ust-panel" id="hizmet-menu" data-acilir-panel>
+<ul class="ust-kat">
+{gruplar.map((g, i) => (
+<li class={i === 0 ? 'etkin' : undefined} data-kat>
+<a href={`/tr/hizmetler#${g.id}`} class="ust-kat-bas"><span>{g.ad}</span><small>{g.hizmetler.length}</small></a>
+<div class="ust-alt">
+<strong>{g.ad}</strong>
+<ul>{g.hizmetler.map((h) => <li><a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a></li>)}</ul>
+<a href={`/tr/hizmetler#${g.id}`} class="ust-alt-tum">{g.ad} hizmetlerinin tümü →</a>
+</div>
+</li>
+))}
+</ul>
+<a href="/tr/hizmetler" class="ust-panel-dip">Bütün hizmetler <span aria-hidden="true">→</span></a>
+</div>
+</div>
+) : <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
 </nav>
 <div class="ust-eylem">
 <button type="button" class="ikon-dugme arama-dugme" data-arama-ac aria-label="Sitede ara" aria-keyshortcuts="Control+K Meta+K"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span class="arama-yazi">Ara</span><kbd>⌘K</kbd></button>
@@ -313,6 +356,30 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </div>
 </header>
+<script>
+  // Hizmetler açılır menüsü: fareyle üzerine gelince, ok düğmesiyle (klavye, dokunmatik) açılır; Esc veya dışarı tıklama kapatır.
+  // Fare sağa (alt listeye) doğru giderken yoldaki başka kategoriye hemen geçilmez.
+  document.querySelectorAll('[data-acilir]').forEach((k) => {
+    const d = k.querySelector('[data-acilir-dugme]');
+    const ac = (v) => { k.classList.toggle('acik', v); d.setAttribute('aria-expanded', String(v)); };
+    let kapanis, gecis, onceki = 0, son = 0;
+    k.addEventListener('mousemove', (o) => { onceki = son; son = o.clientX; });
+    k.addEventListener('mouseenter', () => { clearTimeout(kapanis); ac(true); });
+    k.addEventListener('mouseleave', () => { kapanis = setTimeout(() => ac(false), 180); });
+    d.addEventListener('click', () => ac(!k.classList.contains('acik')));
+    k.addEventListener('focusout', (o) => { if (!k.contains(o.relatedTarget)) ac(false); });
+    k.addEventListener('keydown', (o) => { if (o.key === 'Escape' && k.classList.contains('acik')) { ac(false); d.focus(); } });
+    const kategoriler = [...k.querySelectorAll('[data-kat]')];
+    const liste = k.querySelector('.ust-kat');
+    new MutationObserver(() => { if (k.classList.contains('acik')) liste.style.minHeight = Math.max(...kategoriler.map((x) => x.querySelector('.ust-alt').offsetHeight)) + 'px'; }).observe(k, { attributes: true, attributeFilter: ['class'] });
+    const sec = (li) => kategoriler.forEach((x) => x.classList.toggle('etkin', x === li));
+    kategoriler.forEach((li) => {
+      li.addEventListener('mouseenter', () => { clearTimeout(gecis); if (son > onceki) gecis = setTimeout(() => { if (li.matches(':hover')) sec(li); }, 220); else sec(li); });
+      li.addEventListener('focusin', () => sec(li));
+    });
+    document.addEventListener('click', (o) => { if (!k.contains(o.target)) ac(false); });
+  });
+</script>
 <dialog id="cekmece" class="cekmece" aria-label="Site menüsü">
 <div class="cm-ust">
 <div class="kap cm-ust-ic">
