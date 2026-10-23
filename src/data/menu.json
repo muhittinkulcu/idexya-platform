@@ -1,0 +1,5 @@
+{
+  "_aciklama": "Hizmetler menüsünün görünümü: standart, orta veya mega. kapali = üst çubuktaki Hizmetler açılır menüsü, acik = Menü düğmesiyle açılan tam ekran menü. Denemek için adrese ?menu=orta (veya standart, mega) ekleyin; ?menu=varsayilan geri alır.",
+  "kapali": "mega",
+  "acik": "mega"
+}

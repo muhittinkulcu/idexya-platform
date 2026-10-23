@@ -1,0 +1,88 @@
+---
+// Menülerdeki küçük temsilî hizmet görselleri (Mega menü). Süslemedir, ekran okuyucudan gizlenir; gerçek veri içermez.
+interface Props { id: string; }
+const { id } = Astro.props;
+---
+<svg class="mg" viewBox="0 0 260 150" aria-hidden="true" focusable="false">
+  {id === 'e-ticaret' && (
+    <g>
+      {[['Mağaza', 8, 8], ['Trendyol', 176, 8], ['Hepsiburada', 8, 112], ['Amazon', 176, 112]].map(([ad, x, y]) => (
+        <g><rect x={x} y={y} width="76" height="30" rx="9" class="mg-kart"/><text x={Number(x) + 38} y={Number(y) + 19} text-anchor="middle" class="mg-yazi">{ad}</text></g>
+      ))}
+      <path d="M84 38 L100 52 M176 38 L160 52 M84 112 L100 98 M176 112 L160 98" class="mg-cizgi"/>
+      <rect x="92" y="50" width="76" height="50" rx="12" class="mg-vurgu"/>
+      <text x="130" y="72" text-anchor="middle" class="mg-beyaz mg-kalin">Tek merkez</text>
+      <text x="130" y="88" text-anchor="middle" class="mg-beyaz mg-ince">Stok · Fiyat</text>
+    </g>
+  )}
+  {id === 'dijital-reklam' && (
+    <g>
+      <rect x="4" y="4" width="252" height="142" rx="14" class="mg-kart"/>
+      <text x="18" y="26" class="mg-yazi mg-kalin">Sonuçlar ayrı ölçülür</text>
+      <path d="M18 118 H244" class="mg-eksen"/>
+      {[['Satış', 58, 'mg-vurgu'], ['Form', 42, 'mg-mavi'], ['Mesaj', 30, 'mg-yesil']].map(([ad, h, c], j) => (
+        <g><rect x={26 + j * 46} y={118 - Number(h)} width="30" height={h} rx="5" class={String(c)}/><text x={41 + j * 46} y="134" text-anchor="middle" class="mg-ince">{ad}</text></g>
+      ))}
+      <path d="M170 106 L186 98 L202 101 L218 84 L238 66" class="mg-cizgi-vurgu"/>
+      <circle cx="238" cy="66" r="4" class="mg-nokta"/>
+    </g>
+  )}
+  {id === 'seo' && (
+    <g>
+      <rect x="4" y="4" width="252" height="28" rx="14" class="mg-kart"/>
+      <circle cx="20" cy="18" r="5" class="mg-cizgi-ince"/><path d="M24 22 L28 26" class="mg-cizgi-ince"/>
+      <text x="36" y="22" class="mg-yazi">en iyi ajans nasıl seçilir?</text>
+      <rect x="4" y="40" width="252" height="66" rx="12" class="mg-ai"/>
+      <text x="16" y="57" class="mg-ince mg-kalin mg-vurgu-yazi">✦ Yapay zekâ özeti</text>
+      <rect x="16" y="65" width="190" height="6" rx="3" class="mg-satir"/><rect x="16" y="76" width="150" height="6" rx="3" class="mg-satir"/>
+      <rect x="16" y="86" width="118" height="14" rx="7" class="mg-kaynak"/><text x="24" y="96" class="mg-ince mg-kalin">Kaynak: markaniz.com</text>
+      <rect x="4" y="114" width="252" height="32" rx="10" class="mg-kart mg-secili"/>
+      <text x="16" y="134" class="mg-ince mg-yesil-yazi mg-kalin">1. markaniz.com</text><rect x="110" y="128" width="128" height="6" rx="3" class="mg-satir"/>
+    </g>
+  )}
+  {id === 'web-yazilim' && (
+    <g>
+      <rect x="4" y="4" width="166" height="104" rx="12" class="mg-kart"/>
+      <circle cx="18" cy="17" r="3" class="mg-nokta"/><circle cx="28" cy="17" r="3" class="mg-nokta-acik"/><circle cx="38" cy="17" r="3" class="mg-nokta-acik"/>
+      <rect x="16" y="32" width="96" height="8" rx="4" class="mg-satir-koyu"/><rect x="16" y="46" width="130" height="6" rx="3" class="mg-satir"/><rect x="16" y="57" width="118" height="6" rx="3" class="mg-satir"/>
+      <rect x="16" y="72" width="62" height="22" rx="7" class="mg-vurgu"/><text x="47" y="87" text-anchor="middle" class="mg-beyaz mg-ince mg-kalin">Teklif al</text>
+      <rect x="184" y="16" width="72" height="130" rx="16" class="mg-kart mg-golge"/>
+      <rect x="194" y="32" width="52" height="7" rx="3.5" class="mg-satir-koyu"/><rect x="194" y="46" width="44" height="5" rx="2.5" class="mg-satir"/><rect x="194" y="58" width="52" height="38" rx="8" class="mg-zemin"/><rect x="194" y="104" width="52" height="18" rx="7" class="mg-vurgu"/>
+      {['CRM', 'ERP', 'Muhasebe'].map((s, j) => (
+        <g><rect x={4 + j * 58} y="118" width={j === 2 ? 60 : 48} height="26" rx="8" class="mg-kart"/><text x={j === 2 ? 4 + j * 58 + 30 : 4 + j * 58 + 24} y="135" text-anchor="middle" class="mg-ince mg-kalin">{s}</text></g>
+      ))}
+    </g>
+  )}
+  {id === 'tasarim-icerik' && (
+    <g>
+      <rect x="4" y="4" width="160" height="142" rx="14" class="mg-kart"/>
+      <rect x="16" y="16" width="34" height="34" rx="9" class="mg-vurgu"/><path d="M26 26 L40 40 M40 26 L26 40" class="mg-beyaz-cizgi"/>
+      <text x="60" y="36" class="mg-buyuk">Aa</text><text x="60" y="48" class="mg-ince">Marka kiti</text>
+      {['mg-vurgu', 'mg-lacivert', 'mg-tint', 'mg-zemin-koyu'].map((c, j) => <rect x={16 + j * 36} y="60" width="28" height="28" rx="8" class={c}/>)}
+      <rect x="16" y="98" width="64" height="38" rx="8" class="mg-zemin"/><path d="M24 128 L38 112 L48 122 L56 116 L66 128 Z" class="mg-tint"/>
+      <rect x="88" y="98" width="64" height="38" rx="8" class="mg-zemin"/><path d="M96 128 L110 112 L120 122 L128 116 L138 128 Z" class="mg-tint"/>
+      <rect x="176" y="4" width="80" height="142" rx="16" class="mg-lacivert"/>
+      <rect x="184" y="14" width="64" height="104" rx="10" class="mg-video"/>
+      <path d="M208 56 L208 78 L226 67 Z" class="mg-beyaz-dolgu"/>
+      <rect x="184" y="126" width="40" height="5" rx="2.5" class="mg-beyaz-dolgu mg-soluk"/><rect x="184" y="135" width="28" height="5" rx="2.5" class="mg-beyaz-dolgu mg-soluk"/>
+    </g>
+  )}
+</svg>
+<style is:global>
+  .mg{display:block;width:100%;height:auto;font-family:inherit}
+  .mg text{font-family:inherit}
+  .mg-yazi{font-size:11px;fill:var(--head)}.mg-ince{font-size:9.5px;fill:var(--tx2)}.mg-buyuk{font-size:20px;font-weight:700;fill:var(--head)}.mg-kalin{font-weight:700}
+  .mg-beyaz{fill:#FFFFFF;font-size:11px}.mg-beyaz.mg-ince{fill:#FFFFFF}.mg-beyaz-dolgu{fill:#FFFFFF}.mg-soluk{opacity:.6}.mg-beyaz-cizgi{stroke:#FFFFFF;stroke-width:4.5;stroke-linecap:round}
+  .mg-kart{fill:var(--card);stroke:var(--line);stroke-width:1.2}.mg-secili{stroke:var(--ok);stroke-width:1.6}.mg-golge{filter:drop-shadow(0 6px 10px rgba(0,0,0,.12))}
+  .mg-zemin{fill:var(--bg2,var(--bg));stroke:var(--line)}.mg-zemin-koyu{fill:var(--tx2)}
+  .mg-vurgu{fill:#F07A23}.mg-lacivert{fill:#002559}.mg-tint{fill:var(--tint);stroke:none}.mg-mavi{fill:#2a78d6}.mg-yesil{fill:#1baf7a}
+  .mg-vurgu-yazi{fill:var(--acc)}.mg-yesil-yazi{fill:var(--ok)}
+  .mg-ai{fill:var(--tint);stroke:color-mix(in srgb,var(--brand) 40%,transparent);stroke-width:1.2}
+  .mg-kaynak{fill:var(--card);stroke:var(--brand);stroke-width:1.2}
+  .mg-satir{fill:var(--line)}.mg-satir-koyu{fill:var(--tx2);opacity:.5}
+  .mg-cizgi{stroke:var(--tx2);stroke-width:1.6;stroke-dasharray:4 4;fill:none}.mg-cizgi-ince{stroke:var(--tx2);stroke-width:1.6;fill:none}
+  .mg-cizgi-vurgu{stroke:#F07A23;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .mg-eksen{stroke:var(--line);stroke-width:1.5}
+  .mg-nokta{fill:#F07A23}.mg-nokta-acik{fill:var(--line)}
+  .mg-video{fill:#0A3270}
+</style>
