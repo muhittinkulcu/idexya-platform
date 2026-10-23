@@ -1,0 +1,24 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Ayarlar" aktif="ayar" yol="Sistem" aciklama="Firma bilgileri ve varsayılanlar. Teklif çıktısı gibi belgelerde bu bilgiler kullanılır. Erişim anahtarları ve gizli değerler burada değil, Cloudflare panelinde tutulur.">
+<form class="kart" data-form style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px"></form>
+<div style="display: flex; gap: 10px; align-items: center"><button type="button" class="dugme ana" data-kaydet>Kaydet</button><span data-durum style="color: var(--tx2); font-size: 14px"></span></div>
+<p style="margin: 0; font-size: 14px; color: var(--tx2)">Bağlantı durumları için <a href="/yonetim/entegrasyonlar/">Entegrasyonlar</a> sayfasına bakın.</p>
+<script>
+  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  const form = document.querySelector('[data-form]'), durum = document.querySelector('[data-durum]');
+  const stil = 'min-height: 42px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit';
+  (async () => {
+    try {
+      const r = await api('ayarlar');
+      form.replaceChildren(...r.alanlar.map((a) => el('label', { style: `display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px${a.sinir > 300 ? '; grid-column: 1 / -1' : ''}` }, a.ad,
+        a.sinir > 300 ? el('textarea', { name: a.k, maxlength: a.sinir, rows: 3, style: stil }, r.degerler[a.k] || '') : el('input', { name: a.k, maxlength: a.sinir, value: r.degerler[a.k] || '', style: stil }))));
+    } catch (h) { genelHata('Ayarlar yüklenemedi: ' + h.message); }
+  })();
+  document.querySelector('[data-kaydet]').addEventListener('click', async (o) => {
+    const d = o.currentTarget; d.disabled = true; durum.textContent = 'Kaydediliyor…';
+    try { await api('ayarlar', Object.fromEntries(new FormData(form))); durum.textContent = 'Kaydedildi.'; } catch (h) { durum.textContent = h.message; } finally { d.disabled = false; }
+  });
+</script>
+</Yonetim>

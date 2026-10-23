@@ -30,7 +30,7 @@ const I = {
 const MENU = [
   { grup: 'MERKEZ', ogeler: [
     { k: 'genel', ad: 'Genel bakış', href: '/yonetim/', sabit: true },
-    { k: 'bildirim', ad: 'Bildirimler', altlar: [{ ad: 'Onay bekleyenler' }, { ad: 'Sistem uyarıları' }] }
+    { k: 'bildirim', ad: 'Bildirimler', href: '/yonetim/bildirimler/', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/yonetim/bildirimler/#onay' }, { ad: 'Sistem uyarıları', href: '/yonetim/bildirimler/#uyari' }] }
   ] },
   { grup: 'SATIŞ VE MÜŞTERİ', ogeler: [
     { k: 'talepler', ad: 'Talepler', href: '/yonetim/talepler/', i: 'talep', sayac: 'talep', altlar: [
@@ -48,7 +48,7 @@ const MENU = [
       { ad: 'Yazılar ve kaynaklar', href: '/yonetim/icerikler/' }, { ad: 'Sayfalar' }, { ad: 'Hizmetler' }, { ad: 'Ürünler' },
       { ad: 'Kategoriler' }, { ad: 'Paketler' }, { ad: 'Referanslar' }] },
     { k: 'instagram', ad: 'Instagram gönderileri', href: '/yonetim/instagram/', i: 'medya' },
-    { k: 'medya', ad: 'Medya kütüphanesi', i: 'medya' },
+    { k: 'medya', ad: 'Medya kütüphanesi', href: '/yonetim/medya/', i: 'medya' },
     { k: 'menuler', ad: 'Menüler ve SSS', i: 'belge' }
   ] },
   { grup: 'ÜYELİK', ogeler: [
@@ -63,12 +63,12 @@ const MENU = [
   { grup: 'FİNANS VE BAĞLANTILAR', ogeler: [
     { k: 'belge', ad: 'Belgeler', i: 'belge' },
     { k: 'muhasebe', ad: 'Muhasebe', i: 'muhasebe' },
-    { k: 'entegre', ad: 'Entegrasyonlar', i: 'entegre' },
-    { k: 'esitle', ad: 'Veri eşitleme', i: 'esitle' }
+    { k: 'entegre', ad: 'Entegrasyonlar', href: '/yonetim/entegrasyonlar/', i: 'entegre' },
+    { k: 'esitle', ad: 'Veri eşitleme', href: '/yonetim/veri-esitleme/', i: 'esitle' }
   ] },
   { grup: 'SİSTEM', ogeler: [
-    { k: 'ayar', ad: 'Ayarlar', i: 'ayar' },
-    { k: 'gecmis', ad: 'İşlem geçmişi', i: 'gecmis' }
+    { k: 'ayar', ad: 'Ayarlar', href: '/yonetim/ayarlar/', i: 'ayar' },
+    { k: 'gecmis', ad: 'İşlem geçmişi', href: '/yonetim/gecmis/', i: 'gecmis' }
   ] }
 ];
 const svg = (k) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k] || ''}</svg>`;
@@ -221,10 +221,10 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 <script is:inline>document.getElementById('kabuk').className='kabuk '+(document.documentElement.dataset.tema||'acik')</script>
 <aside class="yan sabit" id="yan" aria-label="Yan menü">
   <div class="logo">
-    <span style="display: flex; align-items: center; gap: 10px">
+    <a href="/yonetim/" class="logo-baglanti" aria-label="IDPANEL · Genel bakış" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F07A23" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>
       <b class="etiket">ID<span>PANEL</span></b>
-    </span>
+    </a>
     <span class="logo-arac masa">
       <button type="button" class="ikon" data-yan-daralt aria-label="Yan menüyü daralt veya genişlet" title="Menüyü daralt veya genişlet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M9 4v16"></path></svg></button>
       <button type="button" class="ikon" data-yan-sabitle aria-pressed="true" aria-label="Yan menüyü sabitle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M9 3h6l-1 6 4 4H6l4-4z"></path></svg></button>

@@ -1,0 +1,65 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Medya kütüphanesi" aktif="medya" yol="İçerik" aciklama="İçeriklerde kullanacağınız görseller. Görseller yüklenmeden önce tarayıcıda küçültülür (en fazla 1280 piksel) ve sitenin kendi adresinden sunulur. Adresi kopyalayıp içerik metnine ekleyebilirsiniz.">
+<div class="kart" style="padding: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+<label class="dugme ana" style="cursor: pointer">Görsel yükle<input type="file" accept="image/jpeg,image/png,image/webp" multiple data-dosya style="position: absolute; width: 1px; height: 1px; opacity: 0"></label>
+<input type="search" data-ara placeholder="Ada göre ara" aria-label="Görsel ara" style="flex: 1 1 200px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit">
+<span data-durum role="status" style="font-size: 14px; color: var(--tx2)"></span>
+</div>
+<section class="kart" aria-label="Görseller" data-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px"></section>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const liste = document.querySelector('[data-liste]'), durum = document.querySelector('[data-durum]'), ara = document.querySelector('[data-ara]');
+  let tum = [];
+  async function kucult(dosya) {
+    const resim = await createImageBitmap(dosya);
+    const oran = Math.min(1, 1280 / Math.max(resim.width, resim.height));
+    const tuval = el('canvas', { width: Math.round(resim.width * oran), height: Math.round(resim.height * oran) });
+    tuval.getContext('2d').drawImage(resim, 0, 0, tuval.width, tuval.height);
+    for (const [tur, kalite] of [['image/webp', 0.82], ['image/jpeg', 0.8], ['image/jpeg', 0.65], ['image/jpeg', 0.5]]) {
+      const d = tuval.toDataURL(tur, kalite);
+      if (d.startsWith('data:' + tur) && d.length < 270 * 1024) return { veri: d, genislik: tuval.width, yukseklik: tuval.height };
+    }
+    throw new Error(`${dosya.name} küçültülemedi; daha küçük bir görsel seçin`);
+  }
+  document.querySelector('[data-dosya]').addEventListener('change', async (o) => {
+    const dosyalar = [...o.target.files]; let tamam = 0;
+    for (const d of dosyalar) {
+      durum.textContent = `Yükleniyor ${tamam + 1}/${dosyalar.length}…`;
+      try { const k = await kucult(d); await api('medya', { ...k, ad: d.name.replace(/\.[^.]+$/, '') }); tamam++; }
+      catch (h) { genelHata(h.message); }
+    }
+    durum.textContent = `${tamam} görsel yüklendi.`; o.target.value = ''; await yukle();
+  });
+  const kopyala = async (yazi, d) => { try { await navigator.clipboard.writeText(yazi); d.textContent = 'Kopyalandı'; } catch (e) { prompt('Adresi kopyalayın:', yazi); } setTimeout(() => (d.textContent = 'Adresi kopyala'), 1500); };
+  function ciz() {
+    const q = ara.value.trim().toLocaleLowerCase('tr-TR');
+    const g = tum.filter((m) => !q || (m.ad + ' ' + (m.alt || '')).toLocaleLowerCase('tr-TR').includes(q));
+    liste.replaceChildren(...(g.length ? g.map((m) => {
+      const adres = `${location.origin}/api/medya/${m.id}`;
+      const alt = el('input', { value: m.alt || '', maxlength: 200, placeholder: 'Alternatif metin', 'aria-label': 'Alternatif metin', style: 'min-height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px' });
+      return el('article', { style: 'display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 10px' },
+        el('img', { src: `/api/medya/${m.id}`, alt: m.alt || '', loading: 'lazy', style: 'width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: var(--card2)' }),
+        el('b', { style: 'font-size: 14px; overflow-wrap: anywhere' }, m.ad),
+        el('small', { style: 'color: var(--tx2)' }, `${m.genislik}×${m.yukseklik} · ${Math.round(m.boyut / 1024)} KB · ${tarih(m.olusturma, false)}`),
+        alt,
+        el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap' },
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => kopyala(adres, o.currentTarget) }, 'Adresi kopyala'),
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { try { await api(`medya/${m.id}`, { ad: m.ad, alt: alt.value }); m.alt = alt.value; durum.textContent = 'Alternatif metin kaydedildi.'; } catch (h) { genelHata(h.message); } } }, 'Kaydet'),
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: () => sil(m) }, 'Sil')));
+    }) : [el('div', { class: 'bos', style: 'grid-column: 1 / -1' }, tum.length ? 'Aramayla eşleşen görsel yok.' : 'Henüz görsel yüklenmedi.')]));
+  }
+  async function sil(m, zorla = false) {
+    if (!zorla && !confirm(`“${m.ad}” silinsin mi?`)) return;
+    const r = await fetch(`/api/yonetim/medya/${m.id}/sil`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ zorla }) });
+    const s = await r.json().catch(() => ({}));
+    if (r.status === 409 && s.kullanan) { if (confirm(`Bu görsel şu içeriklerde kullanılıyor: ${s.kullanan.join(', ')}. Yine de silinsin mi? (İçeriklerde görsel görünmez olur.)`)) return sil(m, true); return; }
+    if (!r.ok || !s.ok) { genelHata(s.hata || 'Silinemedi'); return; }
+    await yukle();
+  }
+  ara.addEventListener('input', ciz);
+  async function yukle() { try { tum = (await api('medya')).medya; ciz(); } catch (h) { genelHata('Görseller yüklenemedi: ' + h.message); } }
+  yukle();
+</script>
+</Yonetim>

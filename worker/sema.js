@@ -67,5 +67,11 @@ export const SEMA = [
   // Sitede gösterilen Instagram gönderileri (worker/instagram.js): yöneticinin seçtiği bağlantı, açıklama ve küçültülmüş görsel.
   `CREATE TABLE IF NOT EXISTS instagram (
     id TEXT PRIMARY KEY, baglanti TEXT NOT NULL, aciklama TEXT, gorsel TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0,
-    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`
+    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  // Panel ayarları ve medya kütüphanesi (worker/sistem.js)
+  `CREATE TABLE IF NOT EXISTS ayarlar (anahtar TEXT PRIMARY KEY, deger TEXT, guncelleme TEXT NOT NULL, guncelleyen TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS medya (
+    id TEXT PRIMARY KEY, ad TEXT NOT NULL, alt TEXT, tur TEXT NOT NULL, boyut INTEGER NOT NULL, genislik INTEGER, yukseklik INTEGER,
+    veri TEXT NOT NULL, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS islem_zaman ON islem_kaydi (zaman)`
 ];
