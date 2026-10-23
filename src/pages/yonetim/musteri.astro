@@ -3,6 +3,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Müşteri kartı" aktif="crm" yol="Müşteri ilişkileri › CRM">
 <div data-ust style="display: flex; flex-direction: column; gap: 12px"></div>
+<section class="kart" aria-label="Reklam özeti (IDOS)" data-reklam hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section class="kart" aria-label="Müşteri bilgileri" style="flex: 1 1 320px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
 <h2 style="margin: 0; font-size: 16px; color: var(--head)">Bilgiler</h2>
@@ -95,6 +96,32 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   async function yukle() {
     teklifleriYukle();
+  // Reklam özeti (IDOS): yalnız IDOS eşitleme sayfasında bu müşteriye eşleştirilmiş hesap varsa görünür.
+  // Para birimleri birbirine eklenmez; her platform + para birimi ayrı satırdır.
+  const PLATFORM = { meta: 'Meta', google: 'Google Ads' };
+  const paraYaz = (n, kod) => { try { return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: kod, maximumFractionDigits: 0 }).format(n || 0); } catch (e) { return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n || 0) + ' ' + kod; } };
+  const sayi = (n) => (n === null || n === undefined ? '—' : new Intl.NumberFormat('tr-TR').format(n));
+  async function reklamYukle() {
+    const kutu = document.querySelector('[data-reklam]');
+    let r;
+    try { r = await api(`musteriler/${encodeURIComponent(id)}/reklam`); } catch (h) { kutu.hidden = true; return; }
+    if (!r.hesaplar.length) { kutu.hidden = true; return; }
+    kutu.hidden = false;
+    kutu.replaceChildren(
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
+        el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Reklam özeti (IDOS)'),
+        el('a', { href: '/yonetim/crm-idos/', style: 'font-size: 13px' }, 'Eşleşmeleri yönet')),
+      r.ozet.length
+        ? el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px' }, r.ozet.map((o) => el('div', { style: 'padding: 10px 12px; border-radius: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 2px; min-width: 0' },
+            el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${PLATFORM[o.platform] || o.platform} · ${o.para}`),
+            el('strong', { style: 'font-size: 18px; color: var(--head)' }, paraYaz(o.harcama, o.para)),
+            el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${sayi(o.gosterim)} gösterim · ${sayi(o.tiklama)} tıklama`))))
+        : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, `Eşleşen hesaplarda son ${r.gun} günde reklam verisi yok.`),
+      el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, `Son ${r.gun} gün, bugün hariç · farklı para birimleri toplanmaz · hesaplar: ${r.hesaplar.map((h) => `${PLATFORM[h.platform] || h.platform} ${h.hesap}`).join(', ')}`));
+  }
+
+  async function yukle() {
+    reklamYukle();
     try { ciz(await api('musteriler/' + encodeURIComponent(id))); }
     catch (h) { genelHata(h.durum === 404 ? 'Bu müşteri bulunamadı. Bağlantı eski olabilir; CRM listesinden açın.' : 'Müşteri yüklenemedi: ' + h.message); }
   }

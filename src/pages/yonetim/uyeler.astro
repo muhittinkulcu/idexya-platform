@@ -28,7 +28,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   let tum = [], katalog = null, gruplar = [], sekme = 'bekliyor', secili = new URLSearchParams(location.search).get('id');
   const BOLUM = [['bekliyor', 'Onay bekleyen'], ['onayli', 'Onaylı'], ['askida', 'Askıda'], ['reddedildi', 'Reddedilen'], ['hepsi', 'Tümü']];
   const CIP = { bekliyor: 'yeni', onayli: 'kazanildi', askida: 'gorusme', reddedildi: 'kaybedildi' };
-  const ISLEM = { uye_kayit: 'Üyelik talebi gönderdi', uye_durum: 'Durum değişti', uye_modul: 'Bölüm yetkileri değişti', uye_grup: 'Gruplar değişti', uye_sifre_baglantisi: 'Şifre yenileme bağlantısı oluşturuldu', uye_sifre_yenilendi: 'Şifresini yeniledi', uye_sifre_degisti: 'Şifresini değiştirdi', uye_oturum_kapat: 'Tüm oturumları kapatıldı' };
+  const ISLEM = { uye_kayit: 'Üyelik talebi gönderdi', uye_durum: 'Durum değişti', uye_modul: 'Bölüm yetkileri değişti', uye_grup: 'Gruplar değişti', uye_sifre_baglantisi: 'Şifre yenileme bağlantısı oluşturuldu', uye_sifre_yenilendi: 'Şifresini yeniledi', uye_sifre_degisti: 'Şifresini değiştirdi', uye_oturum_kapat: 'Tüm oturumları kapatıldı', davet_kullanildi: 'Davetle üye oldu (onaylı)', portal_bagla: 'CRM müşterisine bağlandı', portal_coz: 'CRM müşteri bağlantısı kaldırıldı' };
 
   function listeCiz() {
     sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
