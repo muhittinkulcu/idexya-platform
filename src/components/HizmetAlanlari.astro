@@ -4,10 +4,8 @@
 // Telefonda sekmeler gizlenir, beş alan alt alta görünür (içerik her zaman sayfada, arama motorları da görür).
 import gruplar from '../data/hizmetler.json';
 import { IKON } from '../data/hizmet-ikon';
-import { ALAN } from '../data/hizmet-alan';
 
-const ICERIK = ALAN;
-const alanlar = gruplar.map((g) => ({ ...g, ...ICERIK[g.id], ikon: IKON[g.id] }));
+const alanlar = gruplar.map((g) => ({ ...g, baslik: g.baslik || g.ad, dikkat: g.dikkat || [], ikon: IKON[g.id] }));
 const ikon = (yol: string) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${yol}</svg>`;
 ---
 <div class="hv" data-hv>

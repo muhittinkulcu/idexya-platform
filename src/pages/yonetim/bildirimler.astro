@@ -1,0 +1,29 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Bildirimler" aktif="bildirim" yol="Merkez" aciklama="Sizi bekleyen işler ve sistemin dikkat gerektiren durumları. Liste her açılışta kayıtlı veriden yeniden hesaplanır.">
+<section class="kart" id="onay" aria-labelledby="onay-b" style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="onay-b" style="margin: 0; font-size: 18px">Onay bekleyenler</h2>
+<div data-onay></div>
+</section>
+<section class="kart" id="uyari" aria-labelledby="uyari-b" style="padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<h2 id="uyari-b" style="margin: 0; font-size: 18px">Sistem uyarıları</h2>
+<div data-uyari></div>
+</section>
+<script>
+  import { api, el, once, genelHata } from '../../scripts/yonetim/ortak.js';
+  const RENK = { kritik: 'kaybedildi', uyari: 'teklif', normal: 'gorusme', bilgi: 'yeni' };
+  const ETIKET = { kritik: 'Acil', uyari: 'Uyarı', normal: 'Bekliyor', bilgi: 'Bilgi' };
+  const ciz = (kutu, liste, bos) => kutu.replaceChildren(...(liste.length ? liste.map((b) => el('a', { href: b.href, style: 'display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: inherit; margin-bottom: 8px' },
+    el('span', { class: 'cip ' + (RENK[b.onem] || ''), style: 'flex: none' }, ETIKET[b.onem] || 'Bilgi'),
+    el('span', { style: 'flex: 1; display: flex; flex-direction: column; gap: 4px' }, el('b', {}, b.baslik), el('span', { style: 'color: var(--tx2); font-size: 14px' }, b.detay || '')),
+    b.zaman ? el('small', { style: 'color: var(--tx2); white-space: nowrap' }, once(b.zaman)) : null)) : [el('div', { class: 'bos' }, bos)]));
+  (async () => {
+    try {
+      const r = await api('bildirimler');
+      ciz(document.querySelector('[data-onay]'), r.onay, 'Bekleyen iş yok, her şey yolunda.');
+      ciz(document.querySelector('[data-uyari]'), r.uyari, 'Sistem uyarısı yok.');
+    } catch (h) { genelHata('Bildirimler yüklenemedi: ' + h.message); }
+  })();
+</script>
+</Yonetim>

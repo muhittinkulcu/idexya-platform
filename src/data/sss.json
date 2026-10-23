@@ -1,0 +1,34 @@
+[
+  {
+    "soru": "Ücretsiz analizde neye bakıyorsunuz?",
+    "cevap": "Reklam hesaplarınızı, ölçüm altyapınızı (GA4, etiketler, dönüşümler) ve sitenizi inceleriz. Nereden başlamanız gerektiğini gerekçesiyle anlatırız. Formu gönderdikten sonra 1 iş günü içinde dönüş yaparız."
+  },
+  {
+    "soru": "Reklam hesabı kime ait olur?",
+    "cevap": "Hesap sizin adınıza açılır ve size aittir. Biz yönetici olarak erişiriz; çalışma bittiğinde erişimimiz kaldırılır, hesap ve tüm geçmiş veriler sizde kalır."
+  },
+  {
+    "soru": "En az ne kadar süre çalışmamız gerekiyor?",
+    "cevap": "Reklam ve SEO çalışmalarının öğrenme ve ölçüm dönemi olduğu için en az 3 ay ile başlamayı öneriyoruz; süre ihtiyacınıza göre görüşülebilir."
+  },
+  {
+    "soru": "Sadece tek bir hizmet alabilir miyim?",
+    "cevap": "Evet. Örneğin yalnızca Google Ads ya da yalnızca pazaryeri yönetimi ile başlayabilirsiniz. İhtiyaç oldukça diğer alanlar aynı ekip tarafından eklenebilir."
+  },
+  {
+    "soru": "Sonuçları nasıl takip ederim?",
+    "cevap": "Reklam ve analiz verileriniz kendi geliştirdiğimiz IDOS panelinde bir arada görünür. Satış, form, arama ve mesaj gibi sonuçlar ayrı ayrı izlenir."
+  },
+  {
+    "soru": "Bütçe veya kampanya değişikliklerini kim onaylıyor?",
+    "cevap": "Siz. Bütçe, teklif stratejisi ve kampanya açma-kapatma gibi kararlar size gerekçesiyle sunulur ve onayınızla uygulanır."
+  },
+  {
+    "soru": "SEO çalışmasının sonuçları ne zaman görülür?",
+    "cevap": "Teknik düzeltmelerin etkisi birkaç hafta içinde görülebilir; içerik ve otorite çalışmaları genellikle aylar sürer. Süre sektöre, rekabete ve sitenin mevcut durumuna bağlıdır, bu yüzden sıralama garantisi vermeyiz."
+  },
+  {
+    "soru": "GEO nedir, SEO’dan farkı ne?",
+    "cevap": "GEO (üretken arama optimizasyonu), sitenizin Google’ın yapay zekâ özetlerinde ve ChatGPT gibi asistanların cevaplarında kaynak gösterilmesini hedefler. SEO’nun üzerine kurulur: net cevap veren, güvenilir ve kaynak gösterilebilir içerik gerektirir."
+  }
+]

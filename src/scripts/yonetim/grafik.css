@@ -1,0 +1,52 @@
+/* Grafik ve tablo biçimleri: Genel bakış sayfasındaki (src/pages/yonetim/index.astro) kuralların ortak kopyası. SEO, hız ve ziyaretçi sayfaları kullanır. */
+.acik{--s1:#eb6834;--s2:#2a78d6;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4}
+.koyu{--s1:#d95926;--s2:#3987e5;--s3:#199e70;--s4:#9085e9;--s5:#d55181}
+.pano{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch}
+.pano>.modul{grid-column:span 1;padding:22px;display:flex;flex-direction:column;gap:14px}
+.pano>.modul.tam{grid-column:span 2}
+.pano.duzen>.modul{border:2px dashed var(--btnline)}
+.modul-bas{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.modul-bas h2{margin:0;font-size:19px;font-weight:700;color:var(--head)}
+.modul-bas small{font-size:12px;color:var(--tx2)}
+.kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
+.kpi:hover{border-color:var(--btnline);color:inherit}
+.kpi b{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--head);line-height:1.15}
+.kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.degisim{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.degisim .ok-u,.degisim-tablo .ok-u{color:var(--ok);font-weight:700}.degisim .ok-a,.degisim-tablo .ok-a{color:var(--err);font-weight:700}
+.kivilcim{display:block;width:100%;height:34px;margin-top:4px}
+.segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg)}
+.segment-kucuk button{height:30px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.segment-kucuk button[aria-pressed=true]{background:var(--card);color:var(--head);box-shadow:0 1px 3px var(--shadow)}
+.lejant{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--tx)}
+.lejant span{display:inline-flex;align-items:center;gap:6px}
+.lejant i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.lejant .onceki{width:16px;height:0;border-top:2px dashed var(--tx2);border-radius:0}
+.cubuk-alan{position:relative;height:220px;margin-left:34px}
+.cubuk-izgara{position:absolute;inset:0;pointer-events:none}
+.cubuk-izgara div{position:absolute;left:0;right:0;border-top:1px solid var(--track)}
+.cubuk-izgara span{position:absolute;left:-34px;width:28px;text-align:right;transform:translateY(-50%);font-size:11px;color:var(--tx2)}
+.cubuklar{position:absolute;inset:0;display:flex;align-items:flex-end;gap:2px}
+.cubuk{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;cursor:default;outline-offset:0}
+.cubuk:hover .yigin,.cubuk:focus-visible .yigin{filter:brightness(1.08)}
+.cubuk:hover{background:color-mix(in oklab,var(--track) 55%,transparent)}
+.yigin{display:flex;flex-direction:column-reverse;gap:2px;min-height:2px;border-radius:4px 4px 0 0;overflow:hidden}
+.onceki-cizgi{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.x-eksen{position:relative;height:18px;margin-left:34px;font-size:11px;color:var(--tx2)}
+.x-eksen span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.bos-not{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:0 20px;color:var(--tx2);font-size:14px;pointer-events:none}
+.yatay{display:flex;flex-direction:column;gap:8px}
+.yatay-sat{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:10px;align-items:center;font-size:13px}
+.yatay-sat .ad{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.yatay-sat .ad i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
+.yatay-iz{height:12px;border-radius:0 4px 4px 0;background:var(--track);overflow:hidden}
+.yatay-iz div{height:100%;border-radius:0 4px 4px 0}
+.yatay-sat b{color:var(--head);font-variant-numeric:tabular-nums}
+.tablo-sar{overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:14px}
+.tablo-sar table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.tablo-sar th,.tablo-sar td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tablo-sar th:first-child,.tablo-sar td:first-child{text-align:left}
+.tablo-sar thead th{position:sticky;top:0;background:var(--card2);color:var(--tx2);font-weight:600}
+.ipucu{position:fixed;z-index:50;pointer-events:none;background:var(--head);color:var(--bg);padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.45;white-space:pre-line;box-shadow:0 10px 30px -12px var(--shadow);max-width:240px}
+@media (max-width:900px){.pano{grid-template-columns:minmax(0,1fr)}.pano>.modul,.pano>.modul.tam{grid-column:auto}}
+@media (max-width:600px){.cubuk-alan,.x-eksen{margin-left:28px}}

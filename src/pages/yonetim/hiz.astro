@@ -1,0 +1,119 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+import '../../scripts/yonetim/grafik.css';
+---
+<Yonetim baslik="Hız ve güvenlik" aktif="hiz" yol="Site" aciklama="Gerçek ziyaretçilerin tarayıcısında ölçülen sayfa hızı (Core Web Vitals) ve site denetiminin sayfa ağırlığı, güvenlik başlıkları, robots.txt ve sitemap kontrolleri.">
+<section class="kart modul" aria-labelledby="b-gercek" style="padding: 22px; display: flex; flex-direction: column; gap: 14px">
+  <div class="modul-bas"><h2 id="b-gercek">Gerçek kullanıcı hızı</h2>
+    <div class="segment-kucuk" role="group" aria-label="Dönem" data-donem><button type="button" data-g="7">Son 7 gün</button><button type="button" data-g="28">Son 28 gün</button></div>
+  </div>
+  <p style="margin: 0; color: var(--tx2); font-size: 14px; max-width: 900px">Değerler ziyaretçilerin kendi cihazında, sayfadan ayrılırken ölçülür ve Google'ın yöntemiyle <b>75. yüzdelik</b> olarak gösterilir: ziyaretlerin %75'i bu değerden iyi ya da eşittir. Eşikler Google Core Web Vitals'a göre: <b>LCP</b> (en büyük içeriğin görünme süresi) iyi ≤ 2,5 sn, kötü &gt; 4 sn; <b>INP</b> (tıklamaya tepki süresi, yaklaşık) iyi ≤ 200 ms, kötü &gt; 500 ms; <b>CLS</b> (sayfa kayması) iyi ≤ 0,1, kötü &gt; 0,25. Do Not Track açık ziyaretçiler ölçülmez; sayfa başına günde en çok 500 örnek tutulur.</p>
+  <div class="kpi-sira" data-vital-kpi></div>
+  <div data-cihaz style="overflow-x: auto"></div>
+  <div data-vital-sayfa style="overflow-x: auto"></div>
+</section>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between">
+  <span style="color: var(--tx2); font-size: 14px" data-son-bilgi></span>
+  <button type="button" class="dugme ana" data-calistir>Denetimi şimdi çalıştır</button>
+</div>
+<div class="uyari bilgi" data-sinir>Denetim bilgisi yükleniyor…</div>
+<div class="pano">
+  <section class="kart modul" aria-labelledby="b-guv">
+    <div class="modul-bas"><h2 id="b-guv">Güvenlik başlıkları</h2></div>
+    <p style="margin: 0; color: var(--tx2); font-size: 13px">Başlıklar, denetlenen her sayfanın Cloudflare dosya sunucusundan gelen yanıtında kontrol edilir; yani public/_headers kuralları uygulanmış hâli. Cloudflare panelinde alan adı düzeyinde eklenen başlıklar (ör. HSTS) bu yanıtta görünmediği için burada denetlenmez.</p>
+    <div data-guvenlik style="overflow-x: auto"></div>
+  </section>
+  <section class="kart modul" aria-labelledby="b-tarama">
+    <div class="modul-bas"><h2 id="b-tarama">robots.txt ve sitemap</h2></div>
+    <div data-tarama></div>
+  </section>
+  <section class="kart modul tam" aria-labelledby="b-agirlik">
+    <div class="modul-bas"><h2 id="b-agirlik">Sayfa ağırlığı</h2><small>HTML boyutu sıkıştırılmadan ölçülür; görseller ve dosyalar dahil değildir</small></div>
+    <div data-agirlik style="overflow-x: auto"></div>
+  </section>
+</div>
+<script>
+  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { SORUN, AGIRLIK_CIP, sayi, kb, calistirKur, sinirNotu, hucre, bas } from '../../scripts/yonetim/denetim.js';
+  const $ = (s) => document.querySelector(s);
+  const ESIK = { lcp: [2500, 4000], inp: [200, 500], cls: [0.1, 0.25] };
+  const DEGER_AD = { iyi: 'İyi', orta: 'Geliştirilmeli', kotu: 'Kötü' };
+  const CIP = { iyi: 'kazanildi', orta: 'gorusme', kotu: 'kaybedildi' };
+  const CIHAZ = { mobil: 'Mobil', tablet: 'Tablet', masaustu: 'Masaüstü' };
+  const derece = (k, v) => (v === null || v === undefined ? null : v <= ESIK[k][0] ? 'iyi' : v <= ESIK[k][1] ? 'orta' : 'kotu');
+  const yaz = (k, v) => (v === null || v === undefined ? '—' : k === 'cls' ? new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 3 }).format(v) : k === 'lcp' ? new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(v / 1000) + ' sn' : sayi(Math.round(v)) + ' ms');
+  const deger = (k, v) => { const d = derece(k, v); return d ? el('span', { style: 'display: inline-flex; gap: 6px; align-items: center; white-space: nowrap' }, el('b', {}, yaz(k, v)), el('span', { class: 'cip ' + CIP[d] }, DEGER_AD[d])) : el('span', { style: 'color: var(--tx2)' }, 'veri yok'); };
+  let donem = 28;
+  try { donem = Number(localStorage.getItem('idx-hiz-donem')) === 7 ? 7 : 28; } catch (e) {}
+
+  async function vitalYukle() {
+    document.querySelectorAll('[data-donem] button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.g) === donem)));
+    let v;
+    try { v = await api('hiz/' + donem); } catch (h) { genelHata('Hız ölçümleri yüklenemedi: ' + h.message); return; }
+    const g = v.genel;
+    if (!g.n) {
+      $('[data-vital-kpi]').replaceChildren();
+      $('[data-cihaz]').replaceChildren();
+      $('[data-vital-sayfa]').replaceChildren(el('div', { class: 'bos' }, `Son ${donem} günde hız ölçümü yok. Ziyaretçiler siteyi gezip sayfadan ayrıldıkça ölçümler burada görünür (canlıya alındıktan sonra birkaç ziyaret yeterli).`));
+      return;
+    }
+    const kart = (ad, k, n) => el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ad + ' · p75'),
+      el('b', { style: derece(k, g[k]) ? `color: ${{ iyi: 'var(--ok)', orta: 'var(--warn)', kotu: 'var(--err)' }[derece(k, g[k])]}` : undefined }, yaz(k, g[k])),
+      el('span', { class: 'degisim' }, derece(k, g[k]) ? DEGER_AD[derece(k, g[k])] + ' · ' : '', `${sayi(n)} ölçüm`));
+    $('[data-vital-kpi]').replaceChildren(kart('LCP', 'lcp', g.nLcp), kart('INP (yaklaşık)', 'inp', g.nInp), kart('CLS', 'cls', g.nCls),
+      el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Örnek sayısı'), el('b', {}, sayi(g.n)), el('span', { class: 'degisim' }, `son ${donem} gün · INP yalnız tıklama/dokunma olan ziyaretlerde ölçülür`)));
+    const tablo = (baslik, satirlar) => el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, bas(baslik), bas('LCP'), bas('INP'), bas('CLS'), bas('Ölçüm'))),
+      el('tbody', {}, ...satirlar.map((s) => el('tr', {}, el('td', { style: hucre + '; min-width: 160px; overflow-wrap: anywhere' }, s.ad), el('td', { style: hucre }, deger('lcp', s.lcp)), el('td', { style: hucre }, deger('inp', s.inp)), el('td', { style: hucre }, deger('cls', s.cls)), el('td', { style: hucre }, sayi(s.n))))));
+    $('[data-cihaz]').replaceChildren(tablo('Cihaz', v.cihazlar.map((c) => ({ ...c, ad: CIHAZ[c.cihaz] || c.cihaz }))));
+    $('[data-vital-sayfa]').replaceChildren(tablo('Sayfa', v.sayfalar.map((s) => ({ ...s, ad: s.sayfa }))));
+  }
+  document.querySelectorAll('[data-donem] button').forEach((b) => b.addEventListener('click', () => { donem = Number(b.dataset.g); try { localStorage.setItem('idx-hiz-donem', String(donem)); } catch (e) {} vitalYukle(); }));
+
+  let veri = null;
+  const bilgiYaz = calistirKur($('[data-calistir]'), $('[data-son-bilgi]'), denetimYukle);
+  function denetimCiz() {
+    const son = veri.son;
+    $('[data-sinir]').textContent = sinirNotu(son, veri.sinir);
+    bilgiYaz(son, veri.sinir);
+    if (!son) {
+      ['[data-guvenlik]', '[data-tarama]', '[data-agirlik]'].forEach((s) => $(s).replaceChildren(el('div', { class: 'bos' }, 'Henüz denetim yok. "Denetimi şimdi çalıştır" düğmesiyle başlatın.')));
+      return;
+    }
+    const o = son.ozet, sayfalar = son.sonuc.sayfalar, ornek = son.sonuc.basliklarOrnek || {};
+    $('[data-guvenlik]').replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 13px' },
+      el('thead', {}, el('tr', {}, bas('Başlık'), bas('Beklenen'), bas('Durum'))),
+      el('tbody', {}, ...Object.entries(o.basliklar.beklenen || {}).map(([b, beklenen]) => {
+        const eksik = o.basliklar.eksik[b] || 0, yanlis = o.basliklar.yanlis[b];
+        const iyi = !eksik && !yanlis && ornek[b];
+        return el('tr', {}, el('td', { style: hucre + '; font-weight: 600; white-space: nowrap' }, b.replace(/(^|-)([a-z])/g, (m, a, c) => a + c.toUpperCase())),
+          el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, beklenen),
+          el('td', { style: hucre }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? `${o.basliklar.kontrol} sayfada var` : eksik ? `${eksik} sayfada eksik` : yanlis ? 'farklı değer: ' + yanlis : 'denetlenemedi')));
+      }))));
+    const st = son.sonuc.site;
+    const satir = (ad, iyi, metin) => el('div', { style: 'display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line)' }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? 'Tamam' : 'Sorun'), el('span', { style: 'overflow-wrap: anywhere' }, el('b', {}, ad + ': '), metin));
+    $('[data-tarama]').replaceChildren(
+      satir('robots.txt', st.robots.durum === 200 && !o.siteSorunlari.includes('robots_kapali'), st.robots.durum === 200 ? `açılıyor · ${(st.robots.engelli || []).length} kapalı yol · sitemap satırı ${(st.robots.sitemaplar || []).length ? 'var' : 'yok'}` : `açılmıyor (durum ${st.robots.durum})`),
+      satir('sitemap.xml', st.sitemap.durum === 200 && st.sitemap.gecerli, st.sitemap.durum === 200 ? `${sayi(st.sitemap.adres)} adres · biçim ${st.sitemap.gecerli ? 'geçerli' : 'bozuk'}` : `açılmıyor (durum ${st.sitemap.durum})`),
+      satir('Sayfa yanıtları', !sayfalar.some((p) => p.durum !== 200), `${sayfalar.filter((p) => p.durum === 200).length} / ${sayfalar.length} sayfa 200 döndü`),
+      satir('İç bağlantılar', !o.baglanti.kirik, `${sayi(o.baglanti.kirik)} kırık · ${sayi(o.baglanti.yonlenir)} yönlendirmeli · ${sayi(o.baglanti.var)} doğrudan açılıyor`));
+    const hizKod = (p) => p.sorunlar.filter((s) => SORUN[s.k] && ['hiz', 'guvenlik'].includes(SORUN[s.k].alan));
+    const gor = sayfalar.filter((p) => p.boyut).slice().sort((a, b) => b.boyut - a.boyut);
+    const ort = gor.length ? gor.reduce((t, p) => t + p.boyut, 0) / gor.length : 0;
+    $('[data-agirlik]').replaceChildren(
+      el('p', { style: 'margin: 0 0 8px; font-size: 14px; color: var(--tx2)' }, `Ortalama ${kb(ort)} · en ağır ${gor[0] ? kb(gor[0].boyut) : '—'} · 100 KB üstü "ağır", 200 KB üstü "çok ağır" sayılır.`),
+      el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+        el('thead', {}, el('tr', {}, bas('Sayfa'), bas('HTML'), bas('Betik'), bas('Stil dosyası'), bas('Görsel'), bas('Bulgu'))),
+        el('tbody', {}, ...gor.map((p) => { const s = hizKod(p); return el('tr', {},
+          el('td', { style: hucre + '; min-width: 180px; overflow-wrap: anywhere' }, p.yol),
+          el('td', { style: hucre + '; white-space: nowrap; font-weight: 600' }, kb(p.boyut)),
+          el('td', { style: hucre }, sayi(p.betik)), el('td', { style: hucre }, sayi(p.stil)), el('td', { style: hucre }, sayi(p.gorsel)),
+          el('td', { style: hucre + '; min-width: 200px' }, s.length ? s.map((x) => el('span', { class: 'cip ' + AGIRLIK_CIP[SORUN[x.k].agirlik], title: SORUN[x.k].aciklama + ' ' + SORUN[x.k].cozum, style: 'margin: 0 4px 4px 0' }, SORUN[x.k].ad)) : el('span', { class: 'cip kazanildi' }, 'Uygun'))); }))));
+  }
+  async function denetimYukle() {
+    try { veri = await api('denetim'); genelHata(''); denetimCiz(); } catch (h) { genelHata('Denetim sonuçları yüklenemedi: ' + h.message); }
+  }
+  vitalYukle();
+  denetimYukle();
+</script>
+</Yonetim>

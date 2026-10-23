@@ -1,0 +1,154 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+import '../../scripts/yonetim/grafik.css';
+---
+<Yonetim baslik="SEO ve GEO" aktif="seo" yol="Site" aciklama="Sitenin kendi sayfalarının arama motoru (SEO) ve yapay zekâ arama motoru (GEO) uyumu. Denetim her sayfanın başlığını, açıklamasını, başlık yapısını, kanonik adresini, yapılandırılmış verisini ve iç bağlantılarını kontrol eder.">
+<div class="uyari bilgi" data-sinir>Denetim bilgisi yükleniyor…</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between">
+  <span style="color: var(--tx2); font-size: 14px" data-son-bilgi></span>
+  <button type="button" class="dugme ana" data-calistir>Denetimi şimdi çalıştır</button>
+</div>
+<div class="kpi-sira" data-kpi></div>
+<div class="pano">
+  <section class="kart modul" aria-labelledby="b-trend">
+    <div class="modul-bas"><h2 id="b-trend">Puanın seyri</h2><small>son 20 denetim</small></div>
+    <div data-trend></div>
+  </section>
+  <section class="kart modul" aria-labelledby="b-site">
+    <div class="modul-bas"><h2 id="b-site">robots.txt ve sitemap</h2></div>
+    <div data-site></div>
+  </section>
+  <section class="kart modul tam" aria-labelledby="b-sorun">
+    <div class="modul-bas"><h2 id="b-sorun">Bulunan sorunlar</h2><small>tıklayınca sayfa tablosu o soruna göre süzülür</small></div>
+    <div data-sorunlar style="display: flex; flex-direction: column; gap: 8px"></div>
+  </section>
+  <section class="kart modul tam" aria-labelledby="b-sayfa">
+    <div class="modul-bas"><h2 id="b-sayfa">Sayfalar</h2>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap">
+        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px">Sorun
+          <select data-suz style="min-height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--tx); font: inherit; max-width: 220px"></select></label>
+        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px">Sırala
+          <select data-sirala style="min-height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--tx); font: inherit">
+            <option value="puan">Puan (düşükten)</option><option value="sorun">Sorun sayısı</option><option value="yol">Adres</option>
+          </select></label>
+      </div>
+    </div>
+    <div data-sayfalar style="overflow-x: auto"></div>
+  </section>
+  <section class="kart modul tam" aria-labelledby="b-geo">
+    <div class="modul-bas"><h2 id="b-geo">GEO: yapay zekâ aramalarına hazırlık</h2></div>
+    <p style="margin: 0; color: var(--tx2); font-size: 14px; max-width: 860px">ChatGPT, Gemini, Perplexity ve Google'ın yapay zekâ özetleri bir sayfayı kaynak gösterirken soruya doğrudan cevap veren bölümleri ve schema.org yapılandırılmış verisini kullanır. Sık sorulan sorular için <b>FAQPage</b>, hizmet sayfaları için <b>Service</b>, kurum bilgisi için <b>Organization</b> verisi ve "Nedir?", "Nasıl?" gibi soru biçimli ara başlıklar bu sayfaların alıntılanma şansını artırır.</p>
+    <div class="kpi-sira" data-geo-kpi></div>
+    <div data-geo style="overflow-x: auto"></div>
+  </section>
+</div>
+<script>
+  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { SORUN, SITE_SORUN, AGIRLIK_AD, AGIRLIK_CIP, sayi, puanRenk, puanAd, calistirKur, sinirNotu, puanTrendi, hucre, bas } from '../../scripts/yonetim/denetim.js';
+  const $ = (s) => document.querySelector(s);
+  const ALANLAR = ['seo', 'geo'];
+  let veri = null, suz = '', sirala = 'puan';
+  const bilgiYaz = calistirKur($('[data-calistir]'), $('[data-son-bilgi]'), yukle);
+  const kpi = (ad, metin, alt, renk) => el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ad), el('b', { style: renk ? `color: ${renk}` : undefined }, metin), alt ? el('span', { class: 'degisim' }, alt) : null);
+  const ilgili = (s) => SORUN[s.k] && ALANLAR.includes(SORUN[s.k].alan);
+
+  function sorunKarti(k, n, bilgi, siteMi) {
+    const secili = suz === k;
+    return el('details', { style: `border: 1px solid ${secili ? 'var(--btnline)' : 'var(--line)'}; border-radius: 14px; padding: 10px 14px; background: var(--card2)` },
+      el('summary', { style: 'cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px; align-items: center' },
+        el('span', { class: 'cip ' + AGIRLIK_CIP[bilgi.agirlik] }, AGIRLIK_AD[bilgi.agirlik]),
+        el('b', { style: 'color: var(--head)' }, bilgi.ad),
+        siteMi ? el('span', { style: 'color: var(--tx2); font-size: 13px' }, 'site geneli') : el('span', { style: 'color: var(--tx2); font-size: 13px' }, `${sayi(n)} sayfada`),
+        siteMi ? null : el('button', { type: 'button', class: 'dugme kucuk', style: 'margin-left: auto', onclick: (o) => { o.preventDefault(); suz = secili ? '' : k; ciz(); document.getElementById('b-sayfa').scrollIntoView({ behavior: 'smooth' }); } }, secili ? 'Süzmeyi kaldır' : 'Sayfaları göster')),
+      el('p', { style: 'margin: 8px 0 4px; font-size: 14px' }, bilgi.aciklama),
+      el('p', { style: 'margin: 0; font-size: 14px' }, el('b', {}, 'Nasıl düzeltilir: '), bilgi.cozum));
+  }
+
+  function ciz() {
+    const son = veri.son;
+    $('[data-sinir]').textContent = sinirNotu(son, veri.sinir);
+    bilgiYaz(son, veri.sinir);
+    puanTrendi($('[data-trend]'), veri.gecmis);
+    if (!son) {
+      const b = (t) => el('div', { class: 'bos' }, t);
+      $('[data-kpi]').replaceChildren();
+      $('[data-site]').replaceChildren(b('Henüz denetim yok. "Denetimi şimdi çalıştır" düğmesiyle ilk denetimi başlatın.'));
+      $('[data-sorunlar]').replaceChildren(b('Denetim çalışınca bulunan sorunlar ve nasıl düzeltilecekleri burada listelenir.'));
+      $('[data-sayfalar]').replaceChildren(b('Denetim çalışınca sayfa sayfa sonuçlar burada görünür.'));
+      $('[data-geo-kpi]').replaceChildren(); $('[data-geo]').replaceChildren(b('Denetim çalışınca yapılandırılmış veri ve soru başlıkları burada görünür.'));
+      return;
+    }
+    const o = son.ozet, sayfalar = son.sonuc.sayfalar;
+    // SEO puanı yalnız SEO ve GEO sorunlarından hesaplanır (hız ve güvenlik sorunları Hız ve güvenlik sayfasında).
+    const sayac = {};
+    sayfalar.forEach((p) => p.sorunlar.filter(ilgili).forEach((s) => { sayac[s.k] = (sayac[s.k] || 0) + 1; }));
+    const ag = { kritik: 0, onemli: 0, oneri: 0 };
+    Object.entries(sayac).forEach(([k, n]) => { ag[SORUN[k].agirlik] += n; });
+    $('[data-kpi]').replaceChildren(
+      kpi('Genel puan', String(o.puan), puanAd(o.puan) + ' · 100 üzerinden; hız ve güvenlik dahil', puanRenk(o.puan)),
+      kpi('Denetlenen sayfa', sayi(o.sayfa), o.atlananSayfa ? `${o.atlananSayfa} sayfa sınır nedeniyle atlandı` : `sitemap'teki ${sayi(o.sitemapAdres)} adresin hepsi`),
+      kpi('Kritik', sayi(ag.kritik), 'hemen düzeltilmeli', ag.kritik ? 'var(--err)' : undefined),
+      kpi('Önemli', sayi(ag.onemli), 'yakında düzeltilmeli', ag.onemli ? 'var(--warn)' : undefined),
+      kpi('Öneri', sayi(ag.oneri), 'iyileştirme fırsatı'),
+      kpi('Kırık iç bağlantı', sayi(o.baglanti.kirik), `${sayi(o.baglanti.toplam)} farklı iç adres · ${sayi(o.baglanti.yonlenir)} yönlendirmeli`, o.baglanti.kirik ? 'var(--err)' : undefined));
+
+    // robots.txt ve sitemap
+    const st = son.sonuc.site;
+    const satir = (ad, iyi, metin) => el('div', { style: 'display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line)' }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? 'Tamam' : 'Sorun'), el('span', {}, el('b', {}, ad + ': '), metin));
+    $('[data-site]').replaceChildren(
+      satir('robots.txt', st.robots.durum === 200 && !o.siteSorunlari.includes('robots_kapali'), st.robots.durum === 200 ? `açılıyor · kapalı yollar: ${(st.robots.engelli || []).join(', ') || 'yok'} · sitemap satırı: ${(st.robots.sitemaplar || []).join(', ') || 'yok'}` : `açılmıyor (durum ${st.robots.durum})`),
+      satir('sitemap.xml', st.sitemap.durum === 200 && st.sitemap.gecerli && !st.sitemap.yabanci, st.sitemap.durum === 200 ? `${sayi(st.sitemap.adres)} adres · biçim ${st.sitemap.gecerli ? 'geçerli' : 'bozuk'} · başka alan adı ${st.sitemap.yabanci} · tekrar ${st.sitemap.tekrar}` : `açılmıyor (durum ${st.sitemap.durum})`),
+      ...o.siteSorunlari.map((k) => SITE_SORUN[k] ? sorunKarti(k, 0, SITE_SORUN[k], true) : null));
+
+    // Sorunlar (ağırlığa, sonra sayıya göre)
+    const sira = { kritik: 0, onemli: 1, oneri: 2 };
+    const kodlar = Object.keys(sayac).sort((a, b) => sira[SORUN[a].agirlik] - sira[SORUN[b].agirlik] || sayac[b] - sayac[a]);
+    $('[data-sorunlar]').replaceChildren(...(kodlar.length ? kodlar.map((k) => sorunKarti(k, sayac[k], SORUN[k])) : [el('div', { class: 'uyari ok' }, 'Denetlenen sayfalarda SEO veya GEO sorunu bulunmadı.')]));
+
+    // Sayfa tablosu
+    const secim = $('[data-suz]');
+    secim.replaceChildren(el('option', { value: '' }, 'Tümü'), ...kodlar.map((k) => el('option', { value: k, selected: suz === k }, `${SORUN[k].ad} (${sayac[k]})`)));
+    let gor = sayfalar.filter((p) => !suz || p.sorunlar.some((s) => s.k === suz));
+    const seoPuan = (p) => p.puan;
+    gor = gor.slice().sort(sirala === 'yol' ? (a, b) => a.yol.localeCompare(b.yol, 'tr') : sirala === 'sorun' ? (a, b) => b.sorunlar.filter(ilgili).length - a.sorunlar.filter(ilgili).length : (a, b) => seoPuan(a) - seoPuan(b));
+    $('[data-sayfalar]').replaceChildren(gor.length ? el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, bas('Sayfa'), bas('Puan'), bas('Başlık'), bas('Açıklama'), bas('H1'), bas('Sorunlar'))),
+      el('tbody', {}, ...gor.map((p) => {
+        const sor = p.sorunlar.filter(ilgili);
+        return el('tr', {},
+          el('td', { style: hucre + '; min-width: 180px; overflow-wrap: anywhere' }, el('a', { href: p.yol, target: '_blank', rel: 'noopener' }, p.yol)),
+          el('td', { style: hucre + `; font-weight: 700; color: ${puanRenk(p.puan)}` }, String(p.puan)),
+          el('td', { style: hucre + '; min-width: 200px' }, p.baslik ? el('span', {}, p.baslik, el('span', { style: 'color: var(--tx2); font-size: 12px' }, ` · ${p.baslikUzunluk} karakter`)) : '—'),
+          el('td', { style: hucre + '; color: var(--tx2); font-size: 13px' }, p.aciklama ? `${p.aciklamaUzunluk} karakter` : 'yok'),
+          el('td', { style: hucre }, p.h1 === undefined ? '—' : String(p.h1)),
+          el('td', { style: hucre + '; min-width: 240px' }, sor.length ? el('details', {}, el('summary', { style: 'cursor: pointer; display: inline-flex; flex-wrap: wrap; gap: 4px' }, ...sor.map((s) => el('span', { class: 'cip ' + AGIRLIK_CIP[SORUN[s.k].agirlik], title: SORUN[s.k].aciklama }, SORUN[s.k].ad + (s.n ? ` (${s.n})` : '')))),
+            el('ul', { style: 'margin: 8px 0 0; padding-left: 18px; font-size: 13px; color: var(--tx2)' }, ...sor.map((s) => el('li', { style: 'overflow-wrap: anywhere' }, el('b', { style: 'color: var(--tx)' }, SORUN[s.k].ad + ': '), s.d ? s.d + ' · ' : '', SORUN[s.k].cozum)))) : el('span', { class: 'cip kazanildi' }, 'Sorun yok')));
+      }))) : el('div', { class: 'bos' }, 'Bu süzgeçle eşleşen sayfa yok.'));
+
+    // GEO
+    const g = o.geo, n = sayfalar.filter((p) => p.durum === 200).length;
+    $('[data-geo-kpi]').replaceChildren(
+      kpi('FAQPage verisi olan', `${sayi(g.faq)} / ${sayi(n)}`, 'sık sorulan sorular'),
+      kpi('Service verisi olan', `${sayi(g.hizmet)} / ${sayi(n)}`, 'hizmet tanımı'),
+      kpi('Organization verisi olan', `${sayi(g.kurulus)} / ${sayi(n)}`, 'kurum bilgisi'),
+      kpi('Soru biçimli başlığı olan', `${sayi(g.soru)} / ${sayi(n)}`, '"Nedir?", "Nasıl?" gibi H2/H3'));
+    const geoSira = sayfalar.filter((p) => p.durum === 200).slice().sort((a, b) => (a.jsonld.length ? 1 : 0) - (b.jsonld.length ? 1 : 0) || a.yol.localeCompare(b.yol, 'tr'));
+    const var_ = (b) => el('span', { class: 'cip ' + (b ? 'kazanildi' : 'kaybedildi') }, b ? 'Var' : 'Yok');
+    $('[data-geo]').replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, bas('Sayfa'), bas('FAQPage'), bas('Service'), bas('Organization'), bas('Tüm şema türleri'), bas('Soru biçimli başlıklar'))),
+      el('tbody', {}, ...geoSira.map((p) => el('tr', {},
+        el('td', { style: hucre + '; min-width: 180px; overflow-wrap: anywhere' }, p.yol),
+        el('td', { style: hucre }, var_(p.jsonld.includes('FAQPage'))),
+        el('td', { style: hucre }, var_(p.jsonld.includes('Service'))),
+        el('td', { style: hucre }, var_(p.jsonld.some((t) => ['Organization', 'LocalBusiness', 'ProfessionalService', 'MarketingAgency'].includes(t)))),
+        el('td', { style: hucre + '; color: var(--tx2); font-size: 13px; min-width: 140px' }, p.jsonld.join(', ') || 'yapılandırılmış veri yok'),
+        el('td', { style: hucre + '; font-size: 13px; min-width: 220px' }, p.sorular.length ? el('details', {}, el('summary', { style: 'cursor: pointer' }, `${p.sorular.length} başlık`), el('ul', { style: 'margin: 6px 0 0; padding-left: 18px; color: var(--tx2)' }, ...p.sorular.map((q) => el('li', {}, q)))) : el('span', { style: 'color: var(--tx2)' }, 'yok')))))));
+  }
+  $('[data-suz]').addEventListener('change', (o) => { suz = o.currentTarget.value; ciz(); });
+  $('[data-sirala]').addEventListener('change', (o) => { sirala = o.currentTarget.value; ciz(); });
+  async function yukle() {
+    try { veri = await api('denetim'); genelHata(''); ciz(); } catch (h) { genelHata('Denetim sonuçları yüklenemedi: ' + h.message); }
+  }
+  yukle();
+</script>
+</Yonetim>

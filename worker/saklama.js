@@ -10,7 +10,10 @@ export const KURALLAR = [
   { ad: 'Giriş denemeleri ve IP özetleri (2 yıl)', sql: 'DELETE FROM giris_denemeleri WHERE zaman < ?', sure: 2 * YIL },
   { ad: 'Bültenden ayrılanların onay kayıtları (3 yıl)', sql: "DELETE FROM bulten WHERE durum = 'ayrildi' AND ayrilma_zamani < ?", sure: 3 * YIL },
   { ad: 'Süresi dolmuş oturumlar', sql: 'DELETE FROM oturumlar WHERE bitis < ?', sure: 0 },
-  { ad: 'Süresi dolmuş şifre yenileme bağlantıları (30 gün sonra)', sql: 'DELETE FROM sifre_yenileme WHERE bitis < ?', sure: 30 * 86400000 }
+  { ad: 'Süresi dolmuş şifre yenileme bağlantıları (30 gün sonra)', sql: 'DELETE FROM sifre_yenileme WHERE bitis < ?', sure: 30 * 86400000 },
+  // Kişisel veri içermeyen ölçüm verisi (worker/olcum.js); gun sütunu YYYY-MM-DD, ISO zamanla karşılaştırılır.
+  { ad: 'Çerezsiz ziyaret sayaçları (2 yıl)', sql: 'DELETE FROM ziyaret_gunluk WHERE gun < ?', sure: 2 * YIL },
+  { ad: 'Gerçek kullanıcı hız örnekleri (90 gün)', sql: 'DELETE FROM hiz_olcum WHERE gun < ?', sure: 90 * 86400000 }
 ];
 
 export async function saklamaUygula(db, an = Date.now()) {

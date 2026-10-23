@@ -7,28 +7,276 @@
       {
         "ad": "360° e-ticaret yönetimi",
         "slug": "e-ticaret-yonetimi",
-        "ozet": "Mağazanızın günlük işleyişi uçtan uca."
+        "ozet": "Mağazanızın günlük işleyişi uçtan uca.",
+        "giris": "Mağazanızın günlük işleyişini tek ekip olarak yürütüyoruz: ürün, stok, kampanya, sipariş ve raporlama aynı elden, birbirine bağlı ilerler.",
+        "neden": "E-ticarette sorunlar genellikle tek bir yerde değil, parçalar arasındaki boşluklarda çıkar: reklam ekibi stokta olmayan ürünü öne çıkarır, kampanya fiyatı pazaryerine yansımaz, kargo gecikmesi yorumlara düşer. Tüm parçaları aynı ekibin yönetmesi bu boşlukları kapatır ve kararları tek bir gerçek veriye dayandırır.",
+        "yapilanlar": [
+          {
+            "baslik": "Mağaza sağlık kontrolü",
+            "metin": "Ürün sayfaları, ödeme adımları, hız ve ölçüm altyapısı düzenli kontrol edilir; satış kaybettiren sorunlar önceliklendirilir."
+          },
+          {
+            "baslik": "Kampanya ve indirim takvimi",
+            "metin": "Özel günler, sezon geçişleri ve stok durumuna göre yıllık kampanya planı hazırlanır."
+          },
+          {
+            "baslik": "Ürün ve içerik yönetimi",
+            "metin": "Yeni ürünler satışa hazır içerikle yayına alınır; satmayan ürünlerin sayfaları iyileştirilir."
+          },
+          {
+            "baslik": "Kanallar arası koordinasyon",
+            "metin": "Web mağaza, pazaryerleri ve reklamlar aynı stok ve fiyat bilgisiyle çalışır."
+          },
+          {
+            "baslik": "Sipariş ve müşteri deneyimi",
+            "metin": "Sipariş, iade ve müşteri soruları takip edilir; tekrar eden şikâyetlerin kökü bulunur."
+          },
+          {
+            "baslik": "Aylık değerlendirme",
+            "metin": "Satış, kârlılık ve operasyon göstergeleri birlikte değerlendirilir; bir sonraki ayın öncelikleri belirlenir."
+          }
+        ],
+        "olcum": [
+          "Satış ve ciro (kanal bazında)",
+          "Dönüşüm oranı ve sepet terk",
+          "Brüt kâr ve iade oranı",
+          "Sipariş hazırlama ve teslim süresi"
+        ],
+        "kimler": [
+          "Mağazası olan ama günlük yönetimine vakit ayıramayan işletmeler",
+          "Web mağaza ve pazaryerinde birlikte satan markalar",
+          "Ajans, yazılımcı ve kargo firması arasında koordinasyonu tek elde toplamak isteyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Hangi e-ticaret altyapılarıyla çalışıyorsunuz?",
+            "cevap": "ikas, Ticimax, Shopify, WooCommerce, IdeaSoft ve T-Soft başta olmak üzere yaygın altyapılarla çalışıyoruz. Mevcut altyapınızı değiştirmeden başlamayı tercih ederiz."
+          },
+          {
+            "soru": "Mağaza hesapları kime ait olur?",
+            "cevap": "Mağaza, pazaryeri ve reklam hesapları sizin adınıza açılır ve size aittir. Biz yetkili kullanıcı olarak çalışırız."
+          },
+          {
+            "soru": "Hizmete reklam yönetimi dahil mi?",
+            "cevap": "Kapsamı ihtiyacınıza göre birlikte belirleriz. Reklam yönetimi pakete eklenebilir ya da ayrı hizmet olarak alınabilir."
+          }
+        ]
       },
       {
         "ad": "Pazaryeri yönetimi",
         "slug": "e-ticaret-pazaryeri-yonetimi",
-        "ozet": "Pazaryerlerinde ürün, fiyat ve sipariş yönetimi."
+        "ozet": "Pazaryerlerinde ürün, fiyat ve sipariş yönetimi.",
+        "giris": "Trendyol, Hepsiburada, Amazon, N11, Çiçeksepeti ve Pazarama’da mağazanızı günlük olarak yönetiyoruz: ürün, fiyat, stok, kampanya, sipariş ve mağaza puanı.",
+        "neden": "Pazaryerlerinde görünürlük; doğru kategori, eksiksiz ürün bilgisi, rekabetçi fiyat ve mağaza performansıyla belirlenir. Geciken gönderimler, cevapsız sorular ve stok hataları mağaza puanını düşürür ve ürünleri arama sonuçlarında geriye iter. Düzenli takip, satışın sürdürülebilir olmasını sağlar.",
+        "yapilanlar": [
+          {
+            "baslik": "Mağaza kurulumu ve kategori eşleştirme",
+            "metin": "Ürünler her pazaryerinin kategori ve özellik yapısına doğru eşleştirilir."
+          },
+          {
+            "baslik": "Ürün içeriği",
+            "metin": "Başlık, açıklama, görsel ve varyantlar pazaryerinin kurallarına ve arama alışkanlıklarına göre hazırlanır."
+          },
+          {
+            "baslik": "Fiyat ve stok takibi",
+            "metin": "Rakip fiyatları ve stok durumu izlenir; komisyon ve kargo hesaba katılarak fiyat önerisi yapılır."
+          },
+          {
+            "baslik": "Kampanya katılımı",
+            "metin": "Pazaryeri kampanyalarına kârlılık hesabı yapılarak katılınır; zarar ettiren kampanyalar önerilmez."
+          },
+          {
+            "baslik": "Soru, yorum ve iade takibi",
+            "metin": "Müşteri soruları zamanında cevaplanır; iade nedenleri raporlanır."
+          },
+          {
+            "baslik": "Mağaza performansı",
+            "metin": "Gönderim süresi, iptal oranı ve mağaza puanı izlenir; düşüş nedenleri bulunur."
+          }
+        ],
+        "olcum": [
+          "Pazaryeri bazında satış ve ciro",
+          "Komisyon ve kargo sonrası kâr",
+          "Mağaza puanı ve gönderim performansı",
+          "İade ve iptal oranı"
+        ],
+        "kimler": [
+          "Pazaryerinde yeni açılacak markalar",
+          "Birden fazla pazaryerinde satan ve takipte zorlanan işletmeler",
+          "Satışı olan ama kârlılığını göremeyen mağazalar"
+        ],
+        "sss": [
+          {
+            "soru": "Hangi pazaryerlerinde çalışıyorsunuz?",
+            "cevap": "Trendyol, Hepsiburada, Amazon, N11, Çiçeksepeti ve Pazarama’da çalışıyoruz."
+          },
+          {
+            "soru": "Pazaryeri reklamları bu hizmete dahil mi?",
+            "cevap": "Pazaryeri içi reklamlar ayrı bir hizmettir (Pazaryeri reklam yönetimi); ikisi birlikte de alınabilir."
+          },
+          {
+            "soru": "Kârlılığı nasıl hesaplıyorsunuz?",
+            "cevap": "Satış fiyatından ürün maliyeti, komisyon, kargo ve diğer giderler düşülür. Ana sayfamızdaki ücretsiz hesaplayıcıyla kendi rakamlarınızı deneyebilirsiniz."
+          }
+        ]
       },
       {
         "ad": "Entegrasyon yönetimi",
         "slug": "e-ticaret-entegrasyon-yonetimi",
-        "ozet": "Mağaza, pazaryeri, muhasebe ve kargo sistemlerini bağlama."
+        "ozet": "Mağaza, pazaryeri, muhasebe ve kargo sistemlerini bağlama.",
+        "giris": "Mağaza, pazaryeri, muhasebe, kargo ve stok sistemlerinizi birbirine bağlıyoruz; aynı bilgi bir kez girilir, her yerde doğru görünür.",
+        "neden": "Entegrasyon yoksa ya da yanlış kurulmuşsa stok iki yerde farklı görünür, olmayan ürün satılır, fatura ve kargo bilgisi elle taşınır. Bu hem zaman kaybettirir hem de müşteri şikâyetine dönüşen hatalara yol açar. Doğru kurulmuş entegrasyon, büyüdükçe artan iş yükünü taşır.",
+        "yapilanlar": [
+          {
+            "baslik": "Mevcut yapının haritası",
+            "metin": "Hangi sistemin hangi bilgiyi nereye gönderdiği çıkarılır; çift kayıt ve kopukluklar belirlenir."
+          },
+          {
+            "baslik": "Entegratör seçimi ve kurulum",
+            "metin": "İhtiyaca ve bütçeye uygun entegrasyon yazılımı seçilir, kurulur ve ayarlanır."
+          },
+          {
+            "baslik": "Stok ve fiyat eşitleme",
+            "metin": "Stok ve fiyatın tek merkezden tüm kanallara aktarılması sağlanır."
+          },
+          {
+            "baslik": "Sipariş, fatura ve kargo akışı",
+            "metin": "Siparişin faturaya ve kargo etiketine kendiliğinden dönüşmesi kurulur."
+          },
+          {
+            "baslik": "Hata takibi",
+            "metin": "Aktarım hataları düzenli izlenir; tekrarlayan hataların kaynağı düzeltilir."
+          }
+        ],
+        "olcum": [
+          "Aktarım hatası sayısı",
+          "Stok tutarsızlığı nedeniyle iptal edilen sipariş",
+          "Siparişten kargoya geçen süre",
+          "Elle yapılan işlem miktarı"
+        ],
+        "kimler": [
+          "Birden fazla kanalda satan işletmeler",
+          "Muhasebe ve kargo işlemlerini hâlâ elle yapanlar",
+          "Altyapı değiştirmeyi düşünen mağazalar"
+        ],
+        "sss": [
+          {
+            "soru": "Mevcut entegratörümüzü değiştirmemiz gerekir mi?",
+            "cevap": "Gerekmeyebilir. Önce mevcut yapıyı inceleriz; sorun ayarlardaysa düzeltiriz, değişiklik gerekiyorsa gerekçesiyle öneririz."
+          },
+          {
+            "soru": "Hangi muhasebe yazılımlarıyla çalışıyorsunuz?",
+            "cevap": "Logo, Mikro, Paraşüt ve BizimHesap gibi yaygın yazılımlarla çalışıyoruz."
+          }
+        ]
       },
       {
         "ad": "Ürün ve kategori yönetimi",
         "slug": "e-ticaret-urun-kategori-yonetimi",
-        "ozet": "Ürün içerikleri, görseller ve kategori yapısı."
+        "ozet": "Ürün içerikleri, görseller ve kategori yapısı.",
+        "giris": "Ürün içeriklerini, görsellerini ve kategori yapısını hem müşterinin hem de arama motorlarının anlayacağı şekilde düzenliyoruz.",
+        "neden": "Müşteri ürünü elle tutamadığı için kararını sayfadaki bilgiye göre verir. Eksik ölçü, belirsiz malzeme bilgisi ya da yanlış kategori; satışı düşürür, iadeyi artırır. İyi kurgulanmış kategori yapısı ise hem ziyaretçinin aradığını bulmasını hem de Google’da görünürlüğü kolaylaştırır.",
+        "yapilanlar": [
+          {
+            "baslik": "Kategori ağacı",
+            "metin": "Müşterinin arama ve gezinme alışkanlığına göre sade bir kategori yapısı kurulur."
+          },
+          {
+            "baslik": "Ürün başlık ve açıklamaları",
+            "metin": "Ürünün ne olduğu, kime uygun olduğu ve neden tercih edilmesi gerektiği net anlatılır."
+          },
+          {
+            "baslik": "Teknik bilgi ve varyantlar",
+            "metin": "Ölçü, malzeme, renk, beden gibi bilgiler eksiksiz ve tutarlı girilir."
+          },
+          {
+            "baslik": "Görsel standartları",
+            "metin": "Görsel boyutu, arka plan ve açı standartları belirlenir; eksik görseller tamamlanır."
+          },
+          {
+            "baslik": "Filtreler ve ürün özellikleri",
+            "metin": "Ziyaretçinin aradığı ürünü hızla bulmasını sağlayan filtreler düzenlenir."
+          }
+        ],
+        "olcum": [
+          "Ürün sayfası dönüşüm oranı",
+          "İade nedenleri",
+          "Kategori sayfalarının arama trafiği",
+          "Eksik bilgili ürün sayısı"
+        ],
+        "kimler": [
+          "Çok sayıda ürünü olan mağazalar",
+          "İade oranı yüksek kategorilerde satanlar",
+          "Yeni ürün yüklemeye yetişemeyen ekipler"
+        ],
+        "sss": [
+          {
+            "soru": "Ürün fotoğraflarını da çekiyor musunuz?",
+            "cevap": "Evet, ürün fotoğraf ve video çekimi ayrı bir hizmetimizdir; içerik çalışmasıyla birlikte planlanabilir."
+          },
+          {
+            "soru": "Toplu ürün yüklemesi yapıyor musunuz?",
+            "cevap": "Evet. Ürün listesi altyapınızın kabul ettiği biçime getirilip toplu olarak yüklenir; yükleme sonrası kontrol edilir."
+          }
+        ]
       },
       {
         "ad": "Kargo ve lojistik yönetimi",
         "slug": "e-ticaret-kargo-lojistik-yonetimi",
-        "ozet": "Kargo anlaşmaları ve gönderim süreçleri."
+        "ozet": "Kargo anlaşmaları ve gönderim süreçleri.",
+        "giris": "Kargo anlaşmalarını, gönderim süreçlerini ve iade akışını düzenliyoruz; sipariş müşteriye zamanında ve sorunsuz ulaşır.",
+        "neden": "Kargo, müşterinin markanızla yaşadığı son ve en akılda kalan deneyimdir. Geciken ya da hasarlı gelen sipariş olumsuz yoruma, pazaryerlerinde puan kaybına ve tekrar alışverişin kaybedilmesine yol açar. Kargo maliyeti ise doğrudan kârı etkiler.",
+        "yapilanlar": [
+          {
+            "baslik": "Kargo firması ve anlaşma karşılaştırması",
+            "metin": "Gönderi hacmi, desi ve bölgeye göre teklifler karşılaştırılır."
+          },
+          {
+            "baslik": "Paketleme standartları",
+            "metin": "Ürüne uygun paketleme ile hasar ve desi maliyeti azaltılır."
+          },
+          {
+            "baslik": "Gönderim süreci",
+            "metin": "Siparişin hazırlanmasından kargoya verilmesine kadar adımlar ve sorumluluklar netleştirilir."
+          },
+          {
+            "baslik": "İade akışı",
+            "metin": "İade talebinin alınması, ürünün kontrolü ve ödemenin yapılması düzenli bir sürece bağlanır."
+          },
+          {
+            "baslik": "Teslimat takibi",
+            "metin": "Geciken ve sorunlu gönderiler izlenir; müşteri sorun yaşamadan bilgilendirilir."
+          }
+        ],
+        "olcum": [
+          "Siparişten kargoya geçen süre",
+          "Teslimat süresi",
+          "Sipariş başına kargo maliyeti",
+          "Hasar ve kayıp oranı"
+        ],
+        "kimler": [
+          "Günlük sipariş sayısı artan mağazalar",
+          "Kargo maliyeti kârını eriten işletmeler",
+          "Pazaryerinde gönderim performansı düşen satıcılar"
+        ],
+        "sss": [
+          {
+            "soru": "Depo hizmeti veriyor musunuz?",
+            "cevap": "Depo hizmeti vermiyoruz; mevcut deponuzun ya da çalıştığınız lojistik firmasının süreçlerini düzenliyoruz."
+          },
+          {
+            "soru": "Kargo entegrasyonu da kuruyor musunuz?",
+            "cevap": "Evet, sipariş ve kargo etiketinin kendiliğinden oluşması için entegrasyon yönetimiyle birlikte kurulur."
+          }
+        ]
       }
+    ],
+    "baslik": "E-ticaret",
+    "neden": "Satış yalnızca reklamla gelmez. Stok, fiyat, ürün içeriği, kargo ve iade birbirine bağlı bir zincirdir. Bir halkadaki aksama, örneğin yanlış stok, eksik ürün bilgisi ya da geciken kargo, reklam bütçesini boşa harcatır ve pazaryerlerindeki mağaza puanınızı düşürür.",
+    "dikkat": [
+      "Mağaza, pazaryerleri ve muhasebe arasında tek merkezden stok ve fiyat",
+      "Satışa hazır ürün sayfası: doğru görsel, açıklama, varyant ve kategori",
+      "Hızlı, izlenebilir kargo ve düzenli işleyen iade süreci"
     ]
   },
   {
@@ -44,28 +292,268 @@
       {
         "ad": "Meta reklam yönetimi",
         "slug": "meta-business-ads-yonetimi",
-        "ozet": "Facebook ve Instagram kampanyaları."
+        "ozet": "Facebook ve Instagram kampanyaları.",
+        "giris": "Facebook ve Instagram reklamlarınızı satış, form, mesaj ve arama gibi gerçek sonuçlara göre kuruyor ve yönetiyoruz.",
+        "neden": "Meta reklamları, henüz sizi aramayan ama ilgilenebilecek kişilere ulaşmanın en güçlü yollarından biridir. Ancak piksel ve Dönüşüm API doğru kurulmazsa sistem yanlış kişilere gösterir; kreatif yenilenmezse aynı kişiler aynı reklamı tekrar tekrar görür ve maliyet yükselir.",
+        "yapilanlar": [
+          {
+            "baslik": "Ölçüm kurulumu",
+            "metin": "Meta pikseli ve Dönüşüm API (CAPI) birlikte kurulur; satış, form ve mesaj olayları ayrı tanımlanır."
+          },
+          {
+            "baslik": "Kampanya ve kitle kurgusu",
+            "metin": "Soğuk kitle, ilgilenen kitle ve yeniden pazarlama ayrı ele alınır."
+          },
+          {
+            "baslik": "Kreatif testleri",
+            "metin": "Farklı görsel, video ve mesajlar kontrollü olarak test edilir; kazananlar büyütülür."
+          },
+          {
+            "baslik": "Katalog ve dinamik reklamlar",
+            "metin": "E-ticarette ürün kataloğu bağlanır; ziyaretçiye baktığı ürünler gösterilir."
+          },
+          {
+            "baslik": "Sıklık ve yorgunluk takibi",
+            "metin": "Aynı kişiye çok sık gösterilen reklamlar yenilenir."
+          },
+          {
+            "baslik": "Onaylı bütçe değişiklikleri",
+            "metin": "Bütçe artırma ve kampanya kapatma kararları gerekçesiyle sunulur, onayınızla uygulanır."
+          }
+        ],
+        "olcum": [
+          "Sonuç türüne göre maliyet (satış, form, mesaj)",
+          "Reklam harcamasının getirisi (ROAS)",
+          "Sıklık ve tıklama oranı",
+          "Yeni ve geri dönen müşteri payı"
+        ],
+        "kimler": [
+          "Instagram ve Facebook’ta görünür olmak isteyen markalar",
+          "Görsel ürünü olan e-ticaret mağazaları",
+          "Mesaj veya form ile talep toplayan hizmet işletmeleri"
+        ],
+        "sss": [
+          {
+            "soru": "Reklam görsellerini siz mi hazırlıyorsunuz?",
+            "cevap": "İhtiyaca göre. Tasarım ve video çekimini ekibimiz yapabilir ya da sizin içeriklerinizle çalışabiliriz."
+          },
+          {
+            "soru": "Dönüşüm API neden gerekli?",
+            "cevap": "Tarayıcı kısıtlamaları nedeniyle yalnızca piksel bazı sonuçları kaçırır. Dönüşüm API, sonuçları sunucudan da ileterek ölçümü daha eksiksiz hale getirir."
+          },
+          {
+            "soru": "Reklam hesabı kime ait olur?",
+            "cevap": "Hesap sizin işletme yöneticinizde açılır ve size aittir; biz iş ortağı olarak erişiriz."
+          }
+        ]
       },
       {
         "ad": "Dijital pazarlama yönetimi",
         "slug": "dijital-pazarlama-yonetimi",
-        "ozet": "Tüm kanallar için strateji ve bütçe planı."
+        "ozet": "Tüm kanallar için strateji ve bütçe planı.",
+        "giris": "Tüm dijital kanallarınız için hedef, bütçe ve öncelik planını yapıyor; kanalları tek bir strateji altında yönetiyoruz.",
+        "neden": "Her kanal ayrı ayrı yönetildiğinde bütçe en çok gürültü yapan kanala akar; aynı müşteri iki kez sayılır, hangi kanalın gerçekten işe yaradığı görünmez. Tek bir plan ve ortak ölçüm, bütçenin işe yarayan yere gitmesini sağlar.",
+        "yapilanlar": [
+          {
+            "baslik": "Hedef ve bütçe planı",
+            "metin": "Ticari hedeften geriye doğru gidilerek kanal bazında bütçe ve beklenti belirlenir."
+          },
+          {
+            "baslik": "Kanal karması",
+            "metin": "Google, Meta, e-posta, SEO ve pazaryeri gibi kanalların rolü netleştirilir."
+          },
+          {
+            "baslik": "Ortak ölçüm",
+            "metin": "Tüm kanallar aynı ölçüm altyapısına ve tanımlara bağlanır."
+          },
+          {
+            "baslik": "Aylık strateji görüşmesi",
+            "metin": "Sonuçlar birlikte değerlendirilir, bir sonraki ayın öncelikleri belirlenir."
+          },
+          {
+            "baslik": "Test takvimi",
+            "metin": "Yeni kanal ve fikirler küçük, ölçülebilir testlerle denenir."
+          }
+        ],
+        "olcum": [
+          "Kanal bazında sonuç ve maliyet",
+          "Toplam pazarlama getirisi",
+          "Müşteri edinme maliyeti",
+          "Hedefe göre ilerleme"
+        ],
+        "kimler": [
+          "Birden fazla kanalda reklam veren markalar",
+          "Pazarlama ekibi küçük olan işletmeler",
+          "Hangi kanalın işe yaradığını göremeyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Bu hizmet reklam yönetimini kapsıyor mu?",
+            "cevap": "Strateji ve koordinasyonu kapsar. Kanalların günlük yönetimi ihtiyaca göre aynı ekip tarafından eklenebilir."
+          },
+          {
+            "soru": "Mevcut ajansımızla birlikte çalışabilir misiniz?",
+            "cevap": "Evet. Rolleri ve erişimleri netleştirerek diğer ekiplerle birlikte çalışabiliriz."
+          }
+        ]
       },
       {
         "ad": "E-posta ve SMS pazarlama",
         "slug": "e-mail-sms-marketing-yonetimi",
-        "ozet": "Müşterilerinize doğrudan ulaşan kampanyalar."
+        "ozet": "Müşterilerinize doğrudan ulaşan kampanyalar.",
+        "giris": "Müşterilerinize ve abonelerinize doğrudan ulaşan e-posta ve SMS kampanyalarını izinli liste ve otomasyonlarla yönetiyoruz.",
+        "neden": "E-posta ve SMS, reklam bütçesi harcamadan mevcut müşterilere yeniden ulaşmanın yoludur. Sepette bırakılan ürün hatırlatması, hoş geldin serisi ve tekrar alışveriş kampanyaları en verimli kanallar arasındadır. Ticari ileti için izin ve İYS kaydı ise yasal zorunluluktur.",
+        "yapilanlar": [
+          {
+            "baslik": "İzin ve İYS uyumu",
+            "metin": "Ticari ileti onayının doğru toplanması ve İYS süreçleri kontrol edilir."
+          },
+          {
+            "baslik": "Liste ve segmentler",
+            "metin": "Müşteriler alışveriş geçmişine ve ilgisine göre gruplara ayrılır."
+          },
+          {
+            "baslik": "Otomasyonlar",
+            "metin": "Hoş geldin, sepet hatırlatma, satın alma sonrası ve geri kazanım akışları kurulur."
+          },
+          {
+            "baslik": "Kampanya e-postaları",
+            "metin": "Kampanya takvimine uygun, mobilde okunaklı e-postalar hazırlanır."
+          },
+          {
+            "baslik": "Teslim edilebilirlik",
+            "metin": "Gönderen alan adı ayarları ve liste temizliği ile e-postaların gelen kutusuna ulaşması sağlanır."
+          }
+        ],
+        "olcum": [
+          "Açılma ve tıklama oranı",
+          "E-posta ve SMS kaynaklı satış",
+          "Abonelikten çıkma oranı",
+          "Teslim edilemeyen ileti oranı"
+        ],
+        "kimler": [
+          "Müşteri listesi olan e-ticaret mağazaları",
+          "Tekrar satış potansiyeli yüksek markalar",
+          "Kampanya duyurularını düzenli yapmak isteyen işletmeler"
+        ],
+        "sss": [
+          {
+            "soru": "Hangi gönderim servisleriyle çalışıyorsunuz?",
+            "cevap": "Mevcut servisinizle çalışabiliriz; yoksa ihtiyacınıza uygun servisi birlikte seçeriz."
+          },
+          {
+            "soru": "İzinsiz listeye gönderim yapıyor musunuz?",
+            "cevap": "Hayır. Ticari iletiler yalnızca izin vermiş kişilere gönderilir."
+          }
+        ]
       },
       {
         "ad": "Influencer pazarlama",
         "slug": "influencer-marketing-yonetimi",
-        "ozet": "Markanıza uygun içerik üreticileriyle iş birliği."
+        "ozet": "Markanıza uygun içerik üreticileriyle iş birliği.",
+        "giris": "Markanıza ve hedef kitlenize uygun içerik üreticileriyle iş birliklerini buluyor, planlıyor ve ölçüyoruz.",
+        "neden": "Doğru içerik üreticisi, markanızı güvendiği bir kişinin ağzından tanıtır. Yanlış seçim ise takipçi sayısı yüksek ama kitlesi ilgisiz bir hesaba bütçe harcatır. Kitle uyumu, içerik kalitesi ve ölçülebilirlik birlikte değerlendirilmelidir.",
+        "yapilanlar": [
+          {
+            "baslik": "İçerik üreticisi araştırması",
+            "metin": "Kitle yapısı, etkileşim kalitesi ve marka uyumu incelenir."
+          },
+          {
+            "baslik": "İş birliği kurgusu",
+            "metin": "Mesaj, içerik türü, yayın takvimi ve kullanım hakları netleştirilir."
+          },
+          {
+            "baslik": "Reklam etiketi ve mevzuat",
+            "metin": "Paylaşımların reklam olduğu açıkça belirtilir; ilgili düzenlemelere uyulur."
+          },
+          {
+            "baslik": "Takip bağlantıları ve kodlar",
+            "metin": "Her iş birliğinin getirisi ayrı ölçülebilsin diye bağlantı ve indirim kodları tanımlanır."
+          },
+          {
+            "baslik": "Sonuç raporu",
+            "metin": "Erişim, etkileşim ve satış katkısı birlikte raporlanır."
+          }
+        ],
+        "olcum": [
+          "İş birliği başına erişim ve etkileşim",
+          "Bağlantı ve kod kaynaklı satış",
+          "Takipçi kazanımı",
+          "İçeriklerin reklamda yeniden kullanım performansı"
+        ],
+        "kimler": [
+          "Yeni ürün lansmanı yapan markalar",
+          "Güven oluşturması gereken kategorilerde satanlar",
+          "Instagram ve TikTok’ta görünürlük isteyen işletmeler"
+        ],
+        "sss": [
+          {
+            "soru": "Takipçi sayısı mı önemli, etkileşim mi?",
+            "cevap": "İkisi de tek başına yeterli değildir. Kitlenin size uygun olması ve etkileşimin gerçek olması daha önemlidir."
+          },
+          {
+            "soru": "Sağlık alanında influencer çalışması yapılabilir mi?",
+            "cevap": "Sağlık reklamlarında özel kısıtlamalar vardır; bu alanda iş birlikleri mevzuata uygunluk kontrol edilerek planlanır."
+          }
+        ]
       },
       {
         "ad": "Pazaryeri reklam yönetimi",
         "slug": "e-ticaret-pazaryeri-reklam-yonetimi",
-        "ozet": "Trendyol, Hepsiburada ve Amazon içi reklamlar."
+        "ozet": "Trendyol, Hepsiburada ve Amazon içi reklamlar.",
+        "giris": "Trendyol, Hepsiburada ve Amazon gibi pazaryerlerinin kendi reklam alanlarında ürünlerinizi kârlılığı gözeterek öne çıkarıyoruz.",
+        "neden": "Pazaryerlerinde rekabet arttıkça ürünlerin organik olarak öne çıkması zorlaşır. Pazaryeri reklamları satış getirir; ancak komisyon ve kargo üzerine eklenen reklam maliyeti hesaplanmazsa satış artarken kâr azalabilir.",
+        "yapilanlar": [
+          {
+            "baslik": "Ürün seçimi",
+            "metin": "Reklam verilecek ürünler kâr marjı, stok ve rekabet durumuna göre seçilir."
+          },
+          {
+            "baslik": "Kampanya ve teklif yapısı",
+            "metin": "Anahtar kelime ve ürün hedeflemeleri ayrı yönetilir; teklifler kârlılığa göre ayarlanır."
+          },
+          {
+            "baslik": "Arama terimi analizi",
+            "metin": "Satış getirmeyen aramalar ayıklanır, getirenler güçlendirilir."
+          },
+          {
+            "baslik": "Bütçe dağılımı",
+            "metin": "Bütçe, getirisi yüksek ürün ve kampanyalara kaydırılır; değişiklikler onayınızla yapılır."
+          },
+          {
+            "baslik": "Kârlılık raporu",
+            "metin": "Reklam maliyeti dahil ürün başına kâr düzenli raporlanır."
+          }
+        ],
+        "olcum": [
+          "Reklam harcamasının getirisi",
+          "Reklam dahil ürün başına kâr",
+          "Reklam kaynaklı satış payı",
+          "Arama terimi bazında maliyet"
+        ],
+        "kimler": [
+          "Pazaryerinde rekabeti yoğun kategorilerde satanlar",
+          "Yeni ürünlerini hızla görünür yapmak isteyen satıcılar",
+          "Reklam verdiği halde kârını göremeyen mağazalar"
+        ],
+        "sss": [
+          {
+            "soru": "Pazaryeri reklamlarında minimum bütçe var mı?",
+            "cevap": "Pazaryerinin kendi kuralları dışında zorunlu bir alt sınırımız yoktur; başlangıç bütçesini ürün ve kâr yapınıza göre birlikte belirleriz."
+          },
+          {
+            "soru": "Mağaza yönetimi olmadan sadece reklam alabilir miyiz?",
+            "cevap": "Evet, yalnızca pazaryeri reklam yönetimi de alınabilir."
+          }
+        ]
       }
+    ],
+    "baslik": "Dijital reklam",
+    "neden": "Doğru ölçülmeyen bir hesapta bütçe, en çok satış getiren reklama değil en kolay tıklanan reklama akar. Satış, form, arama ve mesaj ayrı ayrı ölçüldüğünde kararlar gerçek ticari sonuca göre verilir; bütçe büyütülmeden önce neyin işe yaradığı bilinir.",
+    "dikkat": [
+      "Her sonuç türünün ayrı ölçülmesi: satış, form, arama ve mesaj karışmaz",
+      "Kontrollü testler ve kademeli bütçe değişiklikleri",
+      "Bütçe ve kampanya değişiklikleri onayınız olmadan yapılmaz"
     ]
   },
   {
@@ -76,33 +564,310 @@
       {
         "ad": "SEO içerik optimizasyonu",
         "slug": "seo-icerik-optimizasyonu",
-        "ozet": "Arayan kişiye cevap veren içerikler."
+        "ozet": "Arayan kişiye cevap veren içerikler.",
+        "giris": "Sitenizdeki içerikleri, arayan kişinin sorusuna net ve güvenilir cevap verecek şekilde yeniden düzenliyor ve yeni içerikler planlıyoruz.",
+        "neden": "Arama motorları ve yapay zekâ asistanları, soruya en açık ve güvenilir cevabı veren sayfayı öne çıkarır. Ürün ve hizmet sayfalarındaki yüzeysel metinler hem sıralamayı hem de ziyaretçinin güvenini düşürür. İyi içerik, reklam durduğunda da ziyaretçi getirmeye devam eder.",
+        "yapilanlar": [
+          {
+            "baslik": "İçerik envanteri",
+            "metin": "Mevcut sayfalar trafik, sıralama ve güncellik açısından incelenir; birleştirilecek ve güncellenecekler belirlenir."
+          },
+          {
+            "baslik": "Arama niyeti eşleştirme",
+            "metin": "Her sayfanın hangi soruya cevap vereceği netleştirilir."
+          },
+          {
+            "baslik": "Sayfa içeriklerinin yenilenmesi",
+            "metin": "Başlık yapısı, açıklamalar, sık sorulanlar ve iç bağlantılar düzenlenir."
+          },
+          {
+            "baslik": "Yeni içerik takvimi",
+            "metin": "Müşterilerin sorduğu sorulara göre blog ve rehber içerikleri planlanır."
+          },
+          {
+            "baslik": "Yapay zekâ cevaplarına uygunluk (GEO)",
+            "metin": "Kısa ve doğrudan cevaplar, kaynak gösterilebilir bilgiler ve yapılandırılmış veri eklenir."
+          }
+        ],
+        "olcum": [
+          "Organik trafik ve tıklama",
+          "Hedef sorgulardaki sıralama",
+          "İçerikten gelen dönüşümler",
+          "Yapay zekâ özetlerinde görünürlük"
+        ],
+        "kimler": [
+          "Sitesi olan ama aramadan ziyaretçi alamayan işletmeler",
+          "Uzmanlığını içerikle göstermek isteyen markalar",
+          "Reklam bağımlılığını azaltmak isteyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Yapay zekâyla üretilmiş içerik kullanıyor musunuz?",
+            "cevap": "Araştırma ve taslakta yapay zekâdan yararlanabiliriz; ancak her içerik uzman tarafından kontrol edilir, doğrulanır ve markanızın diline uyarlanır."
+          },
+          {
+            "soru": "İçerikler ne zaman sonuç verir?",
+            "cevap": "Bu; sitenin mevcut durumuna, rekabete ve içeriğin kapsamına bağlıdır. Genellikle aylar içinde gelişen bir süreçtir; sıralama garantisi vermeyiz."
+          }
+        ]
       },
       {
         "ad": "Anahtar kelime analizi",
         "slug": "seo-anahtar-kelime-analizi",
-        "ozet": "Müşterilerinizin gerçekte ne aradığı."
+        "ozet": "Müşterilerinizin gerçekte ne aradığı.",
+        "giris": "Müşterilerinizin sizi ararken gerçekte hangi kelimeleri kullandığını bulup sitenizin yapısını ve içerik planını buna göre kuruyoruz.",
+        "neden": "İşletmelerin kendilerini anlatırken kullandığı kelimeler ile müşterilerin aradığı kelimeler çoğu zaman farklıdır. Doğru kelimeleri hedeflemeyen bir site, ne kadar iyi tasarlanmış olursa olsun aramada bulunmaz. Analiz, emeğin doğru yere harcanmasını sağlar.",
+        "yapilanlar": [
+          {
+            "baslik": "Kelime araştırması",
+            "metin": "Arama hacmi, rekabet ve satın alma niyeti birlikte değerlendirilir."
+          },
+          {
+            "baslik": "Rakip analizi",
+            "metin": "Rakiplerin hangi aramalarda göründüğü ve boşluklar çıkarılır."
+          },
+          {
+            "baslik": "Kelime grupları",
+            "metin": "Kelimeler konulara göre gruplanır ve her grup bir sayfaya eşlenir."
+          },
+          {
+            "baslik": "Önceliklendirme",
+            "metin": "Hızlı kazanılabilecek ve uzun vadeli hedefler ayrılır."
+          },
+          {
+            "baslik": "Uygulama planı",
+            "metin": "Hangi sayfanın oluşturulacağı ya da güncelleneceği sırasıyla listelenir."
+          }
+        ],
+        "olcum": [
+          "Hedef kelimelerdeki görünürlük",
+          "Kelime grubu bazında organik trafik",
+          "Arama Konsolu gösterim ve tıklama",
+          "Dönüşüm getiren sorgular"
+        ],
+        "kimler": [
+          "Yeni site kuracak işletmeler",
+          "İçerik üretiyor ama trafik alamayanlar",
+          "Yeni bir pazara ya da şehre açılan markalar"
+        ],
+        "sss": [
+          {
+            "soru": "Analiz sonunda ne teslim ediyorsunuz?",
+            "cevap": "Kelime grupları, sayfa eşleştirmesi ve öncelik sırasıyla bir uygulama planı teslim ederiz."
+          },
+          {
+            "soru": "Google Ads verisi analizde kullanılıyor mu?",
+            "cevap": "Reklam hesabınız varsa, gerçek arama terimleri analize çok değerli bir kaynak olarak eklenir."
+          }
+        ]
       },
       {
         "ad": "Teknik SEO",
         "slug": "teknik-seo",
-        "ozet": "Hız, taranabilirlik ve site altyapısı."
+        "ozet": "Hız, taranabilirlik ve site altyapısı.",
+        "giris": "Sitenizin hızını, taranabilirliğini ve altyapısını arama motorlarının sorunsuz okuyabileceği hale getiriyoruz.",
+        "neden": "İçerik ne kadar iyi olursa olsun, arama motoru sayfayı tarayamıyor, yanlış sürümünü görüyor ya da sayfa çok yavaş açılıyorsa görünürlük düşer. Site taşımalarında yapılan yönlendirme hataları ise yılların emeğini kısa sürede kaybettirebilir.",
+        "yapilanlar": [
+          {
+            "baslik": "Tarama ve dizine ekleme kontrolü",
+            "metin": "Robots, site haritası, kanonik etiketler ve dizine eklenme sorunları incelenir."
+          },
+          {
+            "baslik": "Hız ve Önemli Web Verileri",
+            "metin": "Sayfa yükleme ve etkileşim hızını düşüren sorunlar bulunur ve düzeltilir."
+          },
+          {
+            "baslik": "Yönlendirmeler ve kırık bağlantılar",
+            "metin": "Kalıcı (301) yönlendirmeler doğru kurulur; kırık bağlantılar giderilir."
+          },
+          {
+            "baslik": "Yapılandırılmış veri",
+            "metin": "Ürün, işletme ve sık sorulan sorular gibi bilgiler arama motorlarına uygun biçimde işaretlenir."
+          },
+          {
+            "baslik": "Site taşıma desteği",
+            "metin": "Alan adı ya da altyapı değişikliklerinde trafik kaybını önleyecek plan uygulanır."
+          }
+        ],
+        "olcum": [
+          "Dizine eklenen sayfa sayısı",
+          "Önemli Web Verileri",
+          "Tarama hataları",
+          "Organik trafik değişimi"
+        ],
+        "kimler": [
+          "Yeni siteye geçen ya da alan adı değiştiren işletmeler",
+          "Trafiği nedeni bilinmeden düşen siteler",
+          "Çok sayfalı e-ticaret siteleri"
+        ],
+        "sss": [
+          {
+            "soru": "Site taşırken trafik kaybı olur mu?",
+            "cevap": "Doğru planlanmış yönlendirmelerle kayıp en aza indirilir; geçiş sonrası Arama Konsolu yakından izlenir."
+          },
+          {
+            "soru": "Teknik düzeltmeleri kim yapıyor?",
+            "cevap": "Altyapınıza göre doğrudan biz uygularız ya da yazılımcınıza ayrıntılı iş listesi veririz."
+          }
+        ]
       },
       {
         "ad": "Site içi SEO",
         "slug": "site-ici-seo-on-page-seo",
-        "ozet": "Başlıklar, açıklamalar ve sayfa yapısı."
+        "ozet": "Başlıklar, açıklamalar ve sayfa yapısı.",
+        "giris": "Sayfa başlıklarını, açıklamaları, başlık yapısını, iç bağlantıları ve görselleri her sayfanın hedefine göre düzenliyoruz.",
+        "neden": "Arama motorları bir sayfanın neyle ilgili olduğunu başlık, alt başlık, metin ve bağlantılardan anlar. Aynı başlığı taşıyan sayfalar birbirleriyle yarışır, açıklaması olmayan sayfalar arama sonucunda tıklanmaz. Site içi düzenlemeler, mevcut içeriğin hakkını vermenin en hızlı yoludur.",
+        "yapilanlar": [
+          {
+            "baslik": "Başlık ve açıklama etiketleri",
+            "metin": "Her sayfaya benzersiz, tıklamaya değer başlık ve açıklama yazılır."
+          },
+          {
+            "baslik": "Başlık hiyerarşisi",
+            "metin": "Sayfa içindeki ana ve alt başlıklar düzenlenir."
+          },
+          {
+            "baslik": "İç bağlantılar",
+            "metin": "Önemli sayfalara site içinden doğru bağlantılar verilir."
+          },
+          {
+            "baslik": "Görsel optimizasyonu",
+            "metin": "Görsel boyutları küçültülür, açıklayıcı alternatif metinler eklenir."
+          },
+          {
+            "baslik": "Yinelenen içerik",
+            "metin": "Birbirine çok benzeyen sayfalar birleştirilir ya da ayrıştırılır."
+          }
+        ],
+        "olcum": [
+          "Arama sonuçlarında tıklama oranı",
+          "Hedef sorgulardaki sıralama",
+          "Sayfa başına organik trafik",
+          "Sayfada kalma ve dönüşüm"
+        ],
+        "kimler": [
+          "İçeriği olan ama sıralaması zayıf siteler",
+          "Ürün ve kategori sayfası çok olan mağazalar",
+          "Kendi sitesini güncelleyen ama SEO bilgisi olmayan ekipler"
+        ],
+        "sss": [
+          {
+            "soru": "Site içi SEO ile teknik SEO arasındaki fark ne?",
+            "cevap": "Teknik SEO sitenin altyapısıyla, site içi SEO ise her sayfanın içeriği ve düzeniyle ilgilenir. İkisi birlikte en iyi sonucu verir."
+          },
+          {
+            "soru": "Değişiklikler siteyi bozar mı?",
+            "cevap": "Değişiklikler önce listelenir ve onayınızla uygulanır; geri alınabilir şekilde kayıt altına alınır."
+          }
+        ]
       },
       {
         "ad": "Yerel SEO",
         "slug": "yerel-seo-hizmeti",
-        "ozet": "Haritalarda ve yakınımdaki aramalarda görünürlük."
+        "ozet": "Haritalarda ve yakınımdaki aramalarda görünürlük.",
+        "giris": "Google Haritalar’da ve “yakınımdaki” aramalarda işletmenizin bulunmasını, doğru bilgilerle görünmesini sağlıyoruz.",
+        "neden": "Klinik, mağaza, servis ya da showroom gibi fiziksel konumu olan işletmelerde müşterilerin büyük kısmı Haritalar’dan gelir. Yanlış çalışma saati, eksik kategori ya da cevapsız yorumlar müşteriyi rakibe yönlendirir. Google İşletme Profili, ücretsiz ama en çok ihmal edilen kanallardandır.",
+        "yapilanlar": [
+          {
+            "baslik": "Google İşletme Profili",
+            "metin": "Kategori, hizmetler, çalışma saatleri, fotoğraflar ve açıklama eksiksiz düzenlenir."
+          },
+          {
+            "baslik": "Tutarlı işletme bilgisi",
+            "metin": "Ad, adres ve telefon bilgisi site ve rehberlerde tutarlı hale getirilir."
+          },
+          {
+            "baslik": "Yorum yönetimi",
+            "metin": "Yorum isteme süreci kurulur; yorumlar zamanında ve özenle cevaplanır."
+          },
+          {
+            "baslik": "Yerel sayfalar",
+            "metin": "Birden fazla şube ya da hizmet bölgesi için ayrı sayfalar oluşturulur."
+          },
+          {
+            "baslik": "Gönderi ve güncellemeler",
+            "metin": "Profilde düzenli gönderi ve kampanya duyurusu yapılır."
+          }
+        ],
+        "olcum": [
+          "Haritalar’da görüntülenme",
+          "Yol tarifi, arama ve web sitesi tıklamaları",
+          "Yorum sayısı ve puanı",
+          "Yerel aramalarda sıralama"
+        ],
+        "kimler": [
+          "Klinikler ve sağlık işletmeleri",
+          "Mağaza, showroom ve servis noktaları",
+          "Belirli şehir ya da bölgelere hizmet verenler"
+        ],
+        "sss": [
+          {
+            "soru": "Sahte yorum hizmeti veriyor musunuz?",
+            "cevap": "Hayır. Sahte yorum hem kurallara aykırıdır hem de markaya zarar verir. Gerçek müşterilerden yorum isteme sürecini kuruyoruz."
+          },
+          {
+            "soru": "Birden fazla şube için çalışır mı?",
+            "cevap": "Evet, her şube için ayrı profil ve yerel sayfa yönetilir."
+          }
+        ]
       },
       {
         "ad": "Backlink stratejisi",
         "slug": "backlink-stratejisi",
-        "ozet": "Güvenilir sitelerden bağlantı kazanımı."
+        "ozet": "Güvenilir sitelerden bağlantı kazanımı.",
+        "giris": "Sitenize güvenilir ve konuyla ilgili kaynaklardan bağlantı kazanmak için içerik ve iş birliği odaklı bir plan uyguluyoruz.",
+        "neden": "Başka sitelerden gelen bağlantılar, arama motorları için güven işaretidir. Ancak satın alınan ya da ilgisiz sitelerden gelen bağlantılar fayda yerine ceza riski taşır. Kalıcı etki, gerçekten bahsedilmeye değer içerik ve doğru iş birlikleriyle gelir.",
+        "yapilanlar": [
+          {
+            "baslik": "Bağlantı profili analizi",
+            "metin": "Mevcut bağlantılar incelenir; riskli olanlar belirlenir."
+          },
+          {
+            "baslik": "Rakip karşılaştırması",
+            "metin": "Rakiplerin bağlantı aldığı kaynaklar ve fırsatlar çıkarılır."
+          },
+          {
+            "baslik": "Bahsedilmeye değer içerik",
+            "metin": "Rehber, araştırma ve araç gibi doğal bağlantı kazandıracak içerikler planlanır."
+          },
+          {
+            "baslik": "İş birliği ve basın",
+            "metin": "Sektör yayınları, iş ortakları ve yerel kaynaklarla iletişim kurulur."
+          },
+          {
+            "baslik": "Kırık bağlantı fırsatları",
+            "metin": "Sizden bahseden ama bağlantı vermeyen ya da kırık bağlantı veren siteler tespit edilir."
+          }
+        ],
+        "olcum": [
+          "Bağlantı veren alan adı sayısı ve kalitesi",
+          "Hedef sayfalara gelen bağlantılar",
+          "Organik görünürlük değişimi",
+          "Bağlantı kaynaklı ziyaret"
+        ],
+        "kimler": [
+          "İçeriği güçlü ama otoritesi düşük siteler",
+          "Rekabetçi sektörlerde görünür olmak isteyenler",
+          "Geçmişte riskli bağlantı almış siteler"
+        ],
+        "sss": [
+          {
+            "soru": "Paket halinde backlink satıyor musunuz?",
+            "cevap": "Hayır. Toplu ve ücretli bağlantı paketleri arama motoru kurallarına aykırıdır ve risk taşır."
+          },
+          {
+            "soru": "Kaç bağlantı garanti ediyorsunuz?",
+            "cevap": "Sayı garantisi vermeyiz; kaliteye ve konuyla ilgiye odaklanırız."
+          }
+        ]
       }
+    ],
+    "baslik": "SEO ve GEO",
+    "neden": "Müşterileriniz artık yalnızca arama sonuçlarına değil, Google’ın yapay zekâ özetlerine ve ChatGPT gibi asistanların cevaplarına da bakıyor. Sitenizin teknik olarak sağlam, içeriğinizin soruya net ve güvenilir cevap veriyor olması hem sıralamanızı hem de yapay zekâ cevaplarında kaynak gösterilmenizi belirler. Reklam durduğunda da ziyaretçi getirmeye devam eden kalıcı bir yatırımdır.",
+    "dikkat": [
+      "Teknik altyapı: hız, taranabilirlik, doğru yönlendirme ve site haritası",
+      "Uzman, soruya doğrudan cevap veren ve kaynak gösterilebilir içerik (GEO)",
+      "Yerel görünürlük: Google İşletme Profili ve harita aramaları"
     ]
   },
   {
@@ -113,28 +878,264 @@
       {
         "ad": "Web tasarım",
         "slug": "web-tasarim-hizmetleri",
-        "ozet": "Hızlı, mobil uyumlu ve satışa odaklı siteler."
+        "ozet": "Hızlı, mobil uyumlu ve satışa odaklı siteler.",
+        "giris": "Hızlı açılan, telefonda rahat kullanılan, ölçümü baştan doğru kurulmuş ve satışa ya da talebe odaklı web siteleri tasarlıyoruz.",
+        "neden": "Web sitesi çoğu müşterinin sizinle ilk temasıdır ve reklamla gelen ziyaretçinin karar verdiği yerdir. Yavaş açılan, telefonda zor kullanılan ya da formu çalışmayan bir site, reklam bütçesini de boşa harcatır. Sonradan eklenen ölçüm ise eksik kalır.",
+        "yapilanlar": [
+          {
+            "baslik": "İhtiyaç ve içerik planı",
+            "metin": "Ziyaretçinin hangi sorularla geldiği ve sitede ne yapmasını istediğiniz netleştirilir."
+          },
+          {
+            "baslik": "Önce telefon tasarımı",
+            "metin": "Tasarım önce telefon ekranına göre yapılır, sonra büyük ekranlara uyarlanır."
+          },
+          {
+            "baslik": "Hız ve erişilebilirlik",
+            "metin": "Sayfalar hızlı açılacak ve herkesin kullanabileceği şekilde hazırlanır."
+          },
+          {
+            "baslik": "Ölçüm ve form altyapısı",
+            "metin": "GA4, etiketler, form ve arama ölçümü yayından önce kurulur ve test edilir."
+          },
+          {
+            "baslik": "KVKK ve çerez uyumu",
+            "metin": "Aydınlatma metni, çerez onayı ve form izinleri baştan doğru kurulur."
+          },
+          {
+            "baslik": "Yayın ve yönlendirmeler",
+            "metin": "Eski siteden geçişte kalıcı yönlendirmeler yapılır, yayın sonrası kontrol edilir."
+          }
+        ],
+        "olcum": [
+          "Sayfa hızı",
+          "Form ve arama dönüşümleri",
+          "Telefon kullanıcılarının dönüşüm oranı",
+          "Hata ve kırık bağlantı sayısı"
+        ],
+        "kimler": [
+          "Sitesi eskiyen ya da telefonda zor kullanılan işletmeler",
+          "Reklam veren ama siteden talep alamayanlar",
+          "Yeni kurulan markalar"
+        ],
+        "sss": [
+          {
+            "soru": "Site yayına alındıktan sonra güncellemeleri kim yapıyor?",
+            "cevap": "İçeriği kendiniz yönetebileceğiniz bir yapı kuruyoruz; isterseniz bakım ve güncellemeyi biz üstleniyoruz."
+          },
+          {
+            "soru": "Alan adı ve barındırma kime ait olur?",
+            "cevap": "Alan adı ve barındırma hesapları sizin adınıza olur."
+          }
+        ]
       },
       {
         "ad": "Yazılım danışmanlığı",
         "slug": "yazilim-danismanligi",
-        "ozet": "Doğru yazılımı seçme ve uygulama."
+        "ozet": "Doğru yazılımı seçme ve uygulama.",
+        "giris": "İşinizi kolaylaştıracak yazılımı seçmenize, kurmanıza ve mevcut sistemlerinizle bağlamanıza yardım ediyoruz.",
+        "neden": "Yanlış seçilen yazılım, aylar süren uyum sürecine, kullanılmayan lisanslara ve verinin birden çok yerde tutulmasına yol açar. İhtiyacın net tanımlanması ve seçeneklerin tarafsız karşılaştırılması, hem maliyeti hem de zaman kaybını azaltır.",
+        "yapilanlar": [
+          {
+            "baslik": "İhtiyaç analizi",
+            "metin": "Ekibin günlük iş akışı ve sorun yaşadığı noktalar çıkarılır."
+          },
+          {
+            "baslik": "Seçenek karşılaştırması",
+            "metin": "Hazır yazılımlar ve özel geliştirme seçenekleri maliyet ve uygunluk açısından karşılaştırılır."
+          },
+          {
+            "baslik": "Kurulum ve veri aktarımı",
+            "metin": "Seçilen yazılım kurulur, mevcut veriler kontrollü şekilde aktarılır."
+          },
+          {
+            "baslik": "Entegrasyon",
+            "metin": "Yazılımın web sitesi, e-ticaret ve muhasebe sistemleriyle bağlantısı kurulur."
+          },
+          {
+            "baslik": "Ekip eğitimi",
+            "metin": "Ekibin yazılımı doğru kullanması için eğitim ve kısa kılavuzlar hazırlanır."
+          }
+        ],
+        "olcum": [
+          "Elle yapılan işlem miktarı",
+          "Aynı verinin girildiği yer sayısı",
+          "Kullanıcıların yazılımı benimseme oranı",
+          "Süreç başına harcanan süre"
+        ],
+        "kimler": [
+          "Excel ve e-postayla yürüyen işleri sisteme taşımak isteyenler",
+          "Yazılım seçiminde kararsız kalan işletmeler",
+          "Birbiriyle konuşmayan yazılımları olanlar"
+        ],
+        "sss": [
+          {
+            "soru": "Belirli bir yazılım firmasının bayisi misiniz?",
+            "cevap": "Danışmanlıkta tarafsız kalırız; öneriyi ihtiyacınıza göre yaparız."
+          },
+          {
+            "soru": "Özel yazılım geliştiriyor musunuz?",
+            "cevap": "Gerekli durumlarda özel çözüm ve entegrasyon geliştiriyoruz; önce hazır seçenekleri değerlendiririz."
+          }
+        ]
       },
       {
         "ad": "ERP yazılım danışmanlığı",
         "slug": "erp-yazilim-danismanligi",
-        "ozet": "Kurumsal kaynak planlama sistemleri."
+        "ozet": "Kurumsal kaynak planlama sistemleri.",
+        "giris": "Stok, satın alma, üretim, satış ve muhasebeyi tek sistemde toplayan ERP yazılımının seçimi ve kurulumunda yanınızdayız.",
+        "neden": "ERP doğru kurulduğunda işletmenin tek doğru bilgi kaynağı olur; yanlış kurulduğunda ise ekip eski yöntemlere geri döner ve yatırım boşa gider. Süreçlerin yazılımdan önce netleştirilmesi başarının en önemli koşuludur.",
+        "yapilanlar": [
+          {
+            "baslik": "Süreç analizi",
+            "metin": "Satın alma, stok, satış ve muhasebe süreçleri uçtan uca çıkarılır."
+          },
+          {
+            "baslik": "ERP seçimi",
+            "metin": "İşletmenin büyüklüğüne ve sektörüne uygun ERP seçenekleri karşılaştırılır."
+          },
+          {
+            "baslik": "Kurulum planı",
+            "metin": "Modüller, veri aktarımı ve canlıya geçiş takvimi planlanır."
+          },
+          {
+            "baslik": "E-ticaret ve pazaryeri bağlantısı",
+            "metin": "ERP’nin satış kanallarıyla stok ve sipariş alışverişi kurulur."
+          },
+          {
+            "baslik": "Canlıya geçiş desteği",
+            "metin": "İlk dönemde ortaya çıkan sorunlar takip edilir ve çözülür."
+          }
+        ],
+        "olcum": [
+          "Stok doğruluğu",
+          "Siparişten faturaya geçen süre",
+          "Raporlama için harcanan süre",
+          "Kanallar arası veri tutarlılığı"
+        ],
+        "kimler": [
+          "Büyüyen ve süreçleri karmaşıklaşan işletmeler",
+          "Üretim ve stok yönetimi olan firmalar",
+          "Birden çok satış kanalını tek merkezden yönetmek isteyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Hangi ERP yazılımlarıyla çalışıyorsunuz?",
+            "cevap": "Logo ve Mikro gibi yaygın yerli çözümlerle çalışıyoruz; ihtiyaca göre diğer seçenekleri de değerlendiriyoruz."
+          },
+          {
+            "soru": "ERP geçişi ne kadar sürer?",
+            "cevap": "Kapsama, modül sayısına ve veri durumuna göre değişir; analizden sonra gerçekçi bir takvim çıkarırız."
+          }
+        ]
       },
       {
         "ad": "CRM yazılım danışmanlığı",
         "slug": "crm-yazilim-danismanligi",
-        "ozet": "Müşteri ilişkileri yönetimi sistemleri."
+        "ozet": "Müşteri ilişkileri yönetimi sistemleri.",
+        "giris": "Müşteri ve satış süreçlerinizi takip edeceğiniz CRM sistemini seçiyor, kuruyor ve reklam ile web formlarınıza bağlıyoruz.",
+        "neden": "Talepler e-posta, telefon ve mesaj arasında dağıldığında hangi talebin satışa döndüğü bilinmez, takip edilmeyen müşteriler kaybolur. CRM, talepten satışa kadar her adımı görünür kılar ve reklamların gerçek satış katkısını ölçmeyi mümkün kılar.",
+        "yapilanlar": [
+          {
+            "baslik": "Satış süreci tasarımı",
+            "metin": "Talep, görüşme, teklif ve kazanım aşamaları tanımlanır."
+          },
+          {
+            "baslik": "CRM seçimi ve kurulumu",
+            "metin": "Ekip büyüklüğüne ve ihtiyaca uygun CRM seçilir ve kurulur."
+          },
+          {
+            "baslik": "Form ve reklam bağlantısı",
+            "metin": "Web formları, reklam formları ve mesajlar CRM’e kendiliğinden düşer."
+          },
+          {
+            "baslik": "Otomatik hatırlatmalar",
+            "metin": "Takip edilmeyen talepler ve süresi geçen teklifler için hatırlatmalar kurulur."
+          },
+          {
+            "baslik": "Satış raporları",
+            "metin": "Kaynak bazında talep, teklif ve kazanım raporları hazırlanır."
+          }
+        ],
+        "olcum": [
+          "Talepten satışa dönüşüm oranı",
+          "İlk dönüş süresi",
+          "Kaynak bazında kazanılan satış",
+          "Takipsiz kalan talep sayısı"
+        ],
+        "kimler": [
+          "Form ve telefonla talep toplayan hizmet işletmeleri",
+          "Satış ekibi olan B2B firmalar",
+          "Reklamın gerçek satış katkısını görmek isteyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Hangi CRM’leri kullanıyorsunuz?",
+            "cevap": "HubSpot başta olmak üzere ihtiyaca uygun CRM’lerle çalışıyoruz."
+          },
+          {
+            "soru": "Satış verisi reklam platformlarına gönderilebilir mi?",
+            "cevap": "Evet, kişisel verilere ilişkin kurallara uyularak çevrim dışı dönüşüm olarak gönderilebilir; bu, reklamların nitelikli talebe göre öğrenmesini sağlar."
+          }
+        ]
       },
       {
         "ad": "Ön muhasebe yazılım danışmanlığı",
         "slug": "on-muhasebe-yazilim-danismanligi",
-        "ozet": "Fatura, cari ve stok takibi."
+        "ozet": "Fatura, cari ve stok takibi.",
+        "giris": "Fatura, cari, tahsilat ve gider takibini kolaylaştıran ön muhasebe yazılımını seçiyor, kuruyor ve satış kanallarınıza bağlıyoruz.",
+        "neden": "Faturalar elle kesildiğinde hata ve gecikme artar; tahsilatlar takip edilmezse nakit akışı bozulur. Ön muhasebe yazılımının e-ticaret ve pazaryerleriyle bağlanması, hem zaman kazandırır hem de mali müşavirinizle çalışmayı kolaylaştırır.",
+        "yapilanlar": [
+          {
+            "baslik": "Yazılım seçimi",
+            "metin": "İşlem hacmine ve e-fatura ihtiyacına uygun yazılım seçilir."
+          },
+          {
+            "baslik": "Kurulum ve tanımlar",
+            "metin": "Cari kartlar, ürünler, vergi ayarları ve belge şablonları hazırlanır."
+          },
+          {
+            "baslik": "Satış kanalı bağlantısı",
+            "metin": "E-ticaret ve pazaryeri siparişlerinin faturaya dönüşmesi kurulur."
+          },
+          {
+            "baslik": "Tahsilat ve gider takibi",
+            "metin": "Vadesi gelen alacak ve ödemeler için düzenli takip kurulur."
+          },
+          {
+            "baslik": "Mali müşavirle uyum",
+            "metin": "Verilerin mali müşavirinizin ihtiyacına uygun aktarılması sağlanır."
+          }
+        ],
+        "olcum": [
+          "Fatura kesme süresi",
+          "Hatalı ya da iptal edilen fatura sayısı",
+          "Vadesi geçmiş alacak",
+          "Elle yapılan kayıt miktarı"
+        ],
+        "kimler": [
+          "Faturalarını hâlâ elle kesen işletmeler",
+          "E-ticaret ve pazaryeri siparişi artan mağazalar",
+          "Nakit akışını daha iyi görmek isteyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Muhasebe hizmeti veriyor musunuz?",
+            "cevap": "Hayır, muhasebe ve beyanname işleri mali müşavirinizde kalır. Biz yazılımın seçimi, kurulumu ve bağlantısında destek oluyoruz."
+          },
+          {
+            "soru": "Hangi yazılımlarla çalışıyorsunuz?",
+            "cevap": "Paraşüt ve BizimHesap gibi yaygın ön muhasebe yazılımlarıyla çalışıyoruz."
+          }
+        ]
       }
+    ],
+    "baslik": "Web ve yazılım",
+    "neden": "Web siteniz çoğu müşterinin sizinle ilk temas noktasıdır. Yavaş açılan, telefonda zor kullanılan ya da formu çalışmayan bir site, reklamla gelen ziyaretçiyi de kaybettirir. Doğru seçilip birbirine bağlanan ERP, CRM ve ön muhasebe yazılımları ise aynı bilgiyi iki kez girmeyi ve buna bağlı hataları ortadan kaldırır.",
+    "dikkat": [
+      "Hızlı ve önce telefona göre tasarlanmış sayfalar",
+      "Ölçüm, form ve kişisel veri altyapısının baştan doğru kurulması",
+      "Yazılımlar arası bağlantı: aynı veri bir kez girilir"
     ]
   },
   {
@@ -145,28 +1146,260 @@
       {
         "ad": "Grafik tasarım",
         "slug": "grafik-tasarim-hizmetleri",
-        "ozet": "Reklam, sosyal medya ve basılı tasarımlar."
+        "ozet": "Reklam, sosyal medya ve basılı tasarımlar.",
+        "giris": "Sosyal medya gönderileri, reklam görselleri, kampanya afişleri ve basılı materyaller için markanıza uygun tasarımlar hazırlıyoruz.",
+        "neden": "Reklamda ve sosyal medyada ilk saniyede dikkat çekmeyen görsel kaydırılıp geçilir. Her seferinde farklı görünen tasarımlar ise markanın tanınmasını zorlaştırır. Tutarlı ve platforma uygun tasarım, aynı bütçeyle daha fazla etki demektir.",
+        "yapilanlar": [
+          {
+            "baslik": "Reklam görselleri",
+            "metin": "Google ve Meta reklamları için farklı boyut ve mesajlarda test edilebilir görseller hazırlanır."
+          },
+          {
+            "baslik": "Sosyal medya tasarımları",
+            "metin": "Gönderi, hikâye ve kapak tasarımları marka kimliğine uygun hazırlanır."
+          },
+          {
+            "baslik": "Kampanya materyalleri",
+            "metin": "İndirim, lansman ve özel gün kampanyaları için görsel seti oluşturulur."
+          },
+          {
+            "baslik": "Basılı materyaller",
+            "metin": "Katalog, broşür, kartvizit ve ambalaj tasarımları yapılır."
+          },
+          {
+            "baslik": "Şablon kütüphanesi",
+            "metin": "Ekibinizin hızlıca kullanabileceği düzenlenebilir şablonlar hazırlanır."
+          }
+        ],
+        "olcum": [
+          "Reklam görsellerinin tıklama oranı",
+          "Sosyal medya etkileşimi",
+          "Teslim süresi",
+          "Revizyon sayısı"
+        ],
+        "kimler": [
+          "Düzenli içerik ve reklam görseline ihtiyaç duyan markalar",
+          "Tasarım ekibi olmayan işletmeler",
+          "Kampanya dönemlerinde hızlı üretim isteyenler"
+        ],
+        "sss": [
+          {
+            "soru": "Kaynak dosyalar bize teslim ediliyor mu?",
+            "cevap": "Evet, onaylanan tasarımların kaynak dosyaları teslim edilir."
+          },
+          {
+            "soru": "Kaç revizyon hakkı var?",
+            "cevap": "Revizyon kapsamını işin büyüklüğüne göre başlangıçta birlikte belirleriz."
+          }
+        ]
       },
       {
         "ad": "Logo tasarımı",
         "slug": "logo-tasarimi",
-        "ozet": "Markanızın temel imzası."
+        "ozet": "Markanızın temel imzası.",
+        "giris": "Markanızın karakterini yansıtan, küçük ekranda da büyük tabelada da okunaklı kalan bir logo tasarlıyoruz.",
+        "neden": "Logo, markanızın her yerde ilk görülen yüzüdür: site, sosyal medya profili, ambalaj, fatura. Karmaşık ya da sadece belirli bir boyutta iyi görünen logolar, uygulamada sorun çıkarır. İyi bir logo yıllarca değiştirmeden kullanılabilir.",
+        "yapilanlar": [
+          {
+            "baslik": "Marka görüşmesi",
+            "metin": "Markanın değerleri, hedef kitlesi ve rakipleri konuşulur."
+          },
+          {
+            "baslik": "Konsept önerileri",
+            "metin": "Farklı yönlerde logo konseptleri gerekçeleriyle sunulur."
+          },
+          {
+            "baslik": "Geliştirme",
+            "metin": "Seçilen konsept üzerinde renk, yazı karakteri ve oranlar netleştirilir."
+          },
+          {
+            "baslik": "Kullanım sürümleri",
+            "metin": "Yatay, dikey, tek renk ve küçük boyut sürümleri hazırlanır."
+          },
+          {
+            "baslik": "Teslim paketi",
+            "metin": "Baskı ve dijital kullanım için tüm dosya biçimleri teslim edilir."
+          }
+        ],
+        "olcum": [
+          "Küçük boyutta okunabilirlik",
+          "Farklı zeminlerde kullanılabilirlik",
+          "Rakiplerden ayrışma",
+          "Marka kılavuzuna uyum"
+        ],
+        "kimler": [
+          "Yeni kurulan markalar",
+          "Logosu eskiyen ya da dijitalde zor kullanılan işletmeler",
+          "Yeni ürün markası çıkaran firmalar"
+        ],
+        "sss": [
+          {
+            "soru": "Logo tescili yapıyor musunuz?",
+            "cevap": "Tescil başvurusu marka vekilleri tarafından yapılır; tasarım sürecinde benzer markalara dikkat ederiz, başvuru öncesi vekilinize danışmanızı öneririz."
+          },
+          {
+            "soru": "Logo dosyaları hangi biçimlerde teslim ediliyor?",
+            "cevap": "Vektörel kaynak dosya, SVG, PNG ve PDF biçimlerinde teslim edilir."
+          }
+        ]
       },
       {
         "ad": "Kurumsal kimlik tasarımı",
         "slug": "kurumsal-kimlik-tasarimi",
-        "ozet": "Kartvizitten sunuma tutarlı marka dili."
+        "ozet": "Kartvizitten sunuma tutarlı marka dili.",
+        "giris": "Logo, renk, yazı karakteri ve görsel dilden oluşan, her yerde tutarlı kullanılabilecek bir kurumsal kimlik sistemi hazırlıyoruz.",
+        "neden": "Müşteriler bir markayı tekrar eden görsel işaretlerle tanır ve hatırlar. Her çalışanın ya da ajansın farklı renk ve yazı kullandığı bir marka dağınık ve güvensiz görünür. Kurumsal kimlik kılavuzu, tutarlılığı kişilere değil sisteme bağlar.",
+        "yapilanlar": [
+          {
+            "baslik": "Renk paleti",
+            "metin": "Ana ve yardımcı renkler, ekranda ve baskıda karşılıklarıyla belirlenir."
+          },
+          {
+            "baslik": "Yazı karakterleri",
+            "metin": "Başlık ve metin için okunaklı, lisansı uygun yazı karakterleri seçilir."
+          },
+          {
+            "baslik": "Görsel dil",
+            "metin": "Fotoğraf, ikon ve illüstrasyon tarzı tanımlanır."
+          },
+          {
+            "baslik": "Kurumsal materyaller",
+            "metin": "Kartvizit, antetli kâğıt, e-posta imzası ve sunum şablonu hazırlanır."
+          },
+          {
+            "baslik": "Marka kılavuzu",
+            "metin": "Tüm kuralların doğru ve yanlış örnekleriyle anlatıldığı kılavuz teslim edilir."
+          }
+        ],
+        "olcum": [
+          "Materyaller arası tutarlılık",
+          "Kılavuzun ekip ve ajanslarca kullanımı",
+          "Yeni materyal hazırlama süresi",
+          "Marka bilinirliği"
+        ],
+        "kimler": [
+          "Büyüyen ve birden çok ekiple çalışan markalar",
+          "Yeniden markalaşan işletmeler",
+          "Bayi veya şube ağı olan firmalar"
+        ],
+        "sss": [
+          {
+            "soru": "Logomuz var, sadece kimlik çalışması yapılabilir mi?",
+            "cevap": "Evet, mevcut logonuz korunarak etrafında kurumsal kimlik sistemi kurulabilir."
+          },
+          {
+            "soru": "Web sitesi tasarımı bu hizmete dahil mi?",
+            "cevap": "Değil; ancak kimlik çalışması web tasarımına doğrudan uygulanabilir şekilde hazırlanır."
+          }
+        ]
       },
       {
         "ad": "Reels ve Shorts çekimleri",
         "slug": "instagram-reels-youtube-shorts-cekimleri",
-        "ozet": "Kısa dikey video içerikleri."
+        "ozet": "Kısa dikey video içerikleri.",
+        "giris": "Instagram Reels, YouTube Shorts ve TikTok için kısa, dikey ve izlenmeye değer videolar planlıyor, çekiyor ve kurguluyoruz.",
+        "neden": "Kısa dikey videolar, sosyal platformlarda yeni kişilere ulaşmanın en güçlü biçimlerinden biridir. Ancak ilk saniyelerde dikkat çekmeyen video kaydırılıp geçilir. Plan, çekim ve kurgunun platformun diline göre yapılması gerekir; aynı videolar reklamda da kullanılabilir.",
+        "yapilanlar": [
+          {
+            "baslik": "İçerik planı",
+            "metin": "Markanıza ve hedef kitlenize uygun video fikirleri ve aylık takvim hazırlanır."
+          },
+          {
+            "baslik": "Senaryo ve ilk saniyeler",
+            "metin": "Her video için dikkat çekici açılış ve net bir mesaj yazılır."
+          },
+          {
+            "baslik": "Çekim",
+            "metin": "Ürün, hizmet ve ekip çekimleri dikey formatta yapılır."
+          },
+          {
+            "baslik": "Kurgu, altyazı ve müzik",
+            "metin": "Sessiz izleyenler için altyazı eklenir; müzik ve efektler lisansına uygun seçilir."
+          },
+          {
+            "baslik": "Reklamda kullanım",
+            "metin": "Başarılı videolar Meta ve diğer platformlarda reklam olarak kullanılmak üzere uyarlanır."
+          }
+        ],
+        "olcum": [
+          "İzlenme ve izlenme süresi",
+          "Etkileşim ve paylaşım",
+          "Profil ziyareti ve takipçi kazanımı",
+          "Reklamda kullanıldığında sonuç başına maliyet"
+        ],
+        "kimler": [
+          "Instagram ve YouTube’da büyümek isteyen markalar",
+          "Ürününü hareket halinde göstermesi gereken işletmeler",
+          "Reklam için düzenli video ihtiyacı olanlar"
+        ],
+        "sss": [
+          {
+            "soru": "Çekimler nerede yapılıyor?",
+            "cevap": "İşletmenizde, ürününüzün kullanıldığı ortamda ya da ihtiyaca göre stüdyoda yapılabilir."
+          },
+          {
+            "soru": "Videoları biz mi paylaşıyoruz?",
+            "cevap": "İsterseniz siz paylaşırsınız, isterseniz paylaşım takvimini de biz yönetiriz."
+          }
+        ]
       },
       {
         "ad": "Ürün fotoğraf ve video çekimleri",
         "slug": "urun-fotograf-video-cekimleri",
-        "ozet": "E-ticaret ve reklam için ürün görselleri."
+        "ozet": "E-ticaret ve reklam için ürün görselleri.",
+        "giris": "E-ticaret, pazaryeri ve reklamlar için ürününüzü doğru renk, ölçü ve detayla gösteren fotoğraf ve videolar çekiyoruz.",
+        "neden": "İnternetten alışverişte müşteri ürünü yalnızca görsellerden tanır. Rengi farklı görünen, ölçüsü anlaşılmayan ya da detayı görünmeyen ürünler daha az satar ve daha çok iade edilir. Pazaryerlerinin görsel kurallarına uymayan fotoğraflar ise ürünün yayından kalkmasına neden olabilir.",
+        "yapilanlar": [
+          {
+            "baslik": "Çekim planı",
+            "metin": "Her ürün için gereken açılar, detaylar ve kullanım sahneleri listelenir."
+          },
+          {
+            "baslik": "Beyaz zemin çekimleri",
+            "metin": "Pazaryeri ve e-ticaret kurallarına uygun, temiz arka planlı fotoğraflar çekilir."
+          },
+          {
+            "baslik": "Kullanım ve atmosfer çekimleri",
+            "metin": "Ürünün gerçek kullanımını ve ölçeğini gösteren sahneler hazırlanır."
+          },
+          {
+            "baslik": "Ürün videoları",
+            "metin": "Ürünün her açıdan göründüğü kısa videolar çekilir."
+          },
+          {
+            "baslik": "Düzenleme ve teslim",
+            "metin": "Renk düzeltmesi yapılır; site, pazaryeri ve reklam için gereken boyutlarda teslim edilir."
+          }
+        ],
+        "olcum": [
+          "Ürün sayfası dönüşüm oranı",
+          "“Görseldeki gibi değil” iade nedeni",
+          "Reklam görsellerinin tıklama oranı",
+          "Pazaryeri görsel ret sayısı"
+        ],
+        "kimler": [
+          "Yeni ürün yükleyen e-ticaret mağazaları",
+          "Pazaryerinde görsel kalitesi düşük kalan satıcılar",
+          "Reklam için ürün görseli ihtiyacı olanlar"
+        ],
+        "sss": [
+          {
+            "soru": "Ürünleri size mi göndermemiz gerekiyor?",
+            "cevap": "Çekim, ürün sayısına göre işletmenizde ya da ürünler bize ulaştırılarak yapılabilir."
+          },
+          {
+            "soru": "Mankenli çekim yapıyor musunuz?",
+            "cevap": "Evet, ihtiyaca göre planlanır; manken ve mekân maliyetleri ayrıca belirlenir."
+          }
+        ]
       }
+    ],
+    "baslik": "Tasarım ve içerik",
+    "neden": "İnsanlar bir markaya güvenip güvenmeyeceğine çoğu zaman ilk birkaç saniyede, gördükleriyle karar verir. Tutarlı bir kurumsal kimlik ve ürünü doğru anlatan görseller reklamın etkisini artırır; e-ticarette kararsızlığı ve iadeleri azaltır. Kısa dikey videolar ise Instagram ve YouTube’da keşfedilmenin önemli bir yoludur.",
+    "dikkat": [
+      "Logo, renk ve yazı kullanımında tutarlılık",
+      "Ürünü her açıdan, gerçek ölçüleriyle gösteren fotoğraf ve video",
+      "Her platforma uygun biçim: dikey video, kare gönderi, reklam görseli"
     ]
   }
 ]

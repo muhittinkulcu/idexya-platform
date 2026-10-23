@@ -1,0 +1,31 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Veri eşitleme" aktif="esitle" yol="Finans ve bağlantılar" aciklama="IDOS’tan reklam verisinin çekilme geçmişi. Günlük zamanlayıcı her sabah çalışır; isterseniz buradan elle de çekebilirsiniz (10 dakikada bir).">
+<div class="kart" style="padding: 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap"><span data-baglanti style="flex: 1; min-width: 240px"></span><button type="button" class="dugme ana" data-cek>Şimdi çek</button></div>
+<section class="kart" aria-label="Çekim geçmişi" data-liste style="overflow-x: auto"></section>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  async function yukle() {
+    try {
+      const r = await api('entegrasyonlar');
+      const idos = r.liste.find((x) => x.k === 'idos');
+      document.querySelector('[data-baglanti]').textContent = idos.durum === 'bagli' ? 'IDOS bağlantısı tanımlı.' : 'IDOS bağlantısı tanımlı değil; çekim yapılamaz. Entegrasyonlar sayfasında gereken ayarlar yazıyor.';
+      document.querySelector('[data-cek]').disabled = idos.durum !== 'bagli';
+      const l = document.querySelector('[data-liste]');
+      if (!r.cekimler.length) { l.replaceChildren(el('div', { class: 'bos' }, 'Henüz veri çekimi yapılmadı.')); return; }
+      l.replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+        el('thead', {}, el('tr', {}, ...['Zaman', 'Durum', 'Satır', 'Başlangıç', 'Tetikleyen', 'Mesaj'].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
+        el('tbody', {}, ...r.cekimler.map((c) => el('tr', {}, el('td', { style: hucre + '; white-space: nowrap' }, tarih(c.zaman)),
+          el('td', { style: hucre }, el('span', { class: 'cip ' + (c.durum === 'tamam' ? 'kazanildi' : 'kaybedildi') }, c.durum === 'tamam' ? 'Başarılı' : 'Hata')),
+          el('td', { style: hucre }, c.satir ?? '—'), el('td', { style: hucre }, c.baslangic || '—'), el('td', { style: hucre }, c.tetikleyen), el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, c.mesaj || '—'))))));
+    } catch (h) { genelHata('Eşitleme geçmişi yüklenemedi: ' + h.message); }
+  }
+  document.querySelector('[data-cek]').addEventListener('click', async (o) => {
+    const d = o.currentTarget; d.disabled = true; d.textContent = 'Çekiliyor…';
+    try { await api('reklam/cek', {}); genelHata(''); } catch (h) { genelHata('Çekim yapılamadı: ' + h.message); } finally { d.textContent = 'Şimdi çek'; await yukle(); }
+  });
+  yukle();
+</script>
+</Yonetim>

@@ -1,0 +1,145 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Müşteri alanı" aktif="portal" yol="Üyelik" aciklama="Üyeleri CRM’deki müşteri kartına bağlayın ve müşterilerinizi davetle üye yapın. Davetli kişi davetin gönderildiği e-postayla kaydolunca üyeliği onaylı açılır, seçtiğiniz bölümler verilir ve müşteriye bağlanır.">
+<div role="tablist" aria-label="Müşteri alanı" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); align-self: flex-start; flex-wrap: wrap"></div>
+<div data-mesaj></div>
+<div data-alan style="display: flex; flex-direction: column; gap: 14px"></div>
+<script>
+  import { api, el, tarih, once, genelHata } from '../../scripts/yonetim/ortak.js';
+  const $ = (s) => document.querySelector(s);
+  const alan = $('[data-alan]'), sekmeKutu = $('[data-sekmeler]'), mesaj = $('[data-mesaj]');
+  const SEKME = [['erisim', 'Erişimler'], ['davet', 'Davetler']];
+  let sekme = new URLSearchParams(location.search).get('sekme') === 'davet' ? 'davet' : 'erisim';
+  const bildir = (metin, tur = 'ok') => mesaj.replaceChildren(metin ? el('div', { class: 'uyari ' + tur, role: 'status' }, metin) : '');
+  const secStil = 'min-height: 36px; min-width: 0; max-width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px';
+  const musteriSecenek = (liste, secili, bosMetin) => [el('option', { value: '' }, bosMetin), ...liste.map((m) => el('option', { value: m.id, selected: m.id === secili }, m.alt ? `${m.ad} · ${m.alt}` : m.ad))];
+
+  function sekmeCiz() {
+    sekmeKutu.replaceChildren(...SEKME.map(([k, ad]) => {
+      const s = k === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { if (sekme === k) return; sekme = k; history.replaceState(null, '', '?sekme=' + k); bildir(''); yukle(); } }, ad);
+    }));
+    // Menüdeki alt sayfa işareti sekmeyle birlikte değişir.
+    document.querySelectorAll('[data-alt-link]').forEach((a) => { if (a.getAttribute('href').startsWith('/yonetim/portal/')) { if (a.getAttribute('href') === '/yonetim/portal/?sekme=' + sekme) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); } });
+  }
+
+  // --- Erişimler ---
+  async function erisimCiz() {
+    const v = await api('portal/erisimler');
+    const katalog = Object.fromEntries(v.katalog.map((m) => [m.k, m]));
+    const musAd = Object.fromEntries(v.musteriler.map((m) => [m.id, m.ad]));
+    if (!v.uyeler.length) {
+      alan.replaceChildren(el('div', { class: 'kart bos' }, 'Onaylı üye yok. Üyelik talepleri ', el('a', { href: '/yonetim/uyeler/' }, 'Üyeler ve yetkiler'), ' sayfasında onaylanır; müşterinizi davetle üye yapmak için ', el('a', { href: '/yonetim/portal/?sekme=davet' }, 'Davetler'), ' sekmesini kullanın.'));
+      return;
+    }
+    const bagli = v.uyeler.filter((u) => u.musteri_id).length;
+    alan.replaceChildren(
+      el('span', { style: 'font-size: 13px; color: var(--tx2)' }, `${v.uyeler.length} onaylı üye · ${bagli} tanesi bir müşteriye bağlı. Bölüm yetkileri üyenin ayrıntı sayfasında değiştirilir.`),
+      el('section', { class: 'kart', 'aria-label': 'Onaylı üyeler', style: 'overflow: hidden' }, v.uyeler.map((u) => {
+        const sec = el('select', { 'aria-label': u.ad + ' için müşteri', style: secStil + '; flex: 1 1 200px' }, musteriSecenek(v.musteriler, u.musteri_id || u.oneri_id, 'Müşteri seçin…'));
+        const bagla = el('button', { type: 'button', class: 'dugme ana kucuk', onclick: async (o) => {
+          if (!sec.value) { bildir('Önce bir müşteri seçin.', 'hata'); return; }
+          o.currentTarget.disabled = true;
+          try { await api(`portal/erisimler/${encodeURIComponent(u.id)}/bagla`, { musteri_id: sec.value }); await yukle(); bildir(`${u.ad} “${musAd[sec.value] || 'müşteri'}” kartına bağlandı.`); }
+          catch (h) { bildir('Bağlanamadı: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+        } }, u.musteri_id ? 'Değiştir' : 'Bağla');
+        const coz = u.musteri_id ? el('button', { type: 'button', class: 'dugme kucuk', onclick: async (o) => {
+          if (!confirm(`${u.ad} ile “${u.musteri_ad}” arasındaki bağlantı kaldırılsın mı? Üyelik ve bölüm yetkileri değişmez.`)) return;
+          o.currentTarget.disabled = true;
+          try { await api(`portal/erisimler/${encodeURIComponent(u.id)}/coz`, {}); await yukle(); bildir('Bağlantı kaldırıldı.'); }
+          catch (h) { bildir('Kaldırılamadı: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+        } }, 'Bağlantıyı kaldır') : '';
+        return el('div', { style: 'display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--line)' },
+          el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap' },
+            el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, u.ad), el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [u.eposta, u.firma].filter(Boolean).join(' · ')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, u.son_giris ? 'Son giriş ' + once(u.son_giris) : 'Hiç giriş yapmadı')),
+            el('a', { class: 'dugme kucuk', href: '/yonetim/uyeler/?id=' + encodeURIComponent(u.id), style: 'align-self: flex-start' }, 'Üye ayrıntısı')),
+          el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px' },
+            el('span', { style: 'color: var(--tx2)' }, 'Açık bölümler:'),
+            ...(u.moduller.length ? u.moduller.map((m) => el('span', { class: 'cip crm' }, `${katalog[m.modul] ? katalog[m.modul].ad : m.modul} · ${v.yetkiler[m.yetki] || m.yetki}`)) : [el('span', { style: 'color: var(--tx2)' }, 'yok')])),
+          el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
+            u.musteri_id
+              ? el('span', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1 1 100%; font-size: 13px' }, el('span', { class: 'cip kazanildi' }, 'Bağlı'), el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(u.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, u.musteri_ad), el('span', { style: 'color: var(--tx2)' }, `${tarih(u.baglanma)} · ${u.baglayan}`))
+              : el('span', { style: 'flex: 1 1 100%; font-size: 13px; color: var(--tx2)' }, u.oneri_id ? `Müşteriye bağlı değil · öneri: aynı e-postalı “${musAd[u.oneri_id]}” kartı` : 'Müşteriye bağlı değil'),
+            v.musteriler.length ? sec : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'CRM’de müşteri yok.'), v.musteriler.length ? bagla : '', coz));
+      })));
+  }
+
+  // --- Davetler ---
+  const DURUM = { bekliyor: ['yeni', 'Bekliyor'], kullanildi: ['kazanildi', 'Kullanıldı'], iptal: ['kaybedildi', 'İptal edildi'], suresi_doldu: ['gorusme', 'Süresi doldu'] };
+  async function davetCiz() {
+    const [v, mus] = await Promise.all([api('portal/davetler'), api('musteriler')]);
+    const musteriler = mus.musteriler.map((m) => ({ id: m.id, ad: m.firma || m.ad || m.eposta || 'Adsız müşteri', alt: m.firma && m.ad ? m.ad : m.eposta || '' })).sort((a, b) => a.ad.localeCompare(b.ad, 'tr'));
+    const katalog = Object.fromEntries(v.katalog.map((m) => [m.k, m]));
+    const secimler = {};
+    const modulSatir = v.katalog.map((md) => {
+      const s = el('select', { 'aria-label': md.ad + ' yetkisi', style: secStil }, el('option', { value: '' }, 'Kapalı'), Object.entries(v.yetkiler).map(([k, ad]) => el('option', { value: k }, ad)));
+      secimler[md.k] = s;
+      return el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line)' },
+        el('span', { style: 'display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px' }, el('strong', { style: 'color: var(--head); font-size: 14px' }, md.ad, md.hazir ? '' : el('span', { style: 'margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--tx2)' }, 'Yakında')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, md.aciklama)), s);
+    });
+    const eposta = el('input', { type: 'email', name: 'eposta', required: true, autocomplete: 'off', maxlength: '160' });
+    const musteri = el('select', { name: 'musteri_id' }, musteriSecenek(musteriler, new URLSearchParams(location.search).get('musteri'), 'Müşteriye bağlama (isteğe bağlı)'));
+    const sonuc = el('div', { hidden: true });
+    const form = el('form', { class: 'kart', 'aria-label': 'Yeni davet', style: 'padding: 16px; display: flex; flex-direction: column; gap: 12px', onsubmit: async (o) => {
+      o.preventDefault();
+      const d = o.currentTarget.querySelector('button[type=submit]');
+      const istek = { eposta: eposta.value.trim(), musteri_id: musteri.value || null, moduller: Object.fromEntries(Object.entries(secimler).filter(([, s]) => s.value).map(([k, s]) => [k, s.value])) };
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(istek.eposta)) { bildir('Geçerli bir e-posta adresi yazın.', 'hata'); return; }
+      d.disabled = true;
+      try {
+        const r = await api('portal/davetler', istek);
+        const adres = location.origin + r.yol;
+        const kutu = el('input', { readonly: true, value: adres, 'aria-label': 'Davet bağlantısı', style: 'flex: 1 1 260px; min-width: 0; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit; font-size: 12px' });
+        sonuc.replaceChildren(el('div', { class: 'uyari ok', style: 'display: flex; flex-direction: column; gap: 8px' },
+          el('strong', {}, `Davet oluşturuldu: ${istek.eposta}`),
+          el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, kutu, el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { try { await navigator.clipboard.writeText(adres); bildir('Bağlantı kopyalandı.'); } catch (e) { kutu.select(); } } }, 'Kopyala')),
+          el('span', { style: 'font-size: 13px' }, `Bu bağlantı yalnız şimdi gösterilir; sistemde yalnız özeti saklanır. Uygulama e-posta göndermez: bağlantıyı davetliye kendiniz, güvenli bir kanaldan iletin. ${v.gun} gün (${tarih(r.bitis)} tarihine kadar) ve bir kez geçerli; yalnız ${istek.eposta} adresiyle kaydolunca çalışır.`)));
+        sonuc.hidden = false;
+        eposta.value = ''; musteri.value = ''; Object.values(secimler).forEach((s) => { s.value = ''; });
+        bildir('');
+        await listeCiz();
+      } catch (h) { bildir('Davet oluşturulamadı: ' + h.message, 'hata'); }
+      finally { d.disabled = false; }
+    } },
+      el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Yeni davet'),
+      el('div', { class: 'uyari bilgi' }, 'Uygulama e-posta göndermez. Davet oluşturunca bağlantı bir kez gösterilir; kopyalayıp davetliye kendiniz iletirsiniz.'),
+      el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px' }, el('label', { class: 'alan' }, 'Davetlinin e-postası', eposta), el('label', { class: 'alan' }, 'CRM müşterisi', musteri)),
+      el('div', { style: 'display: flex; flex-direction: column' }, el('strong', { style: 'font-size: 14px; color: var(--head); padding-bottom: 6px' }, 'Açılacak bölümler'), modulSatir),
+      el('div', {}, el('button', { type: 'submit', class: 'dugme ana' }, 'Davet oluştur')),
+      sonuc);
+    const listeKutu = el('section', { class: 'kart', 'aria-label': 'Davetler', style: 'overflow: hidden' });
+    async function listeCiz() {
+      const l = sonuc.hidden ? v : await api('portal/davetler');
+      listeKutu.replaceChildren(el('h2', { style: 'margin: 0; padding: 14px 16px; font-size: 16px; color: var(--head)' }, 'Davetler'),
+        ...(l.davetler.length ? l.davetler.map((d) => el('div', { style: 'display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-top: 1px solid var(--line)' },
+          el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center' },
+            el('strong', { style: 'color: var(--head); overflow-wrap: anywhere' }, d.eposta),
+            el('span', { style: 'display: flex; gap: 8px; align-items: center' }, el('span', { class: 'cip ' + DURUM[d.durum][0] }, DURUM[d.durum][1]),
+              d.durum === 'bekliyor' ? el('button', { type: 'button', class: 'dugme kucuk', onclick: async (o) => {
+                if (!confirm(`${d.eposta} için oluşturulan davet iptal edilsin mi? Bağlantı artık çalışmaz.`)) return;
+                o.currentTarget.disabled = true;
+                try { await api(`portal/davetler/${encodeURIComponent(d.id)}/iptal`, {}); sonuc.hidden = true; await yukle(); bildir('Davet iptal edildi.'); }
+                catch (h) { bildir('İptal edilemedi: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
+              } }, 'İptal et') : '')),
+          el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' },
+            [d.musteri_id ? 'Müşteri: ' + (d.musteri_ad || 'silinmiş kart') : 'Müşteriye bağlanmayacak',
+             'Bölümler: ' + (d.moduller.length ? d.moduller.map((m) => `${katalog[m.modul] ? katalog[m.modul].ad : m.modul} (${v.yetkiler[m.yetki]})`).join(', ') : 'yok')].join(' · ')),
+          el('span', { style: 'font-size: 12px; color: var(--tx2)' },
+            `Oluşturma ${tarih(d.olusturma)} · ${d.olusturan} · `,
+            d.kullanildi ? el('span', {}, `kullanıldı ${tarih(d.kullanildi)}`, d.uye_id ? [' · ', el('a', { href: '/yonetim/uyeler/?id=' + encodeURIComponent(d.uye_id) }, d.uye_ad || 'üye')] : '')
+              : d.iptal ? `iptal ${tarih(d.iptal)} · ${d.iptal_eden}` : `son geçerlilik ${tarih(d.bitis)}`)))
+          : [el('div', { class: 'bos' }, 'Henüz davet oluşturulmadı.')]));
+    }
+    await listeCiz();
+    alan.replaceChildren(form, listeKutu);
+  }
+
+  async function yukle() {
+    sekmeCiz();
+    try { if (sekme === 'davet') await davetCiz(); else await erisimCiz(); genelHata(''); }
+    catch (h) { genelHata('Yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
+  }
+  yukle();
+</script>
+</Yonetim>

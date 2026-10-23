@@ -1,0 +1,47 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="İşlem geçmişi" aktif="gecmis" yol="Sistem" aciklama="Panelde ve sitede yapılan kayıtlı işlemler: kim, neyi, ne zaman yaptı. Kayıtlar değiştirilemez ve silinemez.">
+<div class="kart" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
+<label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">Ara<input data-ara type="search" placeholder="İşlem, kişi veya ayrıntı" style="min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
+<label style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">İşlem türü<select data-tur style="min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"><option value="">Tümü</option></select></label>
+<button type="button" class="dugme" data-csv style="align-self: flex-end">CSV indir</button>
+</div>
+<section class="kart" aria-label="İşlemler" data-liste style="overflow-x: auto"></section>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  // İşlem kodlarının okunur adları; listede olmayan kod olduğu gibi gösterilir.
+  const AD = { talep_crm: 'Talep CRM’e alındı', talep_spam: 'Talep spam işaretlendi', talep_geri: 'Talep geri alındı', musteri_olustur: 'Müşteri oluşturuldu', uye_kayit: 'Üyelik başvurusu', uye_durum: 'Üyelik durumu değişti', uye_modul: 'Üye modül yetkisi', uye_grup: 'Üye grubu', grup_olustur: 'Grup oluşturuldu', grup_sil: 'Grup silindi', uye_oturum_kapat: 'Üye oturumları kapatıldı', uye_sifre_baglantisi: 'Şifre bağlantısı oluşturuldu', uye_sifre_degisti: 'Üye şifresi değişti', uye_sifre_yenilendi: 'Şifre yenilendi', reklam_cek: 'IDOS reklam verisi çekildi', saklama_suresi: 'Saklama süresi dolan kayıtlar silindi', bulten_ayrildi: 'Bültenden ayrıldı', bulten_cikarildi: 'Bültenden çıkarıldı', instagram_eklendi: 'Instagram gönderisi eklendi', instagram_sil: 'Instagram gönderisi silindi', instagram_gizle: 'Instagram gönderisi gizlendi', instagram_goster: 'Instagram gönderisi gösterildi', ayar_degisti: 'Ayar değişti', medya_eklendi: 'Görsel yüklendi', medya_silindi: 'Görsel silindi' };
+  const ad = (k) => AD[k] || k.replace(/_/g, ' ');
+  const liste = document.querySelector('[data-liste]'), ara = document.querySelector('[data-ara]'), tur = document.querySelector('[data-tur]');
+  let tum = [];
+  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  function suz() { const q = ara.value.trim().toLocaleLowerCase('tr-TR'); return tum.filter((k) => (!tur.value || k.islem === tur.value) && (!q || [k.kim, ad(k.islem), k.hedef, k.detay].join(' ').toLocaleLowerCase('tr-TR').includes(q))); }
+  function ciz() {
+    const g = suz();
+    if (!g.length) { liste.replaceChildren(el('div', { class: 'bos' }, tum.length ? 'Bu süzgeçte kayıt yok.' : 'Henüz kayıtlı işlem yok.')); return; }
+    liste.replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, ...['Zaman', 'Kim', 'İşlem', 'Ayrıntı'].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
+      el('tbody', {}, ...g.slice(0, 500).map((k) => el('tr', {},
+        el('td', { style: hucre + '; white-space: nowrap' }, tarih(k.zaman)),
+        el('td', { style: hucre + '; overflow-wrap: anywhere' }, k.kim),
+        el('td', { style: hucre + '; font-weight: 600' }, ad(k.islem)),
+        el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, [k.detay, k.hedef].filter(Boolean).join(' · ') || '—'))))),
+      g.length > 500 ? el('p', { style: 'padding: 10px 14px; color: var(--tx2); font-size: 13px' }, `İlk 500 kayıt gösteriliyor (toplam ${g.length}). Süzgeci daraltın ya da CSV indirin.`) : null);
+  }
+  ara.addEventListener('input', ciz); tur.addEventListener('change', ciz);
+  document.querySelector('[data-csv]').addEventListener('click', () => {
+    const satir = [['zaman', 'kim', 'islem', 'hedef', 'ayrinti'], ...suz().map((k) => [k.zaman, k.kim, k.islem, k.hedef || '', k.detay || ''])];
+    const csv = satir.map((s) => s.map((h) => `"${String(h).replace(/^([=+\-@])/, "'$1").replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    const a = el('a', { href: URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })), download: `idexya-islem-gecmisi-${new Date().toISOString().slice(0, 10)}.csv` });
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  (async () => {
+    try {
+      tum = (await api('gecmis')).kayitlar;
+      [...new Set(tum.map((k) => k.islem))].sort().forEach((k) => tur.append(el('option', { value: k }, ad(k))));
+      ciz();
+    } catch (h) { genelHata('İşlem geçmişi yüklenemedi: ' + h.message); }
+  })();
+</script>
+</Yonetim>

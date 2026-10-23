@@ -67,5 +67,60 @@ export const SEMA = [
   // Sitede gösterilen Instagram gönderileri (worker/instagram.js): yöneticinin seçtiği bağlantı, açıklama ve küçültülmüş görsel.
   `CREATE TABLE IF NOT EXISTS instagram (
     id TEXT PRIMARY KEY, baglanti TEXT NOT NULL, aciklama TEXT, gorsel TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0,
-    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`
+    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  // Panel ayarları ve medya kütüphanesi (worker/sistem.js)
+  `CREATE TABLE IF NOT EXISTS ayarlar (anahtar TEXT PRIMARY KEY, deger TEXT, guncelleme TEXT NOT NULL, guncelleyen TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS medya (
+    id TEXT PRIMARY KEY, ad TEXT NOT NULL, alt TEXT, tur TEXT NOT NULL, boyut INTEGER NOT NULL, genislik INTEGER, yukseklik INTEGER,
+    veri TEXT NOT NULL, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS islem_zaman ON islem_kaydi (zaman)`,
+  // Teklifler (worker/teklif.js): kalemler JSON, tutarlar sunucuda hesaplanır (TL, 2 ondalık). Numara yıl başına sayaçtan.
+  `CREATE TABLE IF NOT EXISTS teklifler (
+    id TEXT PRIMARY KEY, no TEXT NOT NULL UNIQUE, musteri_id TEXT NOT NULL, baslik TEXT NOT NULL, kalemler TEXT NOT NULL,
+    kdv_orani REAL NOT NULL DEFAULT 20, indirim REAL NOT NULL DEFAULT 0, para TEXT NOT NULL DEFAULT 'TRY', gecerlilik TEXT, notlar TEXT,
+    durum TEXT NOT NULL DEFAULT 'taslak', ara_toplam REAL NOT NULL DEFAULT 0, kdv REAL NOT NULL DEFAULT 0, toplam REAL NOT NULL DEFAULT 0,
+    olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, gonderim_zamani TEXT, karar_zamani TEXT, olusturan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS teklif_musteri ON teklifler (musteri_id, olusturma)`,
+  `CREATE INDEX IF NOT EXISTS teklif_durum ON teklifler (durum, guncelleme)`,
+  `CREATE TABLE IF NOT EXISTS teklif_sayac (yil INTEGER PRIMARY KEY, son INTEGER NOT NULL)`,
+  // IDOS eşitleme (worker/crm.js): IDOS reklam hesabı (platform + hesap) ↔ IDP CRM müşterisi. Yönetici elle eşleştirir.
+  `CREATE TABLE IF NOT EXISTS reklam_eslesme (
+    platform TEXT NOT NULL, hesap TEXT NOT NULL, musteri_id TEXT NOT NULL, eslestiren TEXT NOT NULL, zaman TEXT NOT NULL,
+    PRIMARY KEY (platform, hesap))`,
+  `CREATE INDEX IF NOT EXISTS reklam_eslesme_musteri ON reklam_eslesme (musteri_id)`,
+  // Çakışmalar (worker/crm.js): "Bunlar farklı" denen müşteri çiftleri (a < b) bir daha önerilmez.
+  `CREATE TABLE IF NOT EXISTS cakisma_ayri (a TEXT NOT NULL, b TEXT NOT NULL, isaretleyen TEXT NOT NULL, zaman TEXT NOT NULL, PRIMARY KEY (a, b))`,
+  // Müşteri alanı (worker/portal.js): üye ↔ CRM müşterisi bağlantısı ve davetle üyelik. Davet jetonunun yalnız özeti saklanır.
+  `CREATE TABLE IF NOT EXISTS uye_musteri (uye_id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, baglayan TEXT NOT NULL, zaman TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS uye_musteri_musteri ON uye_musteri (musteri_id)`,
+  `CREATE TABLE IF NOT EXISTS davetler (
+    ozet TEXT PRIMARY KEY, id TEXT NOT NULL UNIQUE, eposta TEXT NOT NULL, musteri_id TEXT, moduller TEXT NOT NULL DEFAULT '{}',
+    olusturma TEXT NOT NULL, bitis TEXT NOT NULL, olusturan TEXT NOT NULL, kullanildi TEXT, uye_id TEXT, iptal TEXT, iptal_eden TEXT)`,
+  // Site denetimi çalıştırmaları (worker/denetim.js): özet ve sayfa sonuçları JSON; son 20 çalıştırma saklanır.
+  `CREATE TABLE IF NOT EXISTS denetimler (id TEXT PRIMARY KEY, zaman TEXT NOT NULL, tetikleyen TEXT NOT NULL, ozet TEXT NOT NULL, sonuc TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS denetim_zaman ON denetimler (zaman)`,
+  // Çerezsiz ziyaret sayacı (worker/olcum.js): yalnız günlük toplamlar; IP, tarayıcı bilgisi ya da kimlik tutulmaz.
+  `CREATE TABLE IF NOT EXISTS ziyaret_gunluk (gun TEXT NOT NULL, sayfa TEXT NOT NULL, kaynak TEXT NOT NULL, cihaz TEXT NOT NULL, adet INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (gun, sayfa, kaynak, cihaz))`,
+  // Gerçek kullanıcı hız örnekleri (LCP ms, INP ms, CLS): sayfa başına günde en çok 500 örnek.
+  `CREATE TABLE IF NOT EXISTS hiz_olcum (gun TEXT NOT NULL, sayfa TEXT NOT NULL, cihaz TEXT NOT NULL, lcp REAL, inp REAL, cls REAL)`,
+  `CREATE INDEX IF NOT EXISTS hiz_gun_sayfa ON hiz_olcum (gun, sayfa)`,
+  // Görevler ve takvim (worker/gorev.js): tarih İstanbul takvim günü (YYYY-AA-GG), saat isteğe bağlı (SS:DD).
+  `CREATE TABLE IF NOT EXISTS gorevler (
+    id TEXT PRIMARY KEY, baslik TEXT NOT NULL, aciklama TEXT, tarih TEXT NOT NULL, saat TEXT, musteri_id TEXT,
+    atanan TEXT NOT NULL, oncelik TEXT NOT NULL DEFAULT 'normal', durum TEXT NOT NULL DEFAULT 'acik',
+    olusturma TEXT NOT NULL, tamamlanma TEXT, olusturan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS gorev_tarih ON gorevler (durum, tarih)`,
+  // Belgeler (worker/belge.js): dosya bulunduğu yerde kalır (ör. Google Drive); yalnız bağlantı ve bilgileri saklanır.
+  `CREATE TABLE IF NOT EXISTS belgeler (
+    id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL, musteri_id TEXT, baglanti TEXT NOT NULL, tarih TEXT NOT NULL,
+    aciklama TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS belge_tarih ON belgeler (tarih)`,
+  // Basit gelir-gider defteri (worker/muhasebe.js); resmî muhasebe değildir. tutar: KDV dahil, kuruş cinsinden tam sayı.
+  `CREATE TABLE IF NOT EXISTS muhasebe (
+    id TEXT PRIMARY KEY, tur TEXT NOT NULL, tarih TEXT NOT NULL, tutar INTEGER NOT NULL, kdv_orani INTEGER NOT NULL DEFAULT 0,
+    aciklama TEXT NOT NULL, kategori TEXT, musteri_id TEXT, belge_no TEXT, durum TEXT NOT NULL DEFAULT 'bekliyor',
+    vade TEXT, odeme_tarihi TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS muhasebe_tarih ON muhasebe (tarih)`,
+  `CREATE INDEX IF NOT EXISTS muhasebe_vade ON muhasebe (durum, vade)`
 ];

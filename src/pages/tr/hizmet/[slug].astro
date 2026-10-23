@@ -1,22 +1,27 @@
 ---
 // Hizmet sayfası şablonu. Özel tasarımı olan hizmetler (ör. google-ads-yonetimi) kendi dosyasından gelir.
-// İçerik: src/data/hizmet-detay*.ts (hizmete özel), src/data/hizmet-alan.ts (alan geneli), görsel: MenuGorsel.
+// İçerik: src/data/hizmetler.json (hizmete ve alana özel metinler; panelden düzenlenir), görsel: MenuGorsel.
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
 import MenuGorsel from '../../../components/MenuGorsel.astro';
 import InstagramAkis from '../../../components/InstagramAkis.astro';
 import Baslik from '../../../components/ana/Baslik.astro';
 import gruplar from '../../../data/hizmetler.json';
-import { DETAY, ADIMLAR } from '../../../data/hizmet-detay';
-import { ALAN } from '../../../data/hizmet-alan';
 import { IKON } from '../../../data/hizmet-ikon';
 export function getStaticPaths() {
   return gruplar.flatMap((g) => g.hizmetler.filter((h) => h.slug !== 'google-ads-yonetimi').map((h) => ({ params: { slug: h.slug }, props: { h, g } })));
 }
 const { h, g } = Astro.props;
-const d = DETAY[h.slug];
-if (!d) throw new Error(`Hizmet içeriği eksik: ${h.slug}`);
-const alan = ALAN[g.id];
+// Bütün hizmetlerde ortak çalışma adımları (ana sayfadaki "Dört adım" ile aynı mantık).
+const ADIMLAR = [
+  ['Ücretsiz analiz', 'Mevcut durumunuzu, hesaplarınızı ve hedefinizi inceleriz; nereden başlanacağını gerekçesiyle anlatırız.'],
+  ['Plan ve teklif', 'Kapsam, öncelikler, takvim ve ölçülecek sonuçlar yazılı olarak netleşir.'],
+  ['Onaylı uygulama', 'İşler plana göre yürür; bütçe ve canlı ayar değişiklikleri onayınız olmadan yapılmaz.'],
+  ['Ölçüm ve rapor', 'Sonuçlar düzenli raporlanır; neyin işe yaradığını ve sonraki adımı birlikte değerlendiririz.']
+];
+// Panelden yeni eklenen ve henüz ayrıntısı yazılmamış hizmetlerde boş bölümler gösterilmez.
+const d = { giris: h.giris || h.ozet, neden: h.neden || '', yap: (h.yapilanlar || []).map((x) => [x.baslik, x.metin]), olc: h.olcum || [], kim: h.kimler || [], sss: (h.sss || []).map((x) => [x.soru, x.cevap]) };
+const alan = { baslik: g.baslik || g.ad, dikkat: g.dikkat || [] };
 const digerleri = g.hizmetler.filter((x) => x.slug !== h.slug);
 const ikon = (b = 22) => `<svg width="${b}" height="${b}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[g.id]}</svg>`;
 const ld = {
@@ -56,7 +61,7 @@ const ld = {
   </div>
 </nav>
 
-<section id="neden" class="hd-bolum hd-gri">
+{d.neden && (<section id="neden" class="hd-bolum hd-gri">
   <div class="hd-ic hd-iki">
     <div class="hd-sutun">
       <Baslik etiket="Neden önemli?" baslik={`${h.ad} neden önemli?`} />
@@ -67,9 +72,9 @@ const ld = {
       <ul>{alan.dikkat.map((x) => <li>{x}</li>)}</ul>
     </aside>
   </div>
-</section>
+</section>)}
 
-<section id="neler" class="hd-bolum">
+{d.yap.length > 0 && (<section id="neler" class="hd-bolum">
   <div class="hd-ic hd-sutun">
     <Baslik etiket="Kapsam" baslik="Bu hizmette neler yapıyoruz?" aciklama="Kapsamı ücretsiz analizden sonra ihtiyacınıza göre birlikte netleştiriyoruz." />
     <ol class="hd-isler">
@@ -78,7 +83,7 @@ const ld = {
       ))}
     </ol>
   </div>
-</section>
+</section>)}
 
 <section id="nasil" class="hd-bolum hd-lacivert">
   <div class="hd-ic hd-sutun">
@@ -90,7 +95,7 @@ const ld = {
   </div>
 </section>
 
-<section id="olcum" class="hd-bolum">
+{(d.olc.length > 0 || d.kim.length > 0) && (<section id="olcum" class="hd-bolum">
   <div class="hd-ic hd-iki">
     <div class="hd-sutun">
       <Baslik etiket="Ölçüm" baslik="Neyi ölçüyoruz?" />
@@ -102,9 +107,9 @@ const ld = {
       <ul class="hd-kimler">{d.kim.map((x) => <li><span class="hd-ikon" set:html={ikon(18)}></span>{x}</li>)}</ul>
     </div>
   </div>
-</section>
+</section>)}
 
-<section id="sss" class="hd-bolum hd-gri">
+{d.sss.length > 0 && (<section id="sss" class="hd-bolum hd-gri">
   <div class="hd-ic hd-iki hd-sss-izgara">
     <Baslik etiket="Sık sorulan sorular" baslik="Aklınızdaki sorular" aciklama="Cevabını bulamadığınız bir soru varsa yazın, 1 iş günü içinde dönelim." baglanti={{ href: '/tr/iletisim/', ad: 'İletişim' }} />
     <div class="hd-sorular">
@@ -112,7 +117,7 @@ const ld = {
     </div>
   </div>
   <script type="application/ld+json" set:html={JSON.stringify(ld)}></script>
-</section>
+</section>)}
 
 <section class="hd-bolum">
   <div class="hd-ic hd-sutun">

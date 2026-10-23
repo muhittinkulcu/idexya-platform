@@ -2,6 +2,7 @@
 import UyeCerceve from '../components/UyeCerceve.astro';
 ---
 <UyeCerceve baslik="Üye olun" aciklama="Üyelik talebiniz ekibimize ulaşır. Onaylandığında size açılan bölümleri hesabınızda görürsünüz.">
+<p class="uye-durum" data-davet-bilgi role="status" hidden></p>
 <form class="uye-kart" data-uye-form novalidate>
 <label class="uye-alan">Ad soyad<input name="ad" autocomplete="name" required></label>
 <label class="uye-alan">E-posta<input name="eposta" type="email" autocomplete="email" required></label>
@@ -24,15 +25,39 @@ import UyeCerceve from '../components/UyeCerceve.astro';
 <p style="margin: 0; color: var(--tx2)">Ekibimiz talebinizi inceleyecek. Onaylandığında e-posta adresiniz ve şifrenizle giriş yaparak size açılan bölümleri görebilirsiniz.</p>
 <a href="/giris" class="uye-dugme ikincil" style="align-self: flex-start">Giriş sayfasına git</a>
 </div>
+<div class="uye-kart" data-tamam-davet hidden role="status">
+<strong style="font-size: 20px; color: var(--head)">Hesabınız hazır</strong>
+<p style="margin: 0; color: var(--tx2)">Davetle üye oldunuz; üyeliğiniz onaylı açıldı. E-posta adresiniz ve şifrenizle giriş yaparak size açılan bölümleri görebilirsiniz.</p>
+<a href="/giris" class="uye-dugme" style="align-self: flex-start">Giriş yap</a>
+</div>
 <script>
-  import { formBagla } from '../scripts/uye-sayfa.js';
+  import { formBagla, uyeIstek } from '../scripts/uye-sayfa.js';
   const form = document.querySelector('[data-uye-form]');
+  // Davet bağlantısı (/uye-ol/?davet=…): geçerliyse e-posta doldurulur ve jeton kayıtla birlikte gönderilir.
+  // Jeton yoksa form eskisi gibi onay bekleyen üyelik talebi gönderir.
+  let davet = new URLSearchParams(location.search).get('davet') || '';
+  const davetBilgi = document.querySelector('[data-davet-bilgi]');
+  const bilgiYaz = (metin, tur) => { davetBilgi.hidden = false; davetBilgi.textContent = metin; davetBilgi.style.background = tur === 'ok' ? 'var(--okb)' : 'var(--errb)'; davetBilgi.style.color = tur === 'ok' ? 'var(--ok)' : 'var(--err)'; };
+  if (davet) {
+    uyeIstek('davet', { davet }).then((s) => {
+      if (s.gecerli) {
+        form.elements.eposta.value = s.eposta;
+        bilgiYaz('Davetle üye oluyorsunuz. Davetin gönderildiği e-posta adresiyle kaydolduğunuzda üyeliğiniz onay beklemeden açılır.', 'ok');
+        document.querySelector('[data-uye-baslik]').textContent = 'Davetinizi kabul edin';
+        form.querySelector('button[type=submit]').textContent = 'Üyeliğimi oluştur';
+      } else {
+        davet = '';
+        bilgiYaz('Bu davet bağlantısı geçersiz, süresi dolmuş ya da daha önce kullanılmış. Dilerseniz aşağıdan olağan üyelik talebi gönderebilirsiniz; talebiniz ekibimizin onayına düşer.', 'hata');
+      }
+    }).catch(() => { davet = ''; bilgiYaz('Davet bağlantısı şu an doğrulanamadı. Sayfayı yenileyip tekrar deneyin.', 'hata'); });
+  }
   formBagla(form, 'kayit', (v) => {
+    if (davet) v.davet = davet;
     if (!v.ad.trim()) return 'Adınızı ve soyadınızı yazın.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.eposta.trim())) return 'Geçerli bir e-posta adresi yazın.';
     if (v.sifre.length < 10 || !/\d/.test(v.sifre) || !/\p{L}/u.test(v.sifre)) return 'Şifre en az 10 karakter olmalı ve en az bir harf ile bir rakam içermeli.';
     if (!v.kvkk) return 'Devam etmek için KVKK aydınlatma metnini onaylayın.';
     return null;
-  }, () => { form.hidden = true; document.querySelector('[data-tamam]').hidden = false; });
+  }, (s) => { form.hidden = true; davetBilgi.hidden = true; document.querySelector(s && s.onayli ? '[data-tamam-davet]' : '[data-tamam]').hidden = false; });
 </script>
 </UyeCerceve>

@@ -1,0 +1,100 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="IDOS eşitleme" aktif="crm" yol="Müşteri ilişkileri › CRM" aciklama="IDOS’tan gelen reklam hesaplarını CRM’deki müşterilerle eşleştirin. Eşleşen müşterinin kartında son 28 günün reklam özeti görünür. IDOS’un müşteri listesi okunmaz; yalnız günlük reklam özetindeki hesap numarası, marka adı ve harcama kullanılır.">
+<div data-uyari style="display: flex; flex-direction: column; gap: 10px"></div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<div role="tablist" aria-label="Eşleşme durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); flex-wrap: wrap"></div>
+<label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Hesap ara</span><input type="search" data-ara placeholder="Hesap numarası, marka veya müşteri ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
+</div>
+<section class="kart" aria-label="Reklam hesapları" data-liste style="overflow: hidden"></section>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const $ = (s) => document.querySelector(s);
+  const liste = $('[data-liste]'), uyari = $('[data-uyari]'), sekmeler = $('[data-sekmeler]'), ara = $('[data-ara]');
+  const PLATFORM = { meta: 'Meta', google: 'Google Ads' };
+  const platformAdi = (p) => PLATFORM[p] || p;
+  // Para birimleri birbirine eklenmez; her biri kendi biriminde gösterilir.
+  const paraYaz = (n, kod) => { try { return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: kod, maximumFractionDigits: 0 }).format(n || 0); } catch (e) { return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n || 0) + ' ' + kod; } };
+  const SEKME = [['eslesmemis', 'Eşleşmemiş'], ['eslesmis', 'Eşleşmiş'], ['hepsi', 'Tümü']];
+  let veri = null, sekme = 'eslesmemis';
+
+  const musteriSec = (h) => el('select', { 'aria-label': `${platformAdi(h.platform)} ${h.hesap} için müşteri`, style: 'min-height: 36px; min-width: 0; flex: 1 1 200px; max-width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px' },
+    el('option', { value: '' }, 'Müşteri seçin…'), veri.musteriler.map((m) => el('option', { value: m.id, selected: h.oneri && h.oneri.musteri_id === m.id }, m.alt ? `${m.ad} · ${m.alt}` : m.ad)));
+
+  async function esle(h, musteriId, dugme) {
+    if (!musteriId) { genelHata('Önce bir müşteri seçin.'); return; }
+    dugme.disabled = true;
+    try { await api('crm/idos/esle', { platform: h.platform, hesap: h.hesap, musteri_id: musteriId }); genelHata(''); await yukle(); }
+    catch (e) { genelHata('Eşleştirilemedi: ' + e.message); dugme.disabled = false; }
+  }
+  async function coz(h, dugme) {
+    if (!confirm(`${platformAdi(h.platform)} · ${h.hesap} hesabının “${h.musteri_ad || 'müşteri'}” ile eşleşmesi kaldırılsın mı?`)) return;
+    dugme.disabled = true;
+    try { await api('crm/idos/coz', { platform: h.platform, hesap: h.hesap }); genelHata(''); await yukle(); }
+    catch (e) { genelHata('Kaldırılamadı: ' + e.message); dugme.disabled = false; }
+  }
+
+  function satir(h) {
+    const harcama = h.paralar.length ? h.paralar.map((p) => paraYaz(p.harcama, p.para)).join(' · ') : '—';
+    const ust = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
+      el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' },
+        el('strong', { style: 'color: var(--head); overflow-wrap: anywhere' }, h.marka || 'Marka adı yok'),
+        el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, `${platformAdi(h.platform)} · hesap ${h.hesap}${h.son_gun ? ' · son veri ' + tarih(h.son_gun, false) : ''}`)),
+      el('span', { style: 'display: flex; flex-direction: column; align-items: flex-end; gap: 2px' }, el('strong', { style: 'color: var(--head); white-space: nowrap' }, harcama), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `harcama · son ${veri.gun} gün`)));
+    let alt;
+    if (h.musteri_id) {
+      alt = el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
+        el('span', { class: 'cip kazanildi' }, 'Eşleşti'),
+        h.musteri_ad ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(h.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, h.musteri_ad) : el('span', { style: 'color: var(--err)' }, 'Müşteri kartı silinmiş'),
+        el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${tarih(h.eslesme_zamani)} · ${h.eslestiren}`),
+        h.eski ? el('span', { class: 'cip gorusme' }, 'Son 28 günde veri yok') : '',
+        el('span', { style: 'flex: 1 1 0' }),
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => coz(h, o.currentTarget) }, 'Eşleşmeyi kaldır'));
+    } else {
+      const sec = musteriSec(h);
+      alt = el('div', { style: 'display: flex; flex-direction: column; gap: 8px' },
+        h.oneri ? el('div', { class: 'uyari bilgi', style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding: 8px 12px' },
+          el('span', { style: 'flex: 1 1 220px; overflow-wrap: anywhere' }, 'Öneri: ', el('strong', {}, h.oneri.ad), ` · ad benzerliği %${Math.round(h.oneri.puan * 100)}`),
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => esle(h, h.oneri.musteri_id, o.currentTarget) }, 'Öneriyi kabul et')) : '',
+        el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, sec,
+          el('button', { type: 'button', class: 'dugme ana kucuk', onclick: (o) => esle(h, sec.value, o.currentTarget) }, 'Eşleştir')));
+    }
+    return el('div', { style: 'display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--line)' }, ust, alt);
+  }
+
+  function ciz() {
+    const say = { eslesmemis: veri.hesaplar.filter((h) => !h.musteri_id).length, eslesmis: veri.hesaplar.filter((h) => h.musteri_id).length, hepsi: veri.hesaplar.length };
+    sekmeler.replaceChildren(...SEKME.map(([k, ad]) => {
+      const s = k === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(say[k])));
+    }));
+    if (!veri.hesaplar.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Eşleştirilecek reklam hesabı yok.')); return; }
+    const q = ara.value.trim().toLocaleLowerCase('tr-TR');
+    const gor = veri.hesaplar.filter((h) => (sekme === 'hepsi' || (sekme === 'eslesmis') === !!h.musteri_id) && (!q || [h.hesap, h.marka, h.musteri_ad, platformAdi(h.platform)].some((x) => x && String(x).toLocaleLowerCase('tr-TR').includes(q))));
+    liste.replaceChildren(...(gor.length ? gor.map(satir) : [el('div', { class: 'bos' }, q ? 'Aramayla eşleşen hesap yok.' : sekme === 'eslesmemis' ? 'Eşleşmemiş hesap kalmadı.' : 'Bu bölümde hesap yok.')]));
+  }
+
+  async function yukle() {
+    try { veri = await api('crm/idos'); }
+    catch (h) { genelHata('Reklam hesapları yüklenemedi: ' + h.message); liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); return; }
+    const kutular = [];
+    const ozetVar = veri.hesaplar.some((h) => !h.eski);
+    if (!ozetVar) {
+      kutular.push(el('div', { class: 'uyari bilgi' },
+        el('strong', {}, veri.kurulu ? 'IDOS bağlantısı kurulu, reklam özeti henüz boş. ' : 'IDOS reklam özeti henüz boş. '),
+        veri.kurulu
+          ? 'İlk çekim yapılmamış ya da son 28 günde harcama yok. Veri her gün İstanbul saatiyle 10.00’da çekilir; hemen almak için '
+          : 'IDOS bağlantısı (Cloudflare değişkenleri IDOS_BQ_ANAHTAR ve IDOS_BQ_GORUNUM) henüz girilmediği için IDOS’tan hiçbir reklam hesabı gelmiyor. Ayrıntılar ve bağlantı durumu için ',
+        el('a', { href: '/yonetim/' }, 'Genel bakış › Reklam performansı'),
+        veri.kurulu ? ' bölümündeki “Şimdi çek” düğmesini kullanın.' : ' bölümüne bakın. Bağlantı kurulunca hesaplar burada listelenir.'));
+    }
+    if (!veri.musteriler.length && ozetVar) kutular.push(el('div', { class: 'uyari bilgi' }, 'CRM’de henüz müşteri yok; eşleştirmek için önce ', el('a', { href: '/yonetim/crm/' }, 'CRM’e müşteri ekleyin'), '.'));
+    uyari.replaceChildren(...kutular);
+    if (sekme === 'eslesmemis' && !veri.hesaplar.some((h) => !h.musteri_id) && veri.hesaplar.length) sekme = 'hepsi';
+    ciz();
+  }
+  ara.addEventListener('input', ciz);
+  yukle();
+</script>
+</Yonetim>

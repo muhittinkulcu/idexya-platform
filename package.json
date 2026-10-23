@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && node tools/sitemap.mjs",
+    "build": "astro build && node tools/sitemap.mjs && node tools/panel-veri.mjs",
     "preview": "astro preview",
     "deploy": "npm run build && wrangler deploy"
   },

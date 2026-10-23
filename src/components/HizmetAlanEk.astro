@@ -1,9 +1,9 @@
 ---
-// Hizmetler sayfası: her alanın solunda temsilî görsel, "neden önemli" ve "dikkat ettiklerimiz" (src/data/hizmet-alan.ts).
+// Hizmetler sayfası: her alanın solunda temsilî görsel, "neden önemli" ve "dikkat ettiklerimiz" (src/data/hizmetler.json).
 import MenuGorsel from './MenuGorsel.astro';
-import { ALAN } from '../data/hizmet-alan';
+import gruplar from '../data/hizmetler.json';
 interface Props { id: string; }
-const a = ALAN[Astro.props.id];
+const a = gruplar.find((g) => g.id === Astro.props.id && g.neden);
 ---
 {a && (
   <div class="hae">
@@ -12,7 +12,7 @@ const a = ALAN[Astro.props.id];
       <summary>Neden önemli?</summary>
       <p>{a.neden}</p>
       <b>Neye dikkat ediyoruz?</b>
-      <ul>{a.dikkat.map((x) => <li>{x}</li>)}</ul>
+      <ul>{(a.dikkat || []).map((x) => <li>{x}</li>)}</ul>
     </details>
   </div>
 )}

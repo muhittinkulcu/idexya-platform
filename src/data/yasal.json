@@ -1,0 +1,142 @@
+{
+  "kvkk": {
+    "ad": "KVKK aydınlatma metni",
+    "bolumler": [
+      {
+        "baslik": "Veri sorumlusu",
+        "metin": [
+          "6698 sayılı Kişisel Verilerin Korunması Kanunu (“Kanun”) uyarınca kişisel verileriniz veri sorumlusu sıfatıyla Muhittin Külcü (Idexya | Good Things) tarafından işlenmektedir. İletişim: info@idexya.com · Ankara."
+        ]
+      },
+      {
+        "baslik": "İşlenen kişisel veriler",
+        "metin": [
+          "Kimlik (ad, soyad), iletişim (e-posta, telefon), müşteri işlem (firma, talep, teklif, sözleşme ve fatura bilgileri), pazarlama (ileti izni ve tercihleri), işlem güvenliği (IP adresi, oturum ve giriş kayıtları) ve müşteri adına yönetilen reklam ve analitik hesaplarına ait veriler."
+        ]
+      },
+      {
+        "baslik": "İşleme amaçları",
+        "metin": [
+          "Talebinize yanıt vermek ve teklif hazırlamak; sözleşmenin kurulması ve ifası; faturalama ve tahsilat; hizmet kalitesinin ölçülmesi; bilgi güvenliğinin sağlanması; izniniz varsa ticari ileti gönderilmesi; yasal yükümlülüklerin yerine getirilmesi."
+        ]
+      },
+      {
+        "baslik": "Hukuki sebepler",
+        "metin": [
+          "Kanun’un 5. maddesindeki sebepler: sözleşmenin kurulması veya ifası, hukuki yükümlülük, meşru menfaat ve bir hakkın tesisi. Ticari ileti, analitik ve pazarlama çerezleri yalnız açık rızanıza dayanır; rızanızı istediğiniz zaman geri alabilirsiniz."
+        ]
+      },
+      {
+        "baslik": "Aktarım",
+        "metin": [
+          "Kişisel verileriniz hizmetin sağlanması için gerekli ölçüde barındırma, e-posta, ödeme ve muhasebe hizmeti aldığımız tedarikçilere, yetkili kamu kurumlarına ve hukuken zorunlu hâllerde ilgili kişilere aktarılabilir.",
+          "Kullandığımız bazı hizmet sağlayıcıların sunucuları yurt dışındadır (ör. Google, Meta, Cloudflare). Yurt dışına aktarım Kanun’un 9. maddesindeki şartlara uygun yapılır."
+        ]
+      },
+      {
+        "baslik": "Saklama süresi",
+        "metin": [
+          "Veriler işleme amacının gerektirdiği süre ve ilgili mevzuattaki süreler boyunca saklanır, süre sonunda silinir, yok edilir veya anonim hâle getirilir.",
+          "Saklama süreleri: müşteriye dönüşmeyen talepler 2 yıl; müşteri, sözleşme ve fatura kayıtları 10 yıl; ticari elektronik ileti onay kayıtları onayın geri alınmasından itibaren 3 yıl; site erişim (IP) kayıtları 2 yıl; yapay zekâ asistanı sohbet kayıtları 1 yıl."
+        ]
+      },
+      {
+        "baslik": "Haklarınız",
+        "metin": [
+          "Kanun’un 11. maddesi uyarınca verilerinizin işlenip işlenmediğini öğrenme, bilgi talep etme, düzeltilmesini veya silinmesini isteme, aktarıldığı üçüncü kişileri bilme, itiraz etme ve zararın giderilmesini talep etme haklarına sahipsiniz.",
+          "Başvurularınızı info@idexya.com adresine iletebilirsiniz; başvurunuz en geç 30 gün içinde yanıtlanır."
+        ]
+      }
+    ]
+  },
+  "cerez": {
+    "ad": "Çerez politikası",
+    "bolumler": [
+      {
+        "baslik": "Çerez nedir?",
+        "metin": [
+          "Çerezler, siteyi ziyaret ettiğinizde tarayıcınıza kaydedilen küçük dosyalardır. Sitenin çalışması, ziyaretlerin ölçülmesi ve reklamların ilgili kişilere gösterilmesi için kullanılır."
+        ]
+      },
+      {
+        "baslik": "Kullandığımız çerez türleri",
+        "metin": [
+          "Zorunlu çerezler sitenin çalışması için gereklidir ve kapatılamaz. Analitik ve pazarlama çerezleri yalnız onay verirseniz çalışır; onay vermezseniz Google ve Meta araçları çerez bırakmaz.",
+          "Ayrıca sayfaların ne kadar ziyaret edildiğini ve ne kadar hızlı açıldığını çerez kullanmadan ölçüyoruz: yalnızca sayfa adresi, gelinen sitenin alan adı, cihaz türü ve sayfa hızı değerleri toplu sayılar olarak kaydedilir; IP adresi, tarayıcı bilgisi veya sizi tanımlayan bir kimlik saklanmaz. Tarayıcınızda “İzlenmeyi engelle” (Do Not Track) ya da Global Privacy Control açıksa bu ölçüm yapılmaz."
+        ]
+      },
+      {
+        "baslik": "Onay ve tercih yönetimi",
+        "metin": [
+          "İlk ziyaretinizde çıkan pencereden tümünü kabul edebilir, reddedebilir veya türlere göre seçebilirsiniz. Tercihiniz 6 ay hatırlanır; sayfanın altındaki bağlantıdan istediğiniz zaman değiştirebilirsiniz."
+        ]
+      }
+    ]
+  },
+  "gizlilik": {
+    "ad": "Gizlilik politikası",
+    "bolumler": [
+      {
+        "baslik": "Kapsam",
+        "metin": [
+          "Bu politika idexya.com, IDOS paneli ve müşteri teklif sayfaları için geçerlidir."
+        ]
+      },
+      {
+        "baslik": "Müşteri reklam hesapları",
+        "metin": [
+          "Müşterilerimiz adına yönettiğimiz reklam ve analitik hesaplarındaki veriler yalnız hizmetin sunulması ve raporlanması için kullanılır, başka bir müşteriyle paylaşılmaz ve sözleşme sona erdiğinde erişimimiz kaldırılır."
+        ]
+      },
+      {
+        "baslik": "Güvenlik",
+        "metin": [
+          "Veriler şifreli bağlantı üzerinden taşınır; panel erişimi iki adımlı doğrulama ve rol bazlı yetkiyle sınırlıdır. Erişim ve dışa aktarma işlemleri kayıt altındadır."
+        ]
+      },
+      {
+        "baslik": "İletişim",
+        "metin": [
+          "Gizlilikle ilgili sorularınız için: info@idexya.com"
+        ]
+      }
+    ]
+  },
+  "cerezler": [
+    {
+      "ad": "cerez_onay",
+      "saglayici": "idexya.com",
+      "tur": "Zorunlu",
+      "amac": "Çerez tercihinizi hatırlar",
+      "sure": "6 ay"
+    },
+    {
+      "ad": "__cf_bm",
+      "saglayici": "Cloudflare",
+      "tur": "Zorunlu",
+      "amac": "Bot koruması",
+      "sure": "30 dakika"
+    },
+    {
+      "ad": "_ga, _ga_*",
+      "saglayici": "Google Analytics",
+      "tur": "Analitik",
+      "amac": "Ziyaretleri ölçer",
+      "sure": "2 yıl"
+    },
+    {
+      "ad": "_gcl_au",
+      "saglayici": "Google Ads",
+      "tur": "Pazarlama",
+      "amac": "Reklam dönüşümlerini ölçer",
+      "sure": "90 gün"
+    },
+    {
+      "ad": "_fbp",
+      "saglayici": "Meta",
+      "tur": "Pazarlama",
+      "amac": "Reklam dönüşümlerini ölçer",
+      "sure": "90 gün"
+    }
+  ]
+}

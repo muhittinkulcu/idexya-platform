@@ -1,5 +1,6 @@
 ---
 import Site from '../layouts/Site.astro';
+import referanslar from '../data/referanslar.json';
 import HizmetAlanlari from '../components/HizmetAlanlari.astro';
 import Pazaryeri from '../components/ana/Pazaryeri.astro';
 import Araclar from '../components/ana/Araclar.astro';
@@ -40,8 +41,8 @@ const __v = __c.renderVals();
 const __slug = (t) => String(t).toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const __suz = (anahtar, degerler, liste) => degerler.map((d, i) => { const al = (x) => { const c = new Component({}); c.state[anahtar] = x; return c.renderVals()[liste][i].stil; }; return { deger: d, sec: al(d), nor: al(degerler.find((x) => x !== d)) }; });
 const instagramKutulari = __v.instagramKutulari;
-const markaListesi = __v.markaListesi;
-const referansGoster = __v.referansGoster;
+const markaListesi = referanslar.filter((r) => r.ad);
+const referansGoster = markaListesi.length > 0;
 ---
 <Site baslik="" aciklama="Google Ads, Meta reklamları, e-ticaret, SEO ve yazılımı tek ekipte yöneten 360° dijital performans ajansı. Ücretsiz analiz isteyin." aktif="">
 
@@ -190,7 +191,7 @@ WhatsApp'tan yaz</a>
 </div>
 <ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">
 {(markaListesi || []).map((marka) => (<Fragment>
-<li style="flex: 1 1 260px; min-height: 96px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 18px 22px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-sizing: border-box"><span style="font-weight: 700; color: var(--head)">{marka.ad}</span></li>
+<li style="flex: 1 1 260px; min-height: 96px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 18px 22px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-sizing: border-box">{marka.logo ? <img src={marka.logo} alt={marka.ad} loading="lazy" style="max-height: 56px; max-width: 100%; object-fit: contain" /> : <span style="font-weight: 700; color: var(--head)">{marka.ad}</span>}</li>
 </Fragment>))}
 </ul>
 </div>

@@ -1,0 +1,212 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Muhasebe" aktif="muhasebe" yol="Finans ve bağlantılar" aciklama="Basit gelir-gider defteri: kesilen ve gelen faturaları, tahsilat ve ödemeleri ay ay izleyin. Tutarlar KDV dahil girilir.">
+<style is:global>
+  .mh-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .mh-arac input,.mh-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .mh-ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px}
+  .mh-ozet .kart{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-radius:16px}
+  .mh-ozet .mh-ad{font-size:12px;font-weight:600;color:var(--tx2)}
+  .mh-ozet .mh-deger{font-size:21px;font-weight:800;color:var(--head);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .mh-ozet .mh-alt{font-size:12px;color:var(--tx2)}
+  .mh-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px;align-items:end}
+  .mh-form .genis{grid-column:1/-1}
+  .mh-tablo{width:100%;min-width:920px;border-collapse:collapse;font-size:14px}
+  .mh-tablo th{padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
+  .mh-tablo td{padding:10px 12px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+  .mh-tablo .sayi{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+</style>
+<div class="uyari bilgi">Bu defter resmî muhasebe kaydı değildir; e-fatura, beyanname ya da yasal defter yerine geçmez. Ay sonunda “CSV indir” ile dosyayı alıp mali müşavirinize verin. KDV tutarları bilgi amaçlıdır.</div>
+<div class="mh-arac">
+  <button type="button" class="dugme kucuk" data-ay-geri aria-label="Önceki ay">‹</button>
+  <label><span style="position: absolute; left: -10000px">Ay</span><input type="month" data-ay required></label>
+  <button type="button" class="dugme kucuk" data-ay-ileri aria-label="Sonraki ay">›</button>
+  <h2 data-ay-ad aria-live="polite" style="margin: 0 4px; font-size: 18px; color: var(--head)"></h2>
+  <button type="button" class="dugme kucuk" data-ay-bugun>Bu ay</button>
+  <span style="flex: 1 1 0"></span>
+  <button type="button" class="dugme" data-csv>CSV indir</button>
+  <button type="button" class="dugme ana" data-yeni>+ Yeni kayıt</button>
+</div>
+<section class="mh-ozet" aria-label="Ay özeti" data-ozet></section>
+<form class="kart mh-form" data-form hidden novalidate>
+  <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni kayıt</h2>
+  <label class="alan">Tür<select name="tur"><option value="gelir">Gelir</option><option value="gider">Gider</option></select></label>
+  <label class="alan">İşlem tarihi<input name="tarih" type="date" required></label>
+  <label class="alan">Tutar (KDV dahil, TL)<input name="tutar" inputmode="decimal" required autocomplete="off" placeholder="Ör. 12.500,00"></label>
+  <label class="alan">KDV oranı<select name="kdv_orani" data-kdv><option value="20">%20</option><option value="10">%10</option><option value="1">%1</option><option value="0">%0 (KDV yok)</option></select></label>
+  <label class="alan genis">Açıklama<input name="aciklama" maxlength="300" required autocomplete="off" placeholder="Ör. Ekim ayı sosyal medya yönetimi"></label>
+  <label class="alan">Kategori (isteğe bağlı)<input name="kategori" maxlength="60" list="mh-kategoriler" autocomplete="off"></label>
+  <label class="alan">Müşteri (isteğe bağlı)<select name="musteri_id" data-musteri><option value="">Müşteri yok</option></select></label>
+  <label class="alan">Belge / fatura no (isteğe bağlı)<input name="belge_no" maxlength="60" autocomplete="off"></label>
+  <label class="alan">Vade (isteğe bağlı)<input name="vade" type="date"></label>
+  <label class="alan">Durum<select name="durum" data-durum-sec><option value="bekliyor">Bekliyor</option><option value="odendi">Ödendi</option></select></label>
+  <label class="alan" data-odeme-alan hidden>Ödeme tarihi<input name="odeme_tarihi" type="date"></label>
+  <div class="genis" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+    <button type="submit" class="dugme ana">Kaydet</button><button type="button" class="dugme" data-vazgec>Vazgeç</button>
+    <span role="status" data-form-durum style="font-size: 14px; color: var(--err)"></span>
+  </div>
+  <datalist id="mh-kategoriler"></datalist>
+</form>
+<section class="kart" aria-label="Vadesi geçen kayıtlar" data-geciken hidden style="overflow-x: auto"></section>
+<div class="mh-arac">
+  <label><span style="position: absolute; left: -10000px">Türe göre süz</span><select data-suz-tur><option value="">Gelir ve gider</option><option value="gelir">Yalnız gelir</option><option value="gider">Yalnız gider</option></select></label>
+  <label><span style="position: absolute; left: -10000px">Duruma göre süz</span><select data-suz-durum><option value="">Tüm durumlar</option><option value="bekliyor">Bekleyenler</option><option value="odendi">Ödenenler</option></select></label>
+  <label><span style="position: absolute; left: -10000px">Kategoriye göre süz</span><select data-suz-kategori style="max-width: 200px"><option value="">Tüm kategoriler</option></select></label>
+  <label style="flex: 1 1 200px; display: flex"><span style="position: absolute; left: -10000px">Kayıt ara</span><input type="search" data-ara placeholder="Açıklama, belge no veya müşteri ara…" style="flex: 1"></label>
+</div>
+<section class="kart" aria-label="Kayıtlar" data-liste style="overflow-x: auto"></section>
+<script>
+  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { bugunIst, gun, kucuk, ayAdi, musteriAdi, musteriBag, musterileriDoldur, dosyaIndir } from '../../scripts/yonetim/kayit.js';
+  const $ = (s) => document.querySelector(s);
+  const form = $('[data-form]'), fdurum = $('[data-form-durum]'), ayKutu = $('[data-ay]'), liste = $('[data-liste]'), ozetKutu = $('[data-ozet]'), gecKutu = $('[data-geciken]');
+  const suzTur = $('[data-suz-tur]'), suzDurum = $('[data-suz-durum]'), suzKat = $('[data-suz-kategori]'), ara = $('[data-ara]');
+  const SAYI = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const tl = (k) => SAYI.format((k || 0) / 100) + ' TL';
+  const kdvPay = (t, o) => Math.round((t * o) / (100 + o));
+  let veri = null, duzenlenen = null, ay = bugunIst().slice(0, 7);
+  const durumAdi = (k) => (k.durum === 'odendi' ? (k.tur === 'gelir' ? 'Tahsil edildi' : 'Ödendi') : (k.tur === 'gelir' ? 'Tahsil bekliyor' : 'Ödenecek'));
+  const gecikti = (k) => k.durum === 'bekliyor' && k.vade && k.vade < bugunIst();
+
+  // --- Ay seçimi ---
+  function ayGit(f) { const [y, m] = ay.split('-').map(Number); const d = new Date(Date.UTC(y, m - 1 + f, 1)); ay = d.toISOString().slice(0, 7); yukle(); }
+  $('[data-ay-geri]').addEventListener('click', () => ayGit(-1));
+  $('[data-ay-ileri]').addEventListener('click', () => ayGit(1));
+  $('[data-ay-bugun]').addEventListener('click', () => { ay = bugunIst().slice(0, 7); yukle(); });
+  ayKutu.addEventListener('change', () => { if (/^\d{4}-\d{2}$/.test(ayKutu.value)) { ay = ayKutu.value; yukle(); } });
+
+  // --- Form ---
+  const odemeAlan = $('[data-odeme-alan]');
+  form.durum.addEventListener('change', () => { odemeAlan.hidden = form.durum.value !== 'odendi'; if (!odemeAlan.hidden && !form.odeme_tarihi.value) form.odeme_tarihi.value = bugunIst(); });
+  form.tur.addEventListener('change', () => { form.durum.options[1].textContent = form.tur.value === 'gelir' ? 'Tahsil edildi' : 'Ödendi'; });
+  function formAc(k) {
+    duzenlenen = k || null; form.reset(); fdurum.textContent = '';
+    $('[data-form-baslik]').textContent = k ? 'Kaydı düzenle' : 'Yeni kayıt';
+    const kdv = $('[data-kdv]');
+    kdv.querySelectorAll('[data-ozel]').forEach((o) => o.remove());
+    if (k && ![...kdv.options].some((o) => o.value === String(k.kdv_orani))) kdv.append(el('option', { value: String(k.kdv_orani), 'data-ozel': '' }, '%' + k.kdv_orani));
+    const bugun = bugunIst();
+    form.tarih.value = k ? k.tarih : (bugun.slice(0, 7) === ay ? bugun : ay + '-01');
+    if (k) {
+      form.tur.value = k.tur; form.tutar.value = SAYI.format(k.tutar / 100); form.kdv_orani.value = String(k.kdv_orani); form.aciklama.value = k.aciklama;
+      form.kategori.value = k.kategori || ''; form.musteri_id.value = k.musteri_id || ''; form.belge_no.value = k.belge_no || ''; form.vade.value = k.vade || '';
+      form.durum.value = k.durum; form.odeme_tarihi.value = k.odeme_tarihi || '';
+    }
+    form.tur.dispatchEvent(new Event('change')); odemeAlan.hidden = form.durum.value !== 'odendi';
+    form.hidden = false; form.tutar.focus(); form.scrollIntoView({ block: 'nearest' });
+  }
+  $('[data-yeni]').addEventListener('click', () => formAc(null));
+  $('[data-vazgec]').addEventListener('click', () => { form.hidden = true; duzenlenen = null; });
+  form.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const v = Object.fromEntries(new FormData(form));
+    if (!v.tutar.trim()) { fdurum.textContent = 'Tutar gerekli.'; form.tutar.focus(); return; }
+    if (!v.aciklama.trim()) { fdurum.textContent = 'Açıklama gerekli.'; form.aciklama.focus(); return; }
+    if (v.durum !== 'odendi') v.odeme_tarihi = '';
+    const d = form.querySelector('[type=submit]'); d.disabled = true; fdurum.textContent = '';
+    try {
+      await api(duzenlenen ? 'muhasebe/' + encodeURIComponent(duzenlenen.id) : 'muhasebe', v);
+      form.hidden = true; duzenlenen = null;
+      if (v.tarih && v.tarih.slice(0, 7) !== ay) ay = v.tarih.slice(0, 7); // kaydın ayına geç
+      await yukle();
+    } catch (h) { fdurum.textContent = h.message; } finally { d.disabled = false; }
+  });
+  async function islem(k, ne, dugme) {
+    if (ne === 'sil' && !confirm(`“${k.aciklama}” (${tl(k.tutar)}) kaydı silinsin mi? Bu işlem geri alınamaz.`)) return;
+    dugme.disabled = true;
+    try { await api(`muhasebe/${encodeURIComponent(k.id)}/${ne}`, {}); genelHata(''); await yukle(); }
+    catch (h) { genelHata('İşlem yapılamadı: ' + h.message); dugme.disabled = false; }
+  }
+
+  // --- Çizim ---
+  function ozetCiz(o) {
+    const kart = (ad, deger, alt, renk, veriAd) => el('div', { class: 'kart', 'data-ozet-kalem': veriAd }, el('span', { class: 'mh-ad' }, ad), el('span', { class: 'mh-deger', style: renk ? 'color: ' + renk : '' }, deger), alt ? el('span', { class: 'mh-alt' }, alt) : null);
+    ozetKutu.replaceChildren(
+      kart('Gelir', tl(o.gelir), `Hesaplanan KDV: ${tl(o.hesaplananKdv)}`, 'var(--ok)', 'gelir'),
+      kart('Gider', tl(o.gider), `İndirilecek KDV: ${tl(o.indirilecekKdv)}`, 'var(--err)', 'gider'),
+      kart('Net', (o.net < 0 ? '−' : '') + tl(Math.abs(o.net)), 'Gelir − gider (KDV dahil)', o.net < 0 ? 'var(--err)' : '', 'net'),
+      kart('Tahsil edilmemiş gelir', tl(o.tahsilEdilmemis), `${o.tahsilEdilmemisAdet} kayıt · ödenecek gider ${tl(o.odenmemisGider)}`, o.tahsilEdilmemis ? 'var(--warn)' : '', 'tahsil'),
+      kart('Vadesi geçmiş', tl(o.vadesiGecmisAlacak), `Tüm aylar · ${o.vadesiGecmisAlacakAdet} alacak` + (o.vadesiGecmisBorcAdet ? ` · ${o.vadesiGecmisBorcAdet} borç (${tl(o.vadesiGecmisBorc)})` : ''), o.vadesiGecmisAlacakAdet || o.vadesiGecmisBorcAdet ? 'var(--err)' : '', 'vade'));
+  }
+  const eylemler = (k) => el('div', { style: 'display: flex; gap: 6px; justify-content: flex-end' },
+    k.durum === 'bekliyor'
+      ? el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(k, 'odendi', o.currentTarget) }, k.tur === 'gelir' ? 'Tahsil edildi' : 'Ödendi')
+      : el('button', { type: 'button', class: 'dugme kucuk', title: 'Bekliyor durumuna geri al', onclick: (o) => islem(k, 'bekliyor', o.currentTarget) }, 'Geri al'),
+    el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(k) }, 'Düzenle'),
+    el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(k, 'sil', o.currentTarget) }, 'Sil'));
+  const durumHucre = (k) => el('td', {},
+    el('span', { class: 'cip ' + (k.durum === 'odendi' ? 'kazanildi' : gecikti(k) ? 'kaybedildi' : 'gorusme') }, durumAdi(k)),
+    k.durum === 'odendi' && k.odeme_tarihi ? el('div', { style: 'font-size: 12px; color: var(--tx2); margin-top: 2px' }, gun(k.odeme_tarihi)) : null,
+    k.durum === 'bekliyor' && k.vade ? el('div', { style: `font-size: 12px; margin-top: 2px; color: ${gecikti(k) ? 'var(--err); font-weight: 600' : 'var(--tx2)'}` }, 'Vade ' + gun(k.vade) + (gecikti(k) ? ' · geçti' : '')) : null);
+  const aciklamaHucre = (k) => el('td', { style: 'max-width: 320px' },
+    el('div', { style: 'font-weight: 600; overflow-wrap: anywhere' }, k.aciklama),
+    el('div', { style: 'font-size: 12px; color: var(--tx2); display: flex; gap: 4px 8px; flex-wrap: wrap' }, k.kategori ? el('span', {}, k.kategori) : null, musteriBag(k), k.belge_no ? el('span', {}, 'No: ' + k.belge_no) : null));
+  const tutarHucre = (k) => el('td', { class: 'sayi', style: 'font-weight: 700; color: ' + (k.tur === 'gelir' ? 'var(--ok)' : 'var(--err)') }, (k.tur === 'gider' ? '−' : '+') + tl(k.tutar));
+  const turHucre = (k) => el('td', {}, k.tur === 'gelir' ? 'Gelir' : 'Gider');
+
+  function suzulmus() {
+    const q = kucuk(ara.value.trim());
+    return veri.kayitlar.filter((k) => (!suzTur.value || k.tur === suzTur.value) && (!suzDurum.value || k.durum === suzDurum.value) && (!suzKat.value || (k.kategori || '') === suzKat.value)
+      && (!q || [k.aciklama, k.belge_no, k.kategori, musteriAdi(k)].some((x) => x && kucuk(x).includes(q))));
+  }
+  function listeCiz() {
+    const gor = suzulmus();
+    if (!veri.kayitlar.length) { liste.replaceChildren(el('div', { class: 'bos' }, `${ayAdi(...ay.split('-').map(Number))} için kayıt yok. Kestiğiniz ya da aldığınız her faturayı, yaptığınız ödemeyi “+ Yeni kayıt” ile ekleyin; özet kendiliğinden hesaplanır.`)); return; }
+    if (!gor.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Süzgeçlerle eşleşen kayıt yok.')); return; }
+    const top = (t) => gor.filter((k) => k.tur === t).reduce((s, k) => s + k.tutar, 0);
+    liste.replaceChildren(el('table', { class: 'mh-tablo' },
+      el('thead', {}, el('tr', {}, ['Tarih', 'Tür', 'Açıklama', 'Tutar', 'KDV', 'Durum', ''].map((b, i) => el('th', { scope: 'col', class: i === 3 || i === 4 ? 'sayi' : '' }, b)))),
+      el('tbody', {}, gor.map((k) => el('tr', { 'data-kayit': k.id },
+        el('td', { style: 'white-space: nowrap' }, gun(k.tarih)), turHucre(k), aciklamaHucre(k), tutarHucre(k),
+        el('td', { class: 'sayi', style: 'color: var(--tx2); font-size: 13px' }, `%${k.kdv_orani}`, el('div', {}, tl(kdvPay(k.tutar, k.kdv_orani)))),
+        durumHucre(k), el('td', {}, eylemler(k))))),
+      el('tfoot', {}, el('tr', {}, el('td', { colspan: '3', style: 'font-weight: 600; color: var(--tx2)' }, `${gor.length} kayıt` + (gor.length !== veri.kayitlar.length ? ' (süzülmüş)' : '')),
+        el('td', { class: 'sayi', colspan: '2', style: 'font-size: 13px' }, el('div', { style: 'color: var(--ok)' }, '+' + tl(top('gelir'))), el('div', { style: 'color: var(--err)' }, '−' + tl(top('gider')))), el('td', { colspan: '2' })))));
+  }
+  function gecikenCiz() {
+    const g = veri.gecikenler;
+    gecKutu.hidden = !g.length;
+    if (!g.length) return;
+    gecKutu.replaceChildren(el('h2', { style: 'margin: 0; padding: 14px 14px 4px; font-size: 15px; color: var(--err)' }, `Vadesi geçen kayıtlar (tüm aylar) · ${g.length}`),
+      el('table', { class: 'mh-tablo' }, el('tbody', {}, g.map((k) => el('tr', { 'data-geciken-kayit': k.id },
+        el('td', { style: 'white-space: nowrap' }, gun(k.tarih)), turHucre(k), aciklamaHucre(k), tutarHucre(k), durumHucre(k), el('td', {}, eylemler(k)))))));
+  }
+  function ciz() {
+    ayKutu.value = ay;
+    ozetCiz(veri.ozet); gecikenCiz();
+    const secKat = suzKat.value;
+    suzKat.replaceChildren(el('option', { value: '' }, 'Tüm kategoriler'), ...veri.kategoriler.map((k) => el('option', { value: k }, k)));
+    suzKat.value = veri.kategoriler.includes(secKat) ? secKat : '';
+    $('#mh-kategoriler').replaceChildren(...[...new Set([...veri.kategoriler, 'Hizmet satışı', 'Reklam bütçesi', 'Yazılım ve abonelik', 'Kira', 'Personel', 'Vergi ve SGK', 'Ulaşım', 'Diğer'])].map((k) => el('option', { value: k })));
+    listeCiz();
+  }
+  [suzTur, suzDurum, suzKat].forEach((e) => e.addEventListener('change', listeCiz));
+  ara.addEventListener('input', listeCiz);
+
+  // --- CSV (mali müşavir için): UTF-8 BOM, noktalı virgül ayraç (Türkçe Excel), formül enjeksiyonuna karşı koruma ---
+  const hucre = (h) => `"${String(h ?? '').replace(/^([=+\-@\t\r])/, "'$1").replace(/"/g, '""')}"`;
+  const csvSayi = (k) => ((k || 0) / 100).toFixed(2).replace('.', ',');
+  $('[data-csv]').addEventListener('click', () => {
+    if (!veri) return;
+    const gor = suzulmus();
+    if (!gor.length) { genelHata('İndirilecek kayıt yok: bu ay ve süzgeçlerde kayıt bulunmuyor.'); return; }
+    genelHata('');
+    const bas = ['Tarih', 'Tür', 'Açıklama', 'Kategori', 'Müşteri', 'Belge no', 'Tutar (KDV dahil)', 'KDV oranı (%)', 'KDV tutarı', 'KDV hariç tutar', 'Durum', 'Vade', 'Ödeme tarihi', 'Ekleyen'];
+    const satirlar = [...gor].sort((a, b) => a.tarih.localeCompare(b.tarih)).map((k) => {
+      const kdv = kdvPay(k.tutar, k.kdv_orani);
+      return [gun(k.tarih), k.tur === 'gelir' ? 'Gelir' : 'Gider', k.aciklama, k.kategori, musteriAdi(k), k.belge_no, csvSayi(k.tutar), k.kdv_orani, csvSayi(kdv), csvSayi(k.tutar - kdv), durumAdi(k), k.vade ? gun(k.vade) : '', k.odeme_tarihi ? gun(k.odeme_tarihi) : '', k.ekleyen];
+    });
+    const csv = [bas, ...satirlar].map((s) => s.map(hucre).join(';')).join('\r\n') + '\r\n';
+    dosyaIndir('﻿' + csv, `idexya-gelir-gider-${ay}.csv`, 'text/csv;charset=utf-8');
+  });
+
+  async function yukle() {
+    ayKutu.value = ay; $('[data-ay-ad]').textContent = ayAdi(...ay.split('-').map(Number));
+    try { veri = await api('muhasebe/ay/' + ay); genelHata(''); ciz(); }
+    catch (h) { genelHata('Kayıtlar yüklenemedi: ' + h.message); if (!veri) liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); }
+  }
+  musterileriDoldur([[$('[data-musteri]'), 'Müşteri yok']]);
+  yukle();
+</script>
+</Yonetim>
