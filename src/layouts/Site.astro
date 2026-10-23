@@ -28,7 +28,7 @@ import MenuGorsel from '../components/MenuGorsel.astro';
 const ikon = (id: string, b = 20) => `<svg width="${b}" height="${b}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[id] || ''}</svg>`;
 ---
 <!doctype html>
-<html lang={dil} data-turnstile={turnstile || undefined} data-mk={menuAyar.kapali} data-ma={menuAyar.acik}>
+<html lang={dil} data-turnstile={turnstile || undefined} data-mk={menuAyar.kapali} data-ma={menuAyar.acik} data-olcum={Astro.url.pathname.startsWith('/404') ? '404' : undefined}>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -542,7 +542,10 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 <script>
   import { baslat } from '../scripts/ortak.js';
+  import { olcumBaslat } from '../scripts/olcum.js';
   baslat();
+  // Çerezsiz ziyaret ve hız ölçümü (kişisel veri yok; yönetim panelinde Ziyaretçiler ve Hız ve güvenlik).
+  olcumBaslat();
 </script>
 </body>
 </html>

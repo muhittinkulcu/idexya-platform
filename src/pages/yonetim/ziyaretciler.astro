@@ -1,0 +1,70 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+import '../../scripts/yonetim/grafik.css';
+---
+<Yonetim baslik="Ziyaretçiler" aktif="ziyaret" yol="Site" aciklama="Sitenin kendi ölçümüyle sayfa görüntülemeleri: hangi sayfalar okunuyor, ziyaretçiler nereden geliyor, hangi cihazı kullanıyor.">
+<div class="uyari bilgi">Bu sayılar <b>yaklaşıktır</b>, <b>çerezsizdir</b> ve <b>kişisel veri içermez</b>: her sayfa açılışı günlük bir sayaca eklenir; IP adresi, tarayıcı bilgisi, çerez ya da ziyaretçi kimliği tutulmaz, bu yüzden "tekil ziyaretçi" sayılamaz. Robotlar, "Do Not Track" veya "Global Privacy Control" açık tarayıcılar ve betikleri engelleyen ziyaretçiler sayılmaz; Google Analytics'teki sayılardan farklı olması normaldir. Günlük sayaçlar 2 yıl saklanır. Günler İstanbul saatine göredir.</div>
+<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between">
+  <span style="color: var(--tx2); font-size: 14px" data-not></span>
+  <div class="segment-kucuk" role="group" aria-label="Tarih aralığı" data-donem><button type="button" data-g="7">7 gün</button><button type="button" data-g="30">30 gün</button><button type="button" data-g="90">90 gün</button></div>
+</div>
+<div class="kpi-sira" data-kpi></div>
+<div class="pano">
+  <section class="kart modul tam" aria-labelledby="b-gunluk" id="gunluk">
+    <div class="modul-bas"><h2 id="b-gunluk">Günlük sayfa görüntüleme</h2><div class="lejant" data-lejant></div></div>
+    <div class="cubuk-alan" data-alan></div>
+    <div class="x-eksen" data-x></div>
+  </section>
+  <section class="kart modul" aria-labelledby="b-sayfa">
+    <div class="modul-bas"><h2 id="b-sayfa">En çok görüntülenen sayfalar</h2><small>ilk 20</small></div>
+    <div class="yatay" data-sayfalar></div>
+  </section>
+  <section class="kart modul" aria-labelledby="b-kaynak">
+    <div class="modul-bas"><h2 id="b-kaynak">Nereden geldiler</h2><small>yalnız yönlendiren sitenin alan adı</small></div>
+    <div class="yatay" data-kaynaklar></div>
+  </section>
+  <section class="kart modul" aria-labelledby="b-cihaz">
+    <div class="modul-bas"><h2 id="b-cihaz">Cihaz</h2><small>ekran genişliğine göre</small></div>
+    <div class="yatay" data-cihazlar></div>
+    <p style="margin: 0; font-size: 12px; color: var(--tx2)">Mobil: 768 pikselden dar · Tablet: 768–1099 piksel · Masaüstü: 1100 piksel ve üstü.</p>
+  </section>
+</div>
+<div class="ipucu" data-ipucu hidden></div>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { kpiKart, yiginCiz, yatayCiz, ipucuKur, gunler } from '../../scripts/yonetim/grafik.js';
+  const $ = (s) => document.querySelector(s);
+  const sayi = (n) => new Intl.NumberFormat('tr-TR').format(n);
+  const CIHAZ = [{ k: 'mobil', ad: 'Mobil', renk: 'var(--s1)' }, { k: 'tablet', ad: 'Tablet', renk: 'var(--s3)' }, { k: 'masaustu', ad: 'Masaüstü', renk: 'var(--s2)' }];
+  const KAYNAK = { dogrudan: 'Doğrudan (yönlendiren yok)', ic: 'Site içi gezinme', diger: 'Diğer' };
+  let donem = 30;
+  try { const k = Number(localStorage.getItem('idx-ziyaret-donem')); if ([7, 30, 90].includes(k)) donem = k; } catch (e) {}
+  ipucuKur($('[data-ipucu]'));
+
+  async function yukle() {
+    document.querySelectorAll('[data-donem] button').forEach((b) => b.setAttribute('aria-pressed', String(Number(b.dataset.g) === donem)));
+    let v;
+    try { v = await api('ziyaret/' + donem); genelHata(''); } catch (h) { genelHata('Ziyaret sayıları yüklenemedi: ' + h.message); return; }
+    const liste = gunler(v.bugun, donem);
+    const seriler = CIHAZ.map((c) => ({ ad: c.ad, renk: c.renk, degerler: {} }));
+    let toplam = 0;
+    v.gunluk.forEach((r) => { const s = seriler[CIHAZ.findIndex((c) => c.k === r.cihaz)]; if (s) { s.degerler[r.gun] = (s.degerler[r.gun] || 0) + r.n; toplam += r.n; } });
+    const gunToplam = liste.map((g) => seriler.reduce((t, s) => t + (s.degerler[g] || 0), 0));
+    const enIyi = Math.max(0, ...gunToplam);
+    $('[data-not]').textContent = v.ilkGun ? `Ölçüm ${tarih(v.ilkGun + 'T12:00:00Z', false)} tarihinden beri çalışıyor.` : 'Henüz ölçüm yok.';
+    $('[data-kpi]').replaceChildren(
+      kpiKart({ ad: `Sayfa görüntüleme · ${donem} gün`, deger: toplam, onceki: v.onceki, alt: `önceki ${donem} gün`, href: '#gunluk', seri: gunToplam }),
+      kpiKart({ ad: 'Günlük ortalama', metin: sayi(Math.round(toplam / donem)), aciklama: `en yoğun gün ${sayi(enIyi)}`, href: '#gunluk' }),
+      kpiKart({ ad: 'Farklı sayfa', metin: sayi(v.sayfalar.length) + (v.sayfalar.length >= 20 ? '+' : ''), aciklama: 'en az bir kez görüntülenen', href: '#b-sayfa' }),
+      kpiKart({ ad: 'Dışarıdan gelen', metin: sayi(v.kaynaklar.filter((k) => !['ic', 'dogrudan'].includes(k.kaynak)).reduce((t, k) => t + k.n, 0)), aciklama: 'başka bir siteden tıklayarak', href: '#b-kaynak' }));
+    $('[data-lejant]').replaceChildren(...CIHAZ.map((c, i) => el('span', {}, el('i', { style: `background: ${c.renk}` }), c.ad + ' ', el('b', { style: 'color: var(--head)' }, sayi(Object.values(seriler[i].degerler).reduce((a, b) => a + b, 0))))));
+    yiginCiz($('[data-alan]'), $('[data-x]'), liste, seriler, (n) => sayi(n) + ' görüntüleme');
+    if (!toplam) $('[data-alan]').append(el('div', { class: 'bos-not' }, `Son ${donem} günde ölçülen ziyaret yok. Site canlıda ziyaret aldıkça grafik dolar.`));
+    yatayCiz($('[data-sayfalar]'), v.sayfalar.map((s) => ({ ad: s.sayfa, n: s.n, renk: 'var(--brand)' })), 'Bu dönemde görüntüleme yok.', 'görüntüleme');
+    yatayCiz($('[data-kaynaklar]'), v.kaynaklar.map((k) => ({ ad: KAYNAK[k.kaynak] || k.kaynak, n: k.n, renk: k.kaynak === 'ic' ? 'var(--tx2)' : k.kaynak === 'dogrudan' ? 'var(--s4)' : 'var(--s2)' })), 'Bu dönemde görüntüleme yok.', 'görüntüleme');
+    yatayCiz($('[data-cihazlar]'), CIHAZ.map((c) => ({ ad: c.ad, n: (v.cihazlar.find((x) => x.cihaz === c.k) || { n: 0 }).n, renk: c.renk })), 'Bu dönemde görüntüleme yok.', 'görüntüleme');
+  }
+  document.querySelectorAll('[data-donem] button').forEach((b) => b.addEventListener('click', () => { donem = Number(b.dataset.g); try { localStorage.setItem('idx-ziyaret-donem', String(donem)); } catch (e) {} yukle(); }));
+  yukle();
+</script>
+</Yonetim>

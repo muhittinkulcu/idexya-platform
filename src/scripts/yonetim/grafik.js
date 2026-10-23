@@ -149,10 +149,11 @@ export function isiCiz(satirlar, kutuEl, notEl) {
 }
 
 // Yatay çubuklar: ad, çubuk, sayı ve pay
-export function yatayCiz(kutuEl, liste, bosMetin) {
+// birim: ipucundaki sayının adı (varsayılan "talep"; ör. ziyaretçi sayfasında "ziyaret")
+export function yatayCiz(kutuEl, liste, bosMetin, birim = 'talep') {
   const top = liste.reduce((s, x) => s + x.n, 0), en = Math.max(1, ...liste.map((x) => x.n));
   if (!top) { kutuEl.replaceChildren(el('div', { class: 'bos', style: 'padding: 12px' }, bosMetin)); return; }
-  kutuEl.replaceChildren(...liste.map((x) => el('div', { class: 'yatay-sat', 'data-ip': `${x.ad}\n${sayi(x.n)} talep · %${Math.round(x.n / top * 100)}` },
+  kutuEl.replaceChildren(...liste.map((x) => el('div', { class: 'yatay-sat', 'data-ip': `${x.ad}\n${sayi(x.n)} ${birim} · %${Math.round(x.n / top * 100)}` },
     el('span', { class: 'ad', title: x.ad }, el('i', { style: `background: ${x.renk}` }), x.ad),
     el('div', { class: 'yatay-iz' }, el('div', { style: `width: ${(x.n / en) * 100}%; background: ${x.renk}` })),
     el('span', {}, el('b', {}, sayi(x.n)), el('span', { style: 'color: var(--tx2)' }, ` · %${Math.round(x.n / top * 100)}`)))));
