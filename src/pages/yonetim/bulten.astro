@@ -1,0 +1,51 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Bülten listesi" aktif="eposta" yol="Satış ve müşteri" aciklama="Sitedeki bülten kutusundan açık ticari ileti onayı vererek kaydolanlar. Gönderim servisi ve İYS kaydı hazır olunca bu listeye bülten gönderilir; listeden çıkanlara gönderilmez.">
+<div class="uyari bilgi">İYS yükümlülüğü: ticari ileti göndermeye başlamadan önce bu onayların İleti Yönetim Sistemi'ne (İYS) yüklenmesi gerekir. Listeden çıkan kişilerin kaydı 3 yıl sonra kendiliğinden silinir.</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between">
+<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--track, var(--card2))"></div>
+<button type="button" class="dugme" data-csv>Aktif listeyi CSV indir</button>
+</div>
+<section class="kart" aria-label="Bülten kayıtları" data-liste style="overflow-x: auto"></section>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const liste = document.querySelector('[data-liste]'), sekmeKutu = document.querySelector('[data-sekmeler]');
+  const DURUM = { aktif: 'Listede', ayrildi: 'Ayrıldı' };
+  let tum = [], sekme = 'aktif';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  function ciz() {
+    sekmeKutu.replaceChildren(...['aktif', 'ayrildi', 'hepsi'].map((b) => {
+      const s = b === sekme, n = b === 'hepsi' ? tum.length : tum.filter((x) => x.durum === b).length;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = b; ciz(); } }, (DURUM[b] || 'Tümü') + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+    }));
+    const gor = tum.filter((x) => sekme === 'hepsi' || x.durum === sekme);
+    if (!gor.length) { liste.replaceChildren(el('div', { class: 'bos' }, tum.length ? 'Bu sekmede kayıt yok.' : 'Henüz bülten kaydı yok.')); return; }
+    liste.replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, ...['E-posta', 'Durum', 'Onay zamanı', 'Onay metni', 'Sayfa', 'Ayrılma', ''].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
+      el('tbody', {}, ...gor.map((k) => el('tr', {},
+        el('td', { style: hucre + '; font-weight: 600; overflow-wrap: anywhere' }, k.eposta),
+        el('td', { style: hucre }, el('span', { class: 'cip ' + (k.durum === 'aktif' ? 'kazanildi' : 'kaybedildi') }, DURUM[k.durum] || k.durum)),
+        el('td', { style: hucre }, tarih(k.onay_zamani)),
+        el('td', { style: hucre }, k.onay_surum),
+        el('td', { style: hucre + '; color: var(--tx2)' }, k.sayfa || '—'),
+        el('td', { style: hucre }, k.ayrilma_zamani ? tarih(k.ayrilma_zamani) : '—'),
+        el('td', { style: hucre }, k.durum === 'aktif' ? el('button', { type: 'button', class: 'dugme kucuk', onclick: async (o) => {
+          if (!confirm(`${k.eposta} bülten listesinden çıkarılsın mı? Bu kişiye artık bülten gönderilmez.`)) return;
+          o.currentTarget.disabled = true;
+          try { await api(`bulten/${encodeURIComponent(k.id)}/cikar`, {}); await yukle(); } catch (h) { genelHata('Çıkarılamadı: ' + h.message); }
+        } }, 'Listeden çıkar') : null))))));
+  }
+  async function yukle() {
+    try { tum = (await api('bulten')).kayitlar; genelHata(''); ciz(); } catch (h) { genelHata('Bülten listesi yüklenemedi: ' + h.message); }
+  }
+  // CSV: yalnızca listede olanlar; onay kanıtı için zaman ve metin sürümüyle birlikte (İYS yüklemesi ve gönderim servisi için).
+  document.querySelector('[data-csv]').addEventListener('click', () => {
+    const satirlar = [['eposta', 'onay_zamani', 'onay_metni_surumu'], ...tum.filter((x) => x.durum === 'aktif').map((x) => [x.eposta, x.onay_zamani, x.onay_surum])];
+    const csv = satirlar.map((s) => s.map((h) => `"${String(h).replace(/^([=+\-@])/, "'$1").replace(/"/g, '""')}"`).join(',')).join('\r\n');
+    const a = el('a', { href: URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })), download: `idexya-bulten-${new Date().toISOString().slice(0, 10)}.csv` });
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+  yukle();
+</script>
+</Yonetim>
