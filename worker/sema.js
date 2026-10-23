@@ -73,5 +73,14 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS medya (
     id TEXT PRIMARY KEY, ad TEXT NOT NULL, alt TEXT, tur TEXT NOT NULL, boyut INTEGER NOT NULL, genislik INTEGER, yukseklik INTEGER,
     veri TEXT NOT NULL, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
-  `CREATE INDEX IF NOT EXISTS islem_zaman ON islem_kaydi (zaman)`
+  `CREATE INDEX IF NOT EXISTS islem_zaman ON islem_kaydi (zaman)`,
+  // Teklifler (worker/teklif.js): kalemler JSON, tutarlar sunucuda hesaplanır (TL, 2 ondalık). Numara yıl başına sayaçtan.
+  `CREATE TABLE IF NOT EXISTS teklifler (
+    id TEXT PRIMARY KEY, no TEXT NOT NULL UNIQUE, musteri_id TEXT NOT NULL, baslik TEXT NOT NULL, kalemler TEXT NOT NULL,
+    kdv_orani REAL NOT NULL DEFAULT 20, indirim REAL NOT NULL DEFAULT 0, para TEXT NOT NULL DEFAULT 'TRY', gecerlilik TEXT, notlar TEXT,
+    durum TEXT NOT NULL DEFAULT 'taslak', ara_toplam REAL NOT NULL DEFAULT 0, kdv REAL NOT NULL DEFAULT 0, toplam REAL NOT NULL DEFAULT 0,
+    olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, gonderim_zamani TEXT, karar_zamani TEXT, olusturan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS teklif_musteri ON teklifler (musteri_id, olusturma)`,
+  `CREATE INDEX IF NOT EXISTS teklif_durum ON teklifler (durum, guncelleme)`,
+  `CREATE TABLE IF NOT EXISTS teklif_sayac (yil INTEGER PRIMARY KEY, son INTEGER NOT NULL)`
 ];

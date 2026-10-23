@@ -38,7 +38,9 @@ const MENU = [
       { ad: 'Spam', href: '/yonetim/talepler/?sekme=spam' }, { ad: 'Tümü', href: '/yonetim/talepler/?sekme=hepsi' }] },
     { k: 'crm', ad: 'Müşteriler (CRM)', href: '/yonetim/crm/', i: 'crm', altlar: [
       { ad: 'Satış panosu', href: '/yonetim/crm/' }, { ad: 'IDOS eşitleme' }, { ad: 'Çakışmalar' }] },
-    { k: 'teklif', ad: 'Teklifler', i: 'teklif', altlar: [{ ad: 'Taslaklar' }, { ad: 'Gönderilenler' }, { ad: 'Kabul edilenler' }] },
+    { k: 'teklif', ad: 'Teklifler', href: '/yonetim/teklifler/', i: 'teklif', altlar: [
+      { ad: 'Taslaklar', href: '/yonetim/teklifler/?sekme=taslak' }, { ad: 'Gönderilenler', href: '/yonetim/teklifler/?sekme=gonderildi' },
+      { ad: 'Kabul edilenler', href: '/yonetim/teklifler/?sekme=kabul' }] },
     { k: 'asistan', ad: 'Asistan sohbetleri', href: '/yonetim/asistan/', i: 'asistan' },
     { k: 'gorev', ad: 'Görevler ve takvim', i: 'gorev' },
     { k: 'eposta', ad: 'Bülten listesi', href: '/yonetim/bulten/', i: 'eposta' }

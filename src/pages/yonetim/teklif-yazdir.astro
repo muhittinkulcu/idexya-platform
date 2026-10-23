@@ -1,0 +1,141 @@
+---
+// Teklifin yazdırılabilir A4 görünümü (?id=). Panel yerleşimi kullanılmaz; sayfa /yonetim altında olduğu için
+// Cloudflare Access ve worker'daki yönetici denetimi burada da geçerlidir. Veri tarayıcıda /api/yonetim/teklifler/<id> ucundan okunur.
+---
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Teklif · Idexya</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style is:global>
+:root{--tx:#16181B;--tx2:#5E6166;--line:#E2DDD5;--brand:#F07A23;--acc:#B84406;--head:#002559}
+*{box-sizing:border-box}
+html,body{margin:0;background:#EEEAE4;color:var(--tx);font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:14px;line-height:1.5}
+[hidden]{display:none!important}
+.arac{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(238,234,228,.95);border-bottom:1px solid var(--line)}
+.arac span{font-size:13px;color:var(--tx2)}
+.dugme{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:#FFFFFF;color:var(--tx);font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
+.dugme.ana{border:0;background:var(--acc);color:#FFFFFF}
+.dugme:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.hata{max-width:210mm;margin:16px auto;padding:12px 14px;border-radius:14px;background:#FBE2DF;color:#A62A20}
+.sayfa{width:210mm;max-width:calc(100% - 32px);min-height:297mm;margin:16px auto 40px;background:#FFFFFF;padding:18mm 16mm;box-shadow:0 10px 30px -18px rgba(0,0,0,.35)}
+.bas{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start;padding-bottom:14px;border-bottom:3px solid var(--brand)}
+.marka{font-size:24px;font-weight:800;letter-spacing:-.02em;color:var(--head)}
+.marka span{color:var(--brand)}
+.iletisim{font-size:12px;color:var(--tx2);margin-top:2px}
+.belge{text-align:right}
+.belge h1{margin:0;font-size:22px;color:var(--head);letter-spacing:.02em}
+.belge dl,.kutu dl{margin:4px 0 0;display:grid;grid-template-columns:auto auto;gap:2px 10px;font-size:12px;justify-content:end}
+.belge dt,.kutu dt{color:var(--tx2)}.belge dd,.kutu dd{margin:0}
+.ikili{display:flex;gap:16px;flex-wrap:wrap;margin:18px 0}
+.kutu{flex:1 1 240px;min-width:0;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kutu h2{margin:0 0 4px;font-size:11px;letter-spacing:.08em;color:var(--tx2);font-weight:600}
+.kutu p{margin:0;overflow-wrap:anywhere}
+.kutu dl{justify-content:start}
+h3.konu{margin:0 0 10px;font-size:17px;color:var(--head);overflow-wrap:anywhere}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 6px;text-align:left;font-size:11px;letter-spacing:.04em;color:var(--tx2);border-bottom:1.5px solid var(--tx)}
+td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.sag{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-size:12px;white-space:pre-wrap}
+.toplam{margin:12px 0 0 auto;width:min(100%,300px);display:grid;grid-template-columns:1fr auto;gap:4px 16px;font-variant-numeric:tabular-nums}
+.toplam dt{color:var(--tx2)}.toplam dd{margin:0;text-align:right;white-space:nowrap}
+.toplam .genel{font-weight:800;color:var(--head);font-size:15px;border-top:1.5px solid var(--tx);padding-top:6px}
+.notlar{margin-top:20px;border-top:1px solid var(--line);padding-top:12px}
+.notlar h2{margin:0 0 4px;font-size:11px;letter-spacing:.08em;color:var(--tx2);font-weight:600}
+.notlar p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.alt{margin-top:24px;font-size:11px;color:var(--tx2)}
+@media (max-width:600px){
+  .sayfa{max-width:100%;margin:0;padding:20px 16px;min-height:0;box-shadow:none}
+  .belge{text-align:left}.belge dl{justify-content:start}
+  table{font-size:12px}th,td{padding:6px 4px}.sira{display:none}
+}
+@page{size:A4;margin:14mm 12mm}
+@media print{
+  html,body{background:#FFFFFF}
+  .arac,.hata{display:none!important}
+  .sayfa{width:auto;max-width:none;min-height:0;margin:0;padding:0;box-shadow:none}
+  .sira{display:table-cell!important}
+  tr{break-inside:avoid}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<div class="arac">
+  <a class="dugme" href="/yonetim/teklifler/" data-geri>← Tekliflere dön</a>
+  <span data-bilgi>Teklif yükleniyor…</span>
+  <button type="button" class="dugme ana" data-yazdir disabled>Yazdır / PDF olarak kaydet</button>
+</div>
+<div class="hata" data-genel-hata hidden role="alert"></div>
+<main class="sayfa" data-sayfa hidden>
+  <header class="bas">
+    <div>
+      <div class="marka">Idexya <span>|</span> Good Things</div>
+      <div class="iletisim">Ankara · info@idexya.com · 0507 870 06 29</div>
+    </div>
+    <div class="belge">
+      <h1>FİYAT TEKLİFİ</h1>
+      <dl data-belge></dl>
+    </div>
+  </header>
+  <div class="ikili">
+    <section class="kutu" aria-label="Müşteri"><h2>MÜŞTERİ</h2><div data-musteri></div></section>
+    <section class="kutu" aria-label="Teklif bilgileri"><h2>TEKLİF</h2><dl data-ozet></dl></section>
+  </div>
+  <h3 class="konu" data-konu></h3>
+  <table>
+    <thead><tr><th class="sira" scope="col">#</th><th scope="col">Hizmet / ürün</th><th class="sag" scope="col">Adet</th><th class="sag" scope="col">Birim fiyat</th><th class="sag" scope="col">Tutar</th></tr></thead>
+    <tbody data-kalemler></tbody>
+  </table>
+  <dl class="toplam" data-toplam></dl>
+  <section class="notlar" data-notlar hidden><h2>NOTLAR</h2><p data-not-metin></p></section>
+  <p class="alt" data-alt></p>
+</main>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const $ = (s) => document.querySelector(s);
+  const id = new URLSearchParams(location.search).get('id') || '';
+  const DURUM = { taslak: 'Taslak', gonderildi: 'Gönderildi', kabul: 'Kabul edildi', red: 'Reddedildi' };
+  const tutar = (n) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n) || 0) + ' TL';
+  const sayiYaz = (n) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(Number(n) || 0);
+  const gun = (s) => (s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.split('-').reverse().join('.') : '—');
+  const ciftler = (kutu, liste) => kutu.replaceChildren(...liste.filter(Boolean).flatMap(([a, b, s]) => [el('dt', { class: s || '' }, a), el('dd', { class: s || '' }, b)]));
+
+  async function yukle() {
+    if (!id) { genelHata('Teklif seçilmedi. Teklifler sayfasından bir teklif açıp “Yazdır / PDF”yi seçin.'); $('[data-bilgi]').textContent = ''; return; }
+    let v;
+    try { v = await api('teklifler/' + encodeURIComponent(id)); }
+    catch (h) { genelHata(h.durum === 404 ? 'Bu teklif bulunamadı; silinmiş olabilir.' : 'Teklif yüklenemedi: ' + h.message); $('[data-bilgi]').textContent = ''; return; }
+    const t = v.teklif, m = v.musteri || {};
+    document.title = `${t.no} · ${t.baslik} · Idexya`;
+    $('[data-geri]').href = '/yonetim/teklifler/?id=' + encodeURIComponent(t.id);
+    $('[data-bilgi]').textContent = `${t.no} · ${DURUM[t.durum] || t.durum}`;
+    ciftler($('[data-belge]'), [['Teklif no', t.no], ['Tarih', tarih(t.gonderim_zamani || t.olusturma, false)]]);
+    $('[data-musteri]').replaceChildren(
+      el('p', { style: 'font-weight: 700' }, m.firma || m.ad || '—'),
+      m.firma && m.ad ? el('p', {}, 'Sayın ' + m.ad) : '',
+      m.eposta ? el('p', {}, m.eposta) : '', m.telefon ? el('p', {}, m.telefon) : '');
+    ciftler($('[data-ozet]'), [['Geçerlilik', gun(t.gecerlilik)], ['Para birimi', 'Türk lirası (TL)'], ['Hazırlayan', 'Idexya']]);
+    $('[data-konu]').textContent = t.baslik;
+    $('[data-kalemler]').replaceChildren(...t.kalemler.map((k, i) => el('tr', {},
+      el('td', { class: 'sira' }, String(i + 1)),
+      el('td', { class: 'ad' }, el('strong', {}, k.ad), k.aciklama ? el('small', {}, k.aciklama) : ''),
+      el('td', { class: 'sag' }, sayiYaz(k.adet)), el('td', { class: 'sag' }, tutar(k.birim_fiyat)), el('td', { class: 'sag' }, tutar(k.tutar)))));
+    ciftler($('[data-toplam]'), [['Ara toplam', tutar(t.ara_toplam)], Number(t.indirim) > 0 ? ['İndirim', '−' + tutar(t.indirim)] : null,
+      Number(t.indirim) > 0 ? ['KDV matrahı', tutar(Math.round((t.ara_toplam - t.indirim) * 100) / 100)] : null,
+      [`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)], ['Genel toplam', tutar(t.toplam), 'genel']]);
+    $('[data-notlar]').hidden = !t.notlar;
+    $('[data-not-metin]').textContent = t.notlar || '';
+    $('[data-alt]').textContent = `Fiyatlar Türk lirası (TL) cinsindendir.${t.gecerlilik ? ` Bu teklif ${gun(t.gecerlilik)} tarihine kadar geçerlidir.` : ''} Sorularınız için info@idexya.com adresine yazabilir ya da 0507 870 06 29 numaralı telefonu arayabilirsiniz.`;
+    $('[data-sayfa]').hidden = false;
+    $('[data-yazdir]').disabled = false;
+  }
+  $('[data-yazdir]').addEventListener('click', () => window.print());
+  yukle();
+</script>
+</body>
+</html>
