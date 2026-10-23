@@ -1,36 +1,200 @@
 ---
 // Hizmet sayfası şablonu. Özel tasarımı olan hizmetler (ör. google-ads-yonetimi) kendi dosyasından gelir.
+// İçerik: src/data/hizmet-detay*.ts (hizmete özel), src/data/hizmet-alan.ts (alan geneli), görsel: MenuGorsel.
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
+import MenuGorsel from '../../../components/MenuGorsel.astro';
+import InstagramAkis from '../../../components/InstagramAkis.astro';
+import Baslik from '../../../components/ana/Baslik.astro';
 import gruplar from '../../../data/hizmetler.json';
+import { DETAY, ADIMLAR } from '../../../data/hizmet-detay';
+import { ALAN } from '../../../data/hizmet-alan';
+import { IKON } from '../../../data/hizmet-ikon';
 export function getStaticPaths() {
   return gruplar.flatMap((g) => g.hizmetler.filter((h) => h.slug !== 'google-ads-yonetimi').map((h) => ({ params: { slug: h.slug }, props: { h, g } })));
 }
 const { h, g } = Astro.props;
+const d = DETAY[h.slug];
+if (!d) throw new Error(`Hizmet içeriği eksik: ${h.slug}`);
+const alan = ALAN[g.id];
 const digerleri = g.hizmetler.filter((x) => x.slug !== h.slug);
+const ikon = (b = 22) => `<svg width="${b}" height="${b}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[g.id]}</svg>`;
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'Service', name: h.ad, description: d.giris, serviceType: g.ad, areaServed: 'TR', provider: { '@type': 'Organization', name: 'Idexya | Good Things', url: 'https://idexya.com/' } },
+    { '@type': 'FAQPage', mainEntity: d.sss.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) }
+  ]
+};
 ---
-<Site baslik={h.ad} aciklama={h.ozet} aktif="Hizmetler">
-<section style="position: relative">
-<svg aria-hidden="true" viewBox="0 0 1440 520" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0"><path d="M820 0 C 1000 110 1120 50 1440 120 L1440 0 Z" fill="var(--blob2)"></path><path d="M980 520 C 950 380 1100 250 1440 230 L1440 520 Z" fill="var(--blob)"></path></svg>
-<div style="position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 36px 24px 64px; display: flex; flex-direction: column; gap: 22px">
-<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/hizmetler" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Hizmetler</a><span aria-hidden="true">›</span><a href={`/tr/hizmetler#${g.id}`} style="color: var(--tx2); text-decoration: none; padding: 6px 0">{g.ad}</a></nav>
-<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">{g.ad.toLocaleUpperCase('tr-TR')}</span></div>
-<h1 style="margin: 0; font-size: clamp(36px, 7vw, 56px); line-height: 1.06; letter-spacing: -0.03em; color: var(--head); max-width: 860px">{h.ad}</h1>
-<p style="margin: 0; font-size: 20px; color: var(--tx2); max-width: 720px">{h.ozet}</p>
-<div style="display: flex; gap: 12px; flex-wrap: wrap"><a href="/tr/iletisim#form" style="min-height: 52px; display: flex; align-items: center; padding: 0 24px; border-radius: 12px; background: var(--fill); color: #FFFFFF; text-decoration: none; font-weight: 600">Ücretsiz analiz iste</a><a href="/tr/paketler" style="min-height: 52px; display: flex; align-items: center; padding: 0 22px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--head); text-decoration: none; font-weight: 600">Paketleri incele</a></div>
-</div>
+<Site baslik={h.ad} aciklama={d.giris} aktif="Hizmetler">
+<section class="hd-ust">
+  <svg aria-hidden="true" viewBox="0 0 1440 520" preserveAspectRatio="none" class="hd-zemin"><path d="M820 0 C 1000 110 1120 50 1440 120 L1440 0 Z" fill="var(--blob2)"></path><path d="M980 520 C 950 380 1100 250 1440 230 L1440 520 Z" fill="var(--blob)"></path></svg>
+  <div class="hd-ic hd-ust-ic">
+    <nav aria-label="Sayfa yolu" class="hd-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/hizmetler/">Hizmetler</a><span aria-hidden="true">›</span><a href={`/tr/hizmetler/#${g.id}`}>{g.ad}</a></nav>
+    <div class="hd-ust-izgara">
+      <div class="hd-ust-metin">
+        <div class="hd-etiket"><span class="hd-ikon" set:html={ikon(18)}></span>{g.ad}</div>
+        <h1>{h.ad}</h1>
+        <p class="hd-giris">{d.giris}</p>
+        <div class="hd-eylem"><a href="#analiz" class="hd-ana">Ücretsiz analiz iste</a><a href="/tr/paketler/" class="hd-ikincil">Paketleri incele</a></div>
+        <ul class="hd-ozet" aria-label="Kısaca">
+          <li>Hesaplar sizin adınıza</li><li>Onaysız değişiklik yok</li><li>1 iş günü içinde dönüş</li>
+        </ul>
+      </div>
+      <figure class="hd-gorsel">
+        <MenuGorsel id={g.id} />
+        <figcaption>Temsilî görsel</figcaption>
+      </figure>
+    </div>
+  </div>
 </section>
-<section style="background: var(--bg2); border-top: 1px solid var(--line)">
-<div style="max-width: 1240px; margin: 0 auto; padding: 72px 24px; display: flex; flex-wrap: wrap; gap: 40px">
-<div style="flex: 2 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
-<h2 style="margin: 0; font-size: 32px; color: var(--head)">Bu hizmette neler yapıyoruz?</h2>
-<p style="margin: 0; color: var(--tx2); font-size: 17px">[Bu hizmetin ayrıntılı içeriği hazırlanıyor: kapsam, çalışma adımları, ölçtüğümüz sonuçlar ve sık sorulan sorular.]</p>
-</div>
-<aside style="flex: 1 1 300px; min-width: 0; padding: 24px; border-radius: 20px; background: var(--card); border: 1px solid var(--line); display: flex; flex-direction: column; gap: 10px">
-<b style="color: var(--head)">{g.ad} alanındaki diğer hizmetler</b>
-{digerleri.map((x) => <a href={`/tr/hizmet/${x.slug}`} style="padding: 8px 0; border-bottom: 1px solid var(--line); text-decoration: none; font-weight: 600">{x.ad} →</a>)}
-</aside>
-</div>
+
+<nav class="hd-sayfa-ici" aria-label="Bu sayfada">
+  <div class="hd-ic">
+    <a href="#neden">Neden önemli</a><a href="#neler">Neler yapıyoruz</a><a href="#nasil">Nasıl çalışıyoruz</a><a href="#olcum">Neyi ölçüyoruz</a><a href="#sss">Sorular</a>
+  </div>
+</nav>
+
+<section id="neden" class="hd-bolum hd-gri">
+  <div class="hd-ic hd-iki">
+    <div class="hd-sutun">
+      <Baslik etiket="Neden önemli?" baslik={`${h.ad} neden önemli?`} />
+      <p class="hd-metin">{d.neden}</p>
+    </div>
+    <aside class="hd-kart hd-dikkat">
+      <b>{alan.baslik} alanında dikkat ettiklerimiz</b>
+      <ul>{alan.dikkat.map((x) => <li>{x}</li>)}</ul>
+    </aside>
+  </div>
 </section>
-<CagriKutusu />
+
+<section id="neler" class="hd-bolum">
+  <div class="hd-ic hd-sutun">
+    <Baslik etiket="Kapsam" baslik="Bu hizmette neler yapıyoruz?" aciklama="Kapsamı ücretsiz analizden sonra ihtiyacınıza göre birlikte netleştiriyoruz." />
+    <ol class="hd-isler">
+      {d.yap.map(([ad, metin], i) => (
+        <li><span class="hd-no">{String(i + 1).padStart(2, '0')}</span><h3>{ad}</h3><p>{metin}</p></li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section id="nasil" class="hd-bolum hd-lacivert">
+  <div class="hd-ic hd-sutun">
+    <div class="hd-lacivert-bas"><span class="hd-cizgi" aria-hidden="true"></span>NASIL ÇALIŞIYORUZ</div>
+    <h2 class="hd-beyaz">Dört adım, sıfır sürpriz</h2>
+    <ol class="hd-adimlar">
+      {ADIMLAR.map(([ad, metin], i) => (<li><span>{i + 1}</span><h3>{ad}</h3><p>{metin}</p></li>))}
+    </ol>
+  </div>
+</section>
+
+<section id="olcum" class="hd-bolum">
+  <div class="hd-ic hd-iki">
+    <div class="hd-sutun">
+      <Baslik etiket="Ölçüm" baslik="Neyi ölçüyoruz?" />
+      <p class="hd-metin">Sonuçları tek bir rakama indirgemeyiz; her biri ayrı ölçülür ve raporlanır. Verileriniz IDOS panelinde bir arada görünür.</p>
+      <ul class="hd-olcum">{d.olc.map((x) => <li>{x}</li>)}</ul>
+    </div>
+    <div class="hd-sutun">
+      <h2 class="hd-kucuk-baslik">Kimler için uygun?</h2>
+      <ul class="hd-kimler">{d.kim.map((x) => <li><span class="hd-ikon" set:html={ikon(18)}></span>{x}</li>)}</ul>
+    </div>
+  </div>
+</section>
+
+<section id="sss" class="hd-bolum hd-gri">
+  <div class="hd-ic hd-iki hd-sss-izgara">
+    <Baslik etiket="Sık sorulan sorular" baslik="Aklınızdaki sorular" aciklama="Cevabını bulamadığınız bir soru varsa yazın, 1 iş günü içinde dönelim." baglanti={{ href: '/tr/iletisim/', ad: 'İletişim' }} />
+    <div class="hd-sorular">
+      {d.sss.map(([s, c], i) => (<details open={i === 0}><summary>{s}</summary><p>{c}</p></details>))}
+    </div>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(ld)}></script>
+</section>
+
+<section class="hd-bolum">
+  <div class="hd-ic hd-sutun">
+    <Baslik etiket={g.ad} baslik={`${g.ad} alanındaki diğer hizmetler`} baglanti={{ href: `/tr/hizmetler/#${g.id}`, ad: 'Alanın tüm hizmetleri' }} />
+    <ul class="hd-diger">
+      {digerleri.map((x) => (<li><a href={`/tr/hizmet/${x.slug}/`}><b>{x.ad}</b><span>{x.ozet}</span><i aria-hidden="true">→</i></a></li>))}
+    </ul>
+    {g.id === 'tasarim-icerik' && <InstagramAkis baslik="Instagram’daki çalışmalarımızdan" />}
+  </div>
+</section>
+
+<div id="analiz"><CagriKutusu /></div>
 </Site>
+
+<style>
+  .hd-ic{max-width:var(--kap);margin:0 auto;padding-left:var(--kenar);padding-right:var(--kenar);box-sizing:border-box}
+  .hd-sutun{display:flex;flex-direction:column;gap:24px;min-width:0}
+  .hd-iki{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:48px;align-items:start}
+  .hd-ust{position:relative;overflow:hidden}
+  .hd-zemin{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hd-ust-ic{position:relative;z-index:1;padding-top:36px;padding-bottom:64px;display:flex;flex-direction:column;gap:28px}
+  .hd-yol{font-size:14px;color:var(--tx2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .hd-yol a{color:var(--tx2);text-decoration:none;padding:6px 0}
+  .hd-ust-izgara{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:48px;align-items:center}
+  .hd-ust-metin{display:flex;flex-direction:column;gap:20px}
+  .hd-etiket{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--acc);text-transform:uppercase}
+  .hd-ikon{flex:none;width:36px;height:36px;border-radius:10px;background:var(--tint);color:var(--tintx);display:inline-flex;align-items:center;justify-content:center}
+  h1{margin:0;font-size:clamp(36px,6vw,58px);line-height:1.06;letter-spacing:-.03em;color:var(--head)}
+  .hd-giris{margin:0;font-size:20px;line-height:1.55;color:var(--tx2);max-width:640px;text-align:left}
+  .hd-eylem{display:flex;gap:12px;flex-wrap:wrap}
+  .hd-ana,.hd-ikincil{min-height:52px;display:inline-flex;align-items:center;padding:0 24px;border-radius:12px;text-decoration:none;font-weight:700}
+  .hd-ana{background:var(--fill);color:#FFFFFF}
+  .hd-ikincil{border:1px solid var(--line);background:var(--card);color:var(--head)}
+  .hd-ozet{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px 18px;font-size:14px;font-weight:600;color:var(--tx2)}
+  .hd-ozet li::before{content:"✓";color:var(--ok);margin-right:6px;font-weight:700}
+  .hd-gorsel{margin:0;padding:22px;border-radius:24px;background:var(--card);border:1px solid var(--line);box-shadow:0 30px 70px var(--shadow);display:flex;flex-direction:column;gap:8px}
+  .hd-gorsel figcaption{font-size:12px;color:var(--tx2);text-align:right}
+  .hd-sayfa-ici{position:sticky;top:76px;z-index:20;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .hd-sayfa-ici .hd-ic{display:flex;gap:4px;overflow-x:auto;padding-top:6px;padding-bottom:6px}
+  .hd-sayfa-ici a{flex:none;padding:10px 14px;border-radius:10px;text-decoration:none;font-weight:600;font-size:14.5px;color:var(--tx2)}
+  .hd-sayfa-ici a:hover{background:var(--card);color:var(--acc)}
+  .hd-bolum{padding:88px 0;scroll-margin-top:130px}
+  .hd-gri{background:var(--bg2)}
+  .hd-metin{margin:0;font-size:18px;line-height:1.7;color:var(--tx);text-align:left}
+  .hd-kart{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px}
+  .hd-dikkat{display:flex;flex-direction:column;gap:14px}
+  .hd-dikkat b{color:var(--head);font-size:17px}
+  .hd-dikkat ul,.hd-olcum,.hd-kimler{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+  .hd-dikkat li,.hd-olcum li{position:relative;padding-left:30px;line-height:1.5}
+  .hd-dikkat li::before,.hd-olcum li::before{content:"";position:absolute;left:0;top:2px;width:20px;height:20px;border-radius:50%;background:var(--tint) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23B84406' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12l4 4 8-8'/%3E%3C/svg%3E") center/12px no-repeat}
+  .hd-isler{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .hd-isler li{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;display:flex;flex-direction:column;gap:10px;transition:transform .2s,box-shadow .2s,border-color .2s}
+  .hd-isler li:hover{transform:translateY(-3px);box-shadow:0 18px 40px var(--shadow);border-color:color-mix(in srgb,var(--brand) 45%,var(--line))}
+  .hd-no{width:40px;height:40px;border-radius:12px;background:var(--tint);color:var(--tintx);font-weight:700;display:flex;align-items:center;justify-content:center}
+  .hd-isler h3{margin:6px 0 0;font-size:19px;color:var(--head)}
+  .hd-isler p{margin:0;font-size:15px;line-height:1.6;color:var(--tx2)}
+  .hd-lacivert{background:#002559;color:#F1F3F5}
+  .hd-lacivert-bas{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;letter-spacing:.06em;color:#FFB58A}
+  .hd-cizgi{width:36px;height:2px;background:#F07A23}
+  .hd-beyaz{margin:0;font-size:44px;line-height:1.12;letter-spacing:-.025em;color:#FFFFFF}
+  .hd-adimlar{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+  .hd-adimlar li{padding:24px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);display:flex;flex-direction:column;gap:10px}
+  .hd-adimlar span{width:40px;height:40px;border-radius:50%;background:#F07A23;color:#1A1206;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .hd-adimlar h3{margin:6px 0 0;font-size:19px;color:#FFFFFF}
+  .hd-adimlar p{margin:0;color:#C6D2E3;font-size:15px;line-height:1.6}
+  .hd-olcum{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .hd-olcum li{padding:14px 14px 14px 44px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-weight:600;color:var(--head)}
+  .hd-olcum li::before{left:14px;top:15px}
+  .hd-kucuk-baslik{margin:0;font-size:28px;color:var(--head)}
+  .hd-kimler li{display:flex;gap:14px;align-items:center;padding:16px 18px;border-radius:16px;background:var(--card);border:1px solid var(--line);font-weight:600;line-height:1.45}
+  .hd-sss-izgara{grid-template-columns:minmax(0,1fr) minmax(0,1.5fr)}
+  .hd-sorular{display:flex;flex-direction:column;gap:10px}
+  .hd-sorular details{border:1px solid var(--line);border-radius:16px;background:var(--card)}
+  .hd-sorular summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 22px;font-weight:700;color:var(--head)}
+  .hd-sorular summary::-webkit-details-marker{display:none}
+  .hd-sorular summary::after{content:"+";flex:none;width:28px;height:28px;border-radius:50%;background:var(--tint);color:var(--tintx);display:flex;align-items:center;justify-content:center;font-size:18px;transition:transform .2s}
+  .hd-sorular details[open] summary::after{transform:rotate(45deg)}
+  .hd-sorular p{margin:0;padding:0 22px 20px;line-height:1.65;text-align:left}
+  .hd-diger{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .hd-diger a{height:100%;box-sizing:border-box;display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:22px;border-radius:16px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--tx);transition:border-color .2s,transform .2s}
+  .hd-diger a:hover{border-color:var(--brand);transform:translateY(-2px)}
+  .hd-diger b{color:var(--head);font-size:17px}.hd-diger span{grid-column:1;color:var(--tx2);font-size:14.5px}.hd-diger i{grid-row:1 / span 2;grid-column:2;color:var(--acc);font-style:normal;align-self:center}
+  @media (max-width:1000px){.hd-ust-izgara,.hd-iki,.hd-sss-izgara{grid-template-columns:1fr}.hd-gorsel{max-width:460px}.hd-isler{grid-template-columns:1fr 1fr}.hd-adimlar{grid-template-columns:1fr 1fr}}
+  @media (max-width:640px){.hd-isler,.hd-adimlar,.hd-olcum{grid-template-columns:1fr}.hd-bolum{padding:60px 0}.hd-beyaz{font-size:clamp(28px,8vw,36px)}.hd-giris{font-size:18px}.hd-sayfa-ici{top:64px}}
+</style>

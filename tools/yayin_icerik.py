@@ -104,3 +104,18 @@ if '<IdosDemo />' not in s:
              '<p style="margin: 0; color: var(--tx2); font-size: 15px">{o.aciklama}</p>\n<span class="idos-oz-git">Demoda görün →</span>\n</a>')
     open(p, 'w', encoding='utf-8').write(s)
 print('IDOS demo uygulandı')
+
+# Hizmetler sayfası (Muhittin, 23 Eki 2026): her alanın sol sütununa temsilî görsel ve "neden önemli" açılır kutusu.
+p = 'src/pages/tr/hizmetler.astro'
+s = open(p, encoding='utf-8').read()
+if '<HizmetAlanEk' not in s:
+    eski = '<p style="margin: 0; color: var(--tx2); font-size: 17px">{g.aciklama}</p>\n'
+    assert s.count(eski) == 1, 'hizmetler açıklama'
+    s = s.replace(eski, eski + '<HizmetAlanEk id={g.id} />\n', 1)
+    # Kartlar sol sütunun yüksekliğine uzamasın
+    liste = '<ul style="flex: 2 1 560px; min-width: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">'
+    assert s.count(liste) == 1, 'hizmetler liste'
+    s = s.replace(liste, liste.replace('gap: 14px"', 'gap: 14px; align-content: flex-start; align-self: flex-start"'), 1)
+    s = s.replace("import Site from '../../layouts/Site.astro';", "import Site from '../../layouts/Site.astro';\nimport HizmetAlanEk from '../../components/HizmetAlanEk.astro';", 1)
+    open(p, 'w', encoding='utf-8').write(s)
+print('Hizmetler sayfası alan görselleri uygulandı')

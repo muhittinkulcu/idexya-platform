@@ -63,5 +63,9 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS bulten (
     id TEXT PRIMARY KEY, eposta TEXT NOT NULL UNIQUE, durum TEXT NOT NULL DEFAULT 'aktif', onay_zamani TEXT NOT NULL, onay_surum TEXT NOT NULL,
     sayfa TEXT, ip_ozet TEXT, dogrulama TEXT NOT NULL, ayrilma_anahtari TEXT NOT NULL UNIQUE, ayrilma_zamani TEXT)`,
-  `CREATE INDEX IF NOT EXISTS bulten_ip ON bulten (ip_ozet, onay_zamani)`
+  `CREATE INDEX IF NOT EXISTS bulten_ip ON bulten (ip_ozet, onay_zamani)`,
+  // Sitede gösterilen Instagram gönderileri (worker/instagram.js): yöneticinin seçtiği bağlantı, açıklama ve küçültülmüş görsel.
+  `CREATE TABLE IF NOT EXISTS instagram (
+    id TEXT PRIMARY KEY, baglanti TEXT NOT NULL, aciklama TEXT, gorsel TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0,
+    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`
 ];
