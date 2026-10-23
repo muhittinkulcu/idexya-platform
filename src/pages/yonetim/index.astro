@@ -3,9 +3,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Genel bakış" aktif="genel">
 <style is:global>
-  @keyframes nabiz{0%{transform:scale(1);opacity:.55}100%{transform:scale(1.9);opacity:0}}
-  @keyframes yuz{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  @media (prefers-reduced-motion: reduce){.kure-halka,.kure-top{animation:none!important}}
   /* Talep kaynağı renkleri: sabit sıra, iki tema ayrı doğrulandı (dataviz validate_palette). Açık temada 3. ve 5. renk 3:1 altında; tablo görünümü bunun için var. */
   .acik{--s1:#eb6834;--s2:#2a78d6;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4}
   .koyu{--s1:#d95926;--s2:#3987e5;--s3:#199e70;--s4:#9085e9;--s5:#d55181}
@@ -16,6 +13,46 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .modul-bas{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
   .modul-bas h2{margin:0;font-size:19px;font-weight:700;color:var(--head)}
   .modul-bas small{font-size:12px;color:var(--tx2)}
+  /* Bekleyen talepler */
+  .bk-bag{font-size:13px;font-weight:600}
+  .bk{display:flex;flex-wrap:wrap;align-items:center;gap:28px}
+  .bk-halka{position:relative;width:168px;height:168px;flex:0 0 auto;margin:0 auto;display:block;text-decoration:none;color:inherit;border-radius:50%}
+  .bk-halka svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .bk-halka circle{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dasharray .6s ease,stroke-dashoffset .6s ease}
+  .bk-iz{stroke:var(--track,var(--line))}
+  .bk-dolu{stroke:var(--brand);stroke-dasharray:0 400}
+  .bk-gec{stroke:#E0A100;stroke-dasharray:0 400}
+  .bk-temiz .bk-dolu{stroke:var(--ok)}
+  .bk-ic{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .bk-ic b{font-family:'Bricolage Grotesque',sans-serif;font-size:44px;font-weight:800;letter-spacing:-.04em;line-height:1;color:var(--head)}
+  .bk-ic small{font-size:12px;color:var(--tx2)}
+  .bk-halka:hover .bk-ic b{color:var(--acc)}
+  .bk-yan{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:14px}
+  .bk-durum{margin:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--card2);font-size:14px;color:var(--tx)}
+  .bk-durum i{width:8px;height:8px;border-radius:50%;flex:none;background:var(--brand)}
+  .bk-durum[data-tur=iyi] i{background:var(--ok)}.bk-durum[data-tur=gec]{background:var(--warnb,var(--card2));color:var(--warn,var(--tx))}.bk-durum[data-tur=gec] i{background:#E0A100}
+  .bk-sayilar{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .bk-sayilar div:first-child{grid-column:1 / -1;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:10px}
+  .bk-sayilar div:first-child dt{flex-basis:100%}
+  .bk-sayilar div:first-child dd{font-size:26px}
+  .bk-sayilar div{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:12px;border:1px solid var(--line);min-width:0}
+  .bk-sayilar dt{font-size:12px;color:var(--tx2)}
+  .bk-sayilar dd{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:var(--head);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bk-sayilar small{font-size:11px;color:var(--tx2)}
+  /* Satış hunisi */
+  .hn{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px}
+  .hn-satir{display:grid;grid-template-columns:minmax(110px,150px) minmax(0,1fr) 64px;align-items:center;gap:14px}
+  .hn-ad{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--tx)}
+  .hn-ad i{width:10px;height:10px;border-radius:3px;flex:none;background:var(--brand);opacity:var(--o)}
+  .hn-iz{height:10px;border-radius:999px;background:var(--track,var(--line));overflow:hidden}
+  .hn-iz span{display:block;height:100%;border-radius:999px;background:var(--brand);opacity:var(--o);transition:width .6s ease}
+  .hn-kaz .hn-ad i,.hn-kaz .hn-iz span{background:var(--ok);opacity:1}
+  .hn-kay .hn-ad i,.hn-kay .hn-iz span{background:var(--tx2);opacity:.55}
+  .hn-kaz{margin-top:6px;padding-top:12px;border-top:1px dashed var(--line)}
+  .hn-sayi{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}
+  .hn-sayi b{font-size:16px;color:var(--head)}.hn-sayi small{font-size:11px;color:var(--tx2)}
+  .hn-bos{font-size:13px;color:var(--tx2);padding-top:4px}
+  @media (prefers-reduced-motion:reduce){.bk-halka circle,.hn-iz span{transition:none}}
   .modul-arac{display:flex;gap:6px}
   .modul-arac button{min-width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--head);cursor:pointer;font:inherit;font-size:12px}
   .kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
@@ -106,36 +143,27 @@ import Yonetim from '../../layouts/Yonetim.astro';
     <span style="font-size: 12px; color: var(--tx2)" data-trend-not></span>
   </section>
 
-  <section class="kart modul" data-m="kure" aria-label="Talep küresi">
-    <div class="modul-bas"><h2>Bekleyen talepler</h2></div>
-    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 24px">
-      <div style="position: relative; width: 196px; height: 196px; flex: 0 0 auto; margin: 0 auto; display: flex; align-items: center; justify-content: center">
-        <span style="position: absolute; inset: 0; border-radius: 50%; background: rgba(240,122,35,.10)"></span>
-        <span style="position: absolute; inset: 18px; border-radius: 50%; background: rgba(240,122,35,.14)"></span>
-        <span class="kure-halka" style="position: absolute; inset: 38px; border-radius: 50%; border: 2px solid rgba(240,122,35,.5); animation: nabiz 2.8s ease-out infinite"></span>
-        <a class="kure-top" href="/yonetim/talepler/?sekme=yeni" style="position: relative; width: 140px; height: 140px; border-radius: 50%; background: radial-gradient(circle at 34% 28%, #FFB27A 0%, #F07A23 46%, #C9560E 100%); box-shadow: 0 18px 40px -12px rgba(184,68,6,.6); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #FFFFFF; text-align: center; text-decoration: none; animation: yuz 6s ease-in-out infinite">
-          <span style="font-size: 10px; font-weight: 700; letter-spacing: .14em; color: #2A1406">YANIT BEKLEYEN</span>
-          <span data-v="bekleyen" style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 44px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.05">—</span>
-          <span style="font-size: 12px; font-weight: 600; color: #2A1406">talep</span>
-        </a>
-      </div>
-      <div style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
-        <div style="display: flex; flex-direction: column; gap: 2px; padding-bottom: 12px; border-bottom: 1px solid var(--line)">
-          <span style="font-size: 12px; color: var(--tx2)">Açık fırsat değeri · tahmini aylık</span>
-          <span data-v="firsat" class="baslik-font" style="font-size: 26px; font-weight: 800; color: var(--head)">—</span>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
-          <span style="display: flex; flex-direction: column"><b data-v="musteri" style="font-size: 20px; color: var(--head)">—</b><span style="font-size: 12px; color: var(--tx2)">CRM’deki müşteri</span></span>
-          <span style="display: flex; flex-direction: column"><b data-v="acikFirsat" style="font-size: 20px; color: var(--acc)">—</b><span style="font-size: 12px; color: var(--tx2)">açık fırsat</span></span>
-        </div>
-        <a class="dugme ana" href="/yonetim/talepler/?sekme=yeni">Talepleri aç →</a>
+  <section class="kart modul" data-m="kure" aria-label="Bekleyen talepler">
+    <div class="modul-bas"><h2>Bekleyen talepler</h2><a href="/yonetim/talepler/?sekme=yeni" class="bk-bag">Talepleri aç →</a></div>
+    <div class="bk">
+      <a class="bk-halka" href="/yonetim/talepler/?sekme=yeni" aria-label="Yanıt bekleyen talepler">
+        <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="bk-iz"/><circle cx="60" cy="60" r="50" class="bk-dolu" data-bk-taze/><circle cx="60" cy="60" r="50" class="bk-gec" data-bk-gec/></svg>
+        <span class="bk-ic"><b data-v="bekleyen">—</b><small>yanıt bekleyen</small></span>
+      </a>
+      <div class="bk-yan">
+        <p class="bk-durum" data-bk-durum><i></i><span>Yükleniyor…</span></p>
+        <dl class="bk-sayilar">
+          <div><dt>Açık fırsat değeri</dt><dd data-v="firsat">—</dd><small>tahmini aylık</small></div>
+          <div><dt>CRM’deki müşteri</dt><dd data-v="musteri">—</dd></div>
+          <div><dt>Açık fırsat</dt><dd data-v="acikFirsat">—</dd></div>
+        </dl>
       </div>
     </div>
   </section>
 
   <section class="kart modul" data-m="huni" aria-label="Satış hunisi">
     <div class="modul-bas"><h2>Satış hunisi</h2><a href="/yonetim/crm/" style="font-size: 13px; font-weight: 600">CRM panosu →</a></div>
-    <div data-huni style="display: flex; flex-direction: column; gap: 8px; align-items: center"></div>
+    <ol class="hn" data-huni></ol>
     <div data-huni-alt style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"></div>
   </section>
 
@@ -251,6 +279,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
     // 24 saatten eski, hâlâ yanıtlanmamış talep varsa uyarı şeridi
     const b24 = gr.bekleyen24 || { n: 0 };
+    // Halka: 24 saati geçen bekleyenler kehribar, diğerleri marka rengi; hiç bekleyen yoksa tam yeşil halka
+    { const C = 2 * Math.PI * 50, gec = Math.min(b24.n, bekleyen), taze = bekleyen - gec;
+      const halka = (e, pay, bas) => { e.style.strokeDasharray = `${pay * C} ${C}`; e.style.strokeDashoffset = String(-bas * C); e.style.opacity = pay > 0 ? '1' : '0'; };  // yuvarlak uç sıfır uzunlukta nokta çizmesin
+      const kok = $('[data-m="kure"]'); kok.classList.toggle('bk-temiz', !bekleyen);
+      halka($('[data-bk-taze]'), bekleyen ? taze / bekleyen : 1, 0); halka($('[data-bk-gec]'), bekleyen ? gec / bekleyen : 0, bekleyen ? taze / bekleyen : 0);
+      const d = $('[data-bk-durum]'); d.dataset.tur = !bekleyen ? 'iyi' : gec ? 'gec' : 'normal';
+      d.querySelector('span').textContent = !bekleyen ? 'Yanıt bekleyen talep yok, her şey yolunda.' : gec ? `${gec} talep 24 saati geçti; önce bunlara dönün.` : 'Hepsi son 24 saat içinde geldi.'; }
     const us = $('[data-uyari]');
     if (b24.n > 0) {
       us.hidden = false;
@@ -282,11 +317,16 @@ import Yonetim from '../../layouts/Yonetim.astro';
     // Satış hunisi: aşamadaki mevcut müşteri sayısı ve payı (kohort dönüşümü değildir)
     const say = Object.fromEntries(o.asamalar.map((a) => [a.asama, a.n]));
     const toplam = o.asamalar.reduce((s, a) => s + a.n, 0);
-    const renk = ['#F07A23', '#E2691A', '#C9560E', '#B84406', '#13804F', '#5E6166'];
-    const genislik = [100, 88, 76, 64, 52, 52];
-    ASAMALAR.forEach((a, i) => $('[data-huni]').append(el('div', {
-      style: `width: ${genislik[i]}%; min-width: 150px; height: 42px; border-radius: 14px; background: ${renk[i]}; color: #FFFFFF; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 16px; box-sizing: border-box; font-size: 13px`
-    }, el('span', {}, a.ad), el('span', { style: 'display: flex; gap: 10px; align-items: baseline' }, toplam ? el('span', { style: 'font-size: 12px; opacity: .85' }, '%' + Math.round((say[a.k] || 0) / toplam * 100)) : null, el('b', {}, String(say[a.k] || 0))))));
+    const enCok = Math.max(1, ...ASAMALAR.map((a) => say[a.k] || 0));
+    $('[data-huni]').replaceChildren(...ASAMALAR.map((a, i) => {
+      const n = say[a.k] || 0;
+      const tur = a.k === 'kazanildi' ? 'kaz' : a.k === 'kaybedildi' ? 'kay' : 'acik';
+      return el('li', { class: 'hn-satir hn-' + tur, style: `--o:${0.45 + i * 0.11}` },
+        el('span', { class: 'hn-ad' }, el('i', { 'aria-hidden': 'true' }), a.ad),
+        el('span', { class: 'hn-iz', 'aria-hidden': 'true' }, el('span', { style: `width:${n ? Math.max(4, (n / enCok) * 100) : 0}%` })),
+        el('span', { class: 'hn-sayi' }, el('b', {}, String(n)), toplam ? el('small', {}, '%' + Math.round((n / toplam) * 100)) : null));
+    }));
+    if (!toplam) $('[data-huni]').append(el('li', { class: 'hn-bos' }, 'Henüz CRM’de müşteri yok. Talepler CRM’e alındıkça huni dolar.'));
     const kapanan = (say.kazanildi || 0) + (say.kaybedildi || 0);
     $('[data-huni-alt]').append(
       el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Kazanma oranı'), el('b', { style: 'font-size: 22px' }, kapanan ? '%' + Math.round((say.kazanildi || 0) / kapanan * 100) : '—'), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `Kapanan ${kapanan} fırsattan kazanılan`)),
