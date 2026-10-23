@@ -74,8 +74,8 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
 <main class="sayfa" data-sayfa hidden>
   <header class="bas">
     <div>
-      <div class="marka">Idexya <span>|</span> Good Things</div>
-      <div class="iletisim">Ankara · info@idexya.com · 0507 870 06 29</div>
+      <div class="marka" data-firma>Idexya <span>|</span> Good Things</div>
+      <div class="iletisim" data-iletisim>Ankara · info@idexya.com · 0507 870 06 29</div>
     </div>
     <div class="belge">
       <h1>FİYAT TEKLİFİ</h1>
@@ -111,6 +111,13 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
     try { v = await api('teklifler/' + encodeURIComponent(id)); }
     catch (h) { genelHata(h.durum === 404 ? 'Bu teklif bulunamadı; silinmiş olabilir.' : 'Teklif yüklenemedi: ' + h.message); $('[data-bilgi]').textContent = ''; return; }
     const t = v.teklif, m = v.musteri || {};
+    // Firma bilgileri Ayarlar sayfasından (okunamazsa varsayılan metin kalır)
+    let a = null;
+    try { a = (await api('ayarlar')).degerler; } catch (e) { /* varsayılan */ }
+    if (a) {
+      $('[data-firma]').textContent = a.firma_ad || 'Idexya | Good Things';
+      $('[data-iletisim]').textContent = [a.firma_unvan, a.adres, a.eposta, a.telefon, a.vergi].filter(Boolean).join(' · ');
+    }
     document.title = `${t.no} · ${t.baslik} · Idexya`;
     $('[data-geri]').href = '/yonetim/teklifler/?id=' + encodeURIComponent(t.id);
     $('[data-bilgi]').textContent = `${t.no} · ${DURUM[t.durum] || t.durum}`;
@@ -130,7 +137,7 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
       [`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)], ['Genel toplam', tutar(t.toplam), 'genel']]);
     $('[data-notlar]').hidden = !t.notlar;
     $('[data-not-metin]').textContent = t.notlar || '';
-    $('[data-alt]').textContent = `Fiyatlar Türk lirası (TL) cinsindendir.${t.gecerlilik ? ` Bu teklif ${gun(t.gecerlilik)} tarihine kadar geçerlidir.` : ''} Sorularınız için info@idexya.com adresine yazabilir ya da 0507 870 06 29 numaralı telefonu arayabilirsiniz.`;
+    $('[data-alt]').textContent = `Fiyatlar Türk lirası (TL) cinsindendir.${t.gecerlilik ? ` Bu teklif ${gun(t.gecerlilik)} tarihine kadar geçerlidir.` : ''} Sorularınız için ${(a && a.eposta) || 'info@idexya.com'} adresine yazabilir ya da ${(a && a.telefon) || '0507 870 06 29'} numaralı telefonu arayabilirsiniz.${a && a.teklif_notu ? ' ' + a.teklif_notu : ''}`;
     $('[data-sayfa]').hidden = false;
     $('[data-yazdir]').disabled = false;
   }
