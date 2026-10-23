@@ -28,12 +28,16 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <ol data-gunluk style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ol>
 </section>
 </div>
+<section class="kart" aria-label="Teklifler" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><h2 style="margin: 0; font-size: 16px; color: var(--head)">Teklifler</h2><a class="dugme kucuk" data-teklif-yeni href="/yonetim/teklifler/?yeni=1">+ Bu müşteriye teklif hazırla</a></div>
+<ul data-teklifler style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ul>
+</section>
 <script>
   import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata } from '../../scripts/yonetim/ortak.js';
   const id = new URLSearchParams(location.search).get('id') || '';
   const ust = document.querySelector('[data-ust]'), bilgi = document.querySelector('[data-bilgi]'), gunluk = document.querySelector('[data-gunluk]');
   const TUR = [['not', 'Not'], ['gorusme', 'Görüşme'], ['eposta', 'E-posta'], ['gorev', 'Görev']];
-  const TUR_RENK = { talep: '#1F4E8C', sistem: '#5F574F', not: '#B84406', gorusme: '#176041', eposta: '#6B3FA0', gorev: '#7A4E00' };
+  const TUR_RENK = { talep: '#1F4E8C', sistem: '#5F574F', not: '#B84406', gorusme: '#176041', eposta: '#6B3FA0', gorev: '#7A4E00', teklif: '#B84406' };
   let tur = 'not', m = null;
 
   function turCiz() {
@@ -74,7 +78,23 @@ import Yonetim from '../../layouts/Yonetim.astro';
       : [el('li', { class: 'bos' }, 'Günlükte kayıt yok.')]));
   }
 
+  // Müşterinin teklifleri (worker/teklif.js)
+  const TEKLIF_DURUM = { taslak: ['Taslak', 'yeni'], gonderildi: ['Gönderildi', 'teklif'], kabul: ['Kabul edildi', 'kazanildi'], red: ['Reddedildi', 'kaybedildi'] };
+  const tl = (n) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n) || 0) + ' TL';
+  async function teklifleriYukle() {
+    const kutu = document.querySelector('[data-teklifler]');
+    document.querySelector('[data-teklif-yeni]').href = '/yonetim/teklifler/?yeni=1&musteri=' + encodeURIComponent(id);
+    try {
+      const r = await api('teklifler/musteri/' + encodeURIComponent(id));
+      kutu.replaceChildren(...(r.teklifler.length ? r.teklifler.map((t) => el('li', { style: 'display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line)' },
+        el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0' }, el('a', { href: '/yonetim/teklifler/?id=' + encodeURIComponent(t.id), style: 'font-weight: 600' }, t.no), el('span', { style: 'overflow-wrap: anywhere' }, t.baslik)),
+        el('span', { style: 'display: flex; gap: 8px; align-items: center' }, el('span', { style: 'white-space: nowrap; font-variant-numeric: tabular-nums' }, tl(t.toplam)), el('span', { class: 'cip ' + (TEKLIF_DURUM[t.durum] || ['', ''])[1] }, (TEKLIF_DURUM[t.durum] || [t.durum])[0]))))
+        : [el('li', { class: 'bos', style: 'padding: 16px' }, 'Bu müşteriye henüz teklif hazırlanmadı. “Bu müşteriye teklif hazırla” ile başlayabilirsiniz.')]));
+    } catch (h) { kutu.replaceChildren(el('li', { class: 'bos', style: 'padding: 16px' }, 'Teklifler yüklenemedi: ' + h.message)); }
+  }
+
   async function yukle() {
+    teklifleriYukle();
     try { ciz(await api('musteriler/' + encodeURIComponent(id))); }
     catch (h) { genelHata(h.durum === 404 ? 'Bu müşteri bulunamadı. Bağlantı eski olabilir; CRM listesinden açın.' : 'Müşteri yüklenemedi: ' + h.message); }
   }

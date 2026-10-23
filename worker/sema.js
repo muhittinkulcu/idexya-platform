@@ -67,5 +67,14 @@ export const SEMA = [
   // Sitede gösterilen Instagram gönderileri (worker/instagram.js): yöneticinin seçtiği bağlantı, açıklama ve küçültülmüş görsel.
   `CREATE TABLE IF NOT EXISTS instagram (
     id TEXT PRIMARY KEY, baglanti TEXT NOT NULL, aciklama TEXT, gorsel TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0,
-    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`
+    gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  // Teklifler (worker/teklif.js): kalemler JSON, tutarlar sunucuda hesaplanır (TL, 2 ondalık). Numara yıl başına sayaçtan.
+  `CREATE TABLE IF NOT EXISTS teklifler (
+    id TEXT PRIMARY KEY, no TEXT NOT NULL UNIQUE, musteri_id TEXT NOT NULL, baslik TEXT NOT NULL, kalemler TEXT NOT NULL,
+    kdv_orani REAL NOT NULL DEFAULT 20, indirim REAL NOT NULL DEFAULT 0, para TEXT NOT NULL DEFAULT 'TRY', gecerlilik TEXT, notlar TEXT,
+    durum TEXT NOT NULL DEFAULT 'taslak', ara_toplam REAL NOT NULL DEFAULT 0, kdv REAL NOT NULL DEFAULT 0, toplam REAL NOT NULL DEFAULT 0,
+    olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, gonderim_zamani TEXT, karar_zamani TEXT, olusturan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS teklif_musteri ON teklifler (musteri_id, olusturma)`,
+  `CREATE INDEX IF NOT EXISTS teklif_durum ON teklifler (durum, guncelleme)`,
+  `CREATE TABLE IF NOT EXISTS teklif_sayac (yil INTEGER PRIMARY KEY, son INTEGER NOT NULL)`
 ];

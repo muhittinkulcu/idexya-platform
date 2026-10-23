@@ -1,0 +1,273 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Teklifler" aktif="teklif" yol="Satış ve müşteri" aciklama="CRM’deki müşterilere kalem kalem fiyat teklifi hazırlayın, yazdırın ya da PDF olarak kaydedin. Tutarlar ve KDV sunucuda hesaplanır; teklif gönderildi olarak işaretlenince düzenlenemez.">
+<div class="uyari bilgi">Bu panel teklifi e-postayla <b>göndermez</b>. Teklifi “Yazdır / PDF” ile PDF olarak kaydedip müşteriye kendiniz iletin, sonra “Gönderildi olarak işaretle”yi seçin. İşaretleme, kabul ve ret müşteri kartının günlüğüne yazılır; gönderim ve kabulde müşterinin CRM aşaması da güncellenir.</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between">
+<div role="tablist" aria-label="Teklif durumu" data-sekmeler style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 12px; background: var(--track, var(--card2)); max-width: 100%"></div>
+<button type="button" class="dugme ana" data-yeni>+ Yeni teklif</button>
+</div>
+
+<form class="kart" data-duzenleyici hidden novalidate style="padding: 18px; display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline">
+<h2 data-duz-baslik style="margin: 0; font-size: 20px; color: var(--head)">Yeni teklif</h2>
+<span data-duz-no style="font-size: 13px; color: var(--tx2)"></span>
+</div>
+<div data-musteri-yok hidden class="uyari bilgi">CRM’de henüz müşteri yok. Teklif hazırlamak için önce <a href="/yonetim/crm/">Müşteriler (CRM)</a> sayfasından müşteri ekleyin ya da bir talebi CRM’e alın.</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px">
+<label class="alan">Müşteri<select name="musteri_id" required></select></label>
+<label class="alan" style="grid-column: span 2">Teklif başlığı<input name="baslik" maxlength="160" required placeholder="Ör. Kurumsal web sitesi ve SEO paketi"></label>
+<label class="alan">Geçerlilik tarihi<input name="gecerlilik" type="date"></label>
+<label class="alan">KDV oranı<select name="kdv_orani"><option value="20">%20</option><option value="10">%10</option><option value="1">%1</option><option value="0">%0 (KDV yok)</option></select></label>
+<label class="alan">İndirim (TL)<input name="indirim" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"></label>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<h3 style="margin: 0; font-size: 15px; color: var(--head)">Kalemler</h3>
+<ol data-kalemler style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px"></ol>
+<button type="button" class="dugme" data-kalem-ekle style="align-self: flex-start">+ Kalem ekle</button>
+</div>
+<div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
+<label class="alan" style="flex: 2 1 280px">Notlar (teklifte görünür)<textarea name="notlar" rows="4" maxlength="4000" placeholder="Ödeme koşulları, teslim süresi, kapsam dışı işler…" style="resize: vertical"></textarea></label>
+<dl data-toplamlar style="flex: 1 1 240px; margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid var(--line); font-variant-numeric: tabular-nums"></dl>
+</div>
+<p style="margin: 0; font-size: 12px; color: var(--tx2)">Ekrandaki toplamlar önizlemedir; kaydederken tutarlar sunucuda kuruşa yuvarlanarak yeniden hesaplanır.</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<button type="submit" class="dugme ana">Taslağı kaydet</button>
+<button type="button" class="dugme" data-vazgec>Vazgeç</button>
+<span data-duz-durum role="status" style="font-size: 14px; color: var(--err)"></span>
+</div>
+</form>
+
+<section class="kart" data-detay hidden aria-label="Teklif ayrıntısı" style="padding: 18px; display: flex; flex-direction: column; gap: 14px"></section>
+<section class="kart" aria-label="Teklif listesi" data-liste style="overflow-x: auto"></section>
+
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const $ = (s) => document.querySelector(s);
+  const liste = $('[data-liste]'), sekmeKutu = $('[data-sekmeler]'), detay = $('[data-detay]'), form = $('[data-duzenleyici]');
+  const kalemKutu = $('[data-kalemler]'), toplamKutu = $('[data-toplamlar]'), duzDurum = $('[data-duz-durum]');
+  const DURUM = { taslak: 'Taslak', gonderildi: 'Gönderildi', kabul: 'Kabul edildi', red: 'Reddedildi' };
+  const CIP = { taslak: 'yeni', gonderildi: 'teklif', kabul: 'kazanildi', red: 'kaybedildi' };
+  const SEKMELER = [['taslak', 'Taslaklar'], ['gonderildi', 'Gönderilenler'], ['kabul', 'Kabul edilenler'], ['red', 'Reddedilenler'], ['hepsi', 'Tümü']];
+  const BOS = {
+    taslak: 'Taslak teklif yok. “Yeni teklif” ile bir müşteriye teklif hazırlayın.',
+    gonderildi: 'Gönderilmiş teklif yok. Taslağı müşteriye ilettikten sonra “Gönderildi olarak işaretle”yi seçin.',
+    kabul: 'Kabul edilen teklif yok. Müşteri onay verince gönderilen teklifi “Kabul edildi” olarak işaretleyin.',
+    red: 'Reddedilen teklif yok.', hepsi: 'Henüz teklif yok.'
+  };
+  const tutar = (n) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n) || 0) + ' TL';
+  const sayiYaz = (n) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(Number(n) || 0);
+  const gun = (s) => (s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.split('-').reverse().join('.') : '—');
+  const musteriAdi = (m) => (m ? m.firma || m.ad || m.eposta || 'Adsız müşteri' : '—');
+  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  const yerelGun = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+  const prm = new URLSearchParams(location.search);
+  let sekme = SEKMELER.some((s) => s[0] === prm.get('sekme')) ? prm.get('sekme') : 'taslak';
+  let tum = [], musteriler = null, seciliId = prm.get('id') || '', duzenlenen = null;
+
+  function adresYaz() {
+    const p = new URLSearchParams();
+    p.set('sekme', sekme);
+    if (seciliId) p.set('id', seciliId);
+    history.replaceState(null, '', location.pathname + '?' + p.toString());
+  }
+
+  // --- Liste ---
+  function ciz() {
+    sekmeKutu.replaceChildren(...SEKMELER.map(([k, ad]) => {
+      const s = k === sekme, n = k === 'hepsi' ? tum.length : tum.filter((x) => x.durum === k).length;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; adresYaz(); ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+    }));
+    const gor = tum.filter((x) => sekme === 'hepsi' || x.durum === sekme);
+    if (!gor.length) {
+      liste.replaceChildren(el('div', { class: 'bos' }, tum.length ? BOS[sekme] : 'Henüz teklif yok. “Yeni teklif” ile CRM’deki bir müşteriye teklif hazırlayın; taslağı yazdırıp PDF olarak kaydedebilirsiniz.'));
+      return;
+    }
+    liste.replaceChildren(el('table', { style: 'width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, ...['No', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 3 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
+      el('tbody', {}, ...gor.map((t) => el('tr', { style: t.id === seciliId ? 'background: var(--card2)' : '' },
+        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: '?sekme=' + sekme + '&id=' + encodeURIComponent(t.id), style: 'font-weight: 600', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
+        el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
+        el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.baslik),
+        el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, tutar(t.toplam)),
+        el('td', { style: hucre }, el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
+        el('td', { style: hucre + '; color: var(--tx2); white-space: nowrap' }, tarih(t.karar_zamani || t.gonderim_zamani || t.olusturma, false)))))));
+  }
+
+  async function yukle() {
+    try { tum = (await api('teklifler')).teklifler; genelHata(''); ciz(); }
+    catch (h) { genelHata('Teklifler yüklenemedi: ' + h.message); liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); }
+  }
+
+  // --- Ayrıntı ---
+  async function islem(t, ne) {
+    const soru = {
+      gonderildi: `${t.no} gönderildi olarak işaretlensin mi?\n\nBu işlem e-posta GÖNDERMEZ. Teklifi müşteriye kendiniz ilettiyseniz onaylayın. İşaretledikten sonra teklif düzenlenemez.`,
+      kabul: `${t.no} kabul edildi olarak işaretlensin mi? Müşterinin CRM aşaması “Kazanıldı” olur.`,
+      red: `${t.no} reddedildi olarak işaretlensin mi? Müşterinin CRM aşaması değişmez.`,
+      sil: `${t.no} numaralı taslak silinsin mi? Bu işlem geri alınamaz.`,
+      kopyala: null
+    }[ne];
+    if (soru && !confirm(soru)) return;
+    try {
+      const r = await api(`teklifler/${encodeURIComponent(t.id)}/${ne}`, {});
+      genelHata('');
+      if (ne === 'sil') { seciliId = ''; detay.hidden = true; }
+      if (ne === 'kopyala') { seciliId = r.id; sekme = 'taslak'; }
+      if (ne === 'gonderildi' || ne === 'kabul' || ne === 'red') sekme = ne;
+      adresYaz();
+      await yukle();
+      if (seciliId) await ac(seciliId, ne === 'kopyala' ? `Kopyalandı: yeni taslak ${r.no} açıldı.` : '');
+    } catch (h) { genelHata('İşlem yapılamadı: ' + h.message); }
+  }
+
+  async function ac(id, mesaj = '') {
+    seciliId = id; adresYaz(); form.hidden = true;
+    let v;
+    try { v = await api('teklifler/' + encodeURIComponent(id)); }
+    catch (h) { seciliId = ''; adresYaz(); detay.hidden = true; genelHata(h.durum === 404 ? 'Bu teklif bulunamadı; silinmiş olabilir.' : 'Teklif yüklenemedi: ' + h.message); return; }
+    const t = v.teklif, m = v.musteri;
+    const dugme = (ad, ne, ana) => el('button', { type: 'button', class: 'dugme' + (ana ? ' ana' : ''), onclick: () => islem(t, ne) }, ad);
+    const yazdir = el('a', { class: 'dugme', href: '/yonetim/teklif-yazdir/?id=' + encodeURIComponent(t.id), target: '_blank', rel: 'noopener' }, 'Yazdır / PDF');
+    const eylemler = {
+      taslak: [el('button', { type: 'button', class: 'dugme', onclick: () => duzenle(t) }, 'Düzenle'), yazdir, dugme('Gönderildi olarak işaretle', 'gonderildi', true), dugme('Kopyala', 'kopyala'), dugme('Sil', 'sil')],
+      gonderildi: [dugme('Kabul edildi', 'kabul', true), dugme('Reddedildi', 'red'), yazdir, dugme('Kopyala', 'kopyala')],
+      kabul: [yazdir, dugme('Kopyala', 'kopyala')], red: [yazdir, dugme('Kopyala', 'kopyala')]
+    }[t.durum] || [yazdir];
+    const bilgi = [['Oluşturma', tarih(t.olusturma)], ['Geçerlilik', gun(t.gecerlilik)], t.gonderim_zamani ? ['Gönderildi', tarih(t.gonderim_zamani)] : null,
+      t.karar_zamani ? [t.durum === 'kabul' ? 'Kabul' : 'Ret', tarih(t.karar_zamani)] : null, ['Hazırlayan', t.olusturan]].filter(Boolean);
+    const th = (b, sag) => el('th', { scope: 'col', style: `padding: 8px 10px; font-size: 12px; color: var(--tx2); text-align: ${sag ? 'right' : 'left'}` }, b);
+    const td = (c, sag) => el('td', { style: `padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; ${sag ? 'text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' : 'overflow-wrap: anywhere'}` }, c);
+    detay.replaceChildren(
+      mesaj ? el('div', { class: 'uyari ok', role: 'status' }, mesaj) : '',
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: flex-start' },
+        el('div', { style: 'display: flex; flex-direction: column; gap: 4px; min-width: 0' },
+          el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap' }, el('strong', { style: 'font-size: 13px; color: var(--tx2)' }, t.no), el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
+          el('h2', { style: 'margin: 0; font-size: 22px; color: var(--head); overflow-wrap: anywhere' }, t.baslik),
+          el('span', { style: 'font-size: 14px' }, 'Müşteri: ', m ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(m.id) }, musteriAdi(m)) : 'CRM’de bulunamadı')),
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { seciliId = ''; adresYaz(); detay.hidden = true; ciz(); } }, 'Kapat')),
+      el('dl', { style: 'margin: 0; display: flex; gap: 6px 20px; flex-wrap: wrap; font-size: 13px' }, ...bilgi.map(([a, b]) => el('div', { style: 'display: flex; gap: 6px' }, el('dt', { style: 'color: var(--tx2)' }, a + ':'), el('dd', { style: 'margin: 0' }, b)))),
+      el('div', { style: 'overflow-x: auto; border: 1px solid var(--line); border-radius: 14px' }, el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 13px' },
+        el('thead', {}, el('tr', {}, th('Kalem'), th('Adet', true), th('Birim fiyat', true), th('Tutar', true))),
+        el('tbody', {}, ...t.kalemler.map((k) => el('tr', {}, td([el('strong', {}, k.ad), k.aciklama ? el('div', { style: 'font-size: 13px; color: var(--tx2); white-space: pre-wrap' }, k.aciklama) : '']), td(sayiYaz(k.adet), true), td(tutar(k.birim_fiyat), true), td(tutar(k.tutar), true)))))),
+      el('div', { style: 'display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start' },
+        el('div', { style: 'flex: 2 1 280px; min-width: 0' }, t.notlar ? [el('strong', { style: 'font-size: 13px; color: var(--tx2)' }, 'Notlar'), el('p', { style: 'margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere' }, t.notlar)] : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Not yok.')),
+        toplamListesi(t, { flex: '1 1 240px' })),
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, ...eylemler));
+    detay.hidden = false;
+    ciz();
+    detay.scrollIntoView({ block: 'nearest' });
+  }
+
+  function toplamListesi(t, ek) {
+    const sat = (a, b, guclu) => [el('dt', { style: guclu ? 'font-weight: 700; color: var(--head)' : 'color: var(--tx2)' }, a), el('dd', { style: 'margin: 0; text-align: right; white-space: nowrap' + (guclu ? '; font-weight: 700; color: var(--head)' : '') }, b)];
+    const d = el('dl', { style: 'margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid var(--line); font-variant-numeric: tabular-nums' + (ek ? '; flex: ' + ek.flex : '') },
+      ...sat('Ara toplam', tutar(t.ara_toplam)), ...(Number(t.indirim) > 0 ? sat('İndirim', '−' + tutar(t.indirim)) : []),
+      ...sat(`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)), ...sat('Genel toplam', tutar(t.toplam), true));
+    return d;
+  }
+
+  // --- Düzenleyici ---
+  // Sunucudaki hesapla aynı (kuruş üzerinden); yalnız önizleme içindir.
+  function hesapla(kalemler, indirim, oran) {
+    let ara = 0;
+    const satirlar = kalemler.map((k) => { const a = Math.round((Number(k.adet) || 0) * 100), b = Math.round((Number(k.birim_fiyat) || 0) * 100); const tt = Math.round((a * b) / 100); ara += tt; return tt / 100; });
+    const ind = Math.min(Math.max(0, Math.round((Number(indirim) || 0) * 100)), ara);
+    const kdv = Math.round(((ara - ind) * Math.round((Number(oran) || 0) * 100)) / 10000);
+    return { satirlar, ara_toplam: ara / 100, indirim: ind / 100, kdv_orani: Number(oran) || 0, kdv: kdv / 100, toplam: (ara - ind + kdv) / 100 };
+  }
+
+  function kalemSatiri(k = {}) {
+    const g = (ad, tip, deger, ek) => el('input', { name: ad, type: tip, value: deger ?? '', ...ek });
+    const li = el('li', { style: 'border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 10px' },
+      el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end' },
+        el('label', { class: 'alan', style: 'flex: 3 1 220px; min-width: 0' }, 'Hizmet / ürün', g('ad', 'text', k.ad, { maxlength: '200', required: true, placeholder: 'Ör. Aylık sosyal medya yönetimi' })),
+        el('label', { class: 'alan', style: 'flex: 1 1 90px; min-width: 0' }, 'Adet', g('adet', 'number', k.adet ?? 1, { min: '0.01', step: '0.01', inputmode: 'decimal' })),
+        el('label', { class: 'alan', style: 'flex: 1 1 130px; min-width: 0' }, 'Birim fiyat (TL)', g('birim_fiyat', 'number', k.birim_fiyat ?? '', { min: '0', step: '0.01', inputmode: 'decimal', placeholder: '0,00' })),
+        el('div', { style: 'flex: 1 1 120px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)' }, 'Tutar', el('span', { 'data-tutar': '', style: 'min-height: 42px; display: flex; align-items: center; font-weight: 600; font-variant-numeric: tabular-nums' }, tutar(0))),
+        el('button', { type: 'button', class: 'dugme kucuk', 'data-kaldir': '', onclick: () => { li.remove(); kalemDegisti(); } }, 'Kaldır')),
+      el('label', { class: 'alan' }, 'Açıklama (isteğe bağlı)', el('textarea', { name: 'aciklama', rows: '2', maxlength: '1000', style: 'resize: vertical', placeholder: 'Kapsam, süre, teslim edilecekler…' }, k.aciklama || '')));
+    return li;
+  }
+
+  const kalemleriOku = () => [...kalemKutu.children].map((li) => ({ ad: li.querySelector('[name=ad]').value.trim(), aciklama: li.querySelector('[name=aciklama]').value.trim(), adet: li.querySelector('[name=adet]').value, birim_fiyat: li.querySelector('[name=birim_fiyat]').value }));
+
+  function kalemDegisti() {
+    const kl = kalemleriOku();
+    const h = hesapla(kl, form.elements.indirim.value, form.elements.kdv_orani.value);
+    [...kalemKutu.children].forEach((li, i) => {
+      li.querySelector('[data-tutar]').textContent = tutar(h.satirlar[i]);
+      li.querySelector('[data-kaldir]').disabled = kalemKutu.children.length === 1;
+    });
+    $('[data-kalem-ekle]').disabled = kalemKutu.children.length >= 50;
+    const fazla = Math.round((Number(form.elements.indirim.value) || 0) * 100) > Math.round(h.ara_toplam * 100);
+    toplamKutu.replaceChildren(...toplamListesi(h).children);
+    if (fazla) toplamKutu.append(el('dd', { style: 'grid-column: 1 / -1; margin: 0; color: var(--err); font-size: 13px' }, 'İndirim ara toplamdan büyük olamaz.'));
+  }
+
+  async function musteriSecenekleri(secili) {
+    if (!musteriler) musteriler = (await api('musteriler')).musteriler;
+    const sec = form.elements.musteri_id;
+    $('[data-musteri-yok]').hidden = musteriler.length > 0;
+    sec.replaceChildren(el('option', { value: '' }, musteriler.length ? 'Müşteri seçin…' : 'CRM’de müşteri yok'),
+      ...musteriler.map((m) => el('option', { value: m.id, selected: m.id === secili }, musteriAdi(m) + (m.firma && m.ad ? ' · ' + m.ad : ''))));
+    sec.value = secili || '';
+  }
+
+  async function duzenle(t) {
+    duzenlenen = t || null; duzDurum.textContent = '';
+    try { await musteriSecenekleri(t ? t.musteri_id : prm.get('musteri') || ''); }
+    catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); return; }
+    $('[data-duz-baslik]').textContent = t ? 'Taslağı düzenle' : 'Yeni teklif';
+    $('[data-duz-no]').textContent = t ? t.no : 'Numara kaydedince verilir';
+    form.elements.baslik.value = t ? t.baslik : '';
+    const s30 = new Date(); s30.setDate(s30.getDate() + 30);
+    form.elements.gecerlilik.value = t ? t.gecerlilik || '' : yerelGun(s30);
+    const oran = String(t ? Number(t.kdv_orani) : 20);
+    const ks = form.elements.kdv_orani;
+    if (![...ks.options].some((o) => o.value === oran)) ks.append(el('option', { value: oran }, '%' + sayiYaz(oran)));
+    ks.value = oran;
+    form.elements.indirim.value = t && Number(t.indirim) ? t.indirim : '';
+    form.elements.notlar.value = t ? t.notlar || '' : '';
+    kalemKutu.replaceChildren(...(t && t.kalemler.length ? t.kalemler.map(kalemSatiri) : [kalemSatiri()]));
+    kalemDegisti();
+    detay.hidden = true; form.hidden = false;
+    form.scrollIntoView({ block: 'start' });
+    (t ? form.elements.baslik : form.elements.musteri_id).focus({ preventScroll: true });
+  }
+
+  form.addEventListener('input', kalemDegisti);
+  form.addEventListener('change', kalemDegisti);
+  $('[data-kalem-ekle]').addEventListener('click', () => { const li = kalemSatiri(); kalemKutu.append(li); kalemDegisti(); li.querySelector('[name=ad]').focus(); });
+  $('[data-vazgec]').addEventListener('click', () => { form.hidden = true; if (duzenlenen) ac(duzenlenen.id); duzenlenen = null; });
+  $('[data-yeni]').addEventListener('click', () => { seciliId = ''; adresYaz(); duzenle(null); });
+
+  form.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    duzDurum.textContent = '';
+    const kalemler = kalemleriOku();
+    if (!form.elements.musteri_id.value) { duzDurum.textContent = 'Müşteri seçin.'; form.elements.musteri_id.focus(); return; }
+    if (!form.elements.baslik.value.trim()) { duzDurum.textContent = 'Teklif başlığını yazın.'; form.elements.baslik.focus(); return; }
+    const eksik = kalemler.findIndex((k) => !k.ad);
+    if (eksik >= 0) { duzDurum.textContent = `${eksik + 1}. kalemin adını yazın.`; kalemKutu.children[eksik].querySelector('[name=ad]').focus(); return; }
+    const v = { musteri_id: form.elements.musteri_id.value, baslik: form.elements.baslik.value.trim(), gecerlilik: form.elements.gecerlilik.value, kdv_orani: form.elements.kdv_orani.value,
+      indirim: form.elements.indirim.value || 0, notlar: form.elements.notlar.value.trim(), kalemler: kalemler.map((k) => ({ ...k, adet: k.adet === '' ? 0 : Number(k.adet), birim_fiyat: k.birim_fiyat === '' ? 0 : Number(k.birim_fiyat) })) };
+    v.kdv_orani = Number(v.kdv_orani); v.indirim = Number(v.indirim);
+    const d = form.querySelector('[type=submit]'); d.disabled = true;
+    try {
+      const r = await api(duzenlenen ? 'teklifler/' + encodeURIComponent(duzenlenen.id) : 'teklifler', v);
+      form.hidden = true; duzenlenen = null; sekme = 'taslak';
+      await yukle();
+      await ac(r.id, r.no ? `Taslak ${r.no} kaydedildi.` : 'Taslak kaydedildi.');
+    } catch (h) { duzDurum.textContent = 'Kaydedilemedi: ' + h.message; }
+    finally { d.disabled = false; }
+  });
+
+  (async () => {
+    await yukle();
+    if (seciliId) { const t = tum.find((x) => x.id === seciliId); if (t && prm.get('sekme') === null) { sekme = t.durum; adresYaz(); ciz(); } await ac(seciliId); }
+    else if (prm.get('yeni') === '1') duzenle(null);
+  })();
+</script>
+</Yonetim>
