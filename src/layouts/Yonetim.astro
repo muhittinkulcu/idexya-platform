@@ -28,11 +28,12 @@ const I = {
 };
 // Menü ağacı. href'i olmayan modül veya alt sayfa henüz yapılmadı ("Yakında" görünür, tıklanmaz).
 const MENU = [
-  { grup: 'MERKEZ', ogeler: [
+  { grup: 'ÖZET', ad: 'Özet', ogeler: [
     { k: 'genel', ad: 'Genel bakış', href: '/yonetim/', sabit: true },
     { k: 'bildirim', ad: 'Bildirimler', href: '/yonetim/bildirimler/', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/yonetim/bildirimler/#onay' }, { ad: 'Sistem uyarıları', href: '/yonetim/bildirimler/#uyari' }] }
   ] },
-  { grup: 'SATIŞ VE MÜŞTERİ', ogeler: [
+  // Satış: talep gelir → müşteri olur → teklif verilir → işler planlanır
+  { grup: 'SATIŞ', ad: 'Satış', ogeler: [
     { k: 'talepler', ad: 'Talepler', href: '/yonetim/talepler/', i: 'talep', sayac: 'talep', altlar: [
       { ad: 'Yeni', href: '/yonetim/talepler/?sekme=yeni' }, { ad: 'CRM’e alınan', href: '/yonetim/talepler/?sekme=crm' },
       { ad: 'Spam', href: '/yonetim/talepler/?sekme=spam' }, { ad: 'Tümü', href: '/yonetim/talepler/?sekme=hepsi' }] },
@@ -41,40 +42,50 @@ const MENU = [
     { k: 'teklif', ad: 'Teklifler', href: '/yonetim/teklifler/', i: 'teklif', altlar: [
       { ad: 'Taslaklar', href: '/yonetim/teklifler/?sekme=taslak' }, { ad: 'Gönderilenler', href: '/yonetim/teklifler/?sekme=gonderildi' },
       { ad: 'Kabul edilenler', href: '/yonetim/teklifler/?sekme=kabul' }] },
+    { k: 'gorev', ad: 'Görevler ve takvim', href: '/yonetim/gorevler/', i: 'gorev' }
+  ] },
+  // Pazarlama ve iletişim: ziyaretçiyle ve abonelerle temas
+  { grup: 'PAZARLAMA VE İLETİŞİM', ad: 'Pazarlama ve iletişim', ogeler: [
     { k: 'asistan', ad: 'Asistan sohbetleri', href: '/yonetim/asistan/', i: 'asistan' },
-    { k: 'gorev', ad: 'Görevler ve takvim', href: '/yonetim/gorevler/', i: 'gorev' },
-    { k: 'eposta', ad: 'Bülten listesi', href: '/yonetim/bulten/', i: 'eposta' }
+    { k: 'eposta', ad: 'Bülten listesi', href: '/yonetim/bulten/', i: 'eposta' },
+    { k: 'instagram', ad: 'Instagram gönderileri', href: '/yonetim/instagram/', i: 'medya' }
   ] },
-  { grup: 'İÇERİK', ogeler: [
-    { k: 'icerikler', ad: 'İçerik yönetimi', href: '/yonetim/icerikler/', i: 'icerik', sayac: 'yorum', altlar: [
-      { ad: 'Yazılar ve kaynaklar', href: '/yonetim/icerikler/' }, { ad: 'Sayfalar', href: '/yonetim/site-icerik/?dosya=yasal' },
-      { ad: 'Hizmetler', href: '/yonetim/site-icerik/?dosya=hizmetler' }, { ad: 'Ürünler', href: '/yonetim/site-icerik/?dosya=urunler#urunler' },
-      { ad: 'Kategoriler', href: '/yonetim/site-icerik/?dosya=urunler#kategoriler' }, { ad: 'Paketler', href: '/yonetim/site-icerik/?dosya=paketler' },
-      { ad: 'Referanslar', href: '/yonetim/site-icerik/?dosya=referanslar' }] },
-    { k: 'instagram', ad: 'Instagram gönderileri', href: '/yonetim/instagram/', i: 'medya' },
-    { k: 'medya', ad: 'Medya kütüphanesi', href: '/yonetim/medya/', i: 'medya' },
-    { k: 'menuler', ad: 'Menüler ve SSS', href: '/yonetim/site-icerik/?dosya=site-menu', i: 'belge', altlar: [{ ad: 'Menüler', href: '/yonetim/site-icerik/?dosya=site-menu' }, { ad: 'Sık sorulan sorular', href: '/yonetim/site-icerik/?dosya=sss' }] }
+  // Web sitesi: sitede görünen her şey
+  { grup: 'WEB SİTESİ', ad: 'Web sitesi', ogeler: [
+    { k: 'site', ad: 'Site içeriği', href: '/yonetim/site-icerik/', i: 'icerik', altlar: [
+      { ad: 'Hizmetler', href: '/yonetim/site-icerik/?dosya=hizmetler' }, { ad: 'Paketler', href: '/yonetim/site-icerik/?dosya=paketler' },
+      { ad: 'Ürünler', href: '/yonetim/site-icerik/?dosya=urunler#urunler' }, { ad: 'Kategoriler', href: '/yonetim/site-icerik/?dosya=urunler#kategoriler' },
+      { ad: 'Referanslar', href: '/yonetim/site-icerik/?dosya=referanslar' }, { ad: 'Menüler', href: '/yonetim/site-icerik/?dosya=site-menu' },
+      { ad: 'Sık sorulan sorular', href: '/yonetim/site-icerik/?dosya=sss' }, { ad: 'Yasal sayfalar', href: '/yonetim/site-icerik/?dosya=yasal' }] },
+    { k: 'icerikler', ad: 'Yazılar ve kaynaklar', href: '/yonetim/icerikler/', i: 'belge', sayac: 'yorum' },
+    { k: 'medya', ad: 'Medya kütüphanesi', href: '/yonetim/medya/', i: 'medya' }
   ] },
-  { grup: 'ÜYELİK', ogeler: [
+  // Analiz: sitenin nasıl performans gösterdiği
+  { grup: 'ANALİZ', ad: 'Analiz', ogeler: [
+    { k: 'ziyaret', ad: 'Ziyaretçiler', href: '/yonetim/ziyaretciler/', i: 'ziyaret' },
+    { k: 'seo', ad: 'SEO ve GEO', href: '/yonetim/seo/', i: 'seo' },
+    { k: 'hiz', ad: 'Hız ve güvenlik', href: '/yonetim/hiz/', i: 'hiz' }
+  ] },
+  // Üyelik: kimin neye erişebildiği
+  { grup: 'ÜYELİK VE ERİŞİM', ad: 'Üyelik ve erişim', ogeler: [
     { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/yonetim/uyeler/', i: 'uye', sayac: 'uye' },
     { k: 'portal', ad: 'Müşteri alanı', href: '/yonetim/portal/', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/yonetim/portal/?sekme=erisim' }, { ad: 'Davetler', href: '/yonetim/portal/?sekme=davet' }] }
   ] },
-  { grup: 'SİTE', ogeler: [
-    { k: 'seo', ad: 'SEO ve GEO', href: '/yonetim/seo/', i: 'seo' },
-    { k: 'ziyaret', ad: 'Ziyaretçiler', href: '/yonetim/ziyaretciler/', i: 'ziyaret' },
-    { k: 'hiz', ad: 'Hız ve güvenlik', href: '/yonetim/hiz/', i: 'hiz' }
-  ] },
-  { grup: 'FİNANS VE BAĞLANTILAR', ogeler: [
-    { k: 'belge', ad: 'Belgeler', href: '/yonetim/belgeler/', i: 'belge' },
+  { grup: 'FİNANS', ad: 'Finans', ogeler: [
     { k: 'muhasebe', ad: 'Muhasebe', href: '/yonetim/muhasebe/', i: 'muhasebe' },
-    { k: 'entegre', ad: 'Entegrasyonlar', href: '/yonetim/entegrasyonlar/', i: 'entegre' },
-    { k: 'esitle', ad: 'Veri eşitleme', href: '/yonetim/veri-esitleme/', i: 'esitle' }
+    { k: 'belge', ad: 'Belgeler', href: '/yonetim/belgeler/', i: 'belge' }
   ] },
-  { grup: 'SİSTEM', ogeler: [
+  // Sistem: panelin kendisi ve bağlantıları
+  { grup: 'SİSTEM', ad: 'Sistem', ogeler: [
     { k: 'ayar', ad: 'Ayarlar', href: '/yonetim/ayarlar/', i: 'ayar' },
+    { k: 'entegre', ad: 'Entegrasyonlar', href: '/yonetim/entegrasyonlar/', i: 'entegre' },
+    { k: 'esitle', ad: 'Veri eşitleme', href: '/yonetim/veri-esitleme/', i: 'esitle' },
     { k: 'gecmis', ad: 'İşlem geçmişi', href: '/yonetim/gecmis/', i: 'gecmis' }
   ] }
 ];
+// Sayfa yolu (üst çubuk) her zaman menüdeki grup adından gelir; sayfaların kendi yol metni yalnız grubu olmayan sayfalarda kullanılır.
+const grupAdi = (MENU.find((g) => g.ogeler.some((o) => o.k === aktif)) || {}).ad;
+const sayfaYolu = grupAdi && grupAdi !== 'Özet' ? grupAdi : yol;
 const svg = (k) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k] || ''}</svg>`;
 ---
 <!doctype html>
@@ -105,7 +116,7 @@ a{color:var(--acc)}a:hover{color:var(--tintx)}
 .yan.sabit{position:sticky;top:0;height:100vh;align-self:flex-start}
 .yan.sabit .yan-govde{flex:1 1 0;min-height:0;overflow-y:auto;scrollbar-width:thin;margin:0 -12px;padding:0 12px}
 .yan.dar{flex-basis:76px;width:76px}
-.yan.dar .etiket,.yan.dar .ok,.yan.dar .ok-yer,.yan.dar .rozet,.yan.dar .alt,.yan.dar .mg>.grup-ad,.yan.dar [data-ara-kutu],.yan.dar [data-favori-blok]{display:none!important}
+.yan.dar .etiket,.yan.dar .ok,.yan.dar .ok-yer,.yan.dar .rozet,.yan.dar .alt,.yan.dar .mg>.grup-ad,.yan.dar [data-ara-kutu],.yan.dar [data-tumu],.yan.dar [data-favori-blok]{display:none!important}
 .yan.dar .mo{justify-content:center}
 .yan.gizli{display:none}
 .yan-govde{display:flex;flex-direction:column;gap:16px;flex:1}
@@ -132,6 +143,10 @@ a.ucan-bas:hover{background:var(--card2);color:var(--head)}
 .ikon[aria-pressed=true]{background:var(--tint);color:var(--tintx);border-color:var(--btnline)}
 .mg{display:flex;flex-direction:column;gap:1px}
 .mg>.grup-ad{padding:0 12px 6px;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--tx2)}
+.ara-satir{display:flex;gap:6px;align-items:center}.ara-satir .ara-kutu{flex:1;min-width:0}
+.tum-ac{flex:none;width:34px;height:34px}
+.tum-ac[aria-pressed=true] svg{transform:rotate(180deg)}
+.yan.dar .ara-satir{display:none}
 .mo{width:100%;min-height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;border:0;border-radius:12px;background:transparent;color:var(--tx);font:inherit;font-size:14px;text-align:left;text-decoration:none;cursor:pointer;box-sizing:border-box}
 .mo:hover{background:var(--card2);color:var(--tx)}
 .mo[aria-current=page]{background:var(--tint);color:var(--tintx);font-weight:600}
@@ -236,10 +251,13 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
     <button type="button" class="dugme kucuk mobil" aria-expanded="false" aria-controls="yan-govde" data-menu-ac>Menü</button>
   </div>
   <div class="yan-govde" id="yan-govde">
+    <div class="ara-satir">
     <label class="ara-kutu" data-ara-kutu>
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
       <input type="search" placeholder="Modül ara" aria-label="Menüde modül ara" data-menu-ara>
     </label>
+    <button type="button" class="ikon tum-ac" data-tumu aria-pressed="false" aria-label="Tüm alt menüleri aç" title="Tümünü aç / kapat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"></path></svg></button>
+    </div>
     <div class="mg" data-favori-blok hidden>
       <span class="grup-ad">SIK KULLANILANLAR</span>
       <div data-favoriler style="display: flex; flex-direction: column; gap: 1px"></div>
@@ -292,7 +310,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
       <button type="button" class="ikon" data-yan-ac hidden aria-label="Yan menüyü aç"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
       <nav aria-label="Sayfa yolu" style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--tx2); min-width: 0">
         <span class="masa" data-u="tarih" data-tarih></span>
-        {yol && <span class="masa">{yol} ›</span>}
+        {sayfaYolu && <span class="masa">{sayfaYolu} ›</span>}
         <b class="baslik-font" style="font-size: 17px; font-weight: 800; color: var(--head)" data-baslik>{baslik}</b>
       </nav>
       <div class="panel-ara" data-u="arama">
