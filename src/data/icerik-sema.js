@@ -100,6 +100,7 @@ export const DOSYALAR = {
     ad: 'Yasal sayfalar', yol: 'src/data/yasal.json',
     aciklama: 'KVKK aydınlatma metni, çerez politikası ve gizlilik politikası. Değişiklikten önce hukuki doğruluğunu kontrol edin.',
     sema: { tur: 'nesne', alanlar: {
+      guncelleme: m('Son güncelleme tarihi (ör. 23 Ekim 2026)', 40, { zorunlu: true }),
       ...Object.fromEntries([['kvkk', 'KVKK aydınlatma metni'], ['cerez', 'Çerez politikası'], ['gizlilik', 'Gizlilik politikası']].map(([k, ad]) => [k, { tur: 'nesne', etiket: ad, alanlar: {
         ad: m('Sayfa adı', 80, { zorunlu: true }),
         bolumler: { tur: 'liste', etiket: 'Bölümler', oge: 'bölüm', enCok: 30, ogeSema: { tur: 'nesne', baslikAlan: 'baslik', alanlar: { baslik: m('Bölüm başlığı', 120, { zorunlu: true }), metin: ml('Paragraflar', 'paragraf', 3000, 20) } } }

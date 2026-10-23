@@ -42,7 +42,7 @@ const sekmeler = __v.sekmeler;
 <div style="max-width: 1100px; margin: 0 auto; padding: 36px 24px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px">
 <nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: var(--head); font-weight: 600">{sec.ad}</span></nav>
 <h1 style="margin: 0; font-size: 46px; line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">{sec.ad}</h1>
-<span style="color: var(--tx2)">Son güncelleme: [tarih] · Sürüm 1.0</span>
+<span style="color: var(--tx2)">Son güncelleme: {yasal.guncelleme} · Sürüm 1.0</span>
 <div role="status" style="padding: 12px 16px; border-radius: 12px; background: #FCEFD3; color: #7A4E00; font-size: 14px">Taslak metindir. Yayından önce hukuk danışmanı tarafından kontrol edilmelidir.</div>
 <div role="navigation" aria-label="Yasal metinler" style="display: flex; gap: 8px; flex-wrap: wrap">{(sekmeler || []).map((t) => (<Fragment><a href={({'KVKK aydınlatma metni': '/tr/sayfa/kvkk-aydinlatma-metni', 'Çerez politikası': '/tr/sayfa/cerez-politikasi', 'Gizlilik politikası': '/tr/sayfa/gizlilik-politikasi'})[t.ad]} aria-current={t.secili ? 'page' : undefined} style={t.stil + '; display: inline-flex; align-items: center; text-decoration: none'}>{t.ad}</a></Fragment>))}</div>
 </div>

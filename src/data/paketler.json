@@ -195,7 +195,7 @@
         "kimIcin": "E-ticarete başlangıç paketi.",
         "maddeler": [
           "Tema kurulumu ve marka uyarlaması",
-          "[X] ürün yükleme",
+          "Ürün yükleme (adet ihtiyaca göre belirlenir)",
           "Ödeme ve kargo ayarları",
           "Temel SEO ayarları"
         ]
@@ -206,7 +206,7 @@
         "kimIcin": "Büyüyen mağazalar için.",
         "maddeler": [
           "Grow kapsamı",
-          "[X] ürün yükleme",
+          "Ürün yükleme (adet ihtiyaca göre belirlenir)",
           "Banner tasarımları",
           "E-posta otomasyonları",
           "Pazaryeri entegrasyonu"
@@ -217,7 +217,7 @@
         "kimIcin": "E-ticaret büyüme paketi.",
         "maddeler": [
           "Scale kapsamı",
-          "[X] ürün yükleme",
+          "Ürün yükleme (adet ihtiyaca göre belirlenir)",
           "Eski siteden SEO taşıma",
           "Gelişmiş ölçüm kurulumu"
         ]
