@@ -18,6 +18,7 @@ import { denetimCalistir, yonetimDenetimApi } from './denetim.js';
 import { olcumAl, yonetimOlcumApi } from './olcum.js';
 import { yonetimGorevApi } from './gorev.js';
 import { yonetimBelgeApi } from './belge.js';
+import { uyeMusteriApi, yonetimMusteriAlaniApi } from './musteri-alani.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -104,15 +105,16 @@ async function yonetimApi(istek, env, yol, kim) {
   }
 
   if (yol === 'ozet' && yontem === 'GET') {
-    const [t, m, a, k, u, yo] = await db.batch([
+    const [t, m, a, k, u, yo, de] = await db.batch([
       db.prepare("SELECT durum, COUNT(*) AS n FROM talepler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler"),
       db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler GROUP BY asama"),
       db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12"),
       db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum"),
-      db.prepare("SELECT COUNT(*) AS n FROM yorumlar WHERE durum = 'bekliyor'")
+      db.prepare("SELECT COUNT(*) AS n FROM yorumlar WHERE durum = 'bekliyor'"),
+      db.prepare("SELECT COUNT(*) AS n FROM destek_talepleri WHERE durum = 'acik'")
     ]);
-    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n });
+    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n, bekleyenDestek: de.results[0].n });
   }
   if (yol === 'grafik' && yontem === 'GET') {
     // Genel bakış grafikleri; yalnız okuma. Gün ve saatler İstanbul saatine göre (UTC+3, Türkiye yaz saati uygulamıyor). Spam sayılmaz.
@@ -234,7 +236,7 @@ async function yonetimApi(istek, env, yol, kim) {
     return json({ ok: true });
   }
   const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, yontem, yol, govde, kim)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -258,12 +260,14 @@ export default {
       if (yol === '/api/olcum') { await semaKur(env.DB); return await olcumAl(istek, env); }
       if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
       if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
-      if (yol.startsWith('/uye/')) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
+      if (/^\/uye\/uye-icerik\/?$/.test(yol)) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
+      if (yol.startsWith('/uye/')) return env.ASSETS.fetch(istek);
       const icerikEslesme = yol.match(/^\/icerik\/([a-z0-9-]{1,80})\/?$/);
       if (icerikEslesme) { await semaKur(env.DB); return await icerikSayfasi(istek, env, icerikEslesme[1]); }
       if (yol.startsWith('/api/uye/')) {
         await semaKur(env.DB);
-        return await uyeApi(istek, env, yol.slice('/api/uye/'.length).replace(/\/$/, ''));
+        const uyeYol = yol.slice('/api/uye/'.length).replace(/\/$/, '');
+        return (await uyeMusteriApi(istek, env, uyeYol)) || (await uyeApi(istek, env, uyeYol));
       }
       if (yol.startsWith('/api/yonetim/') || yol === '/yonetim' || yol.startsWith('/yonetim/')) {
         const kim = await yonetici(istek, env);

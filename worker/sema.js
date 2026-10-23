@@ -125,5 +125,16 @@ export const SEMA = [
     aciklama TEXT NOT NULL, kategori TEXT, musteri_id TEXT, belge_no TEXT, durum TEXT NOT NULL DEFAULT 'bekliyor',
     vade TEXT, odeme_tarihi TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS muhasebe_tarih ON muhasebe (tarih)`,
-  `CREATE INDEX IF NOT EXISTS muhasebe_vade ON muhasebe (durum, vade)`
+  `CREATE INDEX IF NOT EXISTS muhasebe_vade ON muhasebe (durum, vade)`,
+  // Müşteri alanı (worker/musteri-alani.js): yöneticinin üyeyle paylaştığı belgeler ve üyelerin destek talepleri.
+  `CREATE TABLE IF NOT EXISTS belge_paylasim (belge_id TEXT PRIMARY KEY, paylasan TEXT NOT NULL, zaman TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS destek_talepleri (
+    id TEXT PRIMARY KEY, no TEXT NOT NULL UNIQUE, uye_id TEXT NOT NULL, musteri_id TEXT, konu TEXT NOT NULL, durum TEXT NOT NULL DEFAULT 'acik',
+    olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, son_yazan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS destek_uye ON destek_talepleri (uye_id, guncelleme)`,
+  `CREATE INDEX IF NOT EXISTS destek_durum ON destek_talepleri (durum, guncelleme)`,
+  `CREATE TABLE IF NOT EXISTS destek_mesajlari (id TEXT PRIMARY KEY, talep_id TEXT NOT NULL, yazan TEXT NOT NULL, yazan_id TEXT NOT NULL, ad TEXT, metin TEXT NOT NULL, zaman TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS destek_mesaj_talep ON destek_mesajlari (talep_id, zaman)`,
+  `CREATE INDEX IF NOT EXISTS destek_mesaj_yazan ON destek_mesajlari (yazan_id, zaman)`,
+  `CREATE TABLE IF NOT EXISTS destek_sayac (k INTEGER PRIMARY KEY, son INTEGER NOT NULL)`
 ];

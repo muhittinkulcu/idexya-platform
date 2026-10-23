@@ -1,0 +1,119 @@
+---
+import UyeCerceve from '../../components/UyeCerceve.astro';
+---
+<UyeCerceve baslik="Teklif ve belgelerim" aciklama="Size gönderilen teklifler ve sizinle paylaşılan belgeler." genis>
+<a href="/hesabim" style="align-self: flex-start; font-weight: 600">← Hesabım</a>
+<div data-durum class="uye-kart" role="status">Yükleniyor…</div>
+<section data-teklif-bolum hidden aria-labelledby="tb" style="display: flex; flex-direction: column; gap: 12px">
+<h2 id="tb" style="margin: 0; font-size: 22px; color: var(--head)">Teklifler</h2>
+<div data-teklifler style="display: flex; flex-direction: column; gap: 12px"></div>
+</section>
+<section data-belge-bolum hidden aria-labelledby="bb" style="display: flex; flex-direction: column; gap: 12px">
+<h2 id="bb" style="margin: 0; font-size: 22px; color: var(--head)">Belgeler</h2>
+<div data-belgeler class="uye-kart" style="padding: 8px clamp(14px, 3vw, 24px); gap: 0"></div>
+</section>
+<script>
+  import { uyeIstek } from '../../scripts/uye-sayfa.js';
+  const $ = (s, k = document) => k.querySelector(s);
+  const durum = $('[data-durum]');
+  const para = (v) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v || 0) + ' TL';
+  const gun = (v) => (v ? new Date(v.length === 10 ? v + 'T12:00:00' : v).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }) : '');
+  const RENK = { gonderildi: ['var(--tint)', 'var(--tintx)'], kabul: ['var(--okb)', 'var(--ok)'], red: ['var(--errb)', 'var(--err)'] };
+  function el(ad, ozellik = {}, ...cocuk) {
+    const e = document.createElement(ad);
+    for (const [k, v] of Object.entries(ozellik)) { if (k === 'style') e.style.cssText = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (v !== false && v != null) e.setAttribute(k, v === true ? '' : v); }
+    e.append(...cocuk.flat().filter((c) => c != null && c !== false));
+    return e;
+  }
+  const cip = (d, ad) => el('span', { class: 'bm-cip', style: `background: ${(RENK[d] || RENK.gonderildi)[0]}; color: ${(RENK[d] || RENK.gonderildi)[1]}` }, ad);
+  let veri;
+
+  async function detay(t, kap, dugme) {
+    if (!kap.hidden) { kap.hidden = true; dugme.textContent = 'Ayrıntıları gör'; dugme.setAttribute('aria-expanded', 'false'); return; }
+    dugme.disabled = true;
+    try {
+      const { teklif: d, yetki, bugun } = await uyeIstek('belgelerim/teklif/' + encodeURIComponent(t.id));
+      const suresiDoldu = d.gecerlilik && d.gecerlilik < bugun;
+      const karar = el('p', { class: 'uye-durum', role: 'status', hidden: true });
+      const kararVer = async (ne, b) => {
+        if (!confirm(ne === 'kabul' ? `${d.no} numaralı teklifi kabul ediyorsunuz. Onaylıyor musunuz?` : `${d.no} numaralı teklifi reddediyorsunuz. Onaylıyor musunuz?`)) return;
+        b.disabled = true;
+        try { await uyeIstek(`belgelerim/teklif/${encodeURIComponent(d.id)}/${ne}`, {}); await yukle(); }
+        catch (h) { karar.hidden = false; karar.textContent = h.message; karar.style.cssText = 'background: var(--errb); color: var(--err)'; b.disabled = false; }
+      };
+      kap.replaceChildren(...[
+        el('div', { class: 'bm-tablo-kap' }, el('table', { class: 'bm-tablo' },
+          el('thead', {}, el('tr', {}, ['Kalem', 'Adet', 'Birim fiyat', 'Tutar'].map((x, i) => el('th', { scope: 'col', style: i ? 'text-align: right' : '' }, x)))),
+          el('tbody', {}, d.kalemler.map((k) => el('tr', {},
+            el('td', {}, el('strong', {}, k.ad), k.aciklama ? el('div', { style: 'color: var(--tx2); font-size: 14px; white-space: pre-wrap' }, k.aciklama) : null),
+            el('td', { style: 'text-align: right' }, String(k.adet).replace('.', ',')), el('td', { style: 'text-align: right; white-space: nowrap' }, para(k.birim_fiyat)), el('td', { style: 'text-align: right; white-space: nowrap' }, para(k.tutar))))))),
+        el('dl', { class: 'bm-toplam' },
+          el('dt', {}, 'Ara toplam'), el('dd', {}, para(d.ara_toplam)),
+          d.indirim ? [el('dt', {}, 'İndirim'), el('dd', {}, '−' + para(d.indirim))] : null,
+          el('dt', {}, `KDV (%${String(d.kdv_orani).replace('.', ',')})`), el('dd', {}, para(d.kdv)),
+          el('dt', { style: 'font-weight: 700; color: var(--head)' }, 'Genel toplam'), el('dd', { style: 'font-weight: 700; color: var(--head)' }, para(d.toplam))),
+        d.notlar ? el('p', { style: 'margin: 0; white-space: pre-wrap; color: var(--tx2)' }, d.notlar) : null,
+        d.durum === 'gonderildi' && yetki === 'kullan' ? el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap; align-items: center' },
+          suresiDoldu ? el('span', { style: 'color: var(--err)' }, 'Geçerlilik süresi doldu; güncel teklif için bizimle iletişime geçin.')
+            : el('button', { type: 'button', class: 'uye-dugme', onclick: (o) => kararVer('kabul', o.currentTarget) }, 'Teklifi kabul et'),
+          el('button', { type: 'button', class: 'uye-dugme ikincil', onclick: (o) => kararVer('red', o.currentTarget) }, 'Reddet')) : null,
+        d.durum === 'gonderildi' && yetki !== 'kullan' ? el('p', { style: 'margin: 0; color: var(--tx2); font-size: 14px' }, 'Bu bölümde görüntüleme yetkiniz var; teklife yanıt vermek için bizimle iletişime geçin.') : null,
+        karar].filter(Boolean));
+      kap.hidden = false; dugme.textContent = 'Ayrıntıları gizle'; dugme.setAttribute('aria-expanded', 'true');
+    } catch (h) { kap.hidden = false; kap.replaceChildren(el('p', { style: 'margin: 0; color: var(--err)' }, 'Teklif açılamadı: ' + h.message)); }
+    dugme.disabled = false;
+  }
+
+  function ciz() {
+    const { teklifler, belgeler, durumlar, belgeTurleri, bugun } = veri;
+    $('[data-teklif-bolum]').hidden = false; $('[data-belge-bolum]').hidden = false;
+    $('[data-teklifler]').replaceChildren(...(teklifler.length ? teklifler.map((t) => {
+      const kap = el('div', { class: 'bm-detay', hidden: true, id: 'td-' + t.id });
+      const dugme = el('button', { type: 'button', class: 'uye-dugme ikincil', style: 'min-height: 44px; font-size: 15px', 'aria-expanded': 'false', 'aria-controls': 'td-' + t.id }, 'Ayrıntıları gör');
+      dugme.addEventListener('click', () => detay(t, kap, dugme));
+      const bekliyor = t.durum === 'gonderildi' && !(t.gecerlilik && t.gecerlilik < bugun);
+      return el('article', { class: 'uye-kart', style: 'gap: 14px; box-shadow: none' + (bekliyor ? '; border-color: var(--brand)' : '') },
+        el('div', { style: 'display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start' },
+          el('div', { style: 'display: flex; flex-direction: column; gap: 4px; min-width: 0' },
+            el('span', { style: 'font-size: 13px; color: var(--tx2)' }, t.no + (t.gonderim_zamani ? ' · ' + gun(t.gonderim_zamani) : '')),
+            el('strong', { style: 'font-size: 18px; color: var(--head); overflow-wrap: anywhere' }, t.baslik),
+            el('span', { style: 'color: var(--tx2); font-size: 14px' }, t.durum === 'gonderildi' ? (t.gecerlilik ? (t.gecerlilik < bugun ? 'Geçerlilik süresi doldu (' + gun(t.gecerlilik) + ')' : 'Geçerlilik: ' + gun(t.gecerlilik)) : 'Yanıtınızı bekliyor') : 'Karar: ' + gun(t.karar_zamani))),
+          el('div', { class: 'bm-sag' }, cip(t.durum, durumlar[t.durum] || t.durum), el('strong', { style: 'font-size: 20px; color: var(--head); white-space: nowrap' }, para(t.toplam)), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'KDV dahil'))),
+        dugme, kap);
+    }) : [el('p', { class: 'uye-kart', style: 'margin: 0; color: var(--tx2); box-shadow: none' }, 'Size gönderilmiş bir teklif henüz yok.')]));
+    $('[data-belgeler]').replaceChildren(...(belgeler.length ? belgeler.map((b) => el('a', { class: 'bm-belge', href: b.baglanti, target: '_blank', rel: 'noopener noreferrer' },
+      el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' },
+        el('strong', { style: 'color: var(--head); overflow-wrap: anywhere' }, b.ad + ' ↗'),
+        el('span', { style: 'color: var(--tx2); font-size: 14px' }, [belgeTurleri[b.tur] || b.tur, gun(b.tarih)].join(' · ')),
+        b.aciklama ? el('span', { style: 'color: var(--tx2); font-size: 14px; white-space: pre-wrap' }, b.aciklama) : null),
+      el('span', { class: 'gizli-metin' }, ' (yeni sekmede açılır)'))) : [el('p', { style: 'margin: 14px 0; color: var(--tx2)' }, 'Sizinle paylaşılmış bir belge henüz yok.')]));
+  }
+
+  async function yukle() {
+    try { veri = await uyeIstek('belgelerim'); }
+    catch (h) {
+      if (h.durum === 401) { location.replace('/giris?sonra=' + encodeURIComponent(location.pathname)); return; }
+      durum.textContent = h.message; return;
+    }
+    if (!veri.bagli) { durum.textContent = 'Üyeliğiniz henüz müşteri kaydınıza bağlanmadı. Bağlantı yapıldığında teklif ve belgeleriniz burada görünecek.'; return; }
+    durum.hidden = true; ciz();
+  }
+  yukle();
+</script>
+<style is:global>
+.bm-sag{display:flex;flex-direction:column;gap:6px;align-items:flex-end;text-align:right}
+@media (max-width:560px){.bm-sag{align-items:flex-start;text-align:left;width:100%}}
+.bm-cip{padding:4px 12px;border-radius:999px;font-size:13px;font-weight:600;white-space:nowrap}
+.bm-detay{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:14px}
+.bm-tablo-kap{overflow-x:auto}
+.bm-tablo{width:100%;min-width:520px;border-collapse:collapse;font-size:15px}
+.bm-tablo th{font-size:13px;color:var(--tx2);font-weight:600;text-align:left;padding:8px 10px}
+.bm-tablo td{border-top:1px solid var(--line);padding:10px;vertical-align:top}
+.bm-toplam{margin:0 0 0 auto;display:grid;grid-template-columns:auto auto;gap:6px 24px;font-size:15px}
+.bm-toplam dt{color:var(--tx2)}.bm-toplam dd{margin:0;text-align:right;white-space:nowrap}
+.bm-belge{display:flex;justify-content:space-between;gap:12px;padding:14px 0;text-decoration:none;color:inherit;border-top:1px solid var(--line)}
+.bm-belge:first-child{border-top:0}
+.bm-belge:hover strong{color:var(--acc)!important}
+.gizli-metin{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</UyeCerceve>
