@@ -80,3 +80,27 @@ if '<Pazaryeri />' not in s:
     s = s.replace("import HizmetAlanlari from '../components/HizmetAlanlari.astro';", "import HizmetAlanlari from '../components/HizmetAlanlari.astro';" + ithal, 1)
     open(p, 'w', encoding='utf-8').write(s)
 print('ana sayfa ek bölümleri uygulandı')
+
+# IDOS tanıtım sayfası (Muhittin, 23 Eki 2026): etkileşimli demo (src/components/IdosDemo.astro), hero'da demo düğmesi,
+# "Neler var" kartları tıklanınca demonun ilgili modülünü açar.
+p = 'src/pages/tr/idos.astro'
+s = open(p, encoding='utf-8').read()
+if '<IdosDemo />' not in s:
+    def degistir(eski, yeni):
+        global s
+        assert s.count(eski) == 1, eski[:70]
+        s = s.replace(eski, yeni, 1)
+    degistir("import Site from '../../layouts/Site.astro';", "import Site from '../../layouts/Site.astro';\nimport IdosDemo from '../../components/IdosDemo.astro';")
+    tanitim = '<a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Tanıtım iste</a>'
+    degistir(tanitim, '<a href="#demo" style="min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Canlı demoyu deneyin <span aria-hidden="true">↓</span></a>\n'
+              + tanitim.replace('background: #F07A23; color: #1A1206', 'border: 1px solid rgba(255,255,255,.35); color: #FFFFFF'))
+    neler = '<section style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">\n<div style="display: flex; flex-direction: column; gap: 14px; max-width: 700px">'
+    degistir(neler, '<IdosDemo />\n\n' + neler)
+    degistir('<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez.</figcaption>',
+             '<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez. <a href="#demo" style="color: #FFB58A; font-weight: 600">Etkileşimli demoyu açın ↓</a></figcaption>')
+    degistir('<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px">',
+             "<a href=\"#demo\" class=\"idos-oz\" data-demo-git={({ '01': 'genel', '02': 'kontrol', '03': 'oneriler', '04': 'kayit', '05': 'raporlar', '06': 'portal' })[o.no]} style=\"flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit\">")
+    degistir('<p style="margin: 0; color: var(--tx2); font-size: 15px">{o.aciklama}</p>\n</article>',
+             '<p style="margin: 0; color: var(--tx2); font-size: 15px">{o.aciklama}</p>\n<span class="idos-oz-git">Demoda görün →</span>\n</a>')
+    open(p, 'w', encoding='utf-8').write(s)
+print('IDOS demo uygulandı')

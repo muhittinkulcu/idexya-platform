@@ -1,0 +1,562 @@
+---
+// IDOS tanıtım sayfası: tarayıcıda çalışan etkileşimli demo (Muhittin, 23 Eki 2026).
+// Tüm müşteri adları ve rakamlar uydurmadır ("Örnek ..."); gerçek müşteri verisi içermez, hiçbir hesaba bağlanmaz, hiçbir yere veri göndermez.
+const MODULLER = [
+  { k: 'genel', ad: 'Genel bakış', i: '<rect x="3" y="3" width="7" height="7" rx="1.5"></rect><rect x="14" y="3" width="7" height="7" rx="1.5"></rect><rect x="3" y="14" width="7" height="7" rx="1.5"></rect><rect x="14" y="14" width="7" height="7" rx="1.5"></rect>' },
+  { k: 'kontrol', ad: 'Günlük kontrol', i: '<path d="M12 3l9 16H3z"></path><path d="M12 10v4M12 17v.5"></path>', sayac: 'kontrol' },
+  { k: 'oneriler', ad: 'Öneriler', i: '<path d="M12 3l2.6 5.6L20 9.5l-4 4 1 5.5-5-2.7-5 2.7 1-5.5-4-4 5.4-.9z"></path>', sayac: 'oneri' },
+  { k: 'kayit', ad: 'Değişiklik kaydı', i: '<path d="M4 5h16M4 12h16M4 19h10"></path>' },
+  { k: 'raporlar', ad: 'Raporlar', i: '<path d="M7 3h7l5 5v13H7z"></path><path d="M14 3v5h5M10 13h6M10 17h6"></path>' },
+  { k: 'hesaplar', ad: 'Bağlı hesaplar', i: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>' },
+  { k: 'portal', ad: 'Müşteri portalı', i: '<circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path>', yakinda: true }
+];
+const svg = (y: string, b = 18) => `<svg width="${b}" height="${b}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${y}</svg>`;
+---
+<section id="demo" class="idd-bolum" aria-labelledby="idd-baslik">
+  <div class="idd-ic">
+    <div class="idd-ust">
+      <div>
+        <div class="idd-etiket"><span aria-hidden="true"></span>CANLI DEMO</div>
+        <h2 id="idd-baslik">IDOS’u şimdi deneyin</h2>
+        <p>Modüllere tıklayın, uyarıları inceleyin, önerileri onaylayın ve raporu kendiniz oluşturun. Demodaki markalar ve rakamlar örnektir; gerçek müşteri verisi içermez.</p>
+      </div>
+      <button type="button" class="idd-tur-dugme" data-tur-baslat>{svg('<path d="M8 5v14l11-7z"></path>')} Rehberli turu başlat</button>
+    </div>
+
+    <div class="idd" data-idd>
+      <aside class="idd-yan" aria-label="IDOS modülleri">
+        <div class="idd-logo"><b>IDOS</b><span>Demo</span></div>
+        <nav role="tablist" aria-label="Modüller" aria-orientation="vertical">
+          {MODULLER.map((m, n) => (
+            <button type="button" role="tab" id={`idd-s-${m.k}`} aria-controls={`idd-p-${m.k}`} aria-selected={n === 0 ? 'true' : 'false'} tabindex={n === 0 ? '0' : '-1'} data-modul={m.k}>
+              <span set:html={svg(m.i)}></span><span class="idd-yan-ad">{m.ad}</span>
+              {m.sayac && <b class="idd-rozet" data-sayac={m.sayac}></b>}
+              {m.yakinda && <small>Yakında</small>}
+            </button>
+          ))}
+        </nav>
+      </aside>
+
+      <div class="idd-govde">
+        <header class="idd-cubuk">
+          <label class="idd-secici">
+            <span class="idd-sr">Müşteri</span>
+            <select data-musteri>
+              <option value="hepsi">Tüm müşteriler</option>
+              <option value="magaza">Örnek Mağaza · e-ticaret</option>
+              <option value="klinik">Örnek Klinik · sağlık</option>
+              <option value="mobilya">Örnek Mobilya · ev ve yapı</option>
+            </select>
+          </label>
+          <div class="idd-donem" role="group" aria-label="Dönem">
+            <button type="button" data-donem="7">7 gün</button><button type="button" data-donem="30" aria-pressed="true">30 gün</button><button type="button" data-donem="90">90 gün</button>
+          </div>
+          <span class="idd-tazelik"><i aria-hidden="true"></i>Veriler güncel · örnek</span>
+        </header>
+
+        <!-- Genel bakış -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-genel" aria-labelledby="idd-s-genel" data-panel="genel">
+          <div class="idd-kpi" data-kpi></div>
+          <div class="idd-kart idd-grafik">
+            <div class="idd-kart-bas">
+              <strong>Gün gün</strong>
+              <div class="idd-metrik" role="group" aria-label="Gösterilen metrik" data-metrikler></div>
+            </div>
+            <div data-grafik class="idd-cizim"></div>
+            <p class="idd-ipucu" data-ipucu aria-live="polite">Çizginin üzerine gelin.</p>
+          </div>
+          <div class="idd-iki">
+            <div class="idd-kart"><div class="idd-kart-bas"><strong>Kanal dağılımı</strong><small>Harcama payı</small></div><div data-kanal></div></div>
+            <div class="idd-kart"><div class="idd-kart-bas"><strong>Bugün dikkat</strong><button type="button" class="idd-baglanti" data-git="kontrol">Tümü →</button></div><ul class="idd-mini" data-mini></ul></div>
+          </div>
+        </section>
+
+        <!-- Günlük kontrol -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-kontrol" aria-labelledby="idd-s-kontrol" data-panel="kontrol" hidden>
+          <div class="idd-kart-bas"><strong>Her sabah: ne yolunda değil, kimi etkiliyor, ne yapılmalı</strong></div>
+          <div class="idd-suzgec" role="group" aria-label="Önem süzgeci" data-onem>
+            <button type="button" data-o="hepsi" aria-pressed="true">Tümü</button><button type="button" data-o="kritik">Kritik</button><button type="button" data-o="uyari">Uyarı</button><button type="button" data-o="bilgi">Bilgi</button>
+          </div>
+          <ul class="idd-liste" data-uyarilar></ul>
+        </section>
+
+        <!-- Öneriler -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-oneriler" aria-labelledby="idd-s-oneriler" data-panel="oneriler" hidden>
+          <div class="idd-kart-bas"><strong>Yapay zekâ önerir, uzman inceler, siz onaylarsınız</strong><small>Onaysız hiçbir değişiklik hesaba yazılmaz</small></div>
+          <ul class="idd-liste" data-oneriler></ul>
+        </section>
+
+        <!-- Değişiklik kaydı -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-kayit" aria-labelledby="idd-s-kayit" data-panel="kayit" hidden>
+          <div class="idd-kart-bas"><strong>Kim, neyi, ne zaman onayladı</strong><small>Her değişiklik geri izlenebilir</small></div>
+          <ol class="idd-zaman" data-kayit></ol>
+        </section>
+
+        <!-- Raporlar -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-raporlar" aria-labelledby="idd-s-raporlar" data-panel="raporlar" hidden>
+          <div class="idd-rapor">
+            <form class="idd-kart idd-rapor-ayar" data-rapor-form>
+              <strong>Rapor oluştur</strong>
+              <label>Müşteri<select name="musteri"><option value="magaza">Örnek Mağaza</option><option value="klinik">Örnek Klinik</option><option value="mobilya">Örnek Mobilya</option></select></label>
+              <label>Dönem<select name="donem"><option value="ay">Geçen ay</option><option value="hafta">Geçen hafta</option><option value="ceyrek">Son 3 ay</option></select></label>
+              <fieldset><legend>Bölümler</legend>
+                <label><input type="checkbox" name="b" value="ozet" checked> Yönetici özeti</label>
+                <label><input type="checkbox" name="b" value="sonuc" checked> Sonuç türleri ayrı ayrı</label>
+                <label><input type="checkbox" name="b" value="kanal" checked> Kanal kırılımı</label>
+                <label><input type="checkbox" name="b" value="degisiklik"> Yapılan değişiklikler</label>
+                <label><input type="checkbox" name="b" value="adim"> Sonraki adımlar</label>
+              </fieldset>
+              <button type="button" class="idd-ana" data-rapor-gonder>Raporu e-postayla gönder</button>
+            </form>
+            <div class="idd-sayfa" data-rapor-onizleme aria-live="polite"></div>
+          </div>
+        </section>
+
+        <!-- Bağlı hesaplar -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-hesaplar" aria-labelledby="idd-s-hesaplar" data-panel="hesaplar" hidden>
+          <div class="idd-kart-bas"><strong>Bağlı hesaplar ve veri tazeliği</strong><button type="button" class="idd-ana" data-bagla>+ Hesap bağla</button></div>
+          <div class="idd-sihirbaz idd-kart" data-sihirbaz hidden></div>
+          <ul class="idd-hesaplar" data-hesaplar></ul>
+        </section>
+
+        <!-- Müşteri portalı -->
+        <section class="idd-panel" role="tabpanel" id="idd-p-portal" aria-labelledby="idd-s-portal" data-panel="portal" hidden>
+          <div class="idd-portal">
+            <span class="idd-yakinda">Yakında</span>
+            <h3>Müşteriler kendi sonuçlarını kendi girişleriyle görecek</h3>
+            <p>Portal, ajans panelinin sade bir görünümüdür: sonuçlar, gönderilen raporlar ve onayınızı bekleyen öneriler. Başka müşterilerin verisi asla görünmez.</p>
+            <div class="idd-portal-onizleme" aria-hidden="true">
+              <div><b>Örnek Mağaza</b><span>Bu ay</span></div>
+              <div class="idd-portal-kpi"><span><small>Satış</small>640</span><span><small>Onay bekleyen</small>2</span><span><small>Son rapor</small>1 Eki</span></div>
+            </div>
+          </div>
+        </section>
+
+        <div class="idd-tost" data-tost role="status" aria-live="polite" hidden></div>
+      </div>
+
+      <div class="idd-tur" data-tur hidden role="dialog" aria-label="Rehberli tur">
+        <span class="idd-tur-adim" data-tur-adim></span>
+        <p data-tur-metin></p>
+        <div><button type="button" data-tur-geri>Geri</button><button type="button" data-tur-ileri class="idd-ana">İleri</button><button type="button" data-tur-kapat aria-label="Turu kapat">✕</button></div>
+      </div>
+    </div>
+    <p class="idd-not">Demo tarayıcınızda çalışır; hiçbir hesaba bağlanmaz ve hiçbir yere veri göndermez. Gösterilen etkiler örnektir, sonuç garantisi değildir.</p>
+  </div>
+</section>
+
+<script>
+  type M = 'magaza' | 'klinik' | 'mobilya';
+  const MUSTERI: Record<M, { ad: string; harcama: number; satis: number; form: number; arama: number; ciro: number; kanal: [string, number][] }> = {
+    magaza: { ad: 'Örnek Mağaza', harcama: 4200, satis: 22, form: 0, arama: 6, ciro: 1100, kanal: [['Google Ads', 58], ['Meta Ads', 34], ['Pazaryeri reklamı', 8]] },
+    klinik: { ad: 'Örnek Klinik', harcama: 1500, satis: 0, form: 14, arama: 22, ciro: 0, kanal: [['Google Ads', 72], ['Meta Ads', 28]] },
+    mobilya: { ad: 'Örnek Mobilya', harcama: 2600, satis: 2, form: 9, arama: 11, ciro: 12000, kanal: [['Google Ads', 46], ['Meta Ads', 54]] }
+  };
+  const ANAHTARLAR = Object.keys(MUSTERI) as M[];
+  const METRIK = [['harcama', 'Harcama'], ['satis', 'Satış'], ['form', 'Form'], ['arama', 'Arama']] as const;
+  type Onem = 'kritik' | 'uyari' | 'bilgi';
+  const UYARILAR: { id: string; m: M | null; onem: Onem; baslik: string; neden: string; adim: string; oneri?: string }[] = [
+    { id: 'u1', m: 'magaza', onem: 'kritik', baslik: 'Merchant Center’da 12 ürün onaylanmadı', neden: 'Onaylanmayan ürünler alışveriş reklamlarında görünmez; bu ürünlerden satış gelmez.', adim: 'Ürün başlıklarındaki kurala aykırı ifade düzeltilip ürünler yeniden incelemeye gönderilmeli.', oneri: 'Onaylanmayan 12 ürünün başlığını düzelt' },
+    { id: 'u2', m: 'klinik', onem: 'kritik', baslik: 'Form dönüşüm etiketi 26 saattir veri göndermiyor', neden: 'Ölçüm durursa form sayısı eksik görünür ve otomatik teklif stratejisi yanlış öğrenir.', adim: 'Etiket Yöneticisi’nde son yayınlanan sürüm kontrol edilmeli; tetikleyici düzeltilip test edilmeli.', oneri: 'Form etiketinin tetikleyicisini düzelt ve test et' },
+    { id: 'u3', m: 'mobilya', onem: 'uyari', baslik: 'Meta reklamlarında sıklık 4,8’e çıktı', neden: 'Aynı kişiler aynı reklamı çok sık görüyor; tıklama oranı düşmeye başladı (kreatif yorgunluğu).', adim: 'Yeni kreatif eklenmeli ya da kitle genişletilmeli.', oneri: 'Yorgun kreatifi iki yeni varyasyonla değiştir' },
+    { id: 'u4', m: 'magaza', onem: 'uyari', baslik: 'Aylık bütçenin %72’si ayın 18’inde harcandı', neden: 'Bu hızla bütçe ay sonundan önce biter; son günlerde reklam durur.', adim: 'Günlük bütçe dengelenmeli ya da bütçe artışı için onayınız alınmalı.', oneri: 'Günlük bütçeyi ay sonuna yetecek şekilde dengele' },
+    { id: 'u5', m: null, onem: 'bilgi', baslik: 'Tüm hesaplarda veriler 3 saatten yeni', neden: 'Reklam ve analiz verileri düzenli çekiliyor; raporlar güncel veriyle hazırlanır.', adim: 'İşlem gerekmiyor.' }
+  ];
+  type Asama = 'oneri' | 'onaylandi' | 'uygulandi' | 'olculuyor' | 'reddedildi';
+  type Oneri = { id: string; m: M; baslik: string; gerekce: string; etki: string; risk: string; asama: Asama };
+  const ONERILER: Oneri[] = [
+    { id: 'o1', m: 'magaza', baslik: '18 negatif anahtar kelime ekle', gerekce: 'Son 30 günde “ücretsiz”, “ikinci el” gibi aramalar tıklama aldı ama hiç satış getirmedi.', etki: 'Boşa giden harcamada azalma beklenir (örnek tahmin).', risk: 'Düşük', asama: 'oneri' },
+    { id: 'o2', m: 'mobilya', baslik: 'Bütçenin %15’ini verimli kampanyaya kaydır', gerekce: 'Showroom kampanyası daha düşük maliyetle teklif talebi getiriyor; diğeri öğrenme aşamasında takıldı.', etki: 'Aynı bütçeyle daha fazla teklif talebi beklenir (örnek tahmin).', risk: 'Orta · kademeli uygulanır', asama: 'oneri' },
+    { id: 'o3', m: 'klinik', baslik: 'Arama reklamlarına arama uzantısı ekle', gerekce: 'Ziyaretçilerin çoğu telefondan geliyor ve arama, formdan daha sık randevuya dönüşüyor.', etki: 'Arama sayısında artış beklenir (örnek tahmin).', risk: 'Düşük', asama: 'oneri' }
+  ];
+  const ASAMA: [Asama, string][] = [['oneri', 'Önerildi'], ['onaylandi', 'Onaylandı'], ['uygulandi', 'Uygulandı'], ['olculuyor', 'Etki ölçülüyor']];
+  const HESAPLAR: Record<M, [string, string, boolean][]> = {
+    magaza: [['Google Ads', '1 sa önce', true], ['Meta Ads', '1 sa önce', true], ['Google Analytics 4', '3 sa önce', true], ['Merchant Center', '2 sa önce', true]],
+    klinik: [['Google Ads', '1 sa önce', true], ['Meta Ads', '1 sa önce', true], ['Google Analytics 4', '26 sa önce', false], ['Search Console', '1 gün önce', true]],
+    mobilya: [['Google Ads', '2 sa önce', true], ['Meta Ads', '1 sa önce', true], ['Google Analytics 4', '3 sa önce', true]]
+  };
+
+  const tl = (n: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(n);
+  const sayi = (n: number) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n);
+  const h = (etiket: string, oz: Record<string, any> = {}, ...cocuk: (Node | string | null | undefined | false)[]) => {
+    const e = document.createElement(etiket);
+    Object.entries(oz).forEach(([k, v]) => { if (v === undefined || v === null || v === false) return; if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else if (k === 'html') e.innerHTML = v; else e.setAttribute(k, String(v)); });
+    cocuk.forEach((c) => { if (c !== null && c !== undefined && c !== false) e.append(c as any); });
+    return e;
+  };
+  // Sabit tohumlu sözde rastgele: her açılışta aynı örnek seriler.
+  const seri = (taban: number, gun: number, tohum: number) => Array.from({ length: gun }, (_, i) => {
+    const x = Math.sin((i + tohum) * 12.9898) * 43758.5453; const r = x - Math.floor(x);
+    return Math.max(0, taban * (1 + 0.16 * Math.sin((i + tohum) / 3.2) + (r - 0.5) * 0.22 + i * 0.003));
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-idd]').forEach((kok) => {
+    const q = <T extends Element = HTMLElement>(s: string) => kok.querySelector(s) as T;
+    let musteri: 'hepsi' | M = 'hepsi', donem = 30, metrik: (typeof METRIK)[number][0] = 'harcama', onem: 'hepsi' | Onem = 'hepsi';
+    const oneriler = ONERILER.map((o) => ({ ...o }));
+    const kayit: { zaman: string; metin: string; kim: string }[] = [
+      { zaman: 'Dün 16.40', metin: 'Örnek Mağaza · 6 negatif anahtar kelime eklendi', kim: 'Onaylayan: müşteri · Uygulayan: uzman' },
+      { zaman: 'Dün 10.15', metin: 'Örnek Klinik · Hafta sonu reklam saatleri daraltıldı', kim: 'Onaylayan: müşteri · Uygulayan: uzman' },
+      { zaman: '2 gün önce', metin: 'Örnek Mobilya · Yeni kreatif yayına alındı', kim: 'Onaylayan: müşteri · Uygulayan: uzman' }
+    ];
+    const saat = () => new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+
+    let tostZ: number | undefined;
+    const tost = (m: string) => { const t = q('[data-tost]'); t.textContent = m; t.hidden = false; clearTimeout(tostZ); tostZ = window.setTimeout(() => (t.hidden = true), 3200); };
+
+    // --- Modül geçişi ---
+    const sekmeler = [...kok.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const ac = (k: string, odak = false) => {
+      sekmeler.forEach((s) => { const a = s.dataset.modul === k; s.setAttribute('aria-selected', String(a)); s.tabIndex = a ? 0 : -1; if (a && odak) s.focus(); });
+      kok.querySelectorAll<HTMLElement>('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== k));
+      const cubuk = q('.idd-cubuk'); cubuk.classList.toggle('idd-sade', !['genel'].includes(k));
+    };
+    sekmeler.forEach((s, i) => {
+      s.addEventListener('click', () => ac(s.dataset.modul!));
+      s.addEventListener('keydown', (o) => {
+        const y = ['ArrowDown', 'ArrowRight'].includes(o.key) ? 1 : ['ArrowUp', 'ArrowLeft'].includes(o.key) ? -1 : 0;
+        if (y) { o.preventDefault(); ac(sekmeler[(i + y + sekmeler.length) % sekmeler.length].dataset.modul!, true); }
+      });
+    });
+    kok.addEventListener('click', (o) => { const g = (o.target as HTMLElement).closest<HTMLElement>('[data-git]'); if (g) ac(g.dataset.git!); });
+    // Sayfadaki "Neler var" kartlarından demoya geçiş
+    document.querySelectorAll<HTMLElement>('[data-demo-git]').forEach((a) => a.addEventListener('click', () => ac(a.dataset.demoGit!)));
+
+    // --- Genel bakış ---
+    const secili = () => (musteri === 'hepsi' ? ANAHTARLAR : [musteri]);
+    const toplamSeri = (alan: 'harcama' | 'satis' | 'form' | 'arama' | 'ciro') => {
+      const s = secili().map((k, j) => seri(MUSTERI[k][alan === 'ciro' ? 'satis' : alan] * (alan === 'ciro' ? MUSTERI[k].ciro : 1), donem, j * 7 + (alan.length * 3)));
+      return Array.from({ length: donem }, (_, i) => s.reduce((t, x) => t + x[i], 0));
+    };
+    const toplam = (a: number[]) => a.reduce((t, x) => t + x, 0);
+    const genelCiz = () => {
+      const har = toplamSeri('harcama'), sat = toplamSeri('satis'), frm = toplamSeri('form'), ara = toplamSeri('arama'), ciro = toplamSeri('ciro');
+      const DEGISIM: Record<string, number> = { harcama: 4, satis: 12, ciro: 9, form: -6, arama: 15 };
+      const kaydir = (musteri === 'hepsi' ? 0 : musteri.length) + (donem === 7 ? -5 : donem === 90 ? 3 : 0);
+      const kart = (ad: string, deger: string, deg: number | null, alt?: string) => h('div', { class: 'idd-kpi-kart' }, h('span', {}, ad), h('strong', {}, deger),
+        deg === null ? h('small', {}, alt || 'Bu müşteride ölçülmüyor') : h('small', { class: deg >= 0 ? 'idd-art' : 'idd-azal' }, `${deg >= 0 ? '▲' : '▼'} %${Math.abs(deg).toFixed(0)} önceki döneme göre`));
+      const fark = (ad: string) => DEGISIM[ad] + kaydir * (ad === 'form' ? -1 : 1);
+      const satisVar = toplam(sat) > 0.5, formVar = toplam(frm) > 0.5;
+      q('[data-kpi]').replaceChildren(
+        kart('Harcama', tl(toplam(har)), fark('harcama')),
+        kart('Satış', satisVar ? sayi(toplam(sat)) : '—', satisVar ? fark('satis') : null),
+        kart('Satış cirosu', satisVar ? tl(toplam(ciro)) : '—', satisVar ? fark('ciro') : null),
+        kart('Form', formVar ? sayi(toplam(frm)) : '—', formVar ? fark('form') : null),
+        kart('Arama', sayi(toplam(ara)), fark('arama')));
+      // Metrik düğmeleri
+      q('[data-metrikler]').replaceChildren(...METRIK.map(([k, ad]) => h('button', { type: 'button', 'aria-pressed': String(k === metrik), onclick: () => { metrik = k; genelCiz(); } }, ad)));
+      // Çizgi grafik
+      const d = { harcama: har, satis: sat, form: frm, arama: ara }[metrik];
+      const G = 640, Y = 200, P = 8, enb = Math.max(...d, 1) * 1.08, enk = Math.min(...d) * 0.75;
+      const x = (i: number) => P + (i * (G - 2 * P)) / Math.max(d.length - 1, 1), y = (v: number) => Y - P - ((v - enk) / Math.max(enb - enk, 1)) * (Y - 2 * P);
+      const yol = d.map((v, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(' ');
+      const alan = `${yol} L${x(d.length - 1)} ${Y - P} L${x(0)} ${Y - P} Z`;
+      const cizim = q('[data-grafik]');
+      cizim.innerHTML = `<svg viewBox="0 0 ${G} ${Y}" preserveAspectRatio="none" role="img" aria-label="${METRIK.find((m) => m[0] === metrik)![1]} için son ${donem} gün (örnek veri)">
+        ${[0.25, 0.5, 0.75].map((o) => `<line x1="0" x2="${G}" y1="${Y * o}" y2="${Y * o}" class="idd-izgara"/>`).join('')}
+        <path d="${alan}" class="idd-alan"/><path d="${yol}" class="idd-cizgi" vector-effect="non-scaling-stroke"/>
+        <line class="idd-imlec" x1="0" x2="0" y1="0" y2="${Y}" hidden/><circle class="idd-nokta" r="4" hidden/></svg>`;
+      const s = cizim.querySelector('svg')!, im = s.querySelector('.idd-imlec')!, nk = s.querySelector('.idd-nokta')!;
+      const ipucu = q('[data-ipucu]');
+      const goster = (cx: number) => {
+        const r = s.getBoundingClientRect(); const i = Math.round(((cx - r.left) / r.width * G - P) / ((G - 2 * P) / Math.max(d.length - 1, 1)));
+        const j = Math.min(d.length - 1, Math.max(0, i)); const gun = new Date(Date.now() - (d.length - 1 - j) * 86400000);
+        im.removeAttribute('hidden'); nk.removeAttribute('hidden'); im.setAttribute('x1', String(x(j))); im.setAttribute('x2', String(x(j)));
+        nk.setAttribute('cx', String(x(j))); nk.setAttribute('cy', String(y(d[j])));
+        ipucu.textContent = `${gun.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })}: ${metrik === 'harcama' ? tl(d[j]) : sayi(d[j]) + ' ' + METRIK.find((m) => m[0] === metrik)![1].toLowerCase()}`;
+      };
+      s.addEventListener('pointermove', (o) => goster(o.clientX));
+      s.addEventListener('pointerdown', (o) => goster(o.clientX));
+      ipucu.textContent = 'Çizginin üzerine gelin ya da dokunun.';
+      // Kanal dağılımı
+      const kanal: Record<string, number> = {};
+      secili().forEach((k) => MUSTERI[k].kanal.forEach(([ad, p]) => (kanal[ad] = (kanal[ad] || 0) + (p / 100) * MUSTERI[k].harcama)));
+      const kt = toplam(Object.values(kanal));
+      q('[data-kanal]').replaceChildren(...Object.entries(kanal).sort((a, b) => b[1] - a[1]).map(([ad, v], i) => h('div', { class: 'idd-cubuk-satir' },
+        h('span', {}, ad), h('div', { class: 'idd-cubuk-iz' }, h('i', { style: `width:${((v / kt) * 100).toFixed(1)}%;--r:var(--idd-r${i + 1})` })), h('b', {}, `%${((v / kt) * 100).toFixed(0)}`))));
+      // Bugün dikkat
+      const ilgili = UYARILAR.filter((u) => u.onem !== 'bilgi' && (musteri === 'hepsi' || u.m === musteri));
+      q('[data-mini]').replaceChildren(...(ilgili.length ? ilgili.map((u) => h('li', {}, h('button', { type: 'button', class: 'idd-mini-oge', onclick: () => { onem = 'hepsi'; ac('kontrol'); kontrolCiz(u.id); } }, h('i', { class: 'idd-nokta-' + u.onem }), h('span', {}, u.baslik), h('small', {}, u.m ? MUSTERI[u.m].ad : 'Tümü'))))
+        : [h('li', { class: 'idd-bos' }, 'Bu müşteride bugün dikkat gerektiren bir durum yok.')]));
+    };
+    q<HTMLSelectElement>('[data-musteri]').addEventListener('change', (o) => { musteri = (o.target as HTMLSelectElement).value as any; genelCiz(); kontrolCiz(); hesapCiz(); });
+    kok.querySelectorAll<HTMLButtonElement>('[data-donem]').forEach((b) => b.addEventListener('click', () => {
+      donem = Number(b.dataset.donem); kok.querySelectorAll('[data-donem]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); genelCiz();
+    }));
+
+    // --- Günlük kontrol ---
+    const ONEM_AD: Record<Onem, string> = { kritik: 'Kritik', uyari: 'Uyarı', bilgi: 'Bilgi' };
+    const donusturulen = new Set<string>();
+    const kontrolCiz = (acik?: string) => {
+      const l = UYARILAR.filter((u) => (onem === 'hepsi' || u.onem === onem) && (musteri === 'hepsi' || !u.m || u.m === musteri));
+      q('[data-uyarilar]').replaceChildren(...(l.length ? l.map((u) => {
+        const d = h('details', { class: 'idd-uyari', open: acik === u.id ? '' : null },
+          h('summary', {}, h('span', { class: 'idd-onem idd-onem-' + u.onem }, ONEM_AD[u.onem]), h('b', {}, u.baslik), h('small', {}, u.m ? MUSTERI[u.m].ad : 'Tüm hesaplar')),
+          h('div', { class: 'idd-uyari-ic' },
+            h('p', {}, h('b', {}, 'Neden önemli: '), u.neden), h('p', {}, h('b', {}, 'Önerilen adım: '), u.adim),
+            u.oneri ? (donusturulen.has(u.id) ? h('button', { type: 'button', class: 'idd-ikincil', 'data-git': 'oneriler' }, 'Öneriler listesinde →')
+              : h('button', { type: 'button', class: 'idd-ana', onclick: () => {
+                donusturulen.add(u.id); oneriler.unshift({ id: 'u-' + u.id, m: u.m!, baslik: u.oneri!, gerekce: u.neden, etki: 'Sorun giderildiğinde ilgili sonuçların normale dönmesi beklenir (örnek).', risk: 'Düşük', asama: 'oneri' });
+                sayacCiz(); oneriCiz(); kontrolCiz(u.id); tost('Öneri oluşturuldu; uygulanması için onayınız gerekiyor.');
+              } }, 'Öneriye dönüştür')) : null));
+        return h('li', {}, d);
+      }) : [h('li', { class: 'idd-bos' }, 'Bu süzgeçte kayıt yok.')]));
+    };
+    kok.querySelectorAll<HTMLButtonElement>('[data-o]').forEach((b) => b.addEventListener('click', () => {
+      onem = b.dataset.o as any; kok.querySelectorAll('[data-o]').forEach((x) => x.setAttribute('aria-pressed', String(x === b))); kontrolCiz();
+    }));
+
+    // --- Öneriler ---
+    const oneriCiz = () => {
+      q('[data-oneriler]').replaceChildren(...oneriler.map((o) => {
+        const idx = ASAMA.findIndex(([a]) => a === o.asama);
+        return h('li', { class: 'idd-oneri' + (o.asama === 'reddedildi' ? ' idd-reddedildi' : '') },
+          h('div', { class: 'idd-oneri-bas' }, h('b', {}, o.baslik), h('small', {}, MUSTERI[o.m].ad)),
+          h('p', {}, o.gerekce),
+          h('div', { class: 'idd-oneri-alt' }, h('span', {}, h('b', {}, 'Beklenen etki: '), o.etki), h('span', {}, h('b', {}, 'Risk: '), o.risk)),
+          o.asama === 'reddedildi' ? h('p', { class: 'idd-durum' }, 'Reddedildi · hesapta hiçbir değişiklik yapılmadı.')
+            : h('ol', { class: 'idd-adimlar', 'aria-label': 'Önerinin aşaması' }, ...ASAMA.map(([a, ad], i) => h('li', { class: i < idx ? 'tamam' : i === idx ? 'simdi' : '', 'aria-current': i === idx ? 'step' : null }, ad))),
+          o.asama === 'oneri' ? h('div', { class: 'idd-eylem' },
+            h('button', { type: 'button', class: 'idd-ana', onclick: () => onayla(o) }, 'Onayla'),
+            h('button', { type: 'button', class: 'idd-ikincil', onclick: () => { o.asama = 'reddedildi'; kayit.unshift({ zaman: 'Bugün ' + saat(), metin: `${MUSTERI[o.m].ad} · Öneri reddedildi: ${o.baslik}`, kim: 'Karar veren: siz (demo)' }); sayacCiz(); oneriCiz(); kayitCiz(); tost('Reddedildi. Hesapta hiçbir değişiklik yapılmadı.'); } }, 'Reddet')) : null);
+      }));
+    };
+    const onayla = (o: Oneri) => {
+      o.asama = 'onaylandi'; kayit.unshift({ zaman: 'Bugün ' + saat(), metin: `${MUSTERI[o.m].ad} · Onaylandı: ${o.baslik}`, kim: 'Onaylayan: siz (demo)' });
+      sayacCiz(); oneriCiz(); kayitCiz(); tost('Onaylandı. Uzman uygulamaya alıyor…');
+      setTimeout(() => { o.asama = 'uygulandi'; kayit.unshift({ zaman: 'Bugün ' + saat(), metin: `${MUSTERI[o.m].ad} · Uygulandı: ${o.baslik}`, kim: 'Uygulayan: uzman (demo)' }); oneriCiz(); kayitCiz(); }, 1400);
+      setTimeout(() => { o.asama = 'olculuyor'; oneriCiz(); tost('Uygulandı. Etkisi 7 gün boyunca ölçülecek.'); }, 2800);
+    };
+    const sayacCiz = () => {
+      const k = UYARILAR.filter((u) => u.onem === 'kritik').length, b = oneriler.filter((o) => o.asama === 'oneri').length;
+      kok.querySelectorAll<HTMLElement>('[data-sayac]').forEach((s) => { const n = s.dataset.sayac === 'kontrol' ? k : b; s.textContent = n ? String(n) : ''; s.hidden = !n; });
+    };
+
+    // --- Değişiklik kaydı ---
+    const kayitCiz = () => q('[data-kayit]').replaceChildren(...kayit.map((k) => h('li', {}, h('time', {}, k.zaman), h('b', {}, k.metin), h('small', {}, k.kim))));
+
+    // --- Raporlar ---
+    const rf = q<HTMLFormElement>('[data-rapor-form]');
+    const raporCiz = () => {
+      const v = new FormData(rf), m = v.get('musteri') as M, b = v.getAll('b') as string[], mu = MUSTERI[m];
+      const kat = v.get('donem') === 'hafta' ? 7 : v.get('donem') === 'ceyrek' ? 90 : 30, ad = { ay: 'Geçen ay', hafta: 'Geçen hafta', ceyrek: 'Son 3 ay' }[v.get('donem') as string];
+      const sat = mu.satis * kat, frm = mu.form * kat, ara = mu.arama * kat;
+      const bolum = (k: string, baslik: string, ...ic: Node[]) => (b.includes(k) ? h('div', { class: 'idd-sayfa-bolum' }, h('h4', {}, baslik), ...ic) : null);
+      q('[data-rapor-onizleme]').replaceChildren(...[
+        h('div', { class: 'idd-sayfa-bas' }, h('b', {}, 'IDEXYA'), h('span', {}, `${mu.ad} · ${ad}`)),
+        h('h3', {}, 'Dönem raporu'),
+        b.length ? null : h('p', { class: 'idd-bos' }, 'Soldan en az bir bölüm seçin.'),
+        bolum('ozet', 'Yönetici özeti', h('p', {}, `${tl(mu.harcama * kat)} harcamayla ${[sat ? sayi(sat) + ' satış' : '', frm ? sayi(frm) + ' form' : '', ara ? sayi(ara) + ' arama' : ''].filter(Boolean).join(', ')} elde edildi.`)) as any,
+        bolum('sonuc', 'Sonuç türleri', h('div', { class: 'idd-sayfa-kpi' }, ...[['Satış', sat], ['Form', frm], ['Arama', ara]].map(([a, n]) => h('span', {}, h('small', {}, a as string), n ? sayi(n as number) : '—')))) as any,
+        bolum('kanal', 'Kanal kırılımı', ...mu.kanal.map(([a, p]) => h('div', { class: 'idd-cubuk-satir' }, h('span', {}, a), h('div', { class: 'idd-cubuk-iz' }, h('i', { style: `width:${p}%` })), h('b', {}, `%${p}`)))) as any,
+        bolum('degisiklik', 'Yapılan değişiklikler', h('ul', {}, ...kayit.filter((k) => k.metin.startsWith(mu.ad)).slice(0, 3).map((k) => h('li', {}, k.metin.replace(mu.ad + ' · ', ''))))) as any,
+        bolum('adim', 'Sonraki adımlar', h('ul', {}, h('li', {}, 'Ölçüm doğrulaması ve testlerin sürdürülmesi'), h('li', {}, 'Onay bekleyen önerilerin değerlendirilmesi'))) as any,
+        h('p', { class: 'idd-sayfa-dip' }, 'Örnek veri · Demo raporu')].filter(Boolean) as Node[]);
+    };
+    rf.addEventListener('change', raporCiz);
+    q('[data-rapor-gonder]').addEventListener('click', () => tost('Demoda rapor gönderilmez. Gerçek panelde PDF, müşterinin e-postasına gider.'));
+
+    // --- Bağlı hesaplar ---
+    const hesapCiz = () => {
+      q('[data-hesaplar]').replaceChildren(...secili().flatMap((m) => HESAPLAR[m].map(([ad, son, iyi]) => h('li', {},
+        h('i', { class: iyi ? 'idd-iyi' : 'idd-kotu', 'aria-hidden': 'true' }), h('b', {}, ad), h('span', {}, MUSTERI[m].ad), h('small', {}, iyi ? `Son veri: ${son}` : `Gecikme: son veri ${son}`)))));
+    };
+    const sihirbaz = q('[data-sihirbaz]');
+    const sihirbazCiz = (adim: number, platform = '') => {
+      const adimlar = ['Platform seçin', 'Yetki verin', 'Doğrulama'];
+      sihirbaz.replaceChildren(
+        h('ol', { class: 'idd-adimlar' }, ...adimlar.map((a, i) => h('li', { class: i < adim ? 'tamam' : i === adim ? 'simdi' : '' }, a))),
+        adim === 0 ? h('div', { class: 'idd-eylem' }, ...['Google Ads', 'Meta Ads', 'Google Analytics 4', 'Search Console', 'Merchant Center'].map((p) => h('button', { type: 'button', class: 'idd-ikincil', onclick: () => sihirbazCiz(1, p) }, p)))
+          : adim === 1 ? h('div', {}, h('p', {}, `${platform} hesabınız için yalnızca gerekli izin istenir. Hesap sizin adınıza kalır; erişimi istediğiniz an kaldırabilirsiniz.`), h('div', { class: 'idd-eylem' }, h('button', { type: 'button', class: 'idd-ana', onclick: () => { sihirbazCiz(2, platform); setTimeout(() => sihirbazCiz(3, platform), 1300); } }, 'Yetki ver (demo)'), h('button', { type: 'button', class: 'idd-ikincil', onclick: () => (sihirbaz.hidden = true) }, 'Vazgeç')))
+          : adim === 2 ? h('p', { class: 'idd-yukleniyor' }, 'Bağlantı doğrulanıyor, ilk veriler çekiliyor…')
+          : h('div', {}, h('p', {}, `${platform} bağlandı (demo). Gerçek panelde ilk veriler birkaç saat içinde görünür.`), h('button', { type: 'button', class: 'idd-ikincil', onclick: () => (sihirbaz.hidden = true) }, 'Kapat')));
+    };
+    q('[data-bagla]').addEventListener('click', () => { sihirbaz.hidden = false; sihirbazCiz(0); });
+
+    // --- Rehberli tur ---
+    const TUR = [
+      { m: 'genel', s: '[data-kpi]', t: 'Genel bakış: harcama ve sonuçlar tek ekranda. Satış, form ve arama ayrı ayrı sayılır; birbirine karışmaz.' },
+      { m: 'genel', s: '[data-metrikler]', t: 'Metriği değiştirin, çizginin üzerine gelin: gün gün ne olduğunu görün. Üstten müşteri ve dönem seçebilirsiniz.' },
+      { m: 'kontrol', s: '[data-uyarilar]', t: 'Günlük kontrol: her sabah neyin yolunda olmadığı, hangi müşteriyi etkilediği ve ne yapılması gerektiği tek listede.' },
+      { m: 'oneriler', s: '[data-oneriler]', t: 'Öneriler: yapay zekâ önerir, uzman inceler. “Onayla”ya basın; önerinin aşamalarını izleyin.' },
+      { m: 'kayit', s: '[data-kayit]', t: 'Değişiklik kaydı: kim neyi ne zaman onayladı ve uyguladı, hepsi kayıt altında.' },
+      { m: 'raporlar', s: '[data-rapor-onizleme]', t: 'Raporlar: bölümleri seçin, rapor anında şekillensin. Gerçek panelde PDF olarak e-postayla gider.' },
+      { m: 'hesaplar', s: '[data-hesaplar]', t: 'Bağlı hesaplar: hangi verinin ne kadar güncel olduğu her zaman görünür. Gecikme olursa uyarı düşer.' }
+    ];
+    let turAdim = -1;
+    const turKutu = q('[data-tur]');
+    const turGoster = () => {
+      kok.querySelectorAll('.idd-vurgu').forEach((e) => e.classList.remove('idd-vurgu'));
+      if (turAdim < 0 || turAdim >= TUR.length) { turKutu.hidden = true; turAdim = -1; return; }
+      const a = TUR[turAdim]; ac(a.m); const hedef = q(a.s); hedef.classList.add('idd-vurgu');
+      q('[data-tur-adim]').textContent = `${turAdim + 1} / ${TUR.length}`; q('[data-tur-metin]').textContent = a.t;
+      (q('[data-tur-geri]') as HTMLButtonElement).disabled = turAdim === 0; q('[data-tur-ileri]').textContent = turAdim === TUR.length - 1 ? 'Bitir' : 'İleri';
+      turKutu.hidden = false;
+    };
+    document.querySelectorAll('[data-tur-baslat]').forEach((b) => b.addEventListener('click', () => { turAdim = 0; kok.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); turGoster(); (q('[data-tur-ileri]') as HTMLButtonElement).focus({ preventScroll: true }); }));
+    q('[data-tur-ileri]').addEventListener('click', () => { turAdim++; turGoster(); });
+    q('[data-tur-geri]').addEventListener('click', () => { turAdim = Math.max(0, turAdim - 1); turGoster(); });
+    q('[data-tur-kapat]').addEventListener('click', () => { turAdim = -1; turGoster(); });
+    kok.addEventListener('keydown', (o) => { if (o.key === 'Escape' && turAdim >= 0) { turAdim = -1; turGoster(); } });
+
+    sayacCiz(); genelCiz(); kontrolCiz(); oneriCiz(); kayitCiz(); raporCiz(); hesapCiz();
+  });
+</script>
+
+<style is:global>
+  .idd-bolum{padding:72px 0 96px;scroll-margin-top:64px}
+  .idd-ic{max-width:var(--kap);margin:0 auto;padding:0 var(--kenar);box-sizing:border-box;display:flex;flex-direction:column;gap:28px}
+  .idd-ust{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px}
+  .idd-ust>div{max-width:720px;display:flex;flex-direction:column;gap:12px}
+  .idd-etiket{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;letter-spacing:.06em;color:var(--acc)}
+  .idd-etiket span{width:36px;height:2px;background:var(--brand)}
+  .idd-ust h2{margin:0;font-size:44px;line-height:1.12;letter-spacing:-.025em;color:var(--head)}
+  .idd-ust p{margin:0;font-size:17px;color:var(--tx2);text-align:left}
+  .idd-tur-dugme{display:inline-flex;align-items:center;gap:10px;min-height:52px;padding:0 22px;border:0;border-radius:12px;background:var(--fill);color:#FFFFFF;font:inherit;font-weight:700;font-size:16px;cursor:pointer;box-shadow:0 12px 30px rgba(184,68,6,.25)}
+  .idd-not{margin:0;font-size:13px;color:var(--tx2)}
+  /* "Neler var" kartları demoya bağlanır */
+  .idos-oz{transition:transform .2s,box-shadow .2s,border-color .2s}
+  .idos-oz:hover{transform:translateY(-3px);box-shadow:0 18px 40px var(--shadow);border-color:color-mix(in srgb,var(--brand) 45%,var(--line)) !important}
+  .idos-oz-git{margin-top:auto;font-weight:700;color:var(--acc);font-size:15px}
+  .idd-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* Uygulama çerçevesi: IDOS'un kendi açık arayüzü; koyu temada da kendi koyu tonları */
+  .idd{--a-bg:#F4F6FA;--a-yan:#FFFFFF;--a-kart:#FFFFFF;--a-cizgi:#E2E8F0;--a-yazi:#1F2A3A;--a-soluk:#5B6B80;--a-vurgu:#F07A23;--a-vurgu-k:#B84406;--a-tint:#FDE9DB;--a-tintx:#A9420A;--a-iyi:#13804F;--a-iyib:#E3F2EA;--a-kotu:#A62A20;--a-kotub:#FBE2DF;--a-uyari:#8A5600;--a-uyarib:#FBEFD6;--a-bilgi:#1F4E8C;--a-bilgib:#E3ECF8;
+    --idd-r1:#eb6834;--idd-r2:#2a78d6;--idd-r3:#1baf7a;
+    position:relative;display:grid;grid-template-columns:230px minmax(0,1fr);min-height:640px;border-radius:22px;overflow:hidden;background:var(--a-bg);color:var(--a-yazi);border:1px solid var(--a-cizgi);box-shadow:0 40px 90px var(--shadow);font-size:14px}
+  .koyu .idd{--a-bg:#141A22;--a-yan:#1B222C;--a-kart:#1F2731;--a-cizgi:#323D4B;--a-yazi:#EEF1F5;--a-soluk:#A9B4C2;--a-tint:rgba(240,122,35,.16);--a-tintx:#FFB58A;--a-iyi:#7ADFB0;--a-iyib:rgba(122,223,176,.13);--a-kotu:#FF9AA6;--a-kotub:rgba(255,122,138,.14);--a-uyari:#F5C76B;--a-uyarib:rgba(245,199,107,.14);--a-bilgi:#9CC3FF;--a-bilgib:rgba(156,195,255,.12);--idd-r1:#d95926;--idd-r2:#3987e5;--idd-r3:#199e70}
+  .idd button{font:inherit;color:inherit;cursor:pointer}
+  .idd-yan{background:var(--a-yan);border-right:1px solid var(--a-cizgi);padding:16px 12px;display:flex;flex-direction:column;gap:14px}
+  .idd-logo{display:flex;align-items:center;gap:8px;padding:4px 8px}.idd-logo b{font-size:18px;letter-spacing:.04em}
+  .idd-logo span{padding:2px 8px;border-radius:999px;background:var(--a-tint);color:var(--a-tintx);font-size:11px;font-weight:700}
+  .idd-yan nav{display:flex;flex-direction:column;gap:2px}
+  .idd-yan [role=tab]{display:flex;align-items:center;gap:10px;padding:10px;border:0;border-radius:10px;background:transparent;text-align:left;color:var(--a-soluk);font-weight:600}
+  .idd-yan [role=tab]:hover{background:var(--a-bg);color:var(--a-yazi)}
+  .idd-yan [role=tab][aria-selected=true]{background:var(--a-tint);color:var(--a-tintx)}
+  .idd-yan-ad{flex:1}
+  .idd-rozet{min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--a-vurgu);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box}
+  .idd-yan small{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--a-cizgi)}
+  .idd-govde{position:relative;display:flex;flex-direction:column;gap:16px;padding:18px;min-width:0}
+  .idd-cubuk{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+  .idd-cubuk.idd-sade .idd-donem{display:none}
+  .idd-secici select,.idd-rapor-ayar select{min-height:40px;padding:0 12px;border:1px solid var(--a-cizgi);border-radius:10px;background:var(--a-kart);color:var(--a-yazi);font:inherit;font-weight:600}
+  .idd-donem,.idd-metrik,.idd-suzgec{display:flex;gap:2px;padding:3px;border-radius:10px;background:var(--a-cizgi)}
+  .idd-donem button,.idd-metrik button,.idd-suzgec button{min-height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;font-weight:600;color:var(--a-soluk)}
+  .idd-donem [aria-pressed=true],.idd-metrik [aria-pressed=true],.idd-suzgec [aria-pressed=true]{background:var(--a-kart);color:var(--a-yazi);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .idd-suzgec{align-self:flex-start}
+  .idd-tazelik{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:12px;color:var(--a-soluk)}
+  .idd-tazelik i{width:8px;height:8px;border-radius:50%;background:var(--a-iyi)}
+  .idd-panel{display:flex;flex-direction:column;gap:14px}
+  .idd-panel[hidden]{display:none}
+  .idd-kart{background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:14px;padding:16px}
+  .idd-kart-bas{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+  .idd-kart-bas small{color:var(--a-soluk)}
+  .idd-kpi{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+  .idd-kpi-kart{background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+  .idd-kpi-kart span{font-size:12px;color:var(--a-soluk)}.idd-kpi-kart strong{font-size:22px;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .idd-kpi-kart small{font-size:11.5px;color:var(--a-soluk)}.idd-kpi-kart .idd-art{color:var(--a-iyi)}.idd-kpi-kart .idd-azal{color:var(--a-kotu)}
+  .idd-cizim svg{display:block;width:100%;height:200px;touch-action:none}
+  .idd-cizim .idd-izgara{stroke:var(--a-cizgi);stroke-width:1}
+  .idd-cizim .idd-alan{fill:var(--a-vurgu);opacity:.12}
+  .idd-cizim .idd-cizgi{fill:none;stroke:var(--a-vurgu);stroke-width:2.5}
+  .idd-cizim .idd-imlec{stroke:var(--a-soluk);stroke-dasharray:3 3}
+  .idd-cizim .idd-nokta{fill:var(--a-vurgu);stroke:var(--a-kart);stroke-width:2}
+  .idd-ipucu{margin:6px 0 0;font-size:12.5px;color:var(--a-soluk);min-height:18px}
+  .idd-iki{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .idd-govde .idd-cubuk-satir{display:grid;grid-template-columns:130px 1fr 44px;align-items:center;gap:10px;padding:6px 0}
+  .idd-govde .idd-cubuk-iz{height:10px;border-radius:999px;background:var(--a-bg);overflow:hidden}
+  .idd-govde .idd-cubuk-iz i{display:block;height:100%;border-radius:999px;background:var(--r,var(--a-vurgu))}
+  .idd-govde .idd-cubuk-satir b{text-align:right;font-variant-numeric:tabular-nums}
+  .idd-mini{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+  .idd-govde .idd-mini-oge{width:100%;display:grid;grid-template-columns:10px 1fr auto;align-items:center;gap:10px;padding:9px 10px;border:0;border-radius:10px;background:transparent;text-align:left}
+  .idd-govde .idd-mini-oge:hover{background:var(--a-bg)}
+  .idd-govde .idd-mini-oge small{color:var(--a-soluk);font-size:12px}
+  .idd-govde [class^=idd-nokta-]{width:8px;height:8px;border-radius:50%}
+  .idd-govde .idd-nokta-kritik{background:var(--a-kotu)}.idd-govde .idd-nokta-uyari{background:#E0A100}
+  .idd-baglanti{border:0;background:transparent;color:var(--a-vurgu-k);font-weight:700}
+  .koyu .idd-baglanti{color:var(--a-tintx)}
+  .idd-liste{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px}
+  .idd-govde .idd-uyari{background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:14px}
+  .idd-govde .idd-uyari summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px}
+  .idd-govde .idd-uyari summary::-webkit-details-marker{display:none}
+  .idd-govde .idd-uyari summary b{flex:1;min-width:200px}
+  .idd-govde .idd-uyari summary small{color:var(--a-soluk)}
+  .idd-govde .idd-uyari-ic{padding:0 16px 16px;display:flex;flex-direction:column;gap:8px}
+  .idd-govde .idd-uyari-ic p{margin:0;line-height:1.55}
+  .idd-govde .idd-onem{padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700}
+  .idd-govde .idd-onem-kritik{background:var(--a-kotub);color:var(--a-kotu)}.idd-govde .idd-onem-uyari{background:var(--a-uyarib);color:var(--a-uyari)}.idd-govde .idd-onem-bilgi{background:var(--a-bilgib);color:var(--a-bilgi)}
+  .idd .idd-ana{min-height:38px;padding:0 16px;border:0;border-radius:10px;background:var(--a-vurgu-k);color:#fff !important;font-weight:700;align-self:flex-start}
+  .idd .idd-ikincil{min-height:38px;padding:0 14px;border:1px solid var(--a-cizgi);border-radius:10px;background:var(--a-kart);font-weight:600;align-self:flex-start}
+  .idd-govde .idd-oneri{background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .idd-govde .idd-reddedildi{opacity:.6}
+  .idd-govde .idd-oneri-bas{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px}.idd-govde .idd-oneri-bas b{font-size:15.5px}.idd-govde .idd-oneri-bas small{color:var(--a-soluk)}
+  .idd-govde .idd-oneri p{margin:0;line-height:1.55;color:var(--a-soluk)}
+  .idd-govde .idd-oneri-alt{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
+  .idd-govde .idd-durum{color:var(--a-soluk);font-weight:600}
+  .idd .idd-adimlar{margin:0;padding:0;list-style:none;display:flex;gap:4px;counter-reset:a}
+  .idd .idd-adimlar li{flex:1;position:relative;padding:8px 8px 8px 30px;border-radius:8px;background:var(--a-bg);font-size:12.5px;font-weight:600;color:var(--a-soluk);counter-increment:a;transition:background-color .4s,color .4s}
+  .idd .idd-adimlar li::before{content:counter(a);position:absolute;left:8px;top:50%;transform:translateY(-50%);width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;font-size:10px;display:flex;align-items:center;justify-content:center}
+  .idd .idd-adimlar li.tamam{background:var(--a-iyib);color:var(--a-iyi)}
+  .idd .idd-adimlar li.tamam::before{content:"✓"}
+  .idd .idd-adimlar li.simdi{background:var(--a-tint);color:var(--a-tintx)}
+  .idd .idd-eylem{display:flex;flex-wrap:wrap;gap:8px}
+  .idd-zaman{margin:0;padding:0 0 0 18px;list-style:none;border-left:2px solid var(--a-cizgi);display:flex;flex-direction:column;gap:14px}
+  .idd-govde .idd-zaman li{position:relative;display:flex;flex-direction:column;gap:2px;background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:12px;padding:12px 14px}
+  .idd-govde .idd-zaman li::before{content:"";position:absolute;left:-26px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--a-vurgu);border:2px solid var(--a-bg)}
+  .idd-govde .idd-zaman time{font-size:12px;color:var(--a-soluk)}.idd-govde .idd-zaman small{color:var(--a-soluk)}
+  .idd-rapor{display:grid;grid-template-columns:minmax(220px,300px) minmax(0,1fr);gap:16px;align-items:start}
+  .idd-rapor-ayar{display:flex;flex-direction:column;gap:12px}
+  .idd-rapor-ayar label{display:flex;flex-direction:column;gap:6px;font-weight:600;font-size:13px}
+  .idd-rapor-ayar fieldset{margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:6px}
+  .idd-rapor-ayar legend{font-weight:600;font-size:13px;margin-bottom:4px}
+  .idd-rapor-ayar fieldset label{flex-direction:row;align-items:center;gap:8px;font-weight:500}
+  .idd-rapor-ayar input{width:16px;height:16px;accent-color:#B84406}
+  .idd-sayfa{background:#FFFFFF;color:#1F2A3A;border-radius:6px;padding:26px;box-shadow:0 18px 40px rgba(0,0,0,.18);min-height:420px;display:flex;flex-direction:column;gap:14px;border-top:6px solid #F07A23}
+  .idd-sayfa .idd-sayfa-bas{display:flex;justify-content:space-between;font-size:12px;color:#5B6B80}.idd-sayfa .idd-sayfa-bas b{color:#002559;letter-spacing:.12em}
+  .idd-sayfa h3{margin:0;font-size:22px;color:#002559}.idd-sayfa h4{margin:0 0 6px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#B84406}
+  .idd-sayfa p,.idd-sayfa ul{margin:0;line-height:1.55}.idd-sayfa ul{padding-left:18px}
+  .idd-sayfa .idd-sayfa-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .idd-sayfa .idd-sayfa-kpi span{display:flex;flex-direction:column;padding:10px;border-radius:8px;background:#F4F6FA;font-size:20px;font-weight:700}
+  .idd-sayfa .idd-sayfa-kpi small{font-size:11px;font-weight:600;color:#5B6B80}
+  .idd-sayfa .idd-cubuk-iz{background:#EEF1F5 !important}
+  .idd-sayfa .idd-sayfa-dip{margin-top:auto;font-size:11px;color:#8090A4;text-align:right}
+  .idd-sihirbaz{display:flex;flex-direction:column;gap:12px}
+  .idd-sihirbaz p{margin:0}
+  .idd-govde .idd-yukleniyor{color:var(--a-soluk)}
+  .idd-hesaplar{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  .idd-govde .idd-hesaplar li{display:grid;grid-template-columns:10px 1fr;column-gap:10px;row-gap:2px;align-items:center;background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:12px;padding:12px 14px}
+  .idd-govde .idd-hesaplar span,.idd-govde .idd-hesaplar small{grid-column:2;color:var(--a-soluk);font-size:12.5px}
+  .idd-govde .idd-iyi,.idd-govde .idd-kotu{width:10px;height:10px;border-radius:50%;background:var(--a-iyi)}
+  .idd-govde .idd-kotu{background:var(--a-kotu)}
+  .idd-govde .idd-hesaplar li:has(.idd-kotu) small{color:var(--a-kotu);font-weight:600}
+  .idd-portal{background:var(--a-kart);border:1px solid var(--a-cizgi);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+  .idd-portal h3{margin:0;font-size:20px}.idd-portal p{margin:0;color:var(--a-soluk);max-width:60ch;line-height:1.6}
+  .idd-yakinda{padding:3px 10px;border-radius:999px;background:var(--a-tint);color:var(--a-tintx);font-size:12px;font-weight:700}
+  .idd-portal-onizleme{width:100%;max-width:520px;border:1px dashed var(--a-cizgi);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;opacity:.85}
+  .idd-portal-onizleme>div:first-child{display:flex;justify-content:space-between;color:var(--a-soluk)}
+  .idd-portal-kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.idd-portal-kpi span{display:flex;flex-direction:column;padding:10px;border-radius:10px;background:var(--a-bg);font-weight:700;font-size:18px}.idd-portal-kpi small{font-size:11px;color:var(--a-soluk);font-weight:600}
+  .idd-govde .idd-bos{color:var(--a-soluk);padding:10px}
+  .idd-tost{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);max-width:calc(100% - 36px);padding:12px 16px;border-radius:12px;background:#002559;color:#fff;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:3}
+  .idd-tost[hidden]{display:none}
+  .idd .idd-vurgu{outline:3px solid var(--a-vurgu);outline-offset:4px;border-radius:14px;transition:outline-color .3s}
+  .idd-tur{position:absolute;right:18px;top:18px;z-index:4;width:min(360px,calc(100% - 36px));background:#002559;color:#fff;border-radius:16px;padding:16px;box-shadow:0 20px 50px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:10px}
+  .idd-tur[hidden]{display:none}
+  .idd-tur p{margin:0;line-height:1.55;color:#E6ECF5}
+  .idd-tur-adim{font-size:12px;font-weight:700;color:#FFB58A}
+  .idd-tur div{display:flex;gap:8px;align-items:center}
+  .idd-tur button{min-height:36px;padding:0 14px;border-radius:10px;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;font-weight:600}
+  .idd-tur button:disabled{opacity:.4;cursor:default}
+  .idd-tur [data-tur-kapat]{margin-left:auto;border:0}
+  .idd-tur .idd-ana{background:#F07A23 !important;color:#1A1206 !important;border:0}
+  @media (max-width:1100px){.idd-kpi{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:900px){
+    .idd{grid-template-columns:1fr}
+    .idd-yan{border-right:0;border-bottom:1px solid var(--a-cizgi);padding:10px;flex-direction:row;align-items:center;overflow-x:auto}
+    .idd-logo{flex:none}
+    .idd-yan nav{flex-direction:row}
+    .idd-yan [role=tab]{white-space:nowrap}
+    .idd-iki,.idd-rapor{grid-template-columns:1fr}
+    .idd-tur{top:auto;bottom:18px}
+  }
+  @media (max-width:600px){.idd-kpi{grid-template-columns:1fr 1fr}.idd-ust h2{font-size:clamp(28px,8vw,36px)}.idd-govde{padding:12px}.idd-tazelik{margin-left:0}.idd-govde .idd-cubuk-satir{grid-template-columns:100px 1fr 40px}.idd .idd-adimlar{flex-wrap:wrap}.idd .idd-adimlar li{flex:1 1 40%}}
+</style>

@@ -1,5 +1,6 @@
 ---
 import Site from '../../layouts/Site.astro';
+import IdosDemo from '../../components/IdosDemo.astro';
 // Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
 class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
 class Component extends DCLogic {
@@ -43,7 +44,8 @@ const ozellikler = __v.ozellikler;
 <h1 style="margin: 0; font-size: 58px; line-height: 1.05; letter-spacing: -0.03em; color: #FFFFFF">Reklam hesaplarınızın kontrol merkezi</h1>
 <p style="margin: 0; font-size: 19px; color: #C6D2E3; max-width: 560px">Google, Meta ve analiz hesaplarınız tek panelde. Yapay zekâ önerir, uzmanımız inceler, siz onaylarsınız. Onayınız olmadan hiçbir canlı ayar değişmez.</p>
 <div style="display: flex; flex-wrap: wrap; gap: 12px">
-<a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Tanıtım iste</a>
+<a href="#demo" style="min-height: 54px; display: flex; align-items: center; gap: 10px; padding: 0 26px; border-radius: 12px; background: #F07A23; color: #1A1206; text-decoration: none; font-weight: 700; font-size: 17px">Canlı demoyu deneyin <span aria-hidden="true">↓</span></a>
+<a href="/tr/iletisim" style="min-height: 54px; display: flex; align-items: center; padding: 0 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,.35); color: #FFFFFF; text-decoration: none; font-weight: 700; font-size: 17px">Tanıtım iste</a>
 </div>
 </div>
 <figure style="flex: 1 1 540px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 10px">
@@ -66,7 +68,7 @@ const ozellikler = __v.ozellikler;
 </div>
 </div>
 </div>
-<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez.</figcaption>
+<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez. <a href="#demo" style="color: #FFB58A; font-weight: 600">Etkileşimli demoyu açın ↓</a></figcaption>
 </figure>
 </div>
 </div>
@@ -78,6 +80,8 @@ const ozellikler = __v.ozellikler;
 </div>
 </section>
 
+<IdosDemo />
+
 <section style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
 <div style="display: flex; flex-direction: column; gap: 14px; max-width: 700px">
 <div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">NELER VAR</span></div>
@@ -85,11 +89,12 @@ const ozellikler = __v.ozellikler;
 </div>
 <div style="display: flex; flex-wrap: wrap; gap: 20px">
 {(ozellikler || []).map((o) => (<Fragment>
-<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px">
+<a href="#demo" class="idos-oz" data-demo-git={({ '01': 'genel', '02': 'kontrol', '03': 'oneriler', '04': 'kayit', '05': 'raporlar', '06': 'portal' })[o.no]} style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit">
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 30px; font-weight: 700; color: var(--brand); opacity: 0.45">{o.no}</span>{(o.yakinda) && (<Fragment><span style="padding: 3px 10px; border-radius: 999px; background: var(--tint); color: var(--tintx); font-size: 12px; font-weight: 600">Yakında</span></Fragment>)}</div>
 <h3 style="margin: 0; font-size: 21px; color: var(--head)">{o.ad}</h3>
 <p style="margin: 0; color: var(--tx2); font-size: 15px">{o.aciklama}</p>
-</article>
+<span class="idos-oz-git">Demoda görün →</span>
+</a>
 </Fragment>))}
 </div>
 </section>
