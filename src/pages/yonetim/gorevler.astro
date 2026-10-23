@@ -1,0 +1,239 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Görevler ve takvim" aktif="gorev" yol="Satış ve müşteri" aciklama="Ekibin yapılacakları. Her görevin bir günü, isteğe bağlı saati, önceliği ve sorumlusu olur; istenirse bir müşteriye bağlanır. Günler İstanbul saatine göre hesaplanır.">
+<style is:global>
+  .gv-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .gv-grup{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--card2);border:1px solid var(--line)}
+  .gv-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
+  .gv-form .genis{grid-column:1/-1}
+  .gv-bolum{padding:6px 0}
+  .gv-bolum>h2{margin:0;padding:12px 16px 6px;font-size:15px;color:var(--head);display:flex;gap:8px;align-items:center}
+  .gv-satir{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-top:1px solid var(--line)}
+  .gv-satir .govde{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+  .gv-satir .ust-bilgi{display:flex;gap:6px 10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--tx2)}
+  .gv-satir .eylem{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .gv-tik{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:var(--card);cursor:pointer;color:var(--ok);font-weight:800;padding:0;line-height:1}
+  .gv-tik[aria-pressed="true"]{background:var(--okb);border-color:var(--ok)}
+  .gv-takvim{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:10px}
+  .gv-takvim .bas{font-size:11px;font-weight:600;color:var(--tx2);text-align:center;padding:4px 0}
+  .gv-gun{min-height:96px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:6px;display:flex;flex-direction:column;gap:3px;text-align:left;font:inherit;color:var(--tx);cursor:pointer;overflow:hidden}
+  .gv-gun.disi{background:var(--card2);color:var(--tx2)}
+  .gv-gun.bugun{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
+  .gv-gun.secili{background:var(--tint)}
+  .gv-gun .no{font-size:12px;font-weight:700;display:flex;justify-content:space-between;gap:4px}
+  .gv-gun .oge{font-size:11px;line-height:1.3;padding:1px 5px;border-radius:5px;background:var(--infob);color:var(--info);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .gv-gun .oge.gec{background:var(--errb);color:var(--err)}
+  .gv-gun .oge.tamam{background:var(--okb);color:var(--ok);text-decoration:line-through}
+  .gv-gun .daha{font-size:11px;color:var(--tx2)}
+  .gv-gun .bugun-yazi{color:var(--brand);font-size:10px}
+  .gv-gun .nokta{display:none;font-size:11px;font-weight:700;color:var(--info)}
+  @media (max-width:640px){
+    .gv-takvim{gap:2px;padding:6px}
+    .gv-gun{min-height:52px;padding:4px;border-radius:8px}
+    .gv-gun .oge,.gv-gun .daha,.gv-gun .bugun-yazi{display:none}
+    .gv-gun .nokta{display:block}
+    .gv-satir{flex-wrap:wrap}
+    .gv-satir .eylem{width:100%;justify-content:flex-start;padding-left:38px}
+  }
+</style>
+<div class="gv-arac">
+  <div class="gv-grup" role="group" aria-label="Görünüm" data-gorunum></div>
+  <label style="display: inline-flex; gap: 6px; align-items: center; font-size: 14px"><input type="checkbox" data-bana> Yalnız bana atananlar</label>
+  <span style="flex: 1 1 0"></span>
+  <button type="button" class="dugme" data-ics title="Açık görevleri Google Takvim, Outlook veya Apple Takvim'e aktarmak için .ics dosyası indirir">Takvime aktar (.ics)</button>
+  <button type="button" class="dugme ana" data-yeni>+ Yeni görev</button>
+</div>
+<form class="kart gv-form" data-form hidden novalidate>
+  <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni görev</h2>
+  <label class="alan genis">Başlık<input name="baslik" maxlength="160" required autocomplete="off" placeholder="Ör. Teklifi müşteriye gönder"></label>
+  <label class="alan">Gün<input name="tarih" type="date" required></label>
+  <label class="alan">Saat (isteğe bağlı)<input name="saat" type="time"></label>
+  <label class="alan">Öncelik<select name="oncelik"><option value="dusuk">Düşük</option><option value="normal" selected>Normal</option><option value="yuksek">Yüksek</option></select></label>
+  <label class="alan">Müşteri (isteğe bağlı)<select name="musteri_id" data-musteri><option value="">Müşteri yok</option></select></label>
+  <label class="alan">Sorumlu (e-posta)<input name="atanan" type="email" maxlength="160" autocomplete="off" data-atanan placeholder="Boş bırakılırsa siz"></label>
+  <label class="alan genis">Açıklama (isteğe bağlı)<textarea name="aciklama" rows="3" maxlength="4000"></textarea></label>
+  <div class="genis" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+    <button type="submit" class="dugme ana">Kaydet</button><button type="button" class="dugme" data-vazgec>Vazgeç</button>
+    <span role="status" data-form-durum style="font-size: 14px; color: var(--err)"></span>
+  </div>
+</form>
+<div data-alan></div>
+<script>
+  import { api, el, tarih as zaman, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { bugunIst, gun, saatYaz, uzunGun, ayAdi, musteriBag, musteriAdi, musterileriDoldur, dosyaIndir, secmeDugme } from '../../scripts/yonetim/kayit.js';
+  const alan = document.querySelector('[data-alan]'), form = document.querySelector('[data-form]'), fdurum = document.querySelector('[data-form-durum]');
+  const bana = document.querySelector('[data-bana]');
+  const ONCELIK = { dusuk: ['Düşük', 'background: var(--card2); color: var(--tx2)'], normal: ['Normal', ''], yuksek: ['Yüksek', ''] };
+  const ONCELIK_SINIF = { dusuk: 'cip', normal: 'cip yeni', yuksek: 'cip kaybedildi' };
+  let tum = [], ben = '', gorunum = 'liste', duzenlenen = null, secGun = null;
+  const bugun0 = bugunIst();
+  let ay = { y: +bugun0.slice(0, 4), m: +bugun0.slice(5, 7) };
+  try { const k = JSON.parse(localStorage.getItem('idx-gorev') || '{}'); if (k.gorunum === 'takvim') gorunum = 'takvim'; bana.checked = !!k.bana; } catch (e) {}
+  const tercihYaz = () => { try { localStorage.setItem('idx-gorev', JSON.stringify({ gorunum, bana: bana.checked })); } catch (e) {} };
+  const gorunen = () => tum.filter((g) => !bana.checked || g.atanan === ben);
+
+  // --- Form ---
+  function formAc(g, onTarih) {
+    duzenlenen = g || null;
+    form.reset(); fdurum.textContent = '';
+    document.querySelector('[data-form-baslik]').textContent = g ? 'Görevi düzenle' : 'Yeni görev';
+    form.tarih.value = g ? g.tarih : onTarih || bugunIst();
+    if (g) { form.baslik.value = g.baslik; form.saat.value = g.saat || ''; form.oncelik.value = g.oncelik; form.musteri_id.value = g.musteri_id || ''; form.atanan.value = g.atanan === ben ? '' : g.atanan; form.aciklama.value = g.aciklama || ''; }
+    form.hidden = false; form.baslik.focus(); form.scrollIntoView({ block: 'nearest' });
+  }
+  document.querySelector('[data-yeni]').addEventListener('click', () => formAc(null, gorunum === 'takvim' ? secGun : null));
+  document.querySelector('[data-vazgec]').addEventListener('click', () => { form.hidden = true; duzenlenen = null; });
+  form.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const v = Object.fromEntries(new FormData(form));
+    if (!v.baslik.trim()) { fdurum.textContent = 'Görev başlığı gerekli.'; form.baslik.focus(); return; }
+    if (!v.tarih) { fdurum.textContent = 'Bir gün seçin.'; form.tarih.focus(); return; }
+    const d = form.querySelector('[type=submit]'); d.disabled = true; fdurum.textContent = '';
+    try {
+      await api(duzenlenen ? 'gorevler/' + encodeURIComponent(duzenlenen.id) : 'gorevler', v);
+      form.hidden = true; duzenlenen = null; await yukle();
+    } catch (h) { fdurum.textContent = h.message; } finally { d.disabled = false; }
+  });
+
+  async function islem(g, ne, dugme) {
+    if (ne === 'sil' && !confirm(`“${g.baslik}” görevi silinsin mi? Bu işlem geri alınamaz.`)) return;
+    if (dugme) dugme.disabled = true;
+    try { await api(`gorevler/${encodeURIComponent(g.id)}/${ne}`, {}); genelHata(''); await yukle(); }
+    catch (h) { genelHata('İşlem yapılamadı: ' + h.message); if (dugme) dugme.disabled = false; }
+  }
+
+  // --- Satır ---
+  function satir(g, bugun) {
+    const tamam = g.durum === 'tamam', gec = !tamam && g.tarih < bugun;
+    return el('article', { class: 'gv-satir', 'data-gorev': g.id },
+      el('button', { type: 'button', class: 'gv-tik', 'aria-pressed': String(tamam), 'aria-label': tamam ? `“${g.baslik}” görevini yeniden aç` : `“${g.baslik}” görevini tamamla`, title: tamam ? 'Yeniden aç' : 'Tamamla', onclick: (o) => islem(g, tamam ? 'ac' : 'tamamla', o.currentTarget) }, tamam ? '✓' : ''),
+      el('div', { class: 'govde' },
+        el('strong', { style: `overflow-wrap: anywhere; color: var(--head)${tamam ? '; text-decoration: line-through; opacity: .7' : ''}` }, g.baslik),
+        el('div', { class: 'ust-bilgi' },
+          el('span', { style: gec ? 'color: var(--err); font-weight: 600' : '' }, gun(g.tarih) + (g.saat ? ' · ' + saatYaz(g.saat) : '') + (gec ? ' · gecikti' : '')),
+          el('span', { class: ONCELIK_SINIF[g.oncelik], style: ONCELIK[g.oncelik][1] }, ONCELIK[g.oncelik][0]),
+          musteriBag(g),
+          el('span', { style: 'overflow-wrap: anywhere' }, 'Sorumlu: ' + (g.atanan === ben ? 'siz' : g.atanan)),
+          tamam && g.tamamlanma ? el('span', {}, 'Tamamlandı: ' + zaman(g.tamamlanma)) : null),
+        g.aciklama ? el('p', { style: 'margin: 2px 0 0; font-size: 13px; color: var(--tx2); white-space: pre-wrap; overflow-wrap: anywhere' }, g.aciklama) : null),
+      el('div', { class: 'eylem' },
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(g) }, 'Düzenle'),
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(g, 'sil', o.currentTarget) }, 'Sil')));
+  }
+
+  // --- Liste görünümü ---
+  function listeCiz() {
+    const bugun = bugunIst(), gs = gorunen();
+    const acik = gs.filter((g) => g.durum === 'acik');
+    const gruplar = [
+      ['Gecikmiş', acik.filter((g) => g.tarih < bugun), 'Gecikmiş görev yok.', 'color: var(--err)'],
+      ['Bugün', acik.filter((g) => g.tarih === bugun), 'Bugün için açık görev yok.', ''],
+      ['Yaklaşan', acik.filter((g) => g.tarih > bugun), 'Yaklaşan görev yok.', ''],
+      ['Tamamlanan', gs.filter((g) => g.durum === 'tamam').sort((a, b) => (b.tamamlanma || '').localeCompare(a.tamamlanma || '')), 'Henüz tamamlanan görev yok.', '']
+    ];
+    if (!tum.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, 'Henüz görev yok. “+ Yeni görev” ile ilk görevi ekleyin; gün, saat ve sorumlu seçebilir, isterseniz bir müşteriye bağlayabilirsiniz.')); return; }
+    if (!gs.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, 'Size atanmış görev yok. Tüm görevleri görmek için “Yalnız bana atananlar” kutusunu kaldırın.')); return; }
+    alan.replaceChildren(el('div', { style: 'display: flex; flex-direction: column; gap: 12px' }, gruplar.map(([ad, ls, bos, renk]) => {
+      const tamamlanan = ad === 'Tamamlanan';
+      const govde = ls.length ? ls.map((g) => satir(g, bugun)) : [el('div', { style: 'padding: 4px 16px 14px; font-size: 13px; color: var(--tx2)' }, bos)];
+      if (tamamlanan && ls.length) {
+        return el('details', { class: 'kart gv-bolum' }, el('summary', { style: 'cursor: pointer; padding: 12px 16px; font-weight: 700; color: var(--head)' }, `Tamamlanan · ${ls.length}`), ...govde);
+      }
+      return el('section', { class: 'kart gv-bolum', 'aria-label': ad }, el('h2', { style: renk }, ad, el('span', { style: 'font-weight: 500; color: var(--tx2)' }, '· ' + ls.length)), ...govde);
+    })));
+  }
+
+  // --- Takvim görünümü (pazartesiden başlar) ---
+  const isoGun = (d) => d.toISOString().slice(0, 10);
+  function takvimCiz() {
+    const bugun = bugunIst(), gs = gorunen();
+    const ilk = new Date(Date.UTC(ay.y, ay.m - 1, 1));
+    const bas = new Date(ilk); bas.setUTCDate(1 - ((ilk.getUTCDay() + 6) % 7));
+    const son = new Date(Date.UTC(ay.y, ay.m, 0));
+    const bitis = new Date(son); bitis.setUTCDate(son.getUTCDate() + (6 - ((son.getUTCDay() + 6) % 7)));
+    const gunlere = {};
+    gs.forEach((g) => { (gunlere[g.tarih] = gunlere[g.tarih] || []).push(g); });
+    const hucreler = [];
+    for (let d = new Date(bas); d <= bitis; d.setUTCDate(d.getUTCDate() + 1)) {
+      const t = isoGun(d), ls = gunlere[t] || [], disi = d.getUTCMonth() !== ay.m - 1;
+      const acikSay = ls.filter((g) => g.durum === 'acik').length;
+      hucreler.push(el('button', { type: 'button', class: 'gv-gun' + (disi ? ' disi' : '') + (t === bugun ? ' bugun' : '') + (t === secGun ? ' secili' : ''), 'data-gun': t,
+        'aria-label': uzunGun(t) + (ls.length ? `, ${ls.length} görev` : ', görev yok'), 'aria-pressed': String(t === secGun), onclick: () => { secGun = t; takvimCiz(); } },
+        el('span', { class: 'no' }, el('span', {}, String(d.getUTCDate())), t === bugun ? el('span', { class: 'bugun-yazi' }, 'Bugün') : null),
+        ls.slice(0, 3).map((g) => el('span', { class: 'oge' + (g.durum === 'tamam' ? ' tamam' : g.tarih < bugun ? ' gec' : ''), title: g.baslik }, (g.saat ? saatYaz(g.saat) + ' ' : '') + g.baslik)),
+        ls.length > 3 ? el('span', { class: 'daha' }, `+${ls.length - 3} görev daha`) : null,
+        ls.length ? el('span', { class: 'nokta', style: acikSay ? '' : 'color: var(--ok)' }, acikSay ? '● ' + acikSay : '✓ ' + ls.length) : null));
+    }
+    const secili = secGun ? (gunlere[secGun] || []) : [];
+    alan.replaceChildren(
+      el('section', { class: 'kart', 'aria-label': 'Aylık takvim' },
+        el('div', { style: 'display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 12px 0; flex-wrap: wrap' },
+          el('button', { type: 'button', class: 'dugme kucuk', 'data-ay-geri': '', 'aria-label': 'Önceki ay', onclick: () => ayGit(-1) }, '‹ Önceki'),
+          el('h2', { style: 'margin: 0; font-size: 18px; color: var(--head); text-transform: capitalize', 'data-ay-ad': '' }, ayAdi(ay.y, ay.m)),
+          el('div', { style: 'display: flex; gap: 6px' },
+            el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { ay = { y: +bugun.slice(0, 4), m: +bugun.slice(5, 7) }; secGun = bugun; takvimCiz(); } }, 'Bugün'),
+            el('button', { type: 'button', class: 'dugme kucuk', 'data-ay-ileri': '', 'aria-label': 'Sonraki ay', onclick: () => ayGit(1) }, 'Sonraki ›'))),
+        el('div', { class: 'gv-takvim' }, ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz'].map((b) => el('span', { class: 'bas', 'aria-hidden': 'true' }, b)), hucreler)),
+      secGun ? el('section', { class: 'kart gv-bolum', 'aria-label': 'Seçili gün', 'data-secili-gun': '' },
+        el('h2', {}, uzunGun(secGun), el('span', { style: 'font-weight: 500; color: var(--tx2)' }, '· ' + secili.length), el('span', { style: 'flex: 1' }),
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(null, secGun) }, '+ Bu güne görev')),
+        secili.length ? secili.map((g) => satir(g, bugun)) : el('div', { style: 'padding: 4px 16px 14px; font-size: 13px; color: var(--tx2)' }, 'Bu güne görev yok.'))
+        : el('div', { class: 'bos', style: 'padding: 8px' }, tum.length ? 'Bir günün görevlerini görmek için takvimde o güne dokunun.' : 'Henüz görev yok. Takvimden bir gün seçip “+ Bu güne görev” ile ekleyebilirsiniz.'));
+  }
+  function ayGit(f) { const d = new Date(Date.UTC(ay.y, ay.m - 1 + f, 1)); ay = { y: d.getUTCFullYear(), m: d.getUTCMonth() + 1 }; secGun = null; takvimCiz(); }
+
+  function ciz() {
+    const g = document.querySelector('[data-gorunum]');
+    g.replaceChildren(secmeDugme(gorunum === 'liste', 'Liste', () => { gorunum = 'liste'; tercihYaz(); ciz(); }, { 'data-v': 'liste' }),
+      secmeDugme(gorunum === 'takvim', 'Takvim', () => { gorunum = 'takvim'; tercihYaz(); ciz(); }, { 'data-v': 'takvim' }));
+    if (gorunum === 'takvim') takvimCiz(); else listeCiz();
+  }
+  bana.addEventListener('change', () => { tercihYaz(); ciz(); });
+
+  // --- .ics dışa aktarım (RFC 5545): CRLF satır sonu, 75 baytta satır katlama, metin kaçışları ---
+  const icsMetin = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r\n|\r|\n/g, '\\n');
+  function katla(satir) {
+    const kod = new TextEncoder();
+    let cikti = '', parca = '', boy = 0;
+    for (const h of satir) {
+      const b = kod.encode(h).length;
+      if (boy + b > (cikti ? 74 : 75)) { cikti += (cikti ? '\r\n ' : '') + parca; parca = ''; boy = 0; }
+      parca += h; boy += b;
+    }
+    return cikti ? cikti + '\r\n ' + parca : parca;
+  }
+  const utc = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+  function icsUret(gorevler) {
+    const damga = utc(new Date());
+    const s = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Idexya//Yonetim paneli gorevleri//TR', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:Idexya görevleri'];
+    for (const g of gorevler) {
+      const [y, m, d] = g.tarih.split('-').map(Number);
+      s.push('BEGIN:VEVENT', 'UID:' + g.id + '@idexya.com', 'DTSTAMP:' + damga);
+      if (g.saat) {
+        const [sa, dk] = g.saat.split(':').map(Number);
+        s.push('DTSTART:' + utc(new Date(Date.UTC(y, m - 1, d, sa - 3, dk))), 'DURATION:PT30M'); // İstanbul UTC+3
+      } else {
+        const ert = new Date(Date.UTC(y, m - 1, d + 1));
+        s.push('DTSTART;VALUE=DATE:' + g.tarih.replace(/-/g, ''), 'DTEND;VALUE=DATE:' + isoGun(ert).replace(/-/g, ''));
+      }
+      const aciklama = [g.aciklama, musteriAdi(g) ? 'Müşteri: ' + musteriAdi(g) : '', 'Sorumlu: ' + g.atanan, 'Öncelik: ' + ONCELIK[g.oncelik][0]].filter(Boolean).join('\n');
+      s.push('SUMMARY:' + icsMetin(g.baslik), 'DESCRIPTION:' + icsMetin(aciklama), 'PRIORITY:' + { yuksek: 1, normal: 5, dusuk: 9 }[g.oncelik], 'STATUS:CONFIRMED', 'TRANSP:TRANSPARENT', 'END:VEVENT');
+    }
+    s.push('END:VCALENDAR');
+    return s.map(katla).join('\r\n') + '\r\n';
+  }
+  document.querySelector('[data-ics]').addEventListener('click', () => {
+    const acik = gorunen().filter((g) => g.durum === 'acik');
+    if (!acik.length) { genelHata(''); alert('Aktarılacak açık görev yok.'); return; }
+    dosyaIndir(icsUret(acik), `idexya-gorevler-${bugunIst()}.ics`, 'text/calendar;charset=utf-8');
+  });
+
+  async function yukle() {
+    try { const r = await api('gorevler'); tum = r.gorevler; ben = r.kim; genelHata(''); ciz(); }
+    catch (h) { genelHata('Görevler yüklenemedi: ' + h.message); if (!tum.length) alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
+  }
+  musterileriDoldur([[document.querySelector('[data-musteri]'), 'Müşteri yok']]);
+  yukle();
+</script>
+</Yonetim>
