@@ -75,9 +75,9 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     if (!reklamKurulu(env)) uyari.push({ baslik: 'IDOS reklam verisi bağlı değil', detay: 'Genel bakıştaki reklam grafikleri boş kalır. IDOS_BQ_GORUNUM ve IDOS_BQ_ANAHTAR tanımlanmalı.', href: '/yonetim/entegrasyonlar/', onem: 'bilgi' });
     const c = cekim.results[0];
     if (c && c.durum !== 'tamam') uyari.push({ baslik: 'Son IDOS veri çekimi başarısız', detay: c.mesaj || 'Ayrıntı için Veri eşitleme sayfasına bakın.', zaman: c.zaman, href: '/yonetim/veri-esitleme/', onem: 'kritik' });
-    if (await tabloVar(db, 'denetim')) {
-      const d = await db.prepare('SELECT zaman, ozet FROM denetim ORDER BY zaman DESC LIMIT 1').first();
-      if (d) { try { const o = JSON.parse(d.ozet || '{}'); if (o.hata || o.kritik) uyari.push({ baslik: 'Site denetiminde düzeltilmesi gereken sorunlar var', detay: `${o.kritik || o.hata} kritik sorun`, zaman: d.zaman, href: '/yonetim/seo/', onem: 'uyari' }); } catch (e) { /* özet okunamadı */ } }
+    if (await tabloVar(db, 'denetimler')) {
+      const d = await db.prepare('SELECT zaman, ozet FROM denetimler ORDER BY zaman DESC LIMIT 1').first();
+      if (d) { try { const o = JSON.parse(d.ozet || '{}'); const kritik = (o.agirlik && o.agirlik.kritik) || 0; if (kritik) uyari.push({ baslik: 'Site denetiminde kritik sorunlar var', detay: `${kritik} kritik sorun · site puanı ${o.puan}`, zaman: d.zaman, href: '/yonetim/seo/', onem: 'uyari' }); } catch (e) { /* özet okunamadı */ } }
     }
     return json({ ok: true, onay, uyari });
   }

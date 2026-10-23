@@ -94,8 +94,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
     } catch (h) { kutu.replaceChildren(el('li', { class: 'bos', style: 'padding: 16px' }, 'Teklifler yüklenemedi: ' + h.message)); }
   }
 
-  async function yukle() {
-    teklifleriYukle();
   // Reklam özeti (IDOS): yalnız IDOS eşitleme sayfasında bu müşteriye eşleştirilmiş hesap varsa görünür.
   // Para birimleri birbirine eklenmez; her platform + para birimi ayrı satırdır.
   const PLATFORM = { meta: 'Meta', google: 'Google Ads' };
@@ -121,6 +119,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   }
 
   async function yukle() {
+    teklifleriYukle();
     reklamYukle();
     try { ciz(await api('musteriler/' + encodeURIComponent(id))); }
     catch (h) { genelHata(h.durum === 404 ? 'Bu müşteri bulunamadı. Bağlantı eski olabilir; CRM listesinden açın.' : 'Müşteri yüklenemedi: ' + h.message); }
