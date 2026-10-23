@@ -1,0 +1,173 @@
+---
+// Ana sayfa: ücretsiz araçlar. Hesaplar tarayıcıda yapılır; girilen rakamlar hiçbir yere gönderilmez ve saklanmaz.
+import Baslik from './Baslik.astro';
+const SEKMELER = [
+  { id: 'reklam', ad: 'Reklam kârlılığı', alt: 'ROAS ve başabaş noktası' },
+  { id: 'pazaryeri', ad: 'Pazaryeri kârı', alt: 'Komisyon ve kargo sonrası' },
+  { id: 'olcum', ad: 'Ölçüm kontrolü', alt: '8 soruda ölçüm sağlığı' }
+];
+const KONTROL = [
+  'GA4 kurulu; satın alma veya form gönderimi olay olarak ölçülüyor',
+  'Google Ads dönüşümleri satış, form ve arama olarak ayrı tanımlı',
+  'Meta pikseli ve Dönüşüm API (CAPI) birlikte çalışıyor',
+  'Etiketler Google Etiket Yöneticisi (GTM) ile tek yerden yönetiliyor',
+  'Çerez onayı ve Google İzin Modu (Consent Mode v2) kurulu',
+  'Satışlar ciro değeriyle birlikte reklam platformlarına gönderiliyor',
+  'Telefon ve WhatsApp tıklamaları ölçülüyor',
+  'Search Console bağlı, site haritası gönderilmiş'
+];
+---
+<section class="ar" aria-labelledby="ar-baslik">
+  <div class="ar-ic">
+    <Baslik id="ar-baslik" etiket="Ücretsiz araçlar" baslik="Rakamlarınızı kendiniz hesaplayın" aciklama="Girdiğiniz rakamlar yalnızca tarayıcınızda hesaplanır; hiçbir yere gönderilmez." />
+    <div class="ar-kutu" data-araclar>
+      <div class="ar-sekmeler" role="tablist" aria-label="Araçlar">
+        {SEKMELER.map((s, i) => (
+          <button type="button" role="tab" id={`ar-s-${s.id}`} aria-controls={`ar-p-${s.id}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? '0' : '-1'}><b>{s.ad}</b><small>{s.alt}</small></button>
+        ))}
+      </div>
+
+      <div class="ar-panel" role="tabpanel" id="ar-p-reklam" aria-labelledby="ar-s-reklam" data-hesap="reklam">
+        <div class="ar-girdi">
+          <label>Aylık reklam harcaması (₺)<input inputmode="decimal" name="harcama" value="20000"></label>
+          <label>Reklamdan gelen satış adedi<input inputmode="decimal" name="adet" value="80"></label>
+          <label>Ortalama sepet tutarı (₺)<input inputmode="decimal" name="sepet" value="1500"></label>
+          <label>Brüt kâr marjı (%)<input inputmode="decimal" name="marj" value="35"><small>Ürün maliyeti düşüldükten sonra kalan pay</small></label>
+        </div>
+        <div class="ar-sonuc" aria-live="polite">
+          <div><span>Ciro</span><strong data-c="ciro">–</strong></div>
+          <div><span>ROAS</span><strong data-c="roas">–</strong></div>
+          <div><span>Başabaş ROAS</span><strong data-c="basabas">–</strong></div>
+          <div class="ar-ana"><span>Reklam sonrası brüt katkı</span><strong data-c="katki">–</strong></div>
+          <p data-c="yorum"></p>
+        </div>
+      </div>
+
+      <div class="ar-panel" role="tabpanel" id="ar-p-pazaryeri" aria-labelledby="ar-s-pazaryeri" data-hesap="pazaryeri" hidden>
+        <div class="ar-girdi">
+          <label>Satış fiyatı (₺)<input inputmode="decimal" name="fiyat" value="1000"></label>
+          <label>Ürün maliyeti (₺)<input inputmode="decimal" name="maliyet" value="450"></label>
+          <label>Komisyon oranı (%)<input inputmode="decimal" name="komisyon" value="20"></label>
+          <label>Kargo (₺)<input inputmode="decimal" name="kargo" value="60"></label>
+          <label>Diğer giderler (₺)<input inputmode="decimal" name="diger" value="25"><small>Paketleme, hizmet bedeli, reklam payı</small></label>
+        </div>
+        <div class="ar-sonuc" aria-live="polite">
+          <div><span>Komisyon</span><strong data-c="kom">–</strong></div>
+          <div><span>Kâr marjı</span><strong data-c="marj">–</strong></div>
+          <div><span>Başabaş satış fiyatı</span><strong data-c="basabas">–</strong></div>
+          <div class="ar-ana"><span>Ürün başına kâr</span><strong data-c="kar">–</strong></div>
+          <p data-c="yorum"></p>
+        </div>
+        <p class="ar-not">Tüm tutarları KDV hariç girin. Sonuç tahminidir; vergi ve kesinti ayrıntıları için mali müşavirinize danışın. Pazaryerlerinin komisyon oranları kategoriye göre değişir.</p>
+      </div>
+
+      <div class="ar-panel" role="tabpanel" id="ar-p-olcum" aria-labelledby="ar-s-olcum" data-hesap="olcum" hidden>
+        <fieldset class="ar-kontrol">
+          <legend>Hangileri sizde hazır? İşaretleyin.</legend>
+          {KONTROL.map((k, i) => <label><input type="checkbox" name={`k${i}`}><span>{k}</span></label>)}
+        </fieldset>
+        <div class="ar-sonuc" aria-live="polite">
+          <div class="ar-ana"><span>Ölçüm puanı</span><strong data-c="puan">0 / 8</strong></div>
+          <div class="ar-cubuk" aria-hidden="true"><i data-c="cubuk"></i></div>
+          <p data-c="yorum"></p>
+        </div>
+      </div>
+      <div class="ar-dip"><span>Sonucunuzu birlikte yorumlayalım.</span><a href="#analiz">Ücretsiz analiz iste →</a></div>
+    </div>
+  </div>
+</section>
+<script>
+  const tl = (n: number) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY', maximumFractionDigits: 0 }).format(n);
+  const sayi = (v: string) => { const n = parseFloat(String(v).replace(/\./g, '').replace(',', '.')); return Number.isFinite(n) && n >= 0 ? n : NaN; };
+  document.querySelectorAll<HTMLElement>('[data-araclar]').forEach((kok) => {
+    const sekmeler = [...kok.querySelectorAll<HTMLButtonElement>('[role=tab]')];
+    const sec = (s: HTMLButtonElement, odak = false) => sekmeler.forEach((x) => {
+      const ac = x === s; x.setAttribute('aria-selected', String(ac)); x.tabIndex = ac ? 0 : -1;
+      (kok.querySelector('#' + x.getAttribute('aria-controls')) as HTMLElement).hidden = !ac;
+      if (ac && odak) x.focus();
+    });
+    sekmeler.forEach((s, i) => {
+      s.addEventListener('click', () => sec(s));
+      s.addEventListener('keydown', (o) => {
+        const y = o.key === 'ArrowRight' ? 1 : o.key === 'ArrowLeft' ? -1 : 0;
+        if (y) { o.preventDefault(); sec(sekmeler[(i + y + sekmeler.length) % sekmeler.length], true); }
+      });
+    });
+
+    const yaz = (p: Element, ad: string, metin: string) => { const e = p.querySelector(`[data-c="${ad}"]`); if (e) e.textContent = metin; };
+    const deger = (p: Element, ad: string) => sayi((p.querySelector(`[name="${ad}"]`) as HTMLInputElement).value);
+
+    const reklam = kok.querySelector('[data-hesap=reklam]')!;
+    const reklamHesap = () => {
+      const h = deger(reklam, 'harcama'), a = deger(reklam, 'adet'), s = deger(reklam, 'sepet'), m = deger(reklam, 'marj') / 100;
+      if ([h, a, s, m].some(Number.isNaN) || h === 0 || m === 0) { ['ciro', 'roas', 'basabas', 'katki'].forEach((k) => yaz(reklam, k, '–')); yaz(reklam, 'yorum', 'Hesaplamak için tüm alanlara sıfırdan büyük bir rakam girin.'); return; }
+      const ciro = a * s, roas = ciro / h, basabas = 1 / m, katki = ciro * m - h;
+      yaz(reklam, 'ciro', tl(ciro)); yaz(reklam, 'roas', roas.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + 'x');
+      yaz(reklam, 'basabas', basabas.toLocaleString('tr-TR', { maximumFractionDigits: 2 }) + 'x'); yaz(reklam, 'katki', tl(katki));
+      yaz(reklam, 'yorum', katki >= 0
+        ? `ROAS başabaş noktasının üzerinde. Reklam, ürün maliyeti ve reklam gideri düşüldükten sonra ${tl(katki)} katkı bırakıyor (kargo, iade ve sabit giderler hariç).`
+        : `ROAS başabaş noktasının (${basabas.toLocaleString('tr-TR', { maximumFractionDigits: 2 })}x) altında. Bu tabloda her satış reklam gideriyle birlikte zarar ettiriyor; bütçe artırmadan önce hedefleme, ürün ve fiyat incelenmeli.`);
+    };
+
+    const pazar = kok.querySelector('[data-hesap=pazaryeri]')!;
+    const pazarHesap = () => {
+      const f = deger(pazar, 'fiyat'), m = deger(pazar, 'maliyet'), k = deger(pazar, 'komisyon') / 100, kg = deger(pazar, 'kargo'), d = deger(pazar, 'diger');
+      if ([f, m, k, kg, d].some(Number.isNaN) || f === 0 || k >= 1) { ['kom', 'marj', 'basabas', 'kar'].forEach((x) => yaz(pazar, x, '–')); yaz(pazar, 'yorum', 'Hesaplamak için geçerli rakamlar girin; komisyon %100’den küçük olmalı.'); return; }
+      const kom = f * k, kar = f - m - kom - kg - d, basabas = (m + kg + d) / (1 - k);
+      yaz(pazar, 'kom', tl(kom)); yaz(pazar, 'marj', '%' + ((kar / f) * 100).toLocaleString('tr-TR', { maximumFractionDigits: 1 }));
+      yaz(pazar, 'basabas', tl(basabas)); yaz(pazar, 'kar', tl(kar));
+      yaz(pazar, 'yorum', kar >= 0
+        ? `Bu fiyatla ürün başına ${tl(kar)} kalıyor. İndirim veya pazaryeri reklamı planlarken başabaş fiyatın (${tl(basabas)}) altına inmemeye dikkat edin.`
+        : `Bu fiyatla her satış ${tl(-kar)} zarar ettiriyor. Zarar etmemek için satış fiyatı en az ${tl(basabas)} olmalı ya da giderler düşürülmeli.`);
+    };
+
+    const olcum = kok.querySelector('[data-hesap=olcum]')!;
+    const olcumHesap = () => {
+      const kutular = [...olcum.querySelectorAll<HTMLInputElement>('input[type=checkbox]')];
+      const p = kutular.filter((x) => x.checked).length;
+      yaz(olcum, 'puan', `${p} / ${kutular.length}`);
+      (olcum.querySelector('[data-c=cubuk]') as HTMLElement).style.width = (p / kutular.length) * 100 + '%';
+      yaz(olcum, 'yorum', p === kutular.length ? 'Ölçüm altyapınız güçlü görünüyor. Yine de verilerin doğru aktığını düzenli test etmek gerekir.'
+        : p >= 5 ? 'Temel ölçüm var, ama eksik parçalar reklam platformlarının yanlış sonuca göre öğrenmesine yol açabilir.'
+        : 'Ölçüm eksik. Bu durumda reklam kararları tahmine dayanır; önce ölçümü tamamlamak bütçeden daha önceliklidir.');
+    };
+
+    reklam.addEventListener('input', reklamHesap); pazar.addEventListener('input', pazarHesap); olcum.addEventListener('change', olcumHesap);
+    reklamHesap(); pazarHesap(); olcumHesap();
+  });
+</script>
+<style>
+  .ar-ic{max-width:var(--kap);margin:0 auto;padding:96px var(--kenar);box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+  .ar-kutu{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 60px var(--shadow);overflow:hidden}
+  .ar-sekmeler{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:1px solid var(--line)}
+  .ar-sekmeler button{display:flex;flex-direction:column;gap:2px;align-items:flex-start;padding:18px 24px;border:0;border-bottom:3px solid transparent;background:transparent;color:var(--tx);font:inherit;cursor:pointer;text-align:left}
+  .ar-sekmeler button+button{border-left:1px solid var(--line)}
+  .ar-sekmeler b{font-size:17px;color:var(--head)}.ar-sekmeler small{font-size:13px;color:var(--tx2)}
+  .ar-sekmeler [aria-selected=true]{border-bottom-color:var(--brand);background:var(--bg)}
+  .ar-sekmeler [aria-selected=true] b{color:var(--acc)}
+  .ar-panel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:32px;padding:32px}
+  .ar-panel[hidden]{display:none}
+  .ar-girdi{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-content:start}
+  .ar-girdi label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--head)}
+  .ar-girdi small{font-weight:400;color:var(--tx2);font-size:12.5px}
+  .ar-girdi input{min-height:48px;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:16px;font-weight:500}
+  .ar-girdi input:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:transparent}
+  .ar-sonuc{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-content:start;padding:22px;border-radius:18px;background:var(--bg)}
+  .ar-sonuc>div{display:flex;flex-direction:column;gap:4px}
+  .ar-sonuc span{font-size:13px;color:var(--tx2)}.ar-sonuc strong{font-size:22px;color:var(--head);font-variant-numeric:tabular-nums}
+  .ar-sonuc .ar-ana{grid-column:1 / -1;padding-top:12px;border-top:1px solid var(--line)}
+  .ar-sonuc .ar-ana strong{font-size:34px;color:var(--acc)}
+  .ar-sonuc p{grid-column:1 / -1;margin:0;font-size:15px;line-height:1.55;color:var(--tx)}
+  .ar-not{grid-column:1 / -1;margin:0;font-size:13px;color:var(--tx2)}
+  .ar-kontrol{margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:6px}
+  .ar-kontrol legend{font-weight:700;color:var(--head);margin-bottom:8px}
+  .ar-kontrol label{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border-radius:12px;cursor:pointer;font-size:15px}
+  .ar-kontrol label:hover{background:var(--bg)}
+  .ar-kontrol input{width:20px;height:20px;margin:1px 0 0;flex:none;accent-color:var(--fill)}
+  .ar-cubuk{grid-column:1 / -1;height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+  .ar-cubuk i{display:block;height:100%;width:0;background:#F07A23;border-radius:999px;transition:width .3s}
+  .ar-dip{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:18px 32px;border-top:1px solid var(--line);font-size:15px;color:var(--tx2)}
+  .ar-dip a{font-weight:700}
+  @media (max-width:900px){.ar-panel{grid-template-columns:1fr;padding:22px}.ar-sekmeler{grid-template-columns:1fr}.ar-sekmeler button+button{border-left:0;border-top:1px solid var(--line)}}
+  @media (max-width:520px){.ar-girdi{grid-template-columns:1fr}.ar-sonuc{grid-template-columns:1fr 1fr}.ar-ic{padding-top:64px;padding-bottom:64px}.ar-dip{padding:16px 22px}}
+</style>

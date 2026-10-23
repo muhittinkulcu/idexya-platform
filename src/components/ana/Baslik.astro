@@ -1,0 +1,22 @@
+---
+// Ana sayfa bölüm başlığı: tasarımdaki çizgi + üst etiket + büyük başlık düzeninin ortak hali.
+interface Props { etiket: string; baslik: string; aciklama?: string; baglanti?: { href: string; ad: string }; id?: string; }
+const { etiket, baslik, aciklama, baglanti, id } = Astro.props;
+---
+<div class="ab">
+  <div class="ab-sol">
+    <div class="ab-etiket"><span aria-hidden="true"></span>{etiket}</div>
+    <h2 id={id}>{baslik}</h2>
+  </div>
+  {(aciklama || baglanti) && <p>{aciklama} {baglanti && <a href={baglanti.href}>{baglanti.ad} →</a>}</p>}
+</div>
+<style>
+  .ab{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:20px}
+  .ab-sol{display:flex;flex-direction:column;gap:14px;max-width:680px}
+  .ab-etiket{display:flex;align-items:center;gap:12px;font-size:14px;font-weight:600;letter-spacing:.06em;color:var(--acc);text-transform:uppercase}
+  .ab-etiket span{width:36px;height:2px;background:var(--brand)}
+  h2{margin:0;font-size:44px;line-height:1.12;letter-spacing:-.025em;color:var(--head)}
+  .ab p{margin:0;font-size:17px;color:var(--tx2);max-width:420px;text-align:left}
+  p a{font-weight:600;white-space:nowrap}
+  @media (max-width:640px){h2{font-size:clamp(28px,8vw,36px)}}
+</style>

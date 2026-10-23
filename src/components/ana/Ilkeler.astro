@@ -1,0 +1,33 @@
+---
+// Ana sayfa: çalışma ilkeleri (Muhittin'in verdiği bilgilere dayanır: hesap sahipliği, onay, IDOS, 1 iş günü dönüş).
+import Baslik from './Baslik.astro';
+const ILKELER = [
+  { ad: 'Hesaplar sizin adınıza', metin: 'Reklam hesabı, analiz ve mağaza hesapları size aittir. Biz yönetici olarak erişiriz; çalışma bitince erişimimiz kaldırılır, veriler sizde kalır.', ikon: '<rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path>' },
+  { ad: 'Onayınız olmadan değişiklik yok', metin: 'Bütçe, teklif stratejisi ve kampanya açma-kapatma gibi kararlar önce size gerekçesiyle sunulur, onayınızla uygulanır.', ikon: '<path d="M20 6L9 17l-5-5"></path>' },
+  { ad: 'Önce ölçüm, sonra büyüme', metin: 'Satış, form, arama ve mesaj ayrı ölçülmeden bütçe büyütmeyi önermeyiz. Doğru ölçüm, doğru kararın ön koşuludur.', ikon: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>' },
+  { ad: 'Şeffaf raporlama', metin: 'Bütün hesaplarınızın sonuçlarını IDOS panelinde görürsünüz. Neyin işe yaradığını ve bir sonraki adımı açıkça paylaşırız.', ikon: '<rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="M7 14l3-3 3 2 4-5M8 21h8"></path>' },
+  { ad: '1 iş günü içinde dönüş', metin: 'Form ve sorularınıza en geç 1 iş günü içinde dönüş yaparız. Hafta içi 09.00–18.00 arasında ulaşabilirsiniz.', ikon: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>' },
+  { ad: 'Kişisel verilere özen', metin: 'Verileriniz KVKK’ya uygun işlenir; yalnızca işin gerektirdiği kadar yetki isteriz, erişim bilgilerini güvenli saklarız.', ikon: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path>' }
+];
+---
+<section class="il" aria-labelledby="il-baslik">
+  <div class="il-ic">
+    <Baslik id="il-baslik" etiket="Çalışma ilkelerimiz" baslik="Sözümüz, nasıl çalıştığımız" aciklama="Birlikte çalışmaya başlamadan önce bilmeniz gerekenler." baglanti={{ href: '/tr/sayfa/hakkimizda/', ad: 'Hakkımızda' }} />
+    <ul class="il-liste">
+      {ILKELER.map((i) => (
+        <li><span class="il-ikon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={i.ikon}></svg></span><h3>{i.ad}</h3><p>{i.metin}</p></li>
+      ))}
+    </ul>
+  </div>
+</section>
+<style>
+  .il{background:var(--bg2)}
+  .il-ic{max-width:var(--kap);margin:0 auto;padding:96px var(--kenar);box-sizing:border-box;display:flex;flex-direction:column;gap:40px}
+  .il-liste{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+  .il-liste li{background:var(--card);padding:28px;display:flex;flex-direction:column;gap:10px}
+  .il-ikon{width:44px;height:44px;border-radius:12px;background:var(--tint);color:var(--tintx);display:flex;align-items:center;justify-content:center}
+  .il-liste h3{margin:6px 0 0;font-size:19px;color:var(--head)}
+  .il-liste p{margin:0;font-size:15px;line-height:1.6;color:var(--tx2)}
+  @media (max-width:900px){.il-liste{grid-template-columns:1fr 1fr}}
+  @media (max-width:600px){.il-liste{grid-template-columns:1fr}.il-ic{padding-top:64px;padding-bottom:64px}}
+</style>

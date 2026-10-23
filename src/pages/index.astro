@@ -1,6 +1,12 @@
 ---
 import Site from '../layouts/Site.astro';
 import HizmetAlanlari from '../components/HizmetAlanlari.astro';
+import Pazaryeri from '../components/ana/Pazaryeri.astro';
+import Araclar from '../components/ana/Araclar.astro';
+import Ilkeler from '../components/ana/Ilkeler.astro';
+import Sektorler from '../components/ana/Sektorler.astro';
+import Platformlar from '../components/ana/Platformlar.astro';
+import BlogSss from '../components/ana/BlogSss.astro';
 // Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
 class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
 class Component extends DCLogic {
@@ -126,6 +132,10 @@ WhatsApp'tan yaz</a>
 </ol>
 </section>
 
+<Pazaryeri />
+
+<Araclar />
+
 <section id="idos" style="background: #002559; color: #F1F3F5; position: relative; overflow: hidden">
 <svg aria-hidden="true" viewBox="0 0 1440 640" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%"><path d="M0 520 C 360 440 620 640 1000 560 S 1300 420 1440 460 L1440 640 L0 640 Z" fill="#0A3270"></path><path d="M1100 0 C 1180 120 1320 160 1440 150 L1440 0 Z" fill="#F07A23" opacity="0.10"></path></svg>
 <div style="position: relative; max-width: 1240px; margin: 0 auto; padding: 100px 24px; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 56px; align-items: center">
@@ -145,6 +155,8 @@ WhatsApp'tan yaz</a>
 </div>
 </div>
 </section>
+
+<Ilkeler />
 
 <section id="paketler" style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">
@@ -186,6 +198,12 @@ WhatsApp'tan yaz</a>
 </Fragment>)}
 
 
+
+<Sektorler />
+
+<Platformlar />
+
+<BlogSss />
 
 <section id="analiz" style="padding: 96px 24px">
 <div style="max-width: 1192px; margin: 0 auto; box-sizing: border-box; background: var(--card); border: 1px solid var(--line); border-radius: 28px; box-shadow: 0 30px 80px var(--shadow); overflow: hidden; display: flex; flex-wrap: wrap">
