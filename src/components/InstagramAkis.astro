@@ -1,42 +1,60 @@
 ---
-// Yöneticinin panelden seçtiği Instagram gönderileri (/api/instagram). Gönderi yoksa bölüm görünmez.
-interface Props { baslik?: string; }
-const { baslik = 'Instagram’dan son paylaşımlar' } = Astro.props;
+// Instagram akışı (/api/instagram): hesap bağlıysa son gönderiler kendiliğinden, değilse panelden seçilenler.
+// Tam genişlikte dikey kart şeridi; telefonda yana kaydırılır. Gönderi yoksa bölüm görünmez.
+interface Props { baslik?: string; adet?: number; }
+const { baslik = 'Instagram hesabımızı takip edin', adet = 6 } = Astro.props;
 ---
-<div class="ia" data-instagram hidden>
+<section class="ia" data-instagram data-adet={adet} hidden aria-labelledby="ia-baslik">
   <div class="ia-bas">
-    <h3>{baslik}</h3>
-    <a href="https://www.instagram.com/idexya.goodthings" rel="noopener" target="_blank">@idexya.goodthings <span class="ia-sr">(yeni sekmede açılır)</span>→</a>
+    <h2 id="ia-baslik">{baslik}</h2>
+    <a href="https://www.instagram.com/idexya.goodthings" rel="noopener" target="_blank" data-ia-hesap>@idexya.goodthings <span class="ia-sr">(yeni sekmede açılır)</span></a>
   </div>
-  <ul class="ia-izgara" data-izgara></ul>
-</div>
+  <ul class="ia-serit" data-izgara></ul>
+</section>
 <script>
+  type G = { id: string; baglanti: string; aciklama: string | null; video?: boolean; gorsel: string };
+  const OYNAT = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
+  const IG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>';
   document.querySelectorAll<HTMLElement>('[data-instagram]').forEach(async (kok) => {
     try {
       const r = await fetch('/api/instagram');
       const s = await r.json();
       if (!r.ok || !s.ok || !s.gonderiler.length) return;
-      kok.querySelector('[data-izgara]')!.replaceChildren(...s.gonderiler.map((g: { id: string; baglanti: string; aciklama: string | null }) => {
-        const li = document.createElement('li'), a = document.createElement('a'), img = document.createElement('img');
+      const adet = Number(kok.dataset.adet) || 6;
+      kok.querySelector('[data-izgara]')!.replaceChildren(...(s.gonderiler as G[]).slice(0, adet).map((g) => {
+        const li = document.createElement('li'), a = document.createElement('a'), img = document.createElement('img'), ust = document.createElement('span'), alt = document.createElement('span');
         a.href = g.baglanti; a.target = '_blank'; a.rel = 'noopener';
-        a.setAttribute('aria-label', (g.aciklama || 'Instagram gönderisi') + ' (Instagram’da açılır)');
-        img.src = `/api/instagram/${encodeURIComponent(g.id)}/gorsel`; img.alt = g.aciklama || ''; img.loading = 'lazy'; img.decoding = 'async';
-        a.append(img); li.append(a); return li;
+        a.setAttribute('aria-label', (g.aciklama ? g.aciklama.slice(0, 120) : 'Instagram gönderisi') + ' (Instagram’da açılır)');
+        img.src = g.gorsel; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+        ust.className = 'ia-tur'; ust.innerHTML = g.video ? OYNAT : IG;
+        alt.className = 'ia-yazi'; alt.textContent = g.aciklama || 'Instagram’da görüntüle';
+        a.append(img, ust, alt); li.append(a); return li;
       }));
       kok.hidden = false;
-    } catch (e) { /* Gönderiler yüklenemezse bölüm gizli kalır */ }
+    } catch (e) { /* akış yüklenemezse bölüm gizli kalır */ }
   });
 </script>
 <style>
-  .ia{display:flex;flex-direction:column;gap:16px}
+  .ia{padding:72px 0 80px;display:flex;flex-direction:column;gap:28px}
   .ia[hidden]{display:none}
-  .ia-bas{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px}
-  .ia-bas h3{margin:0;font-size:22px;color:var(--head)}
-  .ia-bas a{font-weight:700}
+  .ia-bas{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:0 var(--kenar)}
+  .ia-bas h2{margin:0;font-size:clamp(26px,3.2vw,36px);letter-spacing:-.02em;color:var(--head)}
+  .ia-bas a{font-weight:700;text-decoration:none;color:var(--acc)}
   .ia-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .ia-izgara{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
-  .ia-izgara :global(a){display:block;border-radius:14px;overflow:hidden;aspect-ratio:1;background:var(--card2);border:1px solid var(--line)}
-  .ia-izgara :global(img){width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}
-  .ia-izgara :global(a:hover img){transform:scale(1.04)}
-  @media (max-width:640px){.ia-izgara{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .ia-serit{margin:0;padding:0 8px;list-style:none;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+  .ia-serit :global(a){position:relative;display:block;aspect-ratio:2/3;overflow:hidden;background:var(--bg2);color:#FFFFFF}
+  .ia-serit :global(img){width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .ia-serit :global(.ia-tur){position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  .ia-serit :global(.ia-yazi){position:absolute;inset:auto 0 0 0;padding:48px 16px 16px;font-size:14px;line-height:1.45;background:linear-gradient(transparent,rgba(0,0,0,.78));display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;opacity:0;transform:translateY(8px);transition:opacity .3s,transform .3s}
+  .ia-serit :global(a:hover img),.ia-serit :global(a:focus-visible img){transform:scale(1.05)}
+  .ia-serit :global(a:hover .ia-yazi),.ia-serit :global(a:focus-visible .ia-yazi){opacity:1;transform:none}
+  @media (max-width:1000px){.ia-serit{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:640px){
+    .ia{padding:56px 0}
+    .ia-serit{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 16px;gap:10px}
+    .ia-serit :global(li){flex:0 0 68%;scroll-snap-align:start}
+    .ia-serit :global(a){border-radius:14px}
+    .ia-serit :global(.ia-yazi){opacity:1;transform:none;-webkit-line-clamp:2}
+  }
+  @media (prefers-reduced-motion:reduce){.ia-serit :global(img),.ia-serit :global(.ia-yazi){transition:none}}
 </style>

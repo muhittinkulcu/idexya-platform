@@ -70,6 +70,9 @@ export const SEMA = [
     gorunur INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
   // Panel ayarları ve medya kütüphanesi (worker/sistem.js)
   `CREATE TABLE IF NOT EXISTS ayarlar (anahtar TEXT PRIMARY KEY, deger TEXT, guncelleme TEXT NOT NULL, guncelleyen TEXT NOT NULL)`,
+  // Instagram otomatik akışı (worker/instagram.js): son gönderiler ve görsel kopyaları
+  `CREATE TABLE IF NOT EXISTS instagram_akis (
+    id TEXT PRIMARY KEY, permalink TEXT NOT NULL, aciklama TEXT, tur TEXT NOT NULL, zaman TEXT, gorsel_tur TEXT NOT NULL, gorsel TEXT NOT NULL, sira INTEGER NOT NULL, cekim TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS medya (
     id TEXT PRIMARY KEY, ad TEXT NOT NULL, alt TEXT, tur TEXT NOT NULL, boyut INTEGER NOT NULL, genislik INTEGER, yukseklik INTEGER,
     veri TEXT NOT NULL, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,

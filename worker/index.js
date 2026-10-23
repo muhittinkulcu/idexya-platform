@@ -8,7 +8,7 @@ import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, is
 import { yonetimReklamApi, reklamCek, reklamKurulu } from './reklam.js';
 import { saklamaUygula } from './saklama.js';
 import { bultenApi, yonetimBultenApi } from './bulten.js';
-import { instagramApi, yonetimInstagramApi } from './instagram.js';
+import { instagramApi, yonetimInstagramApi, akisKurulu, akisCek } from './instagram.js';
 import { medyaApi, yonetimSistemApi } from './sistem.js';
 import { yonetimYayinApi } from './yayin.js';
 import { yonetimTeklifApi } from './teklif.js';
@@ -233,14 +233,14 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
     || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
 
 export default {
-  async fetch(istek, env) {
+  async fetch(istek, env, ctx) {
     const url = new URL(istek.url);
     const yol = url.pathname;
     try {
@@ -253,7 +253,7 @@ export default {
         return await icerikApi(istek, env, yol.slice('/api/icerik'.length).replace(/^\/|\/$/g, ''));
       }
       if (yol.startsWith('/api/medya/')) { await semaKur(env.DB); return await medyaApi(istek, env, yol.slice('/api/medya/'.length).replace(/\/$/, '')); }
-      if (yol === '/api/instagram' || yol.startsWith('/api/instagram/')) { await semaKur(env.DB); return await instagramApi(istek, env, yol.slice('/api/instagram'.length).replace(/^\/|\/$/g, '')); }
+      if (yol === '/api/instagram' || yol.startsWith('/api/instagram/')) { await semaKur(env.DB); return await instagramApi(istek, env, yol.slice('/api/instagram'.length).replace(/^\/|\/$/g, ''), ctx); }
       if (yol === '/api/bulten' || yol.startsWith('/api/bulten/')) { await semaKur(env.DB); return await bultenApi(istek, env, yol.slice('/api/bulten'.length).replace(/^\/|\/$/g, '')); }
       if (yol === '/api/olcum') { await semaKur(env.DB); return await olcumAl(istek, env); }
       if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
@@ -291,6 +291,7 @@ export default {
     await semaKur(env.DB);
     ctx.waitUntil(saklamaUygula(env.DB).catch((e) => console.error('saklama', e && e.message)));
     if (reklamKurulu(env)) ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
+    if (akisKurulu(env)) ctx.waitUntil(akisCek(env, 'Zamanlayıcı'));
     // Haftalık site denetimi: pazartesi (UTC; zamanlayıcı 07.00 UTC'de çalışır).
     if (new Date(olay.scheduledTime || Date.now()).getUTCDay() === 1) ctx.waitUntil(denetimCalistir(env, 'idexya.com', 'Zamanlayıcı').catch((e) => console.error('denetim', e && e.message)));
   }

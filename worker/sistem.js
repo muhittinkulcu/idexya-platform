@@ -2,6 +2,7 @@
 // Bildirimler ve entegrasyon durumları kayıtlı veriden ve ortam ayarlarından hesaplanır; gizli değerler asla döndürülmez.
 import { json, hata, simdi, kimlik, kirp, islemYaz, EPOSTA_DESEN } from './ortak.js';
 import { reklamKurulu } from './reklam.js';
+import { akisKurulu } from './instagram.js';
 
 // Ayarlar: yalnız bu anahtarlar kaydedilebilir (teklif çıktısı ve iletişim bilgisi gibi yerlerde kullanılır).
 export const AYARLAR = [
@@ -73,6 +74,10 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     if (!env.TURNSTILE_SECRET) uyari.push({ baslik: 'Robot doğrulaması (Turnstile) kapalı', detay: 'Formlar yalnız hız sınırıyla korunuyor. Cloudflare Turnstile anahtarlarını tanımlayın.', href: '/yonetim/entegrasyonlar/', onem: 'uyari' });
     if (!env.IP_TUZ) uyari.push({ baslik: 'IP_TUZ gizli değeri tanımlı değil', detay: 'IP adresleri varsayılan tuzla özetleniyor. Cloudflare’de rastgele bir IP_TUZ gizli değeri girin.', href: '/yonetim/entegrasyonlar/', onem: 'uyari' });
     if (!reklamKurulu(env)) uyari.push({ baslik: 'IDOS reklam verisi bağlı değil', detay: 'Genel bakıştaki reklam grafikleri boş kalır. IDOS_BQ_GORUNUM ve IDOS_BQ_ANAHTAR tanımlanmalı.', href: '/yonetim/entegrasyonlar/', onem: 'bilgi' });
+    if (akisKurulu(env)) {
+      const ih = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'instagram_son_hata'").first();
+      if (ih && ih.deger) uyari.push({ baslik: 'Instagram akışı güncellenemedi', detay: ih.deger, zaman: ih.guncelleme, href: '/yonetim/instagram/', onem: 'uyari' });
+    }
     const c = cekim.results[0];
     if (c && c.durum !== 'tamam') uyari.push({ baslik: 'Son IDOS veri çekimi başarısız', detay: c.mesaj || 'Ayrıntı için Veri eşitleme sayfasına bakın.', zaman: c.zaman, href: '/yonetim/veri-esitleme/', onem: 'kritik' });
     if (await tabloVar(db, 'denetimler')) {
@@ -112,6 +117,7 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       { k: 'turnstile', ad: 'Robot doğrulaması (Cloudflare Turnstile)', durum: var_(env.TURNSTILE_SECRET) ? 'bagli' : 'eksik', detay: 'Formları ve üyelik sayfalarını robotlara karşı korur.', ayar: 'TURNSTILE_SECRET (gizli) ve derleme değişkeni PUBLIC_TURNSTILE_SITE_KEY' },
       { k: 'idos', ad: 'IDOS reklam verisi (BigQuery)', durum: reklamKurulu(env) ? 'bagli' : 'eksik', detay: reklamKurulu(env) ? `Konum: ${env.IDOS_BQ_KONUM || 'europe-west1'}` : 'Genel bakıştaki reklam özetleri için gerekli.', ayar: 'IDOS_BQ_GORUNUM, IDOS_BQ_ANAHTAR (gizli)' },
       { k: 'asistan', ad: 'Yapay zekâ asistanı (Claude)', durum: var_(env.ANTHROPIC_API_KEY) ? 'bagli' : 'eksik', detay: `Bu ay ${asistanAy ? asistanAy.n : 0} yanıt · aylık sınır ${Number(env.ASISTAN_AYLIK_SINIR || 3000)}`, ayar: 'ANTHROPIC_API_KEY (gizli), ASISTAN_AYLIK_SINIR' },
+      { k: 'instagram', ad: 'Instagram otomatik akışı', durum: akisKurulu(env) ? 'bagli' : 'eksik', detay: 'Sitedeki Instagram bölümü hesabın son gönderilerini kendiliğinden gösterir.', ayar: 'INSTAGRAM_TOKEN (gizli, Instagram profesyonel hesabının uzun ömürlü erişim anahtarı)' },
       { k: 'iptuz', ad: 'IP özetleme tuzu', durum: var_(env.IP_TUZ) ? 'bagli' : 'eksik', detay: 'IP adresleri saklanmaz; hız sınırı için tuzlanmış özeti tutulur.', ayar: 'IP_TUZ (gizli)' },
       { k: 'arama', ad: 'Üye içeriklerinin aramaya açılması', durum: env.ARAMA_ACIK === 'evet' ? 'bagli' : 'kapali', detay: 'Açıkken, “herkese açık” ve “aramaya açık” işaretli içerikler arama motorlarına gösterilir.', ayar: 'ARAMA_ACIK=evet' }
     ] });
