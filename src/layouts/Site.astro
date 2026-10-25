@@ -321,6 +321,35 @@ body:has(#cerez:not(.gizli)) .as-dugme{display:none}
 .koyu .site-ust.ust-koyu:not(.kaydi) .ikon-dugme{border-color:rgba(255,255,255,.2);background:rgba(255,255,255,.05)}
 .koyu .site-ust.ust-koyu:not(.kaydi) .arama-dugme{color:#C6D2E3}.koyu .site-ust.ust-koyu:not(.kaydi) .arama-dugme kbd{border-color:rgba(255,255,255,.25);color:#C6D2E3}
 .koyu .site-ust.ust-koyu:not(.kaydi) .ust-menu a[aria-current=page]{color:#FFB58A}
+/* Koyu tema tek palet (25 Eki 2026): açık temadaki lacivert (#002559) marka blokları koyu temada mavi değil,
+   bir kademe yükseltilmiş kömür yüzeye ve turuncu ışığa döner. Böylece açılış, IDOS, analiz ve çağrı kutuları sayfanın geri kalanıyla aynı ailede kalır. */
+.koyu{--yuzey-vurgu:#1D2531;--yuzey-vurgu2:#232C3A;--cizgi-vurgu:rgba(255,255,255,.09)}
+.koyu #ust{background:radial-gradient(900px 520px at var(--mx,72%) var(--my,38%),rgba(240,122,35,.20),transparent 62%),radial-gradient(1200px 600px at 0% 0%,rgba(255,255,255,.035),transparent 60%),var(--bg)!important;color:var(--tx2);border-bottom:1px solid var(--line)}
+.koyu #ust>svg{display:none}
+.koyu #ust>div:nth-of-type(2)>div{background:var(--card)!important;border-color:var(--line)!important;backdrop-filter:none}
+.koyu .site-ust.ust-koyu:not(.kaydi){background:var(--bg)!important;border-color:var(--line)!important}
+.koyu .site-ust.kaydi,.koyu .site-ust:has(.ust-acilir.acilmis),.koyu .site-ust:has([aria-expanded=true]){background:var(--bg)!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.koyu #idos{background:radial-gradient(700px 420px at 85% 10%,rgba(240,122,35,.14),transparent 65%),var(--yuzey-vurgu)!important;border-top:1px solid var(--cizgi-vurgu);border-bottom:1px solid var(--cizgi-vurgu)}
+.koyu #idos>svg{display:none}
+.koyu #idos [style*="background: rgba(255"]{background:var(--yuzey-vurgu2)!important;border-color:var(--cizgi-vurgu)!important}
+.koyu [style*="background: #002559"]{background:radial-gradient(520px 320px at 100% 0%,rgba(240,122,35,.13),transparent 65%),var(--yuzey-vurgu)!important;border:1px solid var(--cizgi-vurgu)}
+.koyu section[style*="background: #002559"]{border:0;border-bottom:1px solid var(--cizgi-vurgu)}
+.koyu section[style*="background: #002559"]>svg{display:none}
+.koyu section[style*="background: #002559"] [style*="background: #FFFFFF"]{background:var(--card)!important}
+.koyu section[style*="background: #002559"] [style*="background: #F7F9FC"],.koyu section[style*="background: #002559"] [style*="background: #EAF0F7"]{background:var(--card2)!important}
+.koyu section[style*="background: #002559"] [style*="#E3E9F1"],.koyu section[style*="background: #002559"] [style*="#D8E1EC"]{border-color:var(--line)!important}
+.koyu section[style*="background: #002559"] [style*="color: #4A5A70"]{color:var(--tx2)!important}
+.koyu section[style*="background: #002559"] [style*="color: #1F2A3A"]{color:var(--head)!important}
+.koyu section[style*="background: #002559"] [style*="background: #FDE9DB"]{background:var(--tint)!important}
+.koyu section[style*="background: #002559"] [style*="background: #E2F2E9"]{background:var(--okb)!important}
+.koyu section[style*="background: #002559"] [style*="background: #E3ECF8"]{background:var(--infob)!important}
+.koyu section[style*="background: #002559"] [style*="color: #A9420A"]{color:var(--tintx)!important}
+.koyu section[style*="background: #002559"] [style*="color: #176041"]{color:var(--ok)!important}
+.koyu section[style*="background: #002559"] [style*="color: #1F4E8C"]{color:var(--info)!important}
+.koyu [style*="background: #002559"] svg [stroke="#0A3270"],.koyu [style*="background: #002559"] svg [fill="#0A3270"]{opacity:.35}
+.koyu .cm-vurgu,.koyu .as-bas{background:linear-gradient(120deg,#232C3A,#1D2531)!important;border:1px solid var(--cizgi-vurgu)}
+.koyu .as-dugme{background:#232C3A;border:1px solid rgba(255,255,255,.14);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.koyu .as-dugme:hover{box-shadow:0 22px 50px rgba(0,0,0,.55)}
 
 
 /* Efektler (Muhittin, 19 Eki 2026). Tek imza an: ana sayfada IDOS panelinin kendini kurması. Diğerleri kullanıcı eylemine yanıt. */
