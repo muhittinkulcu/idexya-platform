@@ -283,13 +283,24 @@ export function kabuk() {
 
   uygula();
 
+  // Hesap menüsü: avatar tıklanınca açılır; dışarı tıklama ve Esc kapatır. Çıkış yalnız menüdeki "Çıkış yap" ile yapılır.
+  const profil = $('[data-profil]');
+  if (profil) {
+    const dugme = $('[data-kim-avatar]', profil), menu = $('.profil-menu', profil);
+    const kapat = (odak) => { menu.hidden = true; dugme.setAttribute('aria-expanded', 'false'); if (odak) dugme.focus(); };
+    dugme.addEventListener('click', (o) => { o.stopPropagation(); const ac = menu.hidden; menu.hidden = !ac; dugme.setAttribute('aria-expanded', String(ac)); if (ac) $('a', menu).focus(); });
+    document.addEventListener('click', (o) => { if (!menu.hidden && !profil.contains(o.target)) kapat(false); });
+    profil.addEventListener('keydown', (o) => { if (o.key === 'Escape' && !menu.hidden) kapat(true); });
+  }
+
   api('ozet').then((o) => {
     sayacGuncelle(o);
     const say = (liste, d) => (liste.find((x) => x.durum === d) || { n: 0 }).n;
     const yaz = (k, v) => { const e = $(`[data-s="${k}"]`); if (e) e.textContent = String(v); };
     yaz('talep', say(o.talepler, 'yeni')); yaz('musteri', o.musteri.n || 0); yaz('uye', say(o.uyeler, 'bekliyor')); yaz('yorum', o.bekleyenYorum || 0);
     const k = $('[data-kim]'); if (k && o.kim) k.textContent = o.kim;
-    const av = $('[data-kim-avatar]'); if (av && o.kim) { av.textContent = o.kim.slice(0, 2).toUpperCase(); av.title = o.kim + ' · çıkış yap'; }
+    const av = $('[data-kim-avatar]'); if (av && o.kim) av.title = o.kim;
+    const ke = $('[data-kim-eposta]'); if (ke && o.kim) ke.textContent = o.kim;
   }).catch((h) => {
     sayacGuncelle(null);
     if (h.durum === 401) genelHata('Oturumunuz kapanmış. Sayfayı yenileyip yeniden giriş yapın.');

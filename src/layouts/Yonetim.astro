@@ -196,6 +196,15 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 .dugme.kucuk{min-height:32px;padding:0 10px;font-size:13px}
 .avatar{width:40px;height:40px;border-radius:13px;background:#16181B;color:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
 .koyu .avatar{background:var(--card2)}
+.avatar{border:0;cursor:pointer;font:inherit}.avatar:hover,.avatar[aria-expanded=true]{box-shadow:0 0 0 3px var(--tint)}
+.profil{position:relative}
+.profil-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:60;min-width:240px;padding:6px;border-radius:14px;background:var(--card);border:1px solid var(--line);box-shadow:0 18px 48px rgba(0,0,0,.18);display:flex;flex-direction:column}
+.profil-menu[hidden]{display:none!important}
+.profil-bas{display:flex;flex-direction:column;gap:2px;padding:10px 12px 12px;border-bottom:1px solid var(--line);margin-bottom:4px;min-width:0}
+.profil-bas small{font-size:11px;color:var(--tx2)}.profil-bas b{font-size:13px;color:var(--head);overflow-wrap:anywhere}
+.profil-menu a{padding:9px 12px;border-radius:9px;color:var(--tx);text-decoration:none;font-size:14px}
+.profil-menu a:hover,.profil-menu a:focus-visible{background:var(--card2);color:var(--head)}
+.profil-menu .profil-cikis{margin-top:4px;border-top:1px solid var(--line);border-radius:0 0 9px 9px;color:var(--err,#B42318)}
 .sayfa{padding:24px clamp(14px,3vw,36px) 48px;display:flex;flex-direction:column;gap:18px;box-sizing:border-box}
 .sayfa h1{margin:0;font-size:clamp(28px,3vw,38px);line-height:1.08;font-weight:800;color:var(--head)}
 .kart{background:var(--card);border:1px solid var(--line);border-radius:22px;box-sizing:border-box;min-width:0}
@@ -328,7 +337,17 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
       <button type="button" class="dugme" data-ozellestir aria-haspopup="dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg><span class="masa">Özelleştir</span></button>
       <button type="button" class="ikon masa" data-ust-sabitle aria-pressed="true" aria-label="Üst menüyü sabitle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M9 3h6l-1 6 4 4H6l4-4z"></path></svg></button>
       <button type="button" class="ikon" data-ust-kapat aria-label="Üst menüyü gizle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"></path></svg></button>
-      <a class="avatar masa" href="/cdn-cgi/access/logout" title="Çıkış yap" data-kim-avatar>MK</a>
+      <div class="profil masa" data-profil>
+        <button type="button" class="avatar" data-kim-avatar aria-haspopup="menu" aria-expanded="false" aria-controls="profil-menu" aria-label="Hesap menüsü"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></button>
+        <div class="profil-menu" id="profil-menu" role="menu" hidden>
+          <div class="profil-bas"><small>Oturum açık</small><b data-kim-eposta>—</b></div>
+          <a role="menuitem" href="/yonetim/ayarlar/">Ayarlar</a>
+          <a role="menuitem" href="/yonetim/bildirimler/">Bildirimler</a>
+          <a role="menuitem" href="/yonetim/gecmis/">İşlem geçmişi</a>
+          <a role="menuitem" href="/" target="_blank" rel="noopener">Siteyi aç ↗</a>
+          <a role="menuitem" class="profil-cikis" href="/cdn-cgi/access/logout">Çıkış yap</a>
+        </div>
+      </div>
     </div>
     <div class="ust-serit" data-ust-serit hidden>
       <span>Yeni talep <b data-s="talep">—</b></span>

@@ -20,7 +20,7 @@ const svg = (y: string, b = 18) => `<svg width="${b}" height="${b}" viewBox="0 0
         <h2 id="idd-baslik">IDOS’u şimdi deneyin</h2>
         <p>Modüllere tıklayın, uyarıları inceleyin, önerileri onaylayın ve raporu kendiniz oluşturun. Demodaki markalar ve rakamlar örnektir; gerçek müşteri verisi içermez.</p>
       </div>
-      <button type="button" class="idd-tur-dugme" data-tur-baslat>{svg('<path d="M8 5v14l11-7z"></path>')} Rehberli turu başlat</button>
+      <button type="button" class="idd-tur-dugme" data-tur-baslat><Fragment set:html={svg('<path d="M8 5v14l11-7z"></path>')} /> Rehberli turu başlat</button>
     </div>
 
     <div class="idd" data-idd>
