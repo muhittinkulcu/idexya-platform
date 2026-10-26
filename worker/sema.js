@@ -142,5 +142,12 @@ export const SEMA = [
     id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, platform TEXT NOT NULL, hesap_adi TEXT, hesap_kimligi TEXT, erisim_turu TEXT NOT NULL,
     erisim_sahibi TEXT, durum TEXT NOT NULL, verilis TEXT, kaldirilma TEXT, not_ TEXT, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS envanter_musteri ON hesap_envanteri (musteri_id)`,
-  `CREATE INDEX IF NOT EXISTS envanter_kimlik ON hesap_envanteri (platform, hesap_kimligi)`
+  `CREATE INDEX IF NOT EXISTS envanter_kimlik ON hesap_envanteri (platform, hesap_kimligi)`,
+  // Müşteri sitesi sağlık kontrolü (worker/site-saglik.js): hedef siteler ve son 30 kontrol sonucu.
+  `CREATE TABLE IF NOT EXISTS site_saglik_hedef (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, adres TEXT NOT NULL UNIQUE, aktif INTEGER NOT NULL DEFAULT 1, son_kontrol TEXT, son_durum TEXT,
+    alan_kok TEXT, alan_bitis TEXT, rdap_zaman TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS site_saglik_sonuc (
+    id TEXT PRIMARY KEY, hedef_id TEXT NOT NULL, zaman TEXT NOT NULL, durum TEXT NOT NULL, http INTEGER, sure INTEGER, son_adres TEXT, bulunan TEXT, sorunlar TEXT, notlar TEXT)`,
+  `CREATE INDEX IF NOT EXISTS site_saglik_sonuc_hedef ON site_saglik_sonuc (hedef_id, zaman)`
 ];
