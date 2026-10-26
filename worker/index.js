@@ -21,6 +21,7 @@ import { yonetimBelgeApi } from './belge.js';
 import { uyeMusteriApi, yonetimMusteriAlaniApi } from './musteri-alani.js';
 import { yonetimEnvanterApi } from './envanter.js';
 import { yonetimYedekApi, yedekAl, yedekKurulu } from './yedek.js';
+import { yonetimSiteSaglikApi, siteSaglikCron } from './site-saglik.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -238,7 +239,7 @@ async function yonetimApi(istek, env, yol, kim) {
     return json({ ok: true });
   }
   const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -298,6 +299,7 @@ export default {
     ctx.waitUntil(saklamaUygula(env.DB).catch((e) => console.error('saklama', e && e.message)));
     if (reklamKurulu(env)) ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
     if (akisKurulu(env)) ctx.waitUntil(akisCek(env, 'Zamanlayıcı'));
+    ctx.waitUntil(siteSaglikCron(env).catch((e) => console.error('site sağlık', e && e.message)));
     if (yedekKurulu(env)) ctx.waitUntil(yedekAl(env, 'Zamanlayıcı').catch((e) => console.error('yedek', e && e.message)));
     // Haftalık site denetimi: pazartesi (UTC; zamanlayıcı 07.00 UTC'de çalışır).
     if (new Date(olay.scheduledTime || Date.now()).getUTCDay() === 1) ctx.waitUntil(denetimCalistir(env, 'idexya.com', 'Zamanlayıcı').catch((e) => console.error('denetim', e && e.message)));

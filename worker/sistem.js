@@ -2,6 +2,7 @@
 // Bildirimler ve entegrasyon durumları kayıtlı veriden ve ortam ayarlarından hesaplanır; gizli değerler asla döndürülmez.
 import { envanterUyarilari } from './envanter.js';
 import { yedekDurum } from './yedek.js';
+import { siteSaglikUyarilari } from './site-saglik.js';
 import { json, hata, simdi, kimlik, kirp, islemYaz, EPOSTA_DESEN } from './ortak.js';
 import { reklamKurulu } from './reklam.js';
 import { akisKurulu } from './instagram.js';
@@ -72,6 +73,10 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       const u = await envanterUyarilari(db);
       const kritik = u.filter((x) => x.onem === 'kritik').length;
       if (u.length) onay.push({ tur: 'envanter', baslik: `Hesap envanterinde ${u.length} uyarı`, detay: kritik ? `${kritik} kritik: biten müşteride açık erişim ya da IDOS ile çelişen hesap.` : 'Uzun süredir bekleyen erişim istekleri var.', href: '/yonetim/hesaplar/', onem: kritik ? 'kritik' : 'normal' });
+    }
+    if (await tabloVar(db, 'site_saglik_hedef')) {
+      const u = await siteSaglikUyarilari(db), kritik = u.filter((x) => x.son_durum === 'kritik');
+      if (u.length) onay.push({ tur: 'site', baslik: kritik.length ? `${kritik.length} müşteri sitesinde kritik sorun` : `${u.length} müşteri sitesinde uyarı`, detay: u.slice(0, 3).map((x) => `${x.firma || x.ad || ''} ${new URL(x.adres).hostname}`.trim()).join(' · '), href: '/yonetim/site-saglik/', onem: kritik.length ? 'kritik' : 'normal' });
     }
     if (await tabloVar(db, 'destek_talepleri')) {
       const g = await db.prepare("SELECT COUNT(*) AS n, MIN(guncelleme) AS en_eski FROM destek_talepleri WHERE durum = 'acik'").first();
