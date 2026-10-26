@@ -124,7 +124,8 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     if (!t) return hata('Teklif bulunamadı', 404);
     t.kalemler = JSON.parse(t.kalemler || '[]');
     const mus = await db.prepare('SELECT id, firma, ad, eposta, telefon, asama FROM musteriler WHERE id = ?').bind(t.musteri_id).first();
-    return json({ ok: true, teklif: t, musteri: mus || null });
+    const gelir = await db.prepare("SELECT id, durum, vade, odeme_tarihi, tutar FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? LIMIT 1").bind(t.no).first();
+    return json({ ok: true, teklif: t, musteri: mus || null, gelir: gelir || null });
   }
 
   // Güncelleme: yalnız taslak
@@ -141,6 +142,27 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     if (!r.meta || !r.meta.changes) return hata('Teklif bu arada değişti; sayfayı yenileyin', 409);
     await islemYaz(db, kim.eposta, 'teklif_guncelle', t.id, t.no);
     return json({ ok: true, id: t.id });
+  }
+
+  // Kabul edilen tekliften gelir (alacak) kaydı: muhasebede belge_no = teklif no. Aynı teklif için ikinci kayıt açılmaz.
+  m = yol.match(/^teklifler\/([\w-]+)\/gelir$/);
+  if (m && yontem === 'POST') {
+    const t = await db.prepare('SELECT * FROM teklifler WHERE id = ?').bind(m[1]).first();
+    if (!t) return hata('Teklif bulunamadı', 404);
+    if (t.durum !== 'kabul') return hata('Gelir kaydı yalnız kabul edilen tekliften oluşturulur', 409);
+    const var_ = await db.prepare("SELECT id FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? LIMIT 1").bind(t.no).first();
+    if (var_) return hata('Bu teklif için gelir kaydı zaten var', 409);
+    const bugun = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+    const vade = kirp(govde.vade, 10);
+    if (vade && (!gecerliTarih(vade) || vade < bugun)) return hata('Vade bugün ya da sonrası geçerli bir tarih olmalı', 422);
+    const tutar = Math.round(t.toplam * 100);
+    if (!(tutar > 0)) return hata('Teklif toplamı sıfır; gelir kaydı oluşturulamaz', 422);
+    const id = kimlik(), z = simdi();
+    await db.prepare(`INSERT INTO muhasebe (id, tur, tarih, tutar, kdv_orani, aciklama, kategori, musteri_id, belge_no, durum, vade, odeme_tarihi, olusturma, ekleyen)
+      VALUES (?, 'gelir', ?, ?, ?, ?, 'Hizmet geliri', ?, ?, 'bekliyor', ?, NULL, ?, ?)`)
+      .bind(id, bugun, tutar, Math.round(t.kdv_orani), kirp(`${t.no} · ${t.baslik}`, 300), t.musteri_id, t.no, vade || null, z, kim.eposta).run();
+    await islemYaz(db, kim.eposta, 'teklif_gelir', t.id, `${t.no} → gelir kaydı ${tl(tutar)}${vade ? ' · vade ' + vade : ''}`);
+    return json({ ok: true, id });
   }
 
   m = yol.match(/^teklifler\/([\w-]+)\/(gonderildi|kabul|red|kopyala|sil)$/);
