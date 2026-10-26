@@ -23,6 +23,7 @@ import { yonetimEnvanterApi } from './envanter.js';
 import { yonetimYedekApi, yedekAl, yedekKurulu } from './yedek.js';
 import { yonetimSiteSaglikApi, siteSaglikCron } from './site-saglik.js';
 import { yonetimDonusumApi, reklamTemizle, talepReklamSorgu } from './donusum.js';
+import { ekibeBildir } from './eposta.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -92,6 +93,10 @@ async function talepAl(istek, env) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(talepId, simdi(), kaynak, kirp(g.sayfa, 200), ad, kirp(g.firma, 160), eposta || null, telefon || null,
     kirp(g.konu, 120), kirp(g.mesaj, 4000), JSON.stringify(ek), g.iys === true ? 1 : 0, ipOzet, dogrulama),
     ...(reklam ? [talepReklamSorgu(env.DB, talepId, reklam)] : [])]);
+  const KAYNAK_ADI = { iletisim: 'İletişim formu', analiz: 'Ücretsiz analiz formu', paket: 'Paket teklif formu', sihirbaz: 'Paket sihirbazı', asistan: 'Yapay zekâ asistanı', form: 'Site formu' };
+  await ekibeBildir(env, `Yeni talep: ${ad}${kirp(g.firma, 160) ? ' · ' + kirp(g.firma, 160) : ''}`, [['Kaynak', KAYNAK_ADI[kaynak] || kaynak], ['Ad', ad], ['Firma', kirp(g.firma, 160) || '—'],
+    ['E-posta', eposta || '—'], ['Telefon', telefon || '—'], ['Konu', kirp(g.konu, 120) || '—'], ['Mesaj', kirp(g.mesaj, 1500) || '—'], ['Sayfa', kirp(g.sayfa, 200) || '—']],
+    { metin: 'Panelde aç', yol: '/yonetim/talepler/?sekme=yeni' }, eposta || undefined);
   return json({ ok: true });
 }
 
@@ -244,7 +249,7 @@ async function yonetimApi(istek, env, yol, kim) {
     return json({ ok: true });
   }
   const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim)) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim)) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }

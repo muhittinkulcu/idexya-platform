@@ -17,6 +17,8 @@ export const AYARLAR = [
   { k: 'vergi', ad: 'Vergi dairesi ve numarası', vars: '', sinir: 120 },
   { k: 'kdv', ad: 'Varsayılan KDV oranı (%)', vars: '20', sinir: 5 },
   { k: 'teklif_gecerlilik', ad: 'Teklif geçerlilik süresi (gün)', vars: '15', sinir: 4 },
+  { k: 'bildirim_eposta', ad: 'Bildirim e-postası (yeni talep, destek, teklif kararı; boşsa gönderilmez)', vars: '', sinir: 160 },
+  { k: 'eposta_uye_bildirim', ad: 'Destek yanıtında üyeye e-posta gönderilsin mi? (evet / hayır)', vars: 'hayır', sinir: 5 },
   { k: 'teklif_notu', ad: 'Teklif alt notu', vars: 'Fiyatlara KDV dahil değildir. Reklam bütçesi hizmet bedeline dahil değildir.', sinir: 1000 }
 ];
 
@@ -97,6 +99,8 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       const ih = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'instagram_son_hata'").first();
       if (ih && ih.deger) uyari.push({ baslik: 'Instagram akışı güncellenemedi', detay: ih.deger, zaman: ih.guncelleme, href: '/yonetim/instagram/', onem: 'uyari' });
     }
+    const eh = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'eposta_son_hata'").first();
+    if (eh && eh.deger) uyari.push({ baslik: 'Bildirim e-postası gönderilemedi', detay: eh.deger + ' — idexya.com alan adının Cloudflare Email Sending’e eklendiğini kontrol edin.', zaman: eh.guncelleme, href: '/yonetim/ayarlar/', onem: 'uyari' });
     const yd = await yedekDurum(env);
     if (!yd.kurulu) uyari.push({ baslik: 'Otomatik veritabanı yedeği kapalı', detay: 'Cloudflare R2 deposu (YEDEK) bağlı değil. Şimdilik Yedekler sayfasından elle yedek indirebilirsiniz.', href: '/yonetim/yedekler/', onem: 'bilgi' });
     else if (!yd.son || Date.parse(yd.son.zaman) < Date.now() - 36 * 3600000) uyari.push({ baslik: 'Son 36 saatte veritabanı yedeği alınmadı', detay: yd.son ? `Son yedek: ${yd.son.anahtar}` : 'Henüz hiç yedek yok.', zaman: yd.son ? yd.son.zaman : null, href: '/yonetim/yedekler/', onem: 'uyari' });
@@ -116,7 +120,8 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     for (const a of AYARLAR) {
       if (!(a.k in govde)) continue;
       const v = kirp(String(govde[a.k] ?? ''), a.sinir);
-      if (a.k === 'eposta' && v && !EPOSTA_DESEN.test(v)) return hata('E-posta adresi geçersiz', 422);
+      if ((a.k === 'eposta' || a.k === 'bildirim_eposta') && v && !EPOSTA_DESEN.test(v)) return hata(`${a.ad.split(' (')[0]} geçersiz`, 422);
+      if (a.k === 'eposta_uye_bildirim' && v && !['evet', 'hayır'].includes(v.toLocaleLowerCase('tr-TR'))) return hata('Üye e-postası ayarı “evet” ya da “hayır” olmalı', 422);
       if ((a.k === 'kdv' || a.k === 'teklif_gecerlilik') && v && !/^\d{1,3}$/.test(v)) return hata(`${a.ad} sayı olmalı`, 422);
       sorgular.push(db.prepare('INSERT INTO ayarlar (anahtar, deger, guncelleme, guncelleyen) VALUES (?, ?, ?, ?) ON CONFLICT(anahtar) DO UPDATE SET deger = excluded.deger, guncelleme = excluded.guncelleme, guncelleyen = excluded.guncelleyen').bind(a.k, v, z, kim.eposta));
       degisen.push(a.k);
@@ -140,6 +145,7 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       { k: 'idos', ad: 'IDOS reklam verisi (BigQuery)', durum: reklamKurulu(env) ? 'bagli' : 'eksik', detay: reklamKurulu(env) ? `Konum: ${env.IDOS_BQ_KONUM || 'europe-west1'}` : 'Genel bakıştaki reklam özetleri için gerekli.', ayar: 'IDOS_BQ_GORUNUM, IDOS_BQ_ANAHTAR (gizli)' },
       { k: 'asistan', ad: 'Yapay zekâ asistanı (Claude)', durum: var_(env.ANTHROPIC_API_KEY) ? 'bagli' : 'eksik', detay: `Bu ay ${asistanAy ? asistanAy.n : 0} yanıt · aylık sınır ${Number(env.ASISTAN_AYLIK_SINIR || 3000)}`, ayar: 'ANTHROPIC_API_KEY (gizli), ASISTAN_AYLIK_SINIR' },
       { k: 'yedek', ad: 'Veritabanı yedeği (R2)', durum: env.YEDEK ? 'bagli' : 'eksik', detay: 'Panel verisi her gün sıkıştırılmış JSON olarak R2 deposuna yazılır; son 30 gün saklanır.', ayar: 'YEDEK (R2 deposu bağlantısı, wrangler.json)' },
+      { k: 'eposta', ad: 'E-posta bildirimleri (Cloudflare Email Service)', durum: env.EPOSTA ? 'bagli' : 'eksik', detay: 'Yeni talep, destek ve teklif kararlarını Ayarlar’daki bildirim adresine gönderir. Gönderen: bildirim@idexya.com.', ayar: 'send_email bağlantısı EPOSTA (wrangler.jsonc) + idexya.com için Email Sending etkinleştirme' },
       { k: 'instagram', ad: 'Instagram otomatik akışı', durum: akisKurulu(env) ? 'bagli' : 'eksik', detay: 'Sitedeki Instagram bölümü hesabın son gönderilerini kendiliğinden gösterir.', ayar: 'INSTAGRAM_TOKEN (gizli, Instagram profesyonel hesabının uzun ömürlü erişim anahtarı)' },
       { k: 'iptuz', ad: 'IP özetleme tuzu', durum: var_(env.IP_TUZ) ? 'bagli' : 'eksik', detay: 'IP adresleri saklanmaz; hız sınırı için tuzlanmış özeti tutulur.', ayar: 'IP_TUZ (gizli)' },
       { k: 'arama', ad: 'Üye içeriklerinin aramaya açılması', durum: env.ARAMA_ACIK === 'evet' ? 'bagli' : 'kapali', detay: 'Açıkken, “herkese açık” ve “aramaya açık” işaretli içerikler arama motorlarına gösterilir.', ayar: 'ARAMA_ACIK=evet' }

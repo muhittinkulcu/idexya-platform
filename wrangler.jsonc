@@ -15,6 +15,8 @@
   },
   // Veritabanı: ilk yayında Cloudflare kendiliğinden oluşturur (otomatik kaynak oluşturma).
   "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform" }],
+  // E-posta bildirimleri (worker/eposta.js): Cloudflare Email Service. Gönderim için idexya.com, Cloudflare panelinde Email Sending'e eklenmelidir.
+  "send_email": [{ "name": "EPOSTA", "allowed_sender_addresses": ["bildirim@idexya.com"] }],
   // Günlük veritabanı yedeği (worker/yedek.js) için R2 bağlantısı. Otomatik oluşturma ilk denemede yayını durdurdu (26 Eki 2026);
   // R2 Cloudflare panelinde etkinleştirilip "idexya-yedek" deposu açılınca aşağıdaki satır açılır:
   // "r2_buckets": [{ "binding": "YEDEK", "bucket_name": "idexya-yedek" }],
