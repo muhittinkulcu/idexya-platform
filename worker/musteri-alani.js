@@ -4,6 +4,7 @@
 import { json, hata, simdi, kimlik, kirp, islemYaz, ayniKaynak, govdeOku } from './ortak.js';
 import { oturumUyesi, uyeModulleri } from './uye.js';
 import { yonetimTeklifApi, TEKLIF_DURUM } from './teklif.js';
+import { ekibeBildir, uyeyeBildir } from './eposta.js';
 
 export const DESTEK_DURUM = { acik: 'Yanıt bekliyor', yanitlandi: 'Yanıtlandı', kapali: 'Kapandı' };
 const MESAJ_SINIR = 4000;
@@ -64,7 +65,13 @@ export async function uyeMusteriApi(istek, env, yol) {
       if (t.durum !== 'gonderildi') return hata('Bu teklif için karar zaten verilmiş', 409);
       if (m[2] === 'kabul' && t.gecerlilik && t.gecerlilik < bugun()) return hata('Teklifin geçerlilik süresi dolmuş; güncel teklif için bizimle iletişime geçin', 409);
       // Durum geçişi, CRM günlüğü ve aşama değişikliği yönetim tarafıyla aynı kodla yapılır.
-      return await yonetimTeklifApi(db, 'POST', `teklifler/${t.id}/${m[2]}`, {}, { eposta: 'üye: ' + u.eposta });
+      const y = await yonetimTeklifApi(db, 'POST', `teklifler/${t.id}/${m[2]}`, {}, { eposta: 'üye: ' + u.eposta });
+      if (y.ok) {
+        const d = await db.prepare('SELECT no, baslik, toplam FROM teklifler WHERE id = ?').bind(t.id).first();
+        await ekibeBildir(env, `Teklif ${m[2] === 'kabul' ? 'kabul edildi' : 'reddedildi'}: ${d.no}`, [['Teklif', `${d.no} · ${d.baslik}`], ['Toplam (KDV dahil)', new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(d.toplam) + ' TL'], ['Karar veren', `${u.ad} (${u.eposta})`]],
+          { metin: 'Teklifi aç', yol: `/yonetim/teklifler/?sekme=${m[2]}&id=${encodeURIComponent(t.id)}` });
+      }
+      return y;
     }
     return hata('Bulunamadı', 404);
   }
@@ -93,6 +100,7 @@ export async function uyeMusteriApi(istek, env, yol) {
         db.prepare("INSERT INTO destek_mesajlari (id, talep_id, yazan, yazan_id, ad, metin, zaman) VALUES (?, ?, 'uye', ?, ?, ?, ?)").bind(kimlik(), id, u.id, u.ad, metin, z)
       ]);
       await islemYaz(db, 'üye: ' + u.eposta, 'destek_acildi', id, `${no} · ${konu}`);
+      await ekibeBildir(env, `Yeni destek talebi: ${konu}`, [['Talep', no], ['Üye', `${u.ad} (${u.eposta})`], ['Mesaj', metin.slice(0, 1500)]], { metin: 'Talebi aç', yol: `/yonetim/destek/?t=${encodeURIComponent(id)}` }, u.eposta);
       return json({ ok: true, id, no });
     }
     const m = yol.match(/^destek\/([\w-]+)(?:\/(mesaj|kapat))?$/);
@@ -113,6 +121,7 @@ export async function uyeMusteriApi(istek, env, yol) {
         db.prepare("INSERT INTO destek_mesajlari (id, talep_id, yazan, yazan_id, ad, metin, zaman) VALUES (?, ?, 'uye', ?, ?, ?, ?)").bind(kimlik(), talep.id, u.id, u.ad, metin, z),
         db.prepare("UPDATE destek_talepleri SET durum = 'acik', son_yazan = 'uye', guncelleme = ? WHERE id = ?").bind(z, talep.id)
       ]);
+      await ekibeBildir(env, `Destek talebine yeni mesaj: ${talep.konu}`, [['Talep', talep.no], ['Üye', `${u.ad} (${u.eposta})`], ['Mesaj', metin.slice(0, 1500)]], { metin: 'Talebi aç', yol: `/yonetim/destek/?t=${encodeURIComponent(talep.id)}` }, u.eposta);
       return json({ ok: true });
     }
     if (m[2] === 'kapat' && yontem === 'POST') {
@@ -126,7 +135,7 @@ export async function uyeMusteriApi(istek, env, yol) {
 }
 
 // --- Yönetim uçları: /api/yonetim/destek*, /api/yonetim/belgeler/:id/paylas ---
-export async function yonetimMusteriAlaniApi(db, yontem, yol, govde, kim) {
+export async function yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim) {
   let m = yol.match(/^belgeler\/([\w-]+)\/paylas$/);
   if (m && yontem === 'POST') {
     const b = await db.prepare('SELECT id, ad, musteri_id FROM belgeler WHERE id = ?').bind(m[1]).first();
@@ -169,6 +178,8 @@ export async function yonetimMusteriAlaniApi(db, yontem, yol, govde, kim) {
       db.prepare('UPDATE destek_talepleri SET durum = ?, son_yazan = ?, guncelleme = ? WHERE id = ?').bind(kapat ? 'kapali' : 'yanitlandi', 'ekip', z, t.id)
     ]);
     await islemYaz(db, kim.eposta, 'destek_yanitlandi', t.id, t.no);
+    const uye = await db.prepare('SELECT eposta FROM uyeler WHERE id = ?').bind(t.uye_id).first();
+    if (uye) await uyeyeBildir(env, uye.eposta, `Destek talebinize yanıt verildi: ${t.konu}`, [['Talep', t.no], ['Durum', kapat ? 'Kapandı' : 'Yanıtlandı']], { metin: 'Yanıtı görüntüle', yol: `/uye/destek/?t=${encodeURIComponent(t.id)}` });
     return json({ ok: true });
   }
   if (m[2] === 'durum' && yontem === 'POST') {
