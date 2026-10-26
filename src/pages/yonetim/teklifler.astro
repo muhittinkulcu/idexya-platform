@@ -122,6 +122,25 @@ import Yonetim from '../../layouts/Yonetim.astro';
     } catch (h) { genelHata('İşlem yapılamadı: ' + h.message); }
   }
 
+  // Kabul edilen teklif → muhasebede bekleyen gelir (alacak) kaydı. Kayıt varsa durumunu gösterir.
+  function gelirAlani(t, gelir) {
+    if (gelir) {
+      const odendi = gelir.durum === 'odendi';
+      return el('a', { class: 'dugme', href: '/yonetim/muhasebe/', title: 'Muhasebede aç' },
+        el('span', { class: 'cip ' + (odendi ? 'kazanildi' : 'teklif'), style: 'margin-right: 6px' }, odendi ? 'Tahsil edildi' : 'Tahsilat bekliyor'),
+        odendi ? (gelir.odeme_tarihi ? gun(gelir.odeme_tarihi) : '') : gelir.vade ? 'vade ' + gun(gelir.vade) : 'vade yok');
+    }
+    const ileri = new Date(Date.now() + 3 * 3600000 + 30 * 86400000).toISOString().slice(0, 10);
+    const vade = el('input', { type: 'date', value: ileri, 'aria-label': 'Vade tarihi', style: 'min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit' });
+    return el('span', { style: 'display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap' }, vade,
+      el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
+        if (!confirm(`${t.no} için muhasebeye ${tutar(t.toplam)} tutarında, ${vade.value ? 'vadesi ' + gun(vade.value) : 'vadesiz'} bekleyen gelir kaydı eklensin mi?`)) return;
+        const d = o.currentTarget; d.disabled = true;
+        try { await api(`teklifler/${encodeURIComponent(t.id)}/gelir`, { vade: vade.value }); await ac(t.id, 'Gelir kaydı oluşturuldu; Muhasebe sayfasında “bekliyor” olarak görünür.'); }
+        catch (h) { genelHata('Gelir kaydı oluşturulamadı: ' + h.message); d.disabled = false; }
+      } }, 'Gelir kaydı oluştur'));
+  }
+
   async function ac(id, mesaj = '') {
     seciliId = id; adresYaz(); form.hidden = true;
     let v;
@@ -133,7 +152,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const eylemler = {
       taslak: [el('button', { type: 'button', class: 'dugme', onclick: () => duzenle(t) }, 'Düzenle'), yazdir, dugme('Gönderildi olarak işaretle', 'gonderildi', true), dugme('Kopyala', 'kopyala'), dugme('Sil', 'sil')],
       gonderildi: [dugme('Kabul edildi', 'kabul', true), dugme('Reddedildi', 'red'), yazdir, dugme('Kopyala', 'kopyala')],
-      kabul: [yazdir, dugme('Kopyala', 'kopyala')], red: [yazdir, dugme('Kopyala', 'kopyala')]
+      kabul: [gelirAlani(t, v.gelir), yazdir, dugme('Kopyala', 'kopyala')], red: [yazdir, dugme('Kopyala', 'kopyala')]
     }[t.durum] || [yazdir];
     const bilgi = [['Oluşturma', tarih(t.olusturma)], ['Geçerlilik', gun(t.gecerlilik)], t.gonderim_zamani ? ['Gönderildi', tarih(t.gonderim_zamani)] : null,
       t.karar_zamani ? [t.durum === 'kabul' ? 'Kabul' : 'Ret', tarih(t.karar_zamani)] : null, ['Hazırlayan', t.olusturan]].filter(Boolean);

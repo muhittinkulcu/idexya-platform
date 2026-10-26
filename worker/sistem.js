@@ -79,6 +79,9 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     }
     if (await tabloVar(db, 'muhasebe')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM muhasebe WHERE tur = 'gelir' AND durum = 'bekliyor' AND vade IS NOT NULL AND vade < ?").bind(new Date().toISOString().slice(0, 10)).first();
+      const yakin = await db.prepare("SELECT COUNT(*) AS n FROM muhasebe WHERE tur = 'gelir' AND durum = 'bekliyor' AND vade IS NOT NULL AND vade >= ? AND vade <= ?")
+        .bind(new Date().toISOString().slice(0, 10), new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10)).first();
+      if (yakin && yakin.n) onay.push({ tur: 'muhasebe', baslik: `${yakin.n} alacağın vadesi 3 gün içinde doluyor`, detay: 'Müşteriye ödeme hatırlatması yapmayı unutmayın.', href: '/yonetim/muhasebe/', onem: 'normal' });
       if (g && g.n) onay.push({ tur: 'muhasebe', baslik: `${g.n} alacağın vadesi geçti`, detay: 'Tahsilatı takip edin.', href: '/yonetim/muhasebe/', onem: 'kritik' });
     }
     // Sistem uyarıları
