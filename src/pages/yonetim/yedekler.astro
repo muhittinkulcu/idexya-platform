@@ -1,0 +1,46 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Yedekler" aktif="yedek" yol="Sistem" aciklama="Panel verisinin (talepler, CRM, teklifler, muhasebe, üyeler, içerikler…) sıkıştırılmış JSON yedeği. R2 deposu bağlıysa her gün kendiliğinden alınır.">
+<section class="kart" data-durum style="padding: 18px; display: flex; flex-direction: column; gap: 12px"><div class="bos">Yükleniyor…</div></section>
+<div class="uyari bilgi">Yedek dosyası <b>kişisel veri</b> içerir (talep ve müşteri iletişim bilgileri, üye kayıtları). İndirdiğiniz dosyayı yalnız güvenli bir yerde saklayın ve paylaşmayın. Oturumlar, giriş denemeleri, şifre yenileme kayıtları ve erişim anahtarları yedeğe girmez. Geri yükleme panelden yapılmaz; gerekirse kontrollü olarak ayrıca yapılır.</div>
+<section class="kart" aria-label="Kayıtlı yedekler" data-liste style="overflow-x: auto"></section>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const durum = document.querySelector('[data-durum]'), liste = document.querySelector('[data-liste]');
+  const kb = (n) => (n >= 1048576 ? (n / 1048576).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + ' MB' : Math.max(1, Math.round(n / 1024)).toLocaleString('tr-TR') + ' KB');
+  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left';
+  async function yukle() {
+    let r;
+    try { r = await api('yedek'); genelHata(''); } catch (h) { genelHata('Yedek bilgisi alınamadı: ' + h.message); return; }
+    const al = el('button', { type: 'button', class: 'dugme ana', disabled: !r.kurulu, onclick: async (o) => {
+      const d = o.currentTarget; d.disabled = true; d.textContent = 'Yedek alınıyor…';
+      try { await api('yedek/al', {}); await yukle(); } catch (h) { genelHata(h.message); d.disabled = false; d.textContent = 'Şimdi yedek al'; }
+    } }, 'Şimdi yedek al');
+    const gec = r.son && Date.parse(r.son.zaman) < Date.now() - 36 * 3600000;
+    durum.replaceChildren(...[
+      el('div', { style: 'display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: center' },
+        el('div', { style: 'display: flex; flex-direction: column; gap: 4px' },
+          el('b', { style: 'font-size: 17px' }, 'Otomatik yedek'),
+          el('span', { style: 'color: var(--tx2); font-size: 14px' }, !r.kurulu ? 'Kapalı: Cloudflare R2 deposu (YEDEK) bağlı değil. Elle indirme kullanılabilir.'
+            : r.son ? `Son yedek ${tarih(r.son.zaman)} · ${r.son.satir.toLocaleString('tr-TR')} satır · ${kb(r.son.boyut)} · son ${r.saklamaGun} gün saklanır` : 'Henüz yedek alınmadı; ilk yedek bu gece alınacak.')),
+        el('span', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
+          el('span', { class: 'cip ' + (!r.kurulu ? 'yeni' : gec ? 'kaybedildi' : 'kazanildi') }, !r.kurulu ? 'Kapalı' : gec ? 'Gecikmiş' : 'Açık'),
+          al, el('a', { class: 'dugme', href: '/api/yonetim/yedek/indir', download: '' }, 'Şimdi indir'))),
+      el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${r.tablolar.length} tablo yedeklenir. Yedeğe girmeyenler: ${r.haric.join(', ')}.`)]);
+    if (!r.kurulu) { liste.replaceChildren(el('div', { class: 'bos' }, 'R2 deposu bağlanınca günlük yedekler burada listelenir.')); return; }
+    liste.replaceChildren(r.yedekler.length ? el('table', { style: 'width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px' },
+      el('thead', {}, el('tr', {}, ...['Tarih', 'Satır', 'Boyut', 'Alan', ''].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
+      el('tbody', {}, ...r.yedekler.map((y) => {
+        const g = y.anahtar.match(/(\d{4}-\d{2}-\d{2})/)?.[1];
+        return el('tr', {},
+          el('td', { style: hucre + '; font-weight: 600' }, tarih(y.zaman)),
+          el('td', { style: hucre }, y.satir ? y.satir.toLocaleString('tr-TR') : '—'),
+          el('td', { style: hucre }, kb(y.boyut)),
+          el('td', { style: hucre + '; color: var(--tx2); font-size: 13px' }, y.tetikleyen || '—'),
+          el('td', { style: hucre + '; text-align: right' }, g ? el('a', { class: 'dugme kucuk', href: '/api/yonetim/yedek/indir/' + g, download: '' }, 'İndir') : ''));
+      }))) : el('div', { class: 'bos' }, 'Henüz kayıtlı yedek yok.'));
+  }
+  yukle();
+</script>
+</Yonetim>

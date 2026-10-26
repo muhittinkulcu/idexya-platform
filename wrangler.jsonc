@@ -15,6 +15,8 @@
   },
   // Veritabanı: ilk yayında Cloudflare kendiliğinden oluşturur (otomatik kaynak oluşturma).
   "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform" }],
+  // Günlük veritabanı yedeği (worker/yedek.js). Depo ilk yayında Cloudflare tarafından kendiliğinden oluşturulur (otomatik kaynak oluşturma).
+  "r2_buckets": [{ "binding": "YEDEK" }],
   // Yönetim paneli girişi: Cloudflare Access. Değerler Cloudflare panelinden "Variables" olarak girilir.
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
