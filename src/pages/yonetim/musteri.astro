@@ -3,6 +3,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Müşteri kartı" aktif="crm" yol="Müşteri ilişkileri › CRM">
 <div data-ust style="display: flex; flex-direction: column; gap: 12px"></div>
+<section class="kart" aria-label="Hesaplar ve erişimler" data-hesaplar style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <section class="kart" aria-label="Reklam özeti (IDOS)" data-reklam hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section class="kart" aria-label="Müşteri bilgileri" style="flex: 1 1 320px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
@@ -118,9 +119,26 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, `Son ${r.gun} gün, bugün hariç · farklı para birimleri toplanmaz · hesaplar: ${r.hesaplar.map((h) => `${PLATFORM[h.platform] || h.platform} ${h.hesap}`).join(', ')}`));
   }
 
+  // Hesap envanteri: bu müşterinin reklam/ölçüm hesapları ve erişim durumu.
+  async function hesaplarYukle() {
+    const kutu = document.querySelector('[data-hesaplar]');
+    let r;
+    try { r = await api('envanter/musteri/' + encodeURIComponent(id)); } catch (h) { kutu.hidden = true; return; }
+    const bas = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
+      el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, `Hesaplar ve erişimler (${r.kayitlar.length})`),
+      el('a', { href: '/yonetim/hesaplar/?musteri=' + encodeURIComponent(id), style: 'font-size: 13px' }, r.kayitlar.length ? 'Envanterde yönet' : '+ Hesap ekle'));
+    const CIP = { aktif: 'kazanildi', bekliyor: 'teklif', kaldirildi: 'kaybedildi' };
+    kutu.replaceChildren(...[bas, r.kayitlar.length
+      ? el('div', { style: 'display: flex; flex-wrap: wrap; gap: 8px' }, r.kayitlar.map((k) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px' },
+          el('b', {}, r.platformlar[k.platform] || k.platform), el('span', { style: 'color: var(--tx2); font-family: ui-monospace, monospace' }, k.hesap_kimligi || k.hesap_adi || ''),
+          el('span', { class: 'cip ' + (CIP[k.durum] || '') }, r.durumlar[k.durum] || k.durum))))
+      : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu müşteri için henüz hesap kaydı yok. Google Ads, Meta, GA4, GTM gibi hesaplarını ve erişimlerinizi envantere ekleyin.')]);
+  }
+
   async function yukle() {
     teklifleriYukle();
     reklamYukle();
+    hesaplarYukle();
     try { ciz(await api('musteriler/' + encodeURIComponent(id))); }
     catch (h) { genelHata(h.durum === 404 ? 'Bu müşteri bulunamadı. Bağlantı eski olabilir; CRM listesinden açın.' : 'Müşteri yüklenemedi: ' + h.message); }
   }

@@ -1,0 +1,144 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Hesap envanteri" aktif="hesaplar" yol="Satış" aciklama="Her müşterinin reklam, ölçüm ve satış hesapları; bu hesaplara kimin, hangi düzeyde ve ne zamandan beri eriştiği. Aynı hesap kimliği iki müşteriye yazılamaz.">
+<style is:global>
+  .hs-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .hs-arac input,.hs-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .hs-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
+  .hs-form .genis{grid-column:1/-1}
+  .hs-grup{display:flex;flex-direction:column}
+  .hs-grup-bas{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .hs-tablo{width:100%;min-width:860px;border-collapse:collapse;font-size:14px}
+  .hs-tablo th{padding:8px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
+  .hs-tablo td{padding:10px 16px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+  .hs-kimlik{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
+  .hs-uyari{display:flex;flex-direction:column;gap:6px}
+  .hs-uyari li{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--card2)}
+</style>
+<div class="uyari bilgi"><b>Şifre ve erişim anahtarı yazmayın.</b> Envanterde yalnız hesap adı, kimliği ve erişim bilgisi tutulur; şifreye ya da anahtara benzeyen metinler kaydedilmez. Müşteri çalışması bittiğinde (CRM aşaması “Kaybedildi”) açık erişimler bildirimlere düşer.</div>
+<section class="kart" data-uyarilar hidden style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px"></section>
+<div class="hs-arac">
+  <label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Ara</span><input type="search" data-ara placeholder="Hesap adı, kimlik, erişim sahibi ya da müşteri ara…" style="flex: 1"></label>
+  <label><span style="position: absolute; left: -10000px">Platform</span><select data-platform-suz><option value="">Tüm platformlar</option></select></label>
+  <label><span style="position: absolute; left: -10000px">Durum</span><select data-durum-suz><option value="">Tüm durumlar</option></select></label>
+  <label><span style="position: absolute; left: -10000px">Müşteri</span><select data-musteri-suz style="max-width: 220px"><option value="">Tüm müşteriler</option></select></label>
+  <button type="button" class="dugme ana" data-yeni>+ Hesap ekle</button>
+</div>
+<form class="kart hs-form" data-form hidden novalidate>
+  <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni hesap</h2>
+  <label class="alan">Müşteri<select name="musteri_id" data-musteri required><option value="">Müşteri seçin</option></select></label>
+  <label class="alan">Platform<select name="platform" data-platform required></select></label>
+  <label class="alan">Hesap adı<input name="hesap_adi" maxlength="160" autocomplete="off" placeholder="Platformda görünen ad"></label>
+  <label class="alan">Hesap kimliği<input name="hesap_kimligi" maxlength="200" autocomplete="off" spellcheck="false" data-kimlik></label>
+  <label class="alan">Erişim türü<select name="erisim_turu" data-erisim></select></label>
+  <label class="alan">Erişim durumu<select name="durum" data-durum></select></label>
+  <label class="alan">Erişen (kişi ya da ajans portföyü)<input name="erisim_sahibi" maxlength="200" autocomplete="off" placeholder="Ör. info@idexya.com ya da Idexya portföyü"></label>
+  <label class="alan">Erişim tarihi<input name="verilis" type="date"></label>
+  <label class="alan" data-kaldirilma-alan>Kaldırılma tarihi<input name="kaldirilma" type="date"></label>
+  <label class="alan genis">Not (isteğe bağlı)<textarea name="not" rows="2" maxlength="2000" placeholder="Ör. Faturalama müşteride; dönüşüm hedefi: satın alma"></textarea></label>
+  <div class="genis" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+    <button type="submit" class="dugme ana">Kaydet</button><button type="button" class="dugme" data-vazgec>Vazgeç</button>
+    <span role="status" data-form-durum style="font-size: 14px; color: var(--err)"></span>
+  </div>
+</form>
+<div data-liste style="display: flex; flex-direction: column; gap: 14px"></div>
+<script>
+  import { api, el, tarih as zaman, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { bugunIst, gun, kucuk } from '../../scripts/yonetim/kayit.js';
+  const $ = (s) => document.querySelector(s);
+  const liste = $('[data-liste]'), form = $('[data-form]'), fdurum = $('[data-form-durum]');
+  const ara = $('[data-ara]'), pSuz = $('[data-platform-suz]'), dSuz = $('[data-durum-suz]'), mSuz = $('[data-musteri-suz]');
+  const CIP = { aktif: 'kazanildi', bekliyor: 'teklif', kaldirildi: 'kaybedildi' };
+  let v = { kayitlar: [], platformlar: {}, erisimTurleri: {}, durumlar: {}, musteriler: [], uyarilar: [] }, duzenlenen = null;
+  const musAd = (m) => m.firma || m.ad || 'Adsız müşteri';
+  const secenek = (s, nesne, bas) => { const d = s.value; s.replaceChildren(...(bas ? [el('option', { value: '' }, bas)] : []), ...Object.entries(nesne).map(([k, x]) => el('option', { value: k }, typeof x === 'string' ? x : x.ad))); s.value = d; };
+
+  function kimlikIpucu() {
+    const p = v.platformlar[form.platform.value];
+    form.hesap_kimligi.placeholder = p && p.ornek ? p.ornek : '';
+  }
+  function kaldirilmaGoster() { $('[data-kaldirilma-alan]').hidden = form.durum.value !== 'kaldirildi'; }
+  form.platform.addEventListener('change', kimlikIpucu);
+  form.durum.addEventListener('change', () => { kaldirilmaGoster(); if (form.durum.value === 'kaldirildi' && !form.kaldirilma.value) form.kaldirilma.value = bugunIst(); });
+
+  function formAc(k, musteriId) {
+    duzenlenen = k || null; fdurum.textContent = '';
+    $('[data-form-baslik]').textContent = k ? 'Hesabı düzenle' : 'Yeni hesap';
+    form.reset();
+    form.musteri_id.value = k ? k.musteri_id : musteriId || mSuz.value || '';
+    form.platform.value = k ? k.platform : 'google_ads';
+    form.hesap_adi.value = k?.hesap_adi || ''; form.hesap_kimligi.value = k?.hesap_kimligi || '';
+    form.erisim_turu.value = k ? k.erisim_turu : 'yonetici'; form.durum.value = k ? k.durum : 'aktif';
+    form.erisim_sahibi.value = k?.erisim_sahibi || ''; form.verilis.value = k ? k.verilis || '' : bugunIst();
+    form.kaldirilma.value = k?.kaldirilma || ''; form.not.value = k?.not_ || '';
+    kimlikIpucu(); kaldirilmaGoster();
+    form.hidden = false; form.scrollIntoView({ behavior: 'smooth', block: 'start' }); form.hesap_adi.focus({ preventScroll: true });
+  }
+  $('[data-yeni]').addEventListener('click', () => formAc(null));
+  $('[data-vazgec]').addEventListener('click', () => { form.hidden = true; duzenlenen = null; });
+  form.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const g = Object.fromEntries(new FormData(form));
+    const d = form.querySelector('button[type=submit]'); d.disabled = true; fdurum.textContent = '';
+    try { await api(duzenlenen ? 'envanter/' + encodeURIComponent(duzenlenen.id) : 'envanter', g); form.hidden = true; duzenlenen = null; await yukle(); }
+    catch (h) { fdurum.textContent = h.message; } finally { d.disabled = false; }
+  });
+  async function sil(k, d) {
+    if (!confirm('Bu hesap kaydı silinsin mi? Platformdaki hesaba ve erişime dokunulmaz; yalnız envanter kaydı silinir. Erişimi kaldırdıysanız silmek yerine durumu “Erişim kaldırıldı” yapmanız önerilir.')) return;
+    d.disabled = true;
+    try { await api(`envanter/${encodeURIComponent(k.id)}/sil`, {}); await yukle(); } catch (h) { genelHata('Silinemedi: ' + h.message); d.disabled = false; }
+  }
+
+  function ciz() {
+    const kutu = $('[data-uyarilar]');
+    kutu.hidden = !v.uyarilar.length;
+    kutu.replaceChildren(...(v.uyarilar.length ? [el('b', {}, `Dikkat gerektirenler (${v.uyarilar.length})`), el('ul', { class: 'hs-uyari', style: 'list-style: none; margin: 0; padding: 0' },
+      ...v.uyarilar.map((u) => el('li', {}, el('span', {}, el('b', { style: `color: ${u.onem === 'kritik' ? 'var(--err)' : 'var(--head)'}` }, u.baslik), el('div', { style: 'font-size: 13px; color: var(--tx2)' }, u.detay)),
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { const k = v.kayitlar.find((x) => x.id === u.id); if (k) formAc(k); } }, 'Düzenle'))))] : []));
+    const q = kucuk(ara.value.trim());
+    const gor = v.kayitlar.filter((k) => (!pSuz.value || k.platform === pSuz.value) && (!dSuz.value || k.durum === dSuz.value) && (!mSuz.value || k.musteri_id === mSuz.value)
+      && (!q || [k.hesap_adi, k.hesap_kimligi, k.erisim_sahibi, k.not_, k.musteri_firma, k.musteri_ad, v.platformlar[k.platform]?.ad].some((x) => x && kucuk(x).includes(q))));
+    if (!v.kayitlar.length) { liste.replaceChildren(el('div', { class: 'kart bos' }, 'Henüz hesap kaydı yok. “+ Hesap ekle” ile müşterinin Google Ads, Meta, GA4, GTM gibi hesaplarını ekleyin.')); return; }
+    if (!gor.length) { liste.replaceChildren(el('div', { class: 'kart bos' }, 'Süzgeçlerle eşleşen kayıt yok.')); return; }
+    const gruplar = new Map();
+    for (const k of gor) { const a = gruplar.get(k.musteri_id) || []; a.push(k); gruplar.set(k.musteri_id, a); }
+    liste.replaceChildren(...[...gruplar.entries()].map(([mid, ks]) => {
+      const ilk = ks[0], kayip = ilk.musteri_asama === 'kaybedildi';
+      return el('section', { class: 'kart hs-grup', 'aria-label': ilk.musteri_firma || ilk.musteri_ad || 'Müşteri' },
+        el('div', { class: 'hs-grup-bas' },
+          el('span', { style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' },
+            el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(mid), style: 'font-weight: 700; font-size: 16px; text-decoration: none' }, ilk.musteri_firma || ilk.musteri_ad || 'Adsız müşteri'),
+            kayip ? el('span', { class: 'cip kaybedildi' }, 'Çalışma bitti') : null,
+            el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${ks.length} hesap · ${ks.filter((x) => x.durum === 'aktif').length} açık erişim`)),
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(null, mid) }, '+ Bu müşteriye ekle')),
+        el('div', { style: 'overflow-x: auto' }, el('table', { class: 'hs-tablo' },
+          el('thead', {}, el('tr', {}, ...['Platform', 'Hesap', 'Erişim', 'Erişen', 'Tarih', ''].map((b) => el('th', { scope: 'col' }, b)))),
+          el('tbody', {}, ...ks.map((k) => el('tr', {},
+            el('td', { style: 'white-space: nowrap; font-weight: 600' }, v.platformlar[k.platform]?.ad || k.platform),
+            el('td', { style: 'max-width: 300px' }, k.hesap_adi ? el('div', { style: 'overflow-wrap: anywhere' }, k.hesap_adi) : null, k.hesap_kimligi ? el('div', { class: 'hs-kimlik', style: 'color: var(--tx2)' }, k.hesap_kimligi) : null,
+              k.not_ ? el('div', { style: 'font-size: 12px; color: var(--tx2); white-space: pre-wrap; margin-top: 2px' }, k.not_) : null),
+            el('td', {}, el('span', { class: 'cip ' + (CIP[k.durum] || '') }, v.durumlar[k.durum] || k.durum), el('div', { style: 'font-size: 12px; color: var(--tx2); margin-top: 4px' }, v.erisimTurleri[k.erisim_turu] || k.erisim_turu)),
+            el('td', { style: 'font-size: 13px; overflow-wrap: anywhere; max-width: 200px' }, k.erisim_sahibi || '—'),
+            el('td', { style: 'font-size: 13px; white-space: nowrap' }, k.verilis ? gun(k.verilis) : '—', k.kaldirilma ? el('div', { style: 'color: var(--tx2)' }, 'kaldırıldı ' + gun(k.kaldirilma)) : null,
+              el('div', { style: 'font-size: 11px; color: var(--tx2)', title: 'Son güncelleme' }, zaman(k.guncelleme))),
+            el('td', { style: 'white-space: nowrap; text-align: right' },
+              el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(k) }, 'Düzenle'), ' ',
+              el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => sil(k, o.currentTarget) }, 'Sil'))))))));
+    }));
+  }
+  [ara, pSuz, dSuz, mSuz].forEach((e) => e.addEventListener(e === ara ? 'input' : 'change', ciz));
+  async function yukle() {
+    try {
+      v = await api('envanter'); genelHata('');
+      secenek(form.platform, v.platformlar); secenek(form.erisim_turu, v.erisimTurleri); secenek(form.durum, v.durumlar);
+      secenek(pSuz, v.platformlar, 'Tüm platformlar'); secenek(dSuz, v.durumlar, 'Tüm durumlar');
+      const mus = Object.fromEntries(v.musteriler.map((m) => [m.id, musAd(m)]));
+      secenek(form.musteri_id, mus, 'Müşteri seçin'); secenek(mSuz, mus, 'Tüm müşteriler');
+      const p = new URLSearchParams(location.search).get('musteri'); if (p && mus[p] && !mSuz.dataset.ilk) { mSuz.value = p; mSuz.dataset.ilk = '1'; }
+      ciz();
+    } catch (h) { genelHata('Envanter yüklenemedi: ' + h.message); }
+  }
+  yukle();
+</script>
+</Yonetim>
