@@ -1,5 +1,6 @@
 // Yönetim paneli sistem modülleri: İşlem geçmişi, Bildirimler, Ayarlar, Entegrasyonlar / Veri eşitleme ve Medya kütüphanesi.
 // Bildirimler ve entegrasyon durumları kayıtlı veriden ve ortam ayarlarından hesaplanır; gizli değerler asla döndürülmez.
+import { envanterUyarilari } from './envanter.js';
 import { json, hata, simdi, kimlik, kirp, islemYaz, EPOSTA_DESEN } from './ortak.js';
 import { reklamKurulu } from './reklam.js';
 import { akisKurulu } from './instagram.js';
@@ -65,6 +66,11 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     if (await tabloVar(db, 'teklifler')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM teklifler WHERE durum = 'gonderildi' AND gecerlilik IS NOT NULL AND gecerlilik < ?").bind(new Date().toISOString().slice(0, 10)).first();
       if (g && g.n) onay.push({ tur: 'teklif', baslik: `${g.n} gönderilen teklifin geçerlilik süresi doldu`, detay: 'Müşteriyle görüşüp kabul ya da red olarak işaretleyin.', href: '/yonetim/teklifler/?sekme=gonderildi', onem: 'normal' });
+    }
+    if (await tabloVar(db, 'hesap_envanteri')) {
+      const u = await envanterUyarilari(db);
+      const kritik = u.filter((x) => x.onem === 'kritik').length;
+      if (u.length) onay.push({ tur: 'envanter', baslik: `Hesap envanterinde ${u.length} uyarı`, detay: kritik ? `${kritik} kritik: biten müşteride açık erişim ya da IDOS ile çelişen hesap.` : 'Uzun süredir bekleyen erişim istekleri var.', href: '/yonetim/hesaplar/', onem: kritik ? 'kritik' : 'normal' });
     }
     if (await tabloVar(db, 'destek_talepleri')) {
       const g = await db.prepare("SELECT COUNT(*) AS n, MIN(guncelleme) AS en_eski FROM destek_talepleri WHERE durum = 'acik'").first();

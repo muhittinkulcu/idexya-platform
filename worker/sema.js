@@ -136,5 +136,11 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS destek_mesajlari (id TEXT PRIMARY KEY, talep_id TEXT NOT NULL, yazan TEXT NOT NULL, yazan_id TEXT NOT NULL, ad TEXT, metin TEXT NOT NULL, zaman TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS destek_mesaj_talep ON destek_mesajlari (talep_id, zaman)`,
   `CREATE INDEX IF NOT EXISTS destek_mesaj_yazan ON destek_mesajlari (yazan_id, zaman)`,
-  `CREATE TABLE IF NOT EXISTS destek_sayac (k INTEGER PRIMARY KEY, son INTEGER NOT NULL)`
+  `CREATE TABLE IF NOT EXISTS destek_sayac (k INTEGER PRIMARY KEY, son INTEGER NOT NULL)`,
+  // Hesap envanteri (worker/envanter.js): müşteri hesapları ve erişimleri. Şifre/anahtar saklanmaz; platform + kimlik tek müşteriye aittir.
+  `CREATE TABLE IF NOT EXISTS hesap_envanteri (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, platform TEXT NOT NULL, hesap_adi TEXT, hesap_kimligi TEXT, erisim_turu TEXT NOT NULL,
+    erisim_sahibi TEXT, durum TEXT NOT NULL, verilis TEXT, kaldirilma TEXT, not_ TEXT, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS envanter_musteri ON hesap_envanteri (musteri_id)`,
+  `CREATE INDEX IF NOT EXISTS envanter_kimlik ON hesap_envanteri (platform, hesap_kimligi)`
 ];
