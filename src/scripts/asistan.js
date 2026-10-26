@@ -1,4 +1,5 @@
 // Idexya Asistan sohbet penceresi. Metinler güvenli biçimde (textContent) yazılır; yalnız site içi ve https bağlantıları tıklanır olur.
+import { reklamBilgisi } from './reklam-iz.js';
 import { robotBagla } from './form.js';
 const ANAHTAR = 'idx-asistan';
 const oku = () => { try { return JSON.parse(sessionStorage.getItem(ANAHTAR) || 'null'); } catch (e) { return null; } };
@@ -82,7 +83,7 @@ export function asistan() {
       if (sorun) return yazDurum(sorun);
       const b = k.querySelector('.as-kart-gonder'); b.disabled = true; b.textContent = 'Gönderiliyor…';
       try {
-        const r = await fetch('/api/talep', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, kvkk: true, kaynak: 'asistan', sayfa: location.pathname, sohbet: durum.sohbet || '', turnstile: robot.jeton() }) });
+        const r = await fetch('/api/talep', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, ...(reklamBilgisi() ? { reklam: reklamBilgisi(), pazarlama_izni: true } : {}), kvkk: true, kaynak: 'asistan', sayfa: location.pathname, sohbet: durum.sohbet || '', turnstile: robot.jeton() }) });
         const s = await r.json().catch(() => ({}));
         if (!r.ok || !s.ok) throw new Error(s.hata || 'Gönderilemedi');
         k.replaceWith(balon('asistan', 'Teşekkürler, talebiniz ekibimize ulaştı. En geç bir iş günü içinde size dönüyoruz.'));

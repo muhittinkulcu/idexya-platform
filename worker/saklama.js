@@ -13,6 +13,9 @@ export const KURALLAR = [
   { ad: 'Süresi dolmuş şifre yenileme bağlantıları (30 gün sonra)', sql: 'DELETE FROM sifre_yenileme WHERE bitis < ?', sure: 30 * 86400000 },
   // Kişisel veri içermeyen ölçüm verisi (worker/olcum.js); gun sütunu YYYY-MM-DD, ISO zamanla karşılaştırılır.
   { ad: 'Çerezsiz ziyaret sayaçları (2 yıl)', sql: 'DELETE FROM ziyaret_gunluk WHERE gun < ?', sure: 2 * YIL },
+  // Reklam tıklama kimlikleri (worker/donusum.js): en çok 1 yıl; talebi silinenler hemen.
+  { ad: 'Reklam tıklama kimlikleri (1 yıl)', sql: 'DELETE FROM talep_reklam WHERE tiklama_zamani < ? OR talep_id NOT IN (SELECT id FROM talepler)', sure: YIL },
+  { ad: 'Dönüşüm aktarım kayıtları (1 yıl)', sql: 'DELETE FROM donusum_aktarim WHERE zaman < ? OR talep_id NOT IN (SELECT id FROM talepler)', sure: YIL },
   { ad: 'Gerçek kullanıcı hız örnekleri (90 gün)', sql: 'DELETE FROM hiz_olcum WHERE gun < ?', sure: 90 * 86400000 }
 ];
 

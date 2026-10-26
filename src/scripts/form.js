@@ -1,4 +1,5 @@
 // Site formlarını /api/talep'e gönderir. Robot doğrulaması (Turnstile) site anahtarı tanımlıysa yüklenir.
+import { reklamBilgisi } from './reklam-iz.js';
 const ANAHTAR = document.documentElement.dataset.turnstile || '';
 let turnstileYuklendi = null;
 
@@ -66,6 +67,7 @@ export function formlar() {
       const dugme = form.querySelector('button[type=submit]');
       dugme.disabled = true; const eski = dugme.textContent; dugme.textContent = 'Gönderiliyor…';
       try {
+        const rk = reklamBilgisi(); if (rk) { g.reklam = rk; g.pazarlama_izni = true; }
         const r = await fetch('/api/talep', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(g) });
         const s = await r.json().catch(() => ({}));
         if (r.ok && s.ok) {

@@ -149,5 +149,9 @@ export const SEMA = [
     alan_kok TEXT, alan_bitis TEXT, rdap_zaman TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS site_saglik_sonuc (
     id TEXT PRIMARY KEY, hedef_id TEXT NOT NULL, zaman TEXT NOT NULL, durum TEXT NOT NULL, http INTEGER, sure INTEGER, son_adres TEXT, bulunan TEXT, sorunlar TEXT, notlar TEXT)`,
-  `CREATE INDEX IF NOT EXISTS site_saglik_sonuc_hedef ON site_saglik_sonuc (hedef_id, zaman)`
+  `CREATE INDEX IF NOT EXISTS site_saglik_sonuc_hedef ON site_saglik_sonuc (hedef_id, zaman)`,
+  // Reklam dönüşümü (worker/donusum.js): pazarlama çerezi izniyle gelen tıklama kimlikleri ve platforma yüklenen dönüşümler.
+  `CREATE TABLE IF NOT EXISTS talep_reklam (
+    talep_id TEXT PRIMARY KEY, gclid TEXT, gbraid TEXT, wbraid TEXT, fbclid TEXT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, utm_term TEXT, utm_content TEXT, tiklama_zamani TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS donusum_aktarim (talep_id TEXT NOT NULL, platform TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (talep_id, platform))`
 ];
