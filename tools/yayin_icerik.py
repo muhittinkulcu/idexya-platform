@@ -43,6 +43,13 @@ DEGISIM['src/pages/index.astro'] += [
     ('<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">', '<div class="bolum-bas" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">'),
     ('<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">', '<div class="bolum-bas" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">'),
 ]
+# Paketler sayfası: her paket grubunun başlığı ve ücret notunun yanı ayrıntı sayfasına bağlanır (çok katmanlı yapı, 28 Eki 2026).
+DEGISIM['src/pages/tr/paketler.astro'] += [
+    ('<h2 style="margin: 0; font-size: 32px; line-height: 1.15; letter-spacing: -0.02em; color: var(--head)">{g.ad}</h2>',
+     '<h2 style="margin: 0; font-size: 32px; line-height: 1.15; letter-spacing: -0.02em; color: var(--head)"><a href={`/tr/paketler/${g.id}`} style="color: inherit; text-decoration: none">{g.ad}</a></h2>'),
+    ('<span style="font-size: 14px; color: var(--tx2)">{g.ucretNotu}</span>',
+     '<span style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; font-size: 14px; color: var(--tx2)">{g.ucretNotu}<a href={`/tr/paketler/${g.id}`} style="font-weight: 700">Paket ayrıntıları →</a></span>'),
+]
 CEVAP = [
     'Doğru bütçe sektörünüze, hedef bölgenize, rekabete ve hedeflediğiniz satış ya da talep sayısına göre değişir. Akıllı teklif stratejilerinin öğrenebilmesi için kampanyanın düzenli dönüşüm toplayabileceği bir bütçeyle başlamak gerekir. Ücretsiz analizde hesabınızı ve pazarınızı inceleyip gerekçesiyle bir başlangıç bütçesi öneririz.',
     'Tıklama ve ziyaretler kampanya yayına girdiği gün başlar. Teklif stratejilerinin öğrenme dönemi ve anlamlı iyileştirmeler için genellikle birkaç hafta gerekir; kesin süre sektöre, bütçeye ve dönüşüm sayısına bağlıdır. Bu yüzden ilk dönemi ölçüm ve öğrenme, sonrasını büyüme dönemi olarak planlarız.',

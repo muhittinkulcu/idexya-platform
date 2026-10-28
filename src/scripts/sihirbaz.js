@@ -42,5 +42,8 @@ export function sihirbazBaslat() {
     if (b.dataset.eylem === 'oneri' && seciliAd) seciliAd.textContent = v.oneri.ad;
   });
   document.querySelectorAll('[data-paket]').forEach((a) => a.addEventListener('click', () => { if (seciliAd) seciliAd.textContent = a.dataset.paket; }));
+  // Paket sayfalarındaki "Teklif al" bağlantısı ?paket=… ile gelir; seçili paket formda hazır görünür.
+  const q = new URLSearchParams(location.search).get('paket');
+  if (q && seciliAd) seciliAd.textContent = q.slice(0, 120);
   ciz();
 }
