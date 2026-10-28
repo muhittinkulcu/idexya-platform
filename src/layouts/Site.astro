@@ -1,7 +1,6 @@
 ---
 import HizliTalep from '../components/HizliTalep.astro';
-import DuyuruSerit from '../components/DuyuruSerit.astro';
-import DuyuruKutu from '../components/DuyuruKutu.astro';
+import BannerStil from '../components/BannerStil.astro';
 // Ortak yerleşim: üst menü, alt kısım, tema, çerez onayı.
 // gorsel: paylaşım görseli (/ ile başlayan site içi PNG/JPG yolu; yoksa sitenin genel görseli). ogTur: 'article' blog yazıları için.
 interface Props { baslik?: string; aciklama?: string; aktif?: string; dil?: 'tr' | 'en'; aramayaKapali?: boolean; gorsel?: string; ogTur?: 'website' | 'article'; }
@@ -621,7 +620,8 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <body class="acik">
 <script is:inline>if(document.documentElement.dataset.tema==='koyu'){document.body.className='koyu'}</script>
 <a href="#icerik" style="position: absolute; left: -9999px; top: 8px; padding: 8px 12px; background: var(--card); color: var(--head); border-radius: 8px; z-index: 100" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">İçeriğe geç</a>
-<DuyuruSerit />
+<!-- Banner stüdyosu yuvaları: içerik panelden gelir (src/scripts/banner.js) -->
+<div class="bn-yuva" data-bn-yuva="ust-en" hidden></div>
 <header class={`site-ust${Astro.url.pathname === '/' ? ' ust-koyu' : ''}`}>
 <div class="ust kap">
 <a href="/" class="ust-logo" aria-label="Idexya ana sayfa">
@@ -698,6 +698,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </div>
 </header>
+<div class="bn-yuva" data-bn-yuva="ust-menu-alti" hidden></div>
 <script>
   // Hizmetler açılır menüsü (açıkken .acilmis; .acik açık tema sınıfıdır, karışmasın): fareyle üzerine gelince, ok düğmesiyle (klavye, dokunmatik) açılır; Esc veya dışarı tıklama kapatır.
   // Fare sağa (alt listeye) doğru giderken yoldaki başka kategoriye hemen geçilmez.
@@ -899,10 +900,11 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </dialog>
 <main id="icerik">
-<DuyuruKutu konum="sayfaUstu" />
+<div class="bn-yuva bn-yuva-kap" data-bn-yuva="icerik-basi" hidden></div>
 <slot />
-<DuyuruKutu konum="icerikSonu" />
+<div class="bn-yuva bn-yuva-kap" data-bn-yuva="icerik-sonu" hidden></div>
 </main>
+<div class="bn-yuva" data-bn-yuva="footer-ustu" hidden></div>
 <footer style="background: var(--bg2); border-top: 1px solid var(--line)">
 <div style="max-width: 1240px; margin: 0 auto; padding: 60px 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
 <div style="display: flex; flex-wrap: wrap; gap: 40px">
@@ -935,5 +937,6 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
   olcumBaslat();
 </script>
 <HizliTalep />
+<BannerStil />
 </body>
 </html>
