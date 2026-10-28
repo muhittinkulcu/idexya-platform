@@ -1,4 +1,5 @@
 ---
+import HizliTalep from '../components/HizliTalep.astro';
 // Ortak yerleşim: üst menü, alt kısım, tema, çerez onayı.
 // gorsel: paylaşım görseli (/ ile başlayan site içi PNG/JPG yolu; yoksa sitenin genel görseli). ogTur: 'article' blog yazıları için.
 interface Props { baslik?: string; aciklama?: string; aktif?: string; dil?: 'tr' | 'en'; aramayaKapali?: boolean; gorsel?: string; ogTur?: 'website' | 'article'; }
@@ -425,16 +426,18 @@ main p{max-width:76ch}
 }
 @keyframes aramaGir{from{opacity:0;transform:translateY(-12px) scale(.98)}to{opacity:1;transform:none}}
 body:has(dialog[open]){overflow:hidden}
-/* Idexya Asistan */
-.as-dugme{position:fixed;right:20px;bottom:20px;z-index:45;min-height:52px;display:inline-flex;align-items:center;gap:10px;padding:0 20px 0 16px;border:0;border-radius:999px;background:#002559;color:#FFFFFF;font:inherit;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 18px 44px rgba(0,37,89,.35);transition:transform .2s,box-shadow .2s}
-.as-dugme:hover{transform:translateY(-2px);box-shadow:0 22px 50px rgba(0,37,89,.45)}
-.as-dugme svg{color:#FF9A4D}
-.as-dugme.as-acik span{display:none}.as-dugme.as-acik{padding:0 16px}
+/* IDOS asistan (sürüklenebilir düğme; konum src/scripts/asistan.js) */
+.as-dugme{position:fixed;right:16px;bottom:20px;z-index:45;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 14px 0 5px;border:0;border-radius:999px;background:#002559;color:#FFFFFF;font:inherit;font-size:14px;font-weight:600;cursor:grab;touch-action:none;user-select:none;box-shadow:0 14px 34px rgba(0,37,89,.35);transition:box-shadow .2s}
+.as-dugme:hover{box-shadow:0 18px 42px rgba(0,37,89,.45)}
+.as-dugme:focus-visible{outline:3px solid #F07A23;outline-offset:3px}
+.as-robot{width:34px;height:34px;border-radius:50%;background:#F07A23;color:#1A1206;display:inline-flex;align-items:center;justify-content:center;font-style:normal}
+.as-dugme.as-suruk{cursor:grabbing;box-shadow:0 24px 60px rgba(0,37,89,.5);transition:none}
+.as-dugme.as-acik span{display:none}.as-dugme.as-acik{padding:0 5px}
 body:has(#cerez:not(.gizli)) .as-dugme{display:none}
 .as-panel{position:fixed;right:20px;bottom:84px;z-index:46;width:min(400px,calc(100vw - 24px));height:min(620px,calc(100dvh - 110px));display:flex;flex-direction:column;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:22px;box-shadow:0 40px 100px rgba(0,0,0,.25);overflow:hidden}
 .as-panel[hidden]{display:none}
 .as-bas{display:flex;align-items:center;gap:12px;padding:14px 14px 14px 16px;background:linear-gradient(120deg,#002559,#0A3270);color:#FFFFFF}
-.as-avatar{width:38px;height:38px;border-radius:12px;background:#F07A23;color:#1A1206;display:flex;align-items:center;justify-content:center;font-weight:800}
+.as-avatar{width:38px;height:38px;border-radius:12px;background:#F07A23;color:#1A1206;display:flex;align-items:center;justify-content:center}
 .as-baslik{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.25}.as-baslik strong{font-size:16px}
 .as-durum{font-size:12px;color:#C6D2E3;display:flex;align-items:center;gap:6px}.as-durum::before{content:"";width:7px;height:7px;border-radius:50%;background:#5BD39A}
 .as-kucult{width:36px;height:36px;border:0;border-radius:10px;background:rgba(255,255,255,.1);color:#FFFFFF;font-size:22px;line-height:1;cursor:pointer}
@@ -459,7 +462,7 @@ body:has(#cerez:not(.gizli)) .as-dugme{display:none}
 .as-kart .as-onay{flex-direction:row;gap:8px;align-items:flex-start;font-weight:400;color:var(--tx2)}
 .as-kart-gonder{min-height:46px;border:0;border-radius:12px;background:#B84406;color:#FFFFFF;font:inherit;font-weight:600;cursor:pointer}
 .as-kart p{margin:0;padding:8px 10px;border-radius:8px;font-size:13px}.as-hata{background:var(--errb);color:var(--err)}.as-ok{background:var(--okb);color:var(--ok)}
-@media (max-width:560px){.as-panel{right:0;bottom:0;width:100vw;height:100dvh;border-radius:0}.as-dugme span{display:none}.as-dugme{padding:0 16px;right:16px;bottom:16px}body.as-gorunur .as-dugme{display:none}body.as-gorunur{overflow:hidden}}
+@media (max-width:560px){.as-panel{left:0!important;right:0!important;top:0!important;bottom:0!important;width:100vw;height:100dvh!important;border-radius:0}.as-dugme span{display:none}.as-dugme{padding:0 5px}body.as-gorunur .as-dugme{display:none}body.as-gorunur{overflow:hidden}}
 @media (prefers-reduced-motion:no-preference){.as-panel:not([hidden]){animation:aramaGir .25s cubic-bezier(.2,.8,.2,1)}}
 @media print{.as-dugme,.as-panel{display:none!important}}
 
@@ -647,7 +650,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
 </button>
 <a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a>
-<a href="/tr/iletisim#form" class="ust-cta">Ücretsiz analiz iste</a>
+<a href="/tr/iletisim#form" class="ust-cta" data-hizli-talep="analiz">Ücretsiz analiz iste</a>
 <button type="button" class="ikon-dugme menu-dugme" data-cekmece-ac aria-label="Menüyü aç" aria-controls="cekmece" aria-expanded="false"><span class="menu-cizgi" aria-hidden="true"><i></i><i></i></span><span class="menu-yazi">Menü</span></button>
 </div>
 </div>
@@ -683,7 +686,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <button type="button" class="cm-ara" data-cekmece-ara><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span>Hizmet, paket veya yazı arayın</span><kbd>⌘K</kbd></button>
 <div class="cm-ust-eylem">
 <a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a>
-<a href="/tr/iletisim#form" class="ust-cta">Ücretsiz analiz iste</a>
+<a href="/tr/iletisim#form" class="ust-cta" data-hizli-talep="analiz">Ücretsiz analiz iste</a>
 <button type="button" class="ikon-dugme cm-kapat" data-cekmece-kapat aria-label="Menüyü kapat"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg><span>Kapat</span></button>
 </div>
 </div>
@@ -692,7 +695,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <nav aria-label="Site menüsü" class="cm-liste">
 {MENU.map((m, i) => <a href={m.href} data-onizle={m.k} aria-current={aktif === m.ad ? 'page' : undefined} style={`--s:${i}`}><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>)}
 </nav>
-<div class="cm-mobil"><a href="/tr/iletisim#form" class="ust-cta">Ücretsiz analiz iste</a><a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a></div>
+<div class="cm-mobil"><a href="/tr/iletisim#form" class="ust-cta" data-hizli-talep="analiz">Ücretsiz analiz iste</a><a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a></div>
 <div class="cm-sahne" aria-live="polite">
 <section data-pano="hizmetler" class="cm-pano">
 <div class="cm-pano-bas"><strong>Beş alan, 27 hizmet</strong><a href="/tr/hizmetler">Tümünü gör</a></div>
@@ -870,5 +873,6 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
   // Çerezsiz ziyaret ve hız ölçümü (kişisel veri yok; yönetim panelinde Ziyaretçiler ve Hız ve güvenlik).
   olcumBaslat();
 </script>
+<HizliTalep />
 </body>
 </html>

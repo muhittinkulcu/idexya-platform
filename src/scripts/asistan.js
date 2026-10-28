@@ -1,11 +1,13 @@
-// Idexya Asistan sohbet penceresi. Metinler güvenli biçimde (textContent) yazılır; yalnız site içi ve https bağlantıları tıklanır olur.
+// IDOS asistan sohbet penceresi (eski adı Idexya Asistan). Düğme sürüklenebilir; bırakılınca en yakın kenara yapışır,
+// konum bu tarayıcıda hatırlanır. Pencere düğmenin bulunduğu kenara ve yüksekliğe göre açılır. Metinler güvenli biçimde (textContent) yazılır; yalnız site içi ve https bağlantıları tıklanır olur.
 import { reklamBilgisi } from './reklam-iz.js';
 import { robotBagla } from './form.js';
 const ANAHTAR = 'idx-asistan';
 const oku = () => { try { return JSON.parse(sessionStorage.getItem(ANAHTAR) || 'null'); } catch (e) { return null; } };
 const yaz = (v) => { try { sessionStorage.setItem(ANAHTAR, JSON.stringify(v)); } catch (e) {} };
 const el = (t, o = {}, ...c) => { const e = document.createElement(t); for (const [k, v] of Object.entries(o)) { if (v == null || v === false) continue; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); } c.flat().forEach((x) => x != null && x !== false && e.append(x)); return e; };
-const IKON = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.5 8.5 0 1 1 21 11.5z"></path><path d="M8 11h.01M12 11h.01M16 11h.01"></path></svg>';
+const IKON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="4"></rect><path d="M12 8V4M12 4h.01"></path><path d="M9 13.5v1M15 13.5v1"></path><path d="M2 13v3M22 13v3"></path></svg>';
+const KONUM = 'idx-asistan-konum';
 let BASLIKLAR = {};
 fetch('/arama.json').then((r) => r.json()).then((d) => { BASLIKLAR = Object.fromEntries(d.map((x) => [x.u, x.t])); }).catch(() => {});
 const ONERILER = ['Hangi paket bana uygun?', 'Google Ads yönetimi nasıl çalışıyor?', 'E-ticaret sitem için ne yapabilirsiniz?', 'Ücretsiz analiz istiyorum'];
@@ -40,18 +42,18 @@ export function asistan() {
   if (document.querySelector('.as-dugme')) return;
   let durum = oku() || { sohbet: null, mesajlar: [], acik: false };
   let yapayZeka = null, bekliyor = false;
-  const dugme = el('button', { type: 'button', class: 'as-dugme', 'aria-label': 'Idexya Asistan’ı aç', 'aria-expanded': 'false', 'aria-controls': 'asistan' });
-  dugme.innerHTML = IKON + '<span>Asistana sorun</span>';
+  const dugme = el('button', { type: 'button', class: 'as-dugme', 'aria-label': 'IDOS asistanı aç (sürükleyerek yerini değiştirebilirsiniz)', title: 'Sürükleyerek yerini değiştirebilirsiniz', 'aria-expanded': 'false', 'aria-controls': 'asistan' });
+  dugme.innerHTML = '<i class="as-robot">' + IKON + '</i><span>IDOS’a sor</span>';
   const liste = el('div', { class: 'as-liste', role: 'log', 'aria-live': 'polite' });
   const girdi = el('textarea', { rows: '1', placeholder: 'Sorunuzu yazın…', 'aria-label': 'Mesajınız', maxlength: '1500' });
   const gonder = el('button', { type: 'submit', class: 'as-gonder', 'aria-label': 'Gönder' });
   gonder.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
   const form = el('form', { class: 'as-form' }, girdi, gonder);
   const durumYazi = el('span', { class: 'as-durum' }, 'Genelde birkaç saniyede yanıt verir');
-  const panel = el('section', { id: 'asistan', class: 'as-panel', role: 'dialog', 'aria-label': 'Idexya Asistan', hidden: true },
+  const panel = el('section', { id: 'asistan', class: 'as-panel', role: 'dialog', 'aria-label': 'IDOS asistan', hidden: true },
     el('header', { class: 'as-bas' },
-      el('span', { class: 'as-avatar', 'aria-hidden': 'true' }, 'I'),
-      el('span', { class: 'as-baslik' }, el('strong', {}, 'Idexya Asistan'), durumYazi),
+      (() => { const a = el('span', { class: 'as-avatar', 'aria-hidden': 'true' }); a.innerHTML = IKON; return a; })(),
+      el('span', { class: 'as-baslik' }, el('strong', {}, 'IDOS asistan'), durumYazi),
       el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Pencereyi kapat', onclick: () => ac(false) }, '×')),
     liste, form,
     el('p', { class: 'as-not' }, 'Yanıtları yapay zekâ üretir, hata içerebilir. Sohbet hizmet kalitesi için kaydedilir; ', el('a', { href: '/tr/sayfa/kvkk-aydinlatma-metni', target: '_blank', rel: 'noopener' }, 'KVKK'), '.'));
@@ -97,7 +99,7 @@ export function asistan() {
   function ciz() {
     liste.replaceChildren();
     if (!durum.mesajlar.length) {
-      liste.append(balon('asistan', 'Merhaba, ben Idexya Asistan. Reklam, e-ticaret, SEO veya paketlerimizle ilgili sorularınızı yanıtlayabilir, size uygun hizmeti bulmanıza yardım edebilirim.'));
+      liste.append(balon('asistan', 'Merhaba, ben IDOS, Idexya’nın asistanıyım. Reklam, e-ticaret, SEO veya paketlerimizle ilgili sorularınızı yanıtlayabilir, size uygun hizmeti bulmanıza yardım edebilirim.'));
       liste.append(el('div', { class: 'as-eylemler' }, ONERILER.map((o) => el('button', { type: 'button', class: 'as-cip', onclick: () => sor(o) }, o))));
     }
     durum.mesajlar.forEach((m) => liste.append(balon(m.rol, m.metin)));
@@ -138,7 +140,56 @@ export function asistan() {
       if (yapayZeka === null) fetch('/api/asistan/durum').then((r) => r.json()).then((s) => { yapayZeka = !!s.yapayZeka; if (!yapayZeka) durumYazi.textContent = 'Şu an ekibimize yönlendiriyor'; }).catch(() => {});
     } else dugme.focus();
   }
-  dugme.addEventListener('click', () => ac(panel.hidden));
+  // Sürükle-bırak: 6 pikselden fazla hareket sürükleme sayılır (tıklama açmaz). Bırakınca en yakın sol/sağ kenara yapışır.
+  const konumOku = () => { try { return JSON.parse(localStorage.getItem(KONUM) || 'null'); } catch (e) { return null; } };
+  let konum = konumOku() || { kenar: 'sag', alt: 20 };
+  const yerlestir = () => {
+    const h = dugme.offsetHeight || 46;
+    konum.alt = Math.max(12, Math.min(konum.alt, innerHeight - h - 12));
+    dugme.style.left = konum.kenar === 'sol' ? '16px' : 'auto'; dugme.style.right = konum.kenar === 'sag' ? '16px' : 'auto';
+    dugme.style.top = 'auto'; dugme.style.bottom = konum.alt + 'px';
+    dugme.classList.toggle('as-sol', konum.kenar === 'sol');
+    // Pencere: düğmenin kenarında; düğme ekranın üst yarısındaysa altına, değilse üstüne açılır
+    panel.style.left = konum.kenar === 'sol' ? '16px' : 'auto'; panel.style.right = konum.kenar === 'sag' ? '16px' : 'auto';
+    const ustte = konum.alt > innerHeight / 2;
+    panel.style.bottom = ustte ? 'auto' : (konum.alt + h + 12) + 'px';
+    panel.style.top = ustte ? (innerHeight - konum.alt + 12) + 'px' : 'auto';
+    const bosluk = ustte ? konum.alt - 24 : innerHeight - (konum.alt + h + 12) - 12;
+    panel.style.height = Math.max(320, Math.min(620, bosluk)) + 'px';
+  };
+  let surukle = null, suruklendi = false;
+  dugme.addEventListener('dragstart', (o) => o.preventDefault());
+  dugme.addEventListener('pointerdown', (o) => { if (o.button !== 0) return; o.preventDefault(); surukle = { x: o.clientX, y: o.clientY, r: dugme.getBoundingClientRect() }; suruklendi = false; dugme.setPointerCapture(o.pointerId); });
+  dugme.addEventListener('pointermove', (o) => {
+    if (!surukle) return;
+    const dx = o.clientX - surukle.x, dy = o.clientY - surukle.y;
+    if (!suruklendi && Math.hypot(dx, dy) < 6) return;
+    suruklendi = true; dugme.classList.add('as-suruk');
+    const x = Math.max(4, Math.min(innerWidth - surukle.r.width - 4, surukle.r.left + dx)), y = Math.max(4, Math.min(innerHeight - surukle.r.height - 4, surukle.r.top + dy));
+    Object.assign(dugme.style, { left: x + 'px', top: y + 'px', right: 'auto', bottom: 'auto' });
+  });
+  const birak = () => {
+    if (!surukle) return;
+    if (suruklendi) {
+      const r = dugme.getBoundingClientRect();
+      konum = { kenar: r.left + r.width / 2 < innerWidth / 2 ? 'sol' : 'sag', alt: Math.round(innerHeight - r.bottom) };
+      try { localStorage.setItem(KONUM, JSON.stringify(konum)); } catch (e) {}
+      dugme.classList.remove('as-suruk'); yerlestir();
+    }
+    surukle = null;
+  };
+  dugme.addEventListener('pointerup', birak); dugme.addEventListener('pointercancel', birak);
+  // Klavyeyle taşıma: düğme odaktayken Alt + ok tuşları
+  dugme.addEventListener('keydown', (o) => {
+    if (!o.altKey) return;
+    if (o.key === 'ArrowLeft' || o.key === 'ArrowRight') konum.kenar = o.key === 'ArrowLeft' ? 'sol' : 'sag';
+    else if (o.key === 'ArrowUp' || o.key === 'ArrowDown') konum.alt += o.key === 'ArrowUp' ? 60 : -60;
+    else return;
+    o.preventDefault(); yerlestir(); try { localStorage.setItem(KONUM, JSON.stringify(konum)); } catch (e) {}
+  });
+  addEventListener('resize', yerlestir);
+  requestAnimationFrame(yerlestir);
+  dugme.addEventListener('click', (o) => { if (suruklendi) { o.preventDefault(); suruklendi = false; return; } ac(panel.hidden); });
   panel.addEventListener('keydown', (o) => { if (o.key === 'Escape') ac(false); });
   form.addEventListener('submit', (o) => { o.preventDefault(); const m = girdi.value; girdi.value = ''; girdi.style.height = ''; sor(m); });
   girdi.addEventListener('keydown', (o) => { if (o.key === 'Enter' && !o.shiftKey) { o.preventDefault(); form.requestSubmit(); } });

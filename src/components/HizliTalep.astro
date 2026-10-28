@@ -1,0 +1,100 @@
+---
+// Sayfadan çıkmadan talep penceresi (Muhittin, 28 Eki 2026). [data-hizli-talep] olan her bağlantı/düğme açar;
+// değeri (analiz | teklif | iletisim) açılışta seçili türü belirler. Gönderim src/scripts/form.js ile /api/talep'e gider.
+import paketler from '../data/paketler.json';
+const TURLER = [
+  { k: 'analiz', talep: 'analiz', ad: 'Ücretsiz analiz', alt: 'Hesaplarınızı ve sitenizi inceleyip nereden başlamanız gerektiğini anlatalım.' },
+  { k: 'teklif', talep: 'paket', ad: 'Paket teklifi', alt: 'Seçtiğiniz paket ve kademe için kapsam ve fiyatı yazılı iletelim.' },
+  { k: 'iletisim', talep: 'iletisim', ad: 'Soru ve iletişim', alt: 'Aklınızdaki soruyu yazın, ilgili kişi size dönsün.' }
+];
+const paketSecenek = paketler.flatMap((p) => p.kademeler.map((k) => (p.birlesik ? k.ad : `${p.ad} · ${k.ad}`)));
+---
+<dialog id="hizli-talep" class="ht" aria-labelledby="ht-baslik">
+  <form data-talep="analiz" novalidate class="ht-ic">
+    <div class="ht-sol">
+      <strong id="ht-baslik">Nasıl yardımcı olalım?</strong>
+      <fieldset class="ht-turler"><legend class="gizli">Talep türü</legend>
+        {TURLER.map((t, i) => (
+          <label class="ht-tur"><input type="radio" name="ht-tur" value={t.k} data-talep-turu={t.talep} checked={i === 0}><span><b>{t.ad}</b><small>{t.alt}</small></span></label>
+        ))}
+      </fieldset>
+      <ul class="ht-kanal">
+        <li><a href="https://wa.me/905078700629" rel="noopener" target="_blank">WhatsApp: 0507 870 06 29</a></li>
+        <li><a href="mailto:info@idexya.com">info@idexya.com</a></li>
+        <li>Hafta içi 09.00–18.00 · 1 iş günü içinde dönüş</li>
+      </ul>
+    </div>
+    <div class="ht-sag">
+      <button type="button" class="ht-kapat" data-ht-kapat aria-label="Pencereyi kapat">×</button>
+      <div class="ht-izgara">
+        <label>Ad soyad *<input type="text" name="ad" autocomplete="name" required></label>
+        <label>Firma<input type="text" name="firma" autocomplete="organization"></label>
+        <label>E-posta<input type="email" name="eposta" autocomplete="email"></label>
+        <label>Telefon<input type="tel" name="telefon" autocomplete="tel"></label>
+        <label data-ht-alan="analiz">Web siteniz<input type="text" name="site" inputmode="url" placeholder="ornek.com"></label>
+        <label data-ht-alan="analiz">İlgilendiğiniz alan<select name="alan"><option value="">Seçin</option><option>Google ve Meta reklamları</option><option>E-ticaret ve pazaryeri</option><option>SEO ve içerik</option><option>Web sitesi</option><option>Sosyal medya</option><option>Hepsi / emin değilim</option></select></label>
+        <label data-ht-alan="teklif" class="genis" hidden>Paket ve kademe<select name="paket"><option value="">Seçin (emin değilseniz boş bırakın)</option>{paketSecenek.map((x) => <option>{x}</option>)}</select></label>
+        <label data-ht-alan="iletisim" class="genis" hidden>Konu<input type="text" name="konu" maxlength="160"></label>
+        <label class="genis">Mesajınız<textarea name="mesaj" rows="3" placeholder="Kısaca ihtiyacınızı yazın"></textarea></label>
+        <label class="genis ht-onay"><input type="checkbox" name="kvkk"><span><a href="/tr/sayfa/kvkk-aydinlatma-metni" target="_blank" rel="noopener">KVKK aydınlatma metnini</a> okudum, iletişim için bilgilerimin işlenmesini kabul ediyorum.</span></label>
+        <label aria-hidden="true" class="ht-tuzak">Bu alanı boş bırakın<input type="text" name="web_adresi_tekrar" tabindex="-1" autocomplete="off"></label>
+        <div data-turnstile class="genis"></div>
+        <p data-form-durum role="status" aria-live="polite" hidden class="genis ht-durum"></p>
+        <button type="submit" class="genis ht-gonder">Talebi gönder</button>
+      </div>
+    </div>
+  </form>
+</dialog>
+<script>
+  const d = document.getElementById('hizli-talep') as HTMLDialogElement | null;
+  if (d && typeof d.showModal === 'function') {
+    const form = d.querySelector('form')!;
+    const turSec = (k: string) => {
+      const r = form.querySelector<HTMLInputElement>(`input[name=ht-tur][value="${k}"]`) || form.querySelector<HTMLInputElement>('input[name=ht-tur]')!;
+      r.checked = true; form.dataset.talep = r.dataset.talepTuru;
+      form.querySelectorAll<HTMLElement>('[data-ht-alan]').forEach((e) => { const ac = e.dataset.htAlan === r.value; e.hidden = !ac; e.querySelectorAll('input,select').forEach((x: any) => { x.disabled = !ac; }); });
+      const konu = form.querySelector<HTMLInputElement>('[name=konu]')!;
+      if (r.value !== 'iletisim') { konu.disabled = false; konu.value = r.value === 'analiz' ? 'Ücretsiz analiz' : 'Paket teklifi'; } else if (/^(Ücretsiz analiz|Paket teklifi)$/.test(konu.value)) konu.value = '';
+    };
+    form.querySelectorAll<HTMLInputElement>('input[name=ht-tur]').forEach((r) => r.addEventListener('change', () => turSec(r.value)));
+    document.addEventListener('click', (o) => {
+      const a = (o.target as Element).closest<HTMLElement>('[data-hizli-talep]');
+      if (!a) return;
+      o.preventDefault();
+      const c = document.getElementById('cekmece') as HTMLDialogElement | null; if (c && c.open) c.close();
+      turSec(a.dataset.hizliTalep || 'analiz');
+      const paket = a.dataset.paket; if (paket) { turSec('teklif'); const s = form.querySelector<HTMLSelectElement>('[name=paket]')!; if ([...s.options].some((x) => x.text === paket)) s.value = paket; }
+      d.showModal(); setTimeout(() => form.querySelector<HTMLInputElement>('[name=ad]')!.focus(), 30);
+    });
+    d.querySelector('[data-ht-kapat]')!.addEventListener('click', () => d.close());
+    d.addEventListener('click', (o) => { if (o.target === d) d.close(); });
+    turSec('analiz');
+  }
+</script>
+<style is:global>
+.ht{width:min(920px,calc(100vw - 24px));max-height:calc(100dvh - 24px);padding:0;border:0;border-radius:24px;background:var(--card);color:var(--tx);box-shadow:0 40px 120px rgba(0,0,0,.35)}
+.ht::backdrop{background:rgba(0,20,48,.55);backdrop-filter:blur(3px)}
+.ht-ic{display:grid;grid-template-columns:300px minmax(0,1fr);min-height:0}
+.ht-sol{padding:28px 24px;background:linear-gradient(160deg,#0A3A7A,#001B42);color:#E6ECF4;display:flex;flex-direction:column;gap:18px}
+.ht-sol>strong{font-size:22px;line-height:1.25;color:#FFFFFF}
+.ht-turler{margin:0;padding:0;border:0;display:flex;flex-direction:column;gap:8px}
+.ht-tur{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.2);cursor:pointer}
+.ht-tur input{margin-top:3px;accent-color:#F07A23}
+.ht-tur span{display:flex;flex-direction:column;gap:2px}.ht-tur b{color:#FFFFFF;font-size:15px}.ht-tur small{font-size:12.5px;line-height:1.45;color:#C6D2E3}
+.ht-tur:has(input:checked){background:rgba(240,122,35,.16);border-color:#F07A23}
+.ht-kanal{margin:auto 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:#C6D2E3}.ht-kanal a{color:#FFFFFF}
+.ht-sag{position:relative;padding:28px;overflow:auto}
+.ht-kapat{position:absolute;top:12px;right:12px;width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--head);font-size:22px;line-height:1;cursor:pointer}
+.ht-izgara{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.ht-izgara .genis{grid-column:1/-1}
+.ht-izgara label{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600;color:var(--head)}
+.ht-izgara label[hidden]{display:none}
+.ht-izgara input:not([type=checkbox]),.ht-izgara select,.ht-izgara textarea{min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-weight:400}
+.ht-izgara textarea{padding:10px 12px;resize:vertical}
+.ht-izgara :is(input,select,textarea):focus{outline:2px solid var(--brand);outline-offset:1px}
+.ht-onay{flex-direction:row!important;align-items:flex-start;font-weight:400!important;font-size:13px!important;color:var(--tx2)!important}
+.ht-tuzak{position:absolute!important;left:-9999px}
+.ht-durum{margin:0;padding:10px 12px;border-radius:10px;font-size:14px}
+.ht-gonder{min-height:50px;border:0;border-radius:12px;background:var(--fill);color:#FFFFFF;font:inherit;font-weight:700;font-size:16px;cursor:pointer}
+@media (max-width:760px){.ht-ic{grid-template-columns:1fr}.ht-sol{padding:22px 18px 18px}.ht-kanal{display:none}.ht-sag{padding:18px}.ht-izgara{grid-template-columns:1fr}.ht-izgara .genis{grid-column:auto}}
+</style>
