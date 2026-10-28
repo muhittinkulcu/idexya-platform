@@ -1,0 +1,34 @@
+---
+// Yasal metin sayfalarının sağ sütunu: diğer metinler, güncelleme tarihi ve başvuru kanalı.
+import yasal from '../data/yasal.json';
+const yol = Astro.url.pathname.replace(/\/$/, '');
+const METINLER = [['KVKK aydınlatma metni', '/tr/sayfa/kvkk-aydinlatma-metni'], ['Çerez politikası', '/tr/sayfa/cerez-politikasi'], ['Gizlilik politikası', '/tr/sayfa/gizlilik-politikasi']];
+---
+<aside class="yy" aria-label="Bu metin hakkında">
+  <div class="yy-kutu">
+    <b>Yasal metinler</b>
+    <ul>{METINLER.map(([ad, a]) => <li><a href={a} aria-current={a === yol ? 'page' : undefined}>{ad}</a></li>)}</ul>
+    <small>Son güncelleme: {yasal.guncelleme}</small>
+  </div>
+  <div class="yy-kutu">
+    <b>Sorunuz ya da başvurunuz mu var?</b>
+    <p>Kişisel verilerinizle ilgili sorularınızı ve başvurularınızı e-postayla iletebilirsiniz.</p>
+    <a href="mailto:info@idexya.com" class="yy-eposta">info@idexya.com</a>
+    <a href="/tr/iletisim">İletişim sayfası</a>
+  </div>
+</aside>
+<style>
+  .yy{flex:0 1 300px;min-width:240px;position:sticky;top:96px;display:flex;flex-direction:column;gap:16px;font-size:14.5px;line-height:1.55}
+  .yy-kutu{padding:20px 22px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .yy-kutu b{color:var(--head);font-size:15px}
+  .yy-kutu p{margin:0;color:var(--tx2)}
+  .yy-kutu ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+  .yy-kutu li a{display:block;padding:7px 0;border-top:1px solid var(--line);color:var(--tx);text-decoration:none}
+  .yy-kutu li:first-child a{border-top:0}
+  .yy-kutu li a[aria-current]{color:var(--acc);font-weight:700}
+  .yy-kutu a:hover{color:var(--acc)}
+  .yy-kutu small{color:var(--tx2)}
+  .yy-eposta{font-weight:700;color:var(--head)}
+  .yy-kutu>a:last-child{font-weight:600;color:var(--acc)}
+  @media (max-width:1100px){.yy{position:static;flex-basis:100%}}
+</style>

@@ -210,3 +210,26 @@ if 'referanslar.json' not in s:
     s = s.replace("import Site from '../layouts/Site.astro';", "import Site from '../layouts/Site.astro';\nimport referanslar from '../data/referanslar.json';", 1)
     open(p, 'w', encoding='utf-8').write(s)
 print('panelden düzenlenen içerik bağlandı')
+
+# Yasal sayfalar (Muhittin, 28 Eki 2026): ana sayfayla aynı genişlik, çalışan bölüm bağlantıları, okunur metin sütunu ve yan bilgi kutusu.
+for p in YASAL:
+    s = open(p, encoding='utf-8').read()
+    if 'data-yasal-genis' not in s:
+        s = s.replace('<div style="max-width: 1100px; margin: 0 auto; padding: 36px 24px 24px;', '<div data-yasal-genis style="max-width: 1240px; margin: 0 auto; padding: 36px 24px 24px;', 1)
+        eski = '<section style="padding: 0 24px 88px">\n<div style="max-width: 1100px; margin: 0 auto; display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start">'
+        assert s.count(eski) == 1, p + ' gövde'
+        s = s.replace(eski, '<section style="padding: 0 0 88px">\n<div style="max-width: 1240px; margin: 0 auto; display: flex; gap: 48px; flex-wrap: wrap; align-items: flex-start">', 1)
+        s = s.replace('position: sticky; top: 20px;', 'position: sticky; top: 96px;', 1)
+        eski = '{(sec.bolumler || []).map((b) => (<Fragment><a href="#"'
+        assert s.count(eski) == 1, p + ' bölüm bağlantısı'
+        s = s.replace(eski, '{(sec.bolumler || []).map((b, i) => (<Fragment><a href={`#bolum-${i + 1}`}', 1)
+        eski = '{(sec.bolumler || []).map((b) => (<Fragment><div style="display: flex; flex-direction: column; gap: 10px">'
+        assert s.count(eski) == 1, p + ' bölüm'
+        s = s.replace(eski, '{(sec.bolumler || []).map((b, i) => (<Fragment><div id={`bolum-${i + 1}`} style="display: flex; flex-direction: column; gap: 10px; scroll-margin-top: 96px">', 1)
+        s = s.replace('<div style="flex: 1 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 26px; font-size: 17px; line-height: 1.75">', '<div style="flex: 1 1 560px; max-width: 820px; min-width: 0; display: flex; flex-direction: column; gap: 26px; font-size: 17px; line-height: 1.75">', 1)
+        kapa = '</Fragment>)}\n</div>\n</div>\n</section>'
+        assert s.count(kapa) == 1, p + ' kapanış'
+        s = s.replace(kapa, '</Fragment>)}\n</div>\n<YasalYan />\n</div>\n</section>', 1)
+        s = s.replace("import Site from '../../../layouts/Site.astro';", "import Site from '../../../layouts/Site.astro';\nimport YasalYan from '../../../components/YasalYan.astro';", 1)
+        open(p, 'w', encoding='utf-8').write(s)
+print('Yasal sayfalar genişletildi')
