@@ -13,7 +13,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   function grupCiz(g, sira) {
     let tut = g.musteriler[0].id;
-    const dahil = Object.fromEntries(g.musteriler.map((m) => [m.id, true]));
+    const dâhil = Object.fromEntries(g.musteriler.map((m) => [m.id, true]));
     const kutu = el('section', { class: 'kart', 'aria-label': `Olası mükerrer grup ${sira + 1}`, style: 'padding: 16px; display: flex; flex-direction: column; gap: 12px' });
     const govde = el('div', { style: 'display: flex; flex-direction: column; gap: 8px' });
     const ciz = () => {
@@ -28,12 +28,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
             el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `Aşama: ${asamaAdi(m.asama)} · oluşturma ${tarih(m.olusturma, false)} · son hareket ${tarih(m.guncelleme)}`)),
           secili ? el('span', { class: 'cip kazanildi', style: 'flex: none' }, 'Tutulacak')
             : el('label', { style: 'display: flex; gap: 6px; align-items: center; font-size: 13px; cursor: pointer; flex: none' },
-              el('input', { type: 'checkbox', checked: dahil[m.id], onchange: (o) => { dahil[m.id] = o.currentTarget.checked; } }), 'Birleştir'));
+              el('input', { type: 'checkbox', checked: dâhil[m.id], onchange: (o) => { dâhil[m.id] = o.currentTarget.checked; } }), 'Birleştir'));
       }));
     };
     const birlestir = el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
       const tutulan = g.musteriler.find((m) => m.id === tut);
-      const gidecek = g.musteriler.filter((m) => m.id !== tut && dahil[m.id]);
+      const gidecek = g.musteriler.filter((m) => m.id !== tut && dâhil[m.id]);
       if (!gidecek.length) { bildir('Birleştirilecek en az bir kart işaretleyin.', 'hata'); return; }
       const metin = `“${ad(tutulan)}” kartı tutulacak.\n\n${gidecek.map((m) => '• ' + ad(m) + (m.eposta ? ' <' + m.eposta + '>' : '')).join('\n')}\n\nbu karta birleştirilip SİLİNECEK. Günlük, talepler ve bağlı kayıtlar taşınır; boş alanlar doldurulur. Bu işlem geri alınamaz. Devam edilsin mi?`;
       if (!confirm(metin)) return;

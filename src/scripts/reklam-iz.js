@@ -1,6 +1,6 @@
 // Reklam tıklama kimlikleri (gclid, gbraid, wbraid, fbclid) ve UTM bilgisi. YALNIZ pazarlama çerezlerine izin verildiyse
 // tarayıcıda (localStorage "idx-reklam") 90 gün saklanır; izin yoksa ya da geri alınırsa silinir. Form gönderildiğinde
-// talebe eklenir ve CRM'de "Kazanıldı" olan talepler reklam platformlarına çevrimdışı dönüşüm olarak bildirilebilir.
+// talebe eklenir ve CRM'de "Kazanıldı" olan talepler reklam platformlarına çevrim dışı dönüşüm olarak bildirilebilir.
 const ANAHTAR = 'idx-reklam', SURE = 90 * 86400000;
 const ALANLAR = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
 let bekleyen = null;

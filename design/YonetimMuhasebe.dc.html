@@ -146,7 +146,7 @@ a{color:var(--acc)}a:hover{color:var(--tintx)}
 <div style="background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px">
 <span style="font-weight: 700; color: var(--head)">Alacak yaşlandırma</span>
 <sc-for list="{{yaslar}}" as="y" hint-placeholder-count="4"><div style="display: flex; flex-direction: column; gap: 4px"><div style="display: flex; justify-content: space-between; font-size: 13px"><span>{{y.ad}}</span><strong>{{y.tutar}}</strong></div><div style="height: 8px; border-radius: 6px; background: var(--card2); overflow: hidden"><div style="height: 100%; width: {{y.yuzde}}; background: {{y.renk}}"></div></div></div></sc-for>
-<span style="font-size: 12px; color: var(--tx2)">KDV dahil · TL · bugün itibarıyla</span>
+<span style="font-size: 12px; color: var(--tx2)">KDV dâhil · TL · bugün itibarıyla</span>
 </div>
 <div role="status" style="background: #FCE4E6; color: #7A1F2B; border: 1px solid #E5A5AE; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 4px">
 <strong>1 fatura vadesini 36 gün geçti</strong>
@@ -183,7 +183,7 @@ class Component extends DCLogic {
     const rozet = 'padding: 2px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; ';
     const DS = { taslak: ['Taslak', 'background: var(--card2); color: var(--tx2)'], gonderildi: ['Gönderildi · ödeme bekleniyor', 'background: var(--infob); color: var(--info)'], odendi: ['Ödendi', 'background: var(--okb); color: var(--ok)'], gecikti: ['Gecikti · 36 gün', 'background: #FCE4E6; color: #A32F3D'], kismi: ['Kısmi ödendi', 'background: var(--warnb); color: var(--warn)'], bekliyor: ['Onay bekliyor', 'background: var(--warnb); color: var(--warn)'], eslesti: ['Faturayla eşleşti', 'background: var(--okb); color: var(--ok)'], eslesmedi: ['Eşleşmedi · kontrol et', 'background: var(--warnb); color: var(--warn)'] };
     const T = {
-      fatura: { bas: ['Tarih · no', 'Müşteri', 'Tutar (KDV dahil)', 'Vade', 'Durum', ''], not: 'E-arşiv/e-fatura BizimHesap üzerinden kesilir', s: [
+      fatura: { bas: ['Tarih · no', 'Müşteri', 'Tutar (KDV dâhil)', 'Vade', 'Durum', ''], not: 'E-arşiv/e-fatura BizimHesap üzerinden kesilir', s: [
         ['1 Eki · IDX2026-041', '[Firma G]', 'SEO · Büyüme · Ekim', '16.800 TL', '15 Eki', 'odendi', 'Görüntüle'],
         ['1 Eki · IDX2026-042', '[Firma H]', 'Google Ads · Büyüme · Ekim', '19.200 TL', '31 Eki', 'kismi', 'Tahsilat ekle'],
         ['12 Eyl · IDX2026-036', '[Firma F]', 'Dijital başlangıç seti · Eylül', '18.000 TL', '12 Eyl', 'gecikti', 'Hatırlat'],
@@ -211,8 +211,8 @@ class Component extends DCLogic {
     const donemler = DN.map(function (x) { const s = x[0] === self.state.donem; return { ad: x[1], secili: s, sec: function () { self.setState({ donem: x[0] }); },
       stil: 'min-height: 32px; padding: 0 12px; border: 0; border-radius: 9px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; ' + (s ? 'background: var(--card); color: var(--head); box-shadow: 0 1px 3px var(--shadow)' : 'background: transparent; color: var(--tx2)') }; });
     const K = {
-      ekim: [['Kesilen fatura', '62.400 TL', '3 fatura · KDV dahil'], ['Tahsil edilen', '26.400 TL', '2 ödeme'], ['Bekleyen alacak', '36.000 TL', '2 fatura, vadesi gelmedi'], ['Gecikmiş alacak', '18.000 TL', '1 fatura · [Firma F]'], ['Gider', '24.900 TL', '1 gider onay bekliyor']],
-      ceyrek: [['Kesilen fatura', '171.600 TL', '9 fatura · KDV dahil'], ['Tahsil edilen', '135.600 TL', '8 ödeme'], ['Bekleyen alacak', '36.000 TL', '2 fatura'], ['Gecikmiş alacak', '18.000 TL', '1 fatura'], ['Gider', '72.300 TL', 'Temmuz–Eylül']],
+      ekim: [['Kesilen fatura', '62.400 TL', '3 fatura · KDV dâhil'], ['Tahsil edilen', '26.400 TL', '2 ödeme'], ['Bekleyen alacak', '36.000 TL', '2 fatura, vadesi gelmedi'], ['Gecikmiş alacak', '18.000 TL', '1 fatura · [Firma F]'], ['Gider', '24.900 TL', '1 gider onay bekliyor']],
+      ceyrek: [['Kesilen fatura', '171.600 TL', '9 fatura · KDV dâhil'], ['Tahsil edilen', '135.600 TL', '8 ödeme'], ['Bekleyen alacak', '36.000 TL', '2 fatura'], ['Gecikmiş alacak', '18.000 TL', '1 fatura'], ['Gider', '72.300 TL', 'Temmuz–Eylül']],
       yil: [['Kesilen fatura', '—', 'Ocak–Şubat verisi henüz aktarılmadı'], ['Tahsil edilen', '—', 'Eksik dönem var'], ['Bekleyen alacak', '36.000 TL', '2 fatura'], ['Gecikmiş alacak', '18.000 TL', '1 fatura'], ['Gider', '—', 'Eksik dönem var']]
     };
     const kpiler = K[this.state.donem].map(function (k, i) { return { ad: k[0], deger: k[1], alt: k[2], renk: i === 3 ? '#A32F3D' : 'var(--head)' }; });

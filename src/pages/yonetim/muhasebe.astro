@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Muhasebe" aktif="muhasebe" yol="Finans ve bağlantılar" aciklama="Basit gelir-gider defteri: kesilen ve gelen faturaları, tahsilat ve ödemeleri ay ay izleyin. Tutarlar KDV dahil girilir.">
+<Yonetim baslik="Muhasebe" aktif="muhasebe" yol="Finans ve bağlantılar" aciklama="Basit gelir-gider defteri: kesilen ve gelen faturaları, tahsilat ve ödemeleri ay ay izleyin. Tutarlar KDV dâhil girilir.">
 <style is:global>
   .mh-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .mh-arac input,.mh-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
@@ -33,7 +33,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni kayıt</h2>
   <label class="alan">Tür<select name="tur"><option value="gelir">Gelir</option><option value="gider">Gider</option></select></label>
   <label class="alan">İşlem tarihi<input name="tarih" type="date" required></label>
-  <label class="alan">Tutar (KDV dahil, TL)<input name="tutar" inputmode="decimal" required autocomplete="off" placeholder="Ör. 12.500,00"></label>
+  <label class="alan">Tutar (KDV dâhil, TL)<input name="tutar" inputmode="decimal" required autocomplete="off" placeholder="Ör. 12.500,00"></label>
   <label class="alan">KDV oranı<select name="kdv_orani" data-kdv><option value="20">%20</option><option value="10">%10</option><option value="1">%1</option><option value="0">%0 (KDV yok)</option></select></label>
   <label class="alan genis">Açıklama<input name="aciklama" maxlength="300" required autocomplete="off" placeholder="Ör. Ekim ayı sosyal medya yönetimi"></label>
   <label class="alan">Kategori (isteğe bağlı)<input name="kategori" maxlength="60" list="mh-kategoriler" autocomplete="off"></label>
@@ -125,7 +125,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     ozetKutu.replaceChildren(
       kart('Gelir', tl(o.gelir), `Hesaplanan KDV: ${tl(o.hesaplananKdv)}`, 'var(--ok)', 'gelir'),
       kart('Gider', tl(o.gider), `İndirilecek KDV: ${tl(o.indirilecekKdv)}`, 'var(--err)', 'gider'),
-      kart('Net', (o.net < 0 ? '−' : '') + tl(Math.abs(o.net)), 'Gelir − gider (KDV dahil)', o.net < 0 ? 'var(--err)' : '', 'net'),
+      kart('Net', (o.net < 0 ? '−' : '') + tl(Math.abs(o.net)), 'Gelir − gider (KDV dâhil)', o.net < 0 ? 'var(--err)' : '', 'net'),
       kart('Tahsil edilmemiş gelir', tl(o.tahsilEdilmemis), `${o.tahsilEdilmemisAdet} kayıt · ödenecek gider ${tl(o.odenmemisGider)}`, o.tahsilEdilmemis ? 'var(--warn)' : '', 'tahsil'),
       kart('Vadesi geçmiş', tl(o.vadesiGecmisAlacak), `Tüm aylar · ${o.vadesiGecmisAlacakAdet} alacak` + (o.vadesiGecmisBorcAdet ? ` · ${o.vadesiGecmisBorcAdet} borç (${tl(o.vadesiGecmisBorc)})` : ''), o.vadesiGecmisAlacakAdet || o.vadesiGecmisBorcAdet ? 'var(--err)' : '', 'vade'));
   }
@@ -192,7 +192,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const gor = suzulmus();
     if (!gor.length) { genelHata('İndirilecek kayıt yok: bu ay ve süzgeçlerde kayıt bulunmuyor.'); return; }
     genelHata('');
-    const bas = ['Tarih', 'Tür', 'Açıklama', 'Kategori', 'Müşteri', 'Belge no', 'Tutar (KDV dahil)', 'KDV oranı (%)', 'KDV tutarı', 'KDV hariç tutar', 'Durum', 'Vade', 'Ödeme tarihi', 'Ekleyen'];
+    const bas = ['Tarih', 'Tür', 'Açıklama', 'Kategori', 'Müşteri', 'Belge no', 'Tutar (KDV dâhil)', 'KDV oranı (%)', 'KDV tutarı', 'KDV hariç tutar', 'Durum', 'Vade', 'Ödeme tarihi', 'Ekleyen'];
     const satirlar = [...gor].sort((a, b) => a.tarih.localeCompare(b.tarih)).map((k) => {
       const kdv = kdvPay(k.tutar, k.kdv_orani);
       return [gun(k.tarih), k.tur === 'gelir' ? 'Gelir' : 'Gider', k.aciklama, k.kategori, musteriAdi(k), k.belge_no, csvSayi(k.tutar), k.kdv_orani, csvSayi(kdv), csvSayi(k.tutar - kdv), durumAdi(k), k.vade ? gun(k.vade) : '', k.odeme_tarihi ? gun(k.odeme_tarihi) : '', k.ekleyen];

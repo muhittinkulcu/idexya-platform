@@ -78,7 +78,7 @@ import UyeCerceve from '../../components/UyeCerceve.astro';
             el('span', { style: 'font-size: 13px; color: var(--tx2)' }, t.no + (t.gonderim_zamani ? ' · ' + gun(t.gonderim_zamani) : '')),
             el('strong', { style: 'font-size: 18px; color: var(--head); overflow-wrap: anywhere' }, t.baslik),
             el('span', { style: 'color: var(--tx2); font-size: 14px' }, t.durum === 'gonderildi' ? (t.gecerlilik ? (t.gecerlilik < bugun ? 'Geçerlilik süresi doldu (' + gun(t.gecerlilik) + ')' : 'Geçerlilik: ' + gun(t.gecerlilik)) : 'Yanıtınızı bekliyor') : 'Karar: ' + gun(t.karar_zamani))),
-          el('div', { class: 'bm-sag' }, cip(t.durum, durumlar[t.durum] || t.durum), el('strong', { style: 'font-size: 20px; color: var(--head); white-space: nowrap' }, para(t.toplam)), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'KDV dahil'))),
+          el('div', { class: 'bm-sag' }, cip(t.durum, durumlar[t.durum] || t.durum), el('strong', { style: 'font-size: 20px; color: var(--head); white-space: nowrap' }, para(t.toplam)), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'KDV dâhil'))),
         dugme, kap);
     }) : [el('p', { class: 'uye-kart', style: 'margin: 0; color: var(--tx2); box-shadow: none' }, 'Size gönderilmiş bir teklif henüz yok.')]));
     $('[data-belgeler]').replaceChildren(...(belgeler.length ? belgeler.map((b) => el('a', { class: 'bm-belge', href: b.baglanti, target: '_blank', rel: 'noopener noreferrer' },

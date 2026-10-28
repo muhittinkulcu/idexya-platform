@@ -85,7 +85,7 @@ import '../../scripts/yonetim/grafik.css';
     const ag = { kritik: 0, onemli: 0, oneri: 0 };
     Object.entries(sayac).forEach(([k, n]) => { ag[SORUN[k].agirlik] += n; });
     $('[data-kpi]').replaceChildren(
-      kpi('Genel puan', String(o.puan), puanAd(o.puan) + ' · 100 üzerinden; hız ve güvenlik dahil', puanRenk(o.puan)),
+      kpi('Genel puan', String(o.puan), puanAd(o.puan) + ' · 100 üzerinden; hız ve güvenlik dâhil', puanRenk(o.puan)),
       kpi('Denetlenen sayfa', sayi(o.sayfa), o.atlananSayfa ? `${o.atlananSayfa} sayfa sınır nedeniyle atlandı` : `sitemap'teki ${sayi(o.sitemapAdres)} adresin hepsi`),
       kpi('Kritik', sayi(ag.kritik), 'hemen düzeltilmeli', ag.kritik ? 'var(--err)' : undefined),
       kpi('Önemli', sayi(ag.onemli), 'yakında düzeltilmeli', ag.onemli ? 'var(--warn)' : undefined),

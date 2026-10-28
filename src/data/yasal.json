@@ -19,7 +19,7 @@
         "baslik": "İşleme amaçları",
         "metin": [
           "Talebinize yanıt vermek ve teklif hazırlamak; sözleşmenin kurulması ve ifası; faturalama ve tahsilat; hizmet kalitesinin ölçülmesi; bilgi güvenliğinin sağlanması; izniniz varsa ticari ileti gönderilmesi; yasal yükümlülüklerin yerine getirilmesi.",
-          "Pazarlama çerezlerine izin verdiyseniz, sitemize geldiğiniz reklamın tıklama kimliği (Google “gclid”, Meta “fbclid”) ve kampanya bilgisi (UTM) form talebinizle birlikte kaydedilir. Talebiniz müşteriliğe dönüşürse bu kimlik, reklamın sonuç verip vermediğini ölçmek için Google Ads ve Meta’ya çevrimdışı dönüşüm olarak bildirilebilir; bu bildirimde adınız, e-postanız ve telefonunuz paylaşılmaz."
+          "Pazarlama çerezlerine izin verdiyseniz, sitemize geldiğiniz reklamın tıklama kimliği (Google “gclid”, Meta “fbclid”) ve kampanya bilgisi (UTM) form talebinizle birlikte kaydedilir. Talebiniz müşteriliğe dönüşürse bu kimlik, reklamın sonuç verip vermediğini ölçmek için Google Ads ve Meta’ya çevrim dışı dönüşüm olarak bildirilebilir; bu bildirimde adınız, e-postanız ve telefonunuz paylaşılmaz."
         ]
       },
       {
@@ -64,7 +64,7 @@
         "baslik": "Kullandığımız çerez türleri",
         "metin": [
           "Zorunlu çerezler sitenin çalışması için gereklidir ve kapatılamaz. Analitik ve pazarlama çerezleri yalnız onay verirseniz çalışır; onay vermezseniz Google ve Meta araçları çerez bırakmaz.",
-          "Ayrıca sayfaların ne kadar ziyaret edildiğini ve ne kadar hızlı açıldığını çerez kullanmadan ölçüyoruz: yalnızca sayfa adresi, gelinen sitenin alan adı, cihaz türü ve sayfa hızı değerleri toplu sayılar olarak kaydedilir; IP adresi, tarayıcı bilgisi veya sizi tanımlayan bir kimlik saklanmaz. Tarayıcınızda “İzlenmeyi engelle” (Do Not Track) ya da Global Privacy Control açıksa bu ölçüm yapılmaz.",
+          "Ayrıca sayfaların ne kadar ziyaret edildiğini ve ne kadar hızlı açıldığını çerez kullanmadan ölçüyoruz: Yalnızca sayfa adresi, gelinen sitenin alan adı, cihaz türü ve sayfa hızı değerleri toplu sayılar olarak kaydedilir; IP adresi, tarayıcı bilgisi veya sizi tanımlayan bir kimlik saklanmaz. Tarayıcınızda “İzlenmeyi engelle” (Do Not Track) ya da Global Privacy Control açıksa bu ölçüm yapılmaz.",
           "Pazarlama izni verirseniz, sitemize bir reklamdan geldiyseniz reklamın tıklama kimliği ve kampanya bilgisi tarayıcınızın yerel depolamasında (idx-reklam) 90 gün tutulur ve form gönderirseniz talebinize eklenir. İzni geri aldığınızda bu bilgi tarayıcınızdan silinir."
         ]
       },

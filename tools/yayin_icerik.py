@@ -39,7 +39,7 @@ DEGISIM['src/pages/index.astro'] = [
      '<a class="ust-platform" href="/tr/platformlar/google-ads">Google Ads</a><a class="ust-platform" href="/tr/platformlar/meta">Meta</a><a class="ust-platform" href="/tr/platformlar/google-analytics-4">Google Analytics 4</a><a class="ust-platform" href="/tr/platformlar/search-console">Search Console</a><a class="ust-platform" href="/tr/platformlar/tag-manager">Tag Manager</a><a class="ust-platform" href="/tr/platformlar/ikas">ikas</a><a class="ust-platform" href="/tr/platformlar/ticimax">Ticimax</a><a class="ust-platform ust-platform-tum" href="/tr/platformlar/">Tümü →</a>'),
 ]
 CEVAP = [
-    'Doğru bütçe; sektörünüze, hedef bölgenize, rekabete ve hedeflediğiniz satış ya da talep sayısına göre değişir. Akıllı teklif stratejilerinin öğrenebilmesi için kampanyanın düzenli dönüşüm toplayabileceği bir bütçeyle başlamak gerekir. Ücretsiz analizde hesabınızı ve pazarınızı inceleyip gerekçesiyle bir başlangıç bütçesi öneririz.',
+    'Doğru bütçe sektörünüze, hedef bölgenize, rekabete ve hedeflediğiniz satış ya da talep sayısına göre değişir. Akıllı teklif stratejilerinin öğrenebilmesi için kampanyanın düzenli dönüşüm toplayabileceği bir bütçeyle başlamak gerekir. Ücretsiz analizde hesabınızı ve pazarınızı inceleyip gerekçesiyle bir başlangıç bütçesi öneririz.',
     'Tıklama ve ziyaretler kampanya yayına girdiği gün başlar. Teklif stratejilerinin öğrenme dönemi ve anlamlı iyileştirmeler için genellikle birkaç hafta gerekir; kesin süre sektöre, bütçeye ve dönüşüm sayısına bağlıdır. Bu yüzden ilk dönemi ölçüm ve öğrenme, sonrasını büyüme dönemi olarak planlarız.',
     'Reklam hesabı sizin adınıza açılır ve size aittir. Biz yönetici olarak erişiriz; çalışmamız sona erdiğinde erişimimiz kaldırılır, hesap ve tüm geçmiş veriler sizde kalır.',
     'Sonuçlarınızı IDOS panelinde takip edebilirsiniz; satış, form ve arama gibi sonuçlar ayrı ayrı görünür. Düzenli değerlendirmelerde neyin işe yaradığını ve bir sonraki adımları sizinle paylaşırız.',
@@ -111,8 +111,8 @@ if '<IdosDemo />' not in s:
               + tanitim.replace('background: #F07A23; color: #1A1206', 'border: 1px solid rgba(255,255,255,.35); color: #FFFFFF'))
     neler = '<section style="max-width: 1240px; margin: 0 auto; padding: 96px 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">\n<div style="display: flex; flex-direction: column; gap: 14px; max-width: 700px">'
     degistir(neler, '<IdosDemo />\n\n' + neler)
-    degistir('<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez.</figcaption>',
-             '<figcaption style="font-size: 13px; color: #C6D2E3">Temsili görünüm, gerçek müşteri verisi içermez. <a href="#demo" style="color: #FFB58A; font-weight: 600">Etkileşimli demoyu açın ↓</a></figcaption>')
+    degistir('<figcaption style="font-size: 13px; color: #C6D2E3">Temsilî görünüm, gerçek müşteri verisi içermez.</figcaption>',
+             '<figcaption style="font-size: 13px; color: #C6D2E3">Temsilî görünüm, gerçek müşteri verisi içermez. <a href="#demo" style="color: #FFB58A; font-weight: 600">Etkileşimli demoyu açın ↓</a></figcaption>')
     degistir('<article style="flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px">',
              "<a href=\"#demo\" class=\"idos-oz\" data-demo-git={({ '01': 'genel', '02': 'kontrol', '03': 'oneriler', '04': 'kayit', '05': 'raporlar', '06': 'portal' })[o.no]} style=\"flex: 1 1 340px; min-width: 0; background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 28px; display: flex; flex-direction: column; gap: 12px; text-decoration: none; color: inherit\">")
     degistir('<p style="margin: 0; color: var(--tx2); font-size: 15px">{o.aciklama}</p>\n</article>',

@@ -235,7 +235,7 @@ class Component extends DCLogic {
     const sT = [ ['akis', 'Zaman çizelgesi', String(kayit.length)], ['gorev', 'Görevler', String(acik)], ['teklif', 'Teklifler', '1'], ['eposta', 'E-postalar', '6'], ['dosya', 'Dosyalar', '3'] ];
     const sekmeler = sT.map(function (x) { const s = x[0] === self.state.sekme; return { ad: x[1], sayi: x[2], secili: s, sec: function () { self.setState({ sekme: x[0] }); },
       stil: 'min-height: 38px; padding: 0 14px; border-radius: 10px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; ' + (s ? 'border: 1px solid var(--head); background: var(--head); color: var(--card)' : 'border: 1px solid var(--line); background: var(--card); color: var(--head)') }; });
-    const digerMetin = { teklif: 'IDX-T-2026-018 · E-ticaret büyüme seti · Sürüm 2 · Onay bekleniyor. Ayrıntı için soldaki menüden Teklifler’i açın.', eposta: 'Gmail ile eşitlenen tüm yazışmalar burada akış halinde görünür.', dosya: 'Google Drive klasöründeki dosyalar: sözleşme, brif, raporlar.' }[this.state.sekme] || '';
+    const digerMetin = { teklif: 'IDX-T-2026-018 · E-ticaret büyüme seti · Sürüm 2 · Onay bekleniyor. Ayrıntı için soldaki menüden Teklifler’i açın.', eposta: 'Gmail ile eşitlenen tüm yazışmalar burada akış hâlinde görünür.', dosya: 'Google Drive klasöründeki dosyalar: sözleşme, brif, raporlar.' }[this.state.sekme] || '';
     return {
       temaSinifi: koyu ? 'koyu' : 'acik',
       temaEtiketi: koyu ? 'Açık temaya geç' : 'Koyu temaya geç',

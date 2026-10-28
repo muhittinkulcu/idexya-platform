@@ -161,9 +161,9 @@ class Component extends DCLogic {
       return { ad: a[0], zaman: a[1], isaret: b ? '✓' : String(i + 1),
         stil: 'display: flex; gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; ' + (m ? 'background: var(--warnb); border: 1px solid var(--warn)' : (b ? 'background: var(--okb); border: 1px solid transparent' : 'background: var(--card2); border: 1px solid var(--line)')),
         noStil: 'width: 24px; height: 24px; flex: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; ' + (b ? 'background: var(--ok); color: #FFFFFF' : (m ? 'background: var(--warn); color: #FFFFFF' : 'background: var(--card); border: 1px solid var(--line); color: var(--tx2)')) }; });
-    const kalemler = [['Google Ads yönetimi', 'Aylık', '14.000 TL'], ['Meta reklam yönetimi', 'Aylık', '12.000 TL'], ['Ürün akışı ve Merchant Center', 'Aylık', '4.000 TL'], ['ikas geçişi SEO koruması', 'Aylık · ilk 3 ay', '5.000 TL'], ['IDOS paneli ve aylık rapor', 'Dahil', '0 TL']]
+    const kalemler = [['Google Ads yönetimi', 'Aylık', '14.000 TL'], ['Meta reklam yönetimi', 'Aylık', '12.000 TL'], ['Ürün akışı ve Merchant Center', 'Aylık', '4.000 TL'], ['ikas geçişi SEO koruması', 'Aylık · ilk 3 ay', '5.000 TL'], ['IDOS paneli ve aylık rapor', 'Dâhil', '0 TL']]
       .map(function (k) { return { ad: k[0], tur: k[1], tutar: k[2] }; });
-    const ilgi = [['Fiyat ve onay alanı', '1 dk 50 sn', 100], ['Pakete dahil olanlar', '1 dk 10 sn', 64], ['İsteğe bağlı eklemeler', '40 sn', 36], ['Koşullar', '20 sn', 18]].map(function (i) { return { ad: i[0], sure: i[1], yuzde: i[2] + '%' }; });
+    const ilgi = [['Fiyat ve onay alanı', '1 dk 50 sn', 100], ['Pakete dâhil olanlar', '1 dk 10 sn', 64], ['İsteğe bağlı eklemeler', '40 sn', 36], ['Koşullar', '20 sn', 18]].map(function (i) { return { ad: i[0], sure: i[1], yuzde: i[2] + '%' }; });
     const otomatik = [['CRM aşaması “Kazanıldı” olur', 'Hazır'], ['Sözleşme taslağı e-postayla gider', 'Hazır'], ['Muhasebede ilk fatura taslağı açılır (onayınızla kesilir)', 'Hazır'], ['Müşteri IDOS’a gönderilir (önizlemeyle)', 'Hazır'], ['Ekip görevleri açılır: hesap erişimleri, kurulum', 'Hazır']].map(function (o) { return { ad: o[0], durum: o[1] }; });
     return {
       temaSinifi: koyu ? 'koyu' : 'acik',

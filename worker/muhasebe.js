@@ -1,6 +1,6 @@
 // Muhasebe (Muhittin, 23 Eki 2026): basit gelir-gider defteri. Resmî muhasebe kaydı DEĞİLDİR; ay sonunda CSV olarak
 // mali müşavire verilir. Tutarlar kuruş cinsinden tam sayı olarak saklanır (kayan nokta yuvarlama hatası olmasın)
-// ve KDV dahil toplamdır; KDV payı kdv_orani ile hesaplanır.
+// ve KDV dâhil toplamdır; KDV payı kdv_orani ile hesaplanır.
 import { json, hata, simdi, kimlik, kirp, islemYaz } from './ortak.js';
 import { gecerliTarih, bugunIst } from './gorev.js';
 
