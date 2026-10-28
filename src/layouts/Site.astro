@@ -10,6 +10,14 @@ const kapali = YAYIN_ONCESI || aramayaKapali;
 // Yayında ürün varsa "Ürünler" menüye kendiliğinden eklenir.
 const urunVar = urunVeri.urunler.some((u) => u.aktif !== false);
 const MENU = [...menuVeri.ust];
+// Üst menü açılır panelleri: paketler dört sütunda kategoriye göre, blog son yazılar ve konularla.
+const PAKET_SUTUN = [
+  { ad: 'Reklam', alt: 'Google, Meta ve birleşik paketler', idler: ['google-ads', 'meta-ads', 'birlesik'] },
+  { ad: 'E-ticaret', alt: 'Mağaza kurulumu, yönetim ve pazaryeri', idler: ['eticaret-site', 'eticaret-yonetim', 'pazaryeri'] },
+  { ad: 'Web ve SEO', alt: 'Kurumsal site ve arama görünürlüğü', idler: ['kurumsal-site', 'seo'] },
+  { ad: 'İçerik', alt: 'Sosyal medya ve içerik üretimi', idler: ['sosyal-medya'] }
+].map((s) => ({ ...s, paketler: s.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean) }));
+const blogKonuSayi = Object.entries(yazilar.reduce((a, y) => ({ ...a, [y.kategori]: (a[y.kategori] || 0) + 1 }), {}));
 // Çekmece: yazı başına tahmini okuma süresi (dakikada ~200 kelime).
 const okumaDk = (y) => Math.max(1, Math.round(JSON.stringify(y.govde || '').split(/\s+/).length / 200));
 const blogKategoriler = [...new Set(yazilar.map((y) => y.kategori))];
@@ -114,6 +122,37 @@ main p{max-width:76ch}
 .ust-panel{position:absolute;top:calc(100% + 10px);left:-24px;width:min(720px,calc(100vw - 48px));display:none;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 60px -20px var(--shadow);padding:10px;z-index:60}
 .ust-panel::before{content:"";position:absolute;left:0;right:0;top:-14px;height:14px}
 .ust-acilir.acilmis .ust-panel{display:flex}
+.ust-acilir.genis{position:static}
+.site-ust .ust{position:relative}
+.ust-genis-panel{left:var(--kenar);right:var(--kenar);width:auto;top:calc(100% - 4px);padding:16px}
+.ust-genis-panel::before{top:-22px;height:22px}
+.up-sutunlar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(220px,.9fr);gap:12px}
+.up-sutun{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--bg)}
+.up-sutun-bas{display:flex;flex-direction:column;gap:2px;padding:2px 6px 6px}.up-sutun-bas b{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}.up-sutun-bas small{font-size:12px;color:var(--tx2)}
+.up-sutun ul,.ub-yazilar ul,.ub-konular{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ust-menu .up-sutun a,.ust-menu .ub-yazilar a{display:flex;flex-direction:column;gap:3px;padding:10px 12px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--tx);transition:border-color .2s,transform .2s}
+.ust-menu .up-sutun a:hover,.ust-menu .ub-yazilar a:hover,.ust-menu .up-sutun a:focus-visible,.ust-menu .ub-yazilar a:focus-visible{border-color:var(--brand);transform:translateY(-2px)}
+.up-sutun a strong,.ub-yazilar a strong{font-size:14px;color:var(--head);font-weight:700;line-height:1.3}
+.up-sutun a span,.ub-yazilar a span{font-size:12px;line-height:1.45;color:var(--tx2);font-weight:400;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.up-sutun a em{font-style:normal;font-size:11px;font-weight:600;color:var(--acc)}
+.ust-menu .up-sihirbaz{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:14px;background:linear-gradient(135deg,var(--tint),var(--card) 70%);border:1px solid var(--line);color:var(--tx)}
+.ust-menu .up-sihirbaz:hover{border-color:var(--brand)}
+.up-sihirbaz small{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--acc)}.up-sihirbaz strong{font-size:17px;color:var(--head)}.up-sihirbaz>span{font-size:13px;color:var(--tx2);font-weight:400;line-height:1.5}
+.up-ok{margin-top:auto;display:inline-flex!important;align-items:center;gap:6px;font-weight:700!important;color:var(--acc)!important}
+.ust-menu .up-sihirbaz::after,.ust-menu .up-sutun a::after,.ust-menu .ub-yazilar a::after,.ust-menu .ub-konular a::after{display:none}
+.ub-izgara{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(240px,1fr);gap:12px}
+.ub-yazilar{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--bg)}
+.ub-yazilar ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ub-yazilar a small{font-size:11px;font-weight:700;color:var(--acc)}.ub-yazilar a span{-webkit-line-clamp:3}
+.ub-yan{display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:14px;background:var(--bg)}
+.ust-menu .ub-konular a{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line);color:var(--head);font-weight:600}
+.ust-menu .ub-konular a:hover{border-color:var(--brand);color:var(--acc)}.ub-konular small{font-size:12px;color:var(--tx2);font-weight:400}
+@media (max-width:1200px){.up-sutunlar{grid-template-columns:repeat(3,minmax(0,1fr))}.ub-yazilar ul{grid-template-columns:1fr 1fr}}
+.ust-rakam{text-decoration:none;transition:transform .2s}.ust-rakam:hover{transform:translateY(-2px)}.ust-rakam:hover span:first-child{color:var(--acc)!important}
+.ust-platform{color:var(--tx2);text-decoration:none;border-bottom:2px solid transparent;padding-bottom:2px;transition:color .2s,border-color .2s}
+.ust-platform:hover,.ust-platform:focus-visible{color:var(--head);border-color:var(--brand)}
+.ust-platform-tum{color:var(--acc)}
+.koyu #ust .ust-platform{color:#C6D2E3}.koyu #ust .ust-platform:hover{color:#FFFFFF}.koyu #ust .ust-platform-tum{color:#FFB58A}
 .ust-kat{list-style:none;margin:0;padding:0;position:relative;min-height:280px;width:260px}
 .ust-menu .ust-kat-bas{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;color:var(--head);font-weight:600}
 .ust-menu .ust-kat-bas::after,.ust-menu .ust-alt a::after,.ust-menu .ust-panel-dip a::after{display:none}
@@ -557,6 +596,40 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div class="ust-panel-dip"><a href="/tr/hizmetler">Bütün hizmetler <span aria-hidden="true">→</span></a><a href="/tr/iletisim#form" class="ust-dip-cta">Ücretsiz analiz iste</a></div>
 </div>
 </div>
+) : m.k === 'paketler' ? (
+<div class="ust-acilir genis" data-acilir>
+<a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
+<button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="paket-menu" aria-label="Paket kategorilerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<div class="ust-panel ust-genis-panel" id="paket-menu" data-acilir-panel>
+<div class="up-sutunlar">{PAKET_SUTUN.map((s) => (
+  <div class="up-sutun">
+    <span class="up-sutun-bas"><b>{s.ad}</b><small>{s.alt}</small></span>
+    <ul>{s.paketler.map((p) => <li><a href={`/tr/paketler#${p.id}`}><strong>{p.ad}</strong><span>{p.ozet}</span><em>{p.kademeler.map((k) => k.ad).join(' · ')}</em></a></li>)}</ul>
+  </div>))}
+  <a href="/tr/paketler#sihirbaz" class="up-sihirbaz"><small>Kararsız mısınız?</small><strong>Paket sihirbazı</strong><span>Dört soruyla işletmenize uygun paketi bulun.</span><span class="up-ok">Sihirbazı başlatın<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+</div>
+<div class="ust-panel-dip"><a href="/tr/paketler">Bütün paketler <span aria-hidden="true">→</span></a><a href="/tr/iletisim#form" class="ust-dip-cta">Teklif isteyin</a></div>
+</div>
+</div>
+) : m.k === 'blog' ? (
+<div class="ust-acilir genis" data-acilir>
+<a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
+<button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="blog-menu" aria-label="Blog içeriklerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
+<div class="ust-panel ust-genis-panel" id="blog-menu" data-acilir-panel>
+<div class="ub-izgara">
+  <div class="ub-yazilar">
+    <span class="up-sutun-bas"><b>Son yazılar</b><small>Reklam, e-ticaret ve ölçüm üzerine</small></span>
+    <ul>{yazilar.map((y) => <li><a href={`/tr/haber/${y.slug}`}><small>{y.kategori} · {okumaDk(y)} dk okuma</small><strong>{y.baslik}</strong><span>{y.ozet}</span></a></li>)}</ul>
+  </div>
+  <div class="ub-yan">
+    <span class="up-sutun-bas"><b>Konular</b><small>Kategoriye göre yazılar</small></span>
+    <ul class="ub-konular">{blogKonuSayi.map(([k, n]) => <li><a href="/tr/haberler"><span>{k}</span><small>{n} yazı</small></a></li>)}</ul>
+    <a href="/icerik/" class="up-sihirbaz"><small>Üyelere özel</small><strong>İçerikler ve rehberler</strong><span>Ücretsiz üye olun; yalnız üyelere açılan yazılar, rehberler ve dosyalar.</span><span class="up-ok">İçeriklere göz atın<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+  </div>
+</div>
+<div class="ust-panel-dip"><a href="/tr/haberler">Tüm yazılar <span aria-hidden="true">→</span></a><a href="/#bt-eposta" class="ust-dip-cta">Bültene abone olun</a></div>
+</div>
+</div>
 ) : <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
 </nav>
 <div class="ust-eylem">
@@ -585,7 +658,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
     k.addEventListener('keydown', (o) => { if (o.key === 'Escape' && k.classList.contains('acilmis')) { ac(false); d.focus(); } });
     const kategoriler = [...k.querySelectorAll('[data-kat]')];
     const liste = k.querySelector('.ust-kat');
-    new MutationObserver(() => { if (k.classList.contains('acilmis')) liste.style.minHeight = Math.max(...kategoriler.map((x) => x.querySelector('.ust-alt').offsetHeight)) + 'px'; }).observe(k, { attributes: true, attributeFilter: ['class'] });
+    if (liste) new MutationObserver(() => { if (k.classList.contains('acilmis')) liste.style.minHeight = Math.max(...kategoriler.map((x) => x.querySelector('.ust-alt').offsetHeight)) + 'px'; }).observe(k, { attributes: true, attributeFilter: ['class'] });
     const sec = (li) => kategoriler.forEach((x) => x.classList.toggle('etkin', x === li));
     kategoriler.forEach((li) => {
       li.addEventListener('mouseenter', () => { clearTimeout(gecis); if (son > onceki) gecis = setTimeout(() => { if (li.matches(':hover')) sec(li); }, 220); else sec(li); });

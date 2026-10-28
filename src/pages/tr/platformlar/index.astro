@@ -1,0 +1,25 @@
+---
+// Platformlar dizini: ana sayfadaki şeritteki her platformun ayrıntı sayfasına giriş.
+import Site from '../../../layouts/Site.astro';
+import CagriKutusu from '../../../components/CagriKutusu.astro';
+import platformlar from '../../../data/platformlar.json';
+const kategoriler = [...new Set(platformlar.map((p) => p.kategori))];
+---
+<Site baslik="Çalıştığımız platformlar" aciklama="Google Ads, Meta, GA4, Search Console, Tag Manager, ikas ve Ticimax üzerinde neler yaptığımız." aktif="Hizmetler">
+<section class="pf-ust"><div class="pf-ic">
+  <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page">Platformlar</span></nav>
+  <span class="pf-etiket">Platformlar</span>
+  <h1>Çalıştığımız platformlar</h1>
+  <p class="pf-giris">Reklam, ölçüm ve e-ticaret tarafında her gün kullandığımız platformlar. Her birinde ne yaptığımızı, nelere dikkat ettiğimizi ve ilgili hizmetleri inceleyin.</p>
+</div></section>
+<div class="pf-ic pf-govde">
+  {kategoriler.map((k) => (
+    <section class="pf-bolum">
+      <h2>{k}</h2>
+      <div class="pf-kartlar">{platformlar.filter((p) => p.kategori === k).map((p) => <a href={`/tr/platformlar/${p.slug}`} class="pf-bag"><small>{p.kategori}</small><strong>{p.ad}</strong><span>{p.kisa}</span><em>Ayrıntılar →</em></a>)}</div>
+    </section>
+  ))}
+  <p class="pf-not">Marka adları sahiplerine aittir; listedeki platformlarla resmî iş ortaklığı belirtilmez.</p>
+</div>
+<CagriKutusu />
+</Site>

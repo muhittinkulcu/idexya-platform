@@ -1,6 +1,16 @@
 ---
 // Ana sayfa: çalıştığımız platformlar (listeyi Muhittin onayladı, 23 Eki 2026). Resmî iş ortaklığı iddiası içermez; marka logoları kullanılmaz.
 import Baslik from './Baslik.astro';
+// Her ad tıklanabilir: ayrıntı sayfası olanlar /tr/platformlar/…, diğerleri ilgili hizmete gider.
+const BAG = {
+  ikas: '/tr/platformlar/ikas', Ticimax: '/tr/platformlar/ticimax', 'Google Ads': '/tr/platformlar/google-ads', Meta: '/tr/platformlar/meta', 'Meta Dönüşüm API': '/tr/platformlar/meta',
+  'Google Analytics 4': '/tr/platformlar/google-analytics-4', 'Google Etiket Yöneticisi': '/tr/platformlar/tag-manager', 'Search Console': '/tr/platformlar/search-console',
+  Shopify: '/tr/hizmet/e-ticaret-yonetimi', WooCommerce: '/tr/hizmet/e-ticaret-yonetimi', IdeaSoft: '/tr/hizmet/e-ticaret-yonetimi', 'T-Soft': '/tr/hizmet/e-ticaret-yonetimi',
+  Trendyol: '/tr/hizmet/e-ticaret-pazaryeri-yonetimi', Hepsiburada: '/tr/hizmet/e-ticaret-pazaryeri-yonetimi', Amazon: '/tr/hizmet/e-ticaret-pazaryeri-yonetimi', N11: '/tr/hizmet/e-ticaret-pazaryeri-yonetimi', 'Çiçeksepeti': '/tr/hizmet/e-ticaret-pazaryeri-yonetimi', Pazarama: '/tr/hizmet/e-ticaret-pazaryeri-yonetimi',
+  TikTok: '/tr/hizmet/dijital-pazarlama-yonetimi', BigQuery: '/tr/hizmet/dijital-pazarlama-yonetimi',
+  Logo: '/tr/hizmet/erp-yazilim-danismanligi', Mikro: '/tr/hizmet/erp-yazilim-danismanligi', 'Paraşüt': '/tr/hizmet/on-muhasebe-yazilim-danismanligi', BizimHesap: '/tr/hizmet/on-muhasebe-yazilim-danismanligi',
+  HubSpot: '/tr/hizmet/crm-yazilim-danismanligi', Zapier: '/tr/hizmet/yazilim-danismanligi', Make: '/tr/hizmet/yazilim-danismanligi'
+};
 const GRUPLAR = [
   { ad: 'E-ticaret altyapıları', liste: ['ikas', 'Ticimax', 'Shopify', 'WooCommerce', 'IdeaSoft', 'T-Soft'] },
   { ad: 'Pazaryerleri', liste: ['Trendyol', 'Hepsiburada', 'Amazon', 'N11', 'Çiçeksepeti', 'Pazarama'] },
@@ -13,10 +23,10 @@ const GRUPLAR = [
     <Baslik id="pl-baslik" etiket="Platformlar ve entegrasyonlar" baslik="Kullandığınız araçlarla çalışırız" aciklama="Mevcut altyapınızı değiştirmeden, birbirine bağlayarak ilerleriz." baglanti={{ href: '/tr/hizmet/e-ticaret-entegrasyon-yonetimi/', ad: 'Entegrasyon yönetimi' }} />
     <div class="pl-izgara">
       {GRUPLAR.map((g) => (
-        <div class="pl-grup"><h3>{g.ad}</h3><ul>{g.liste.map((p) => <li>{p}</li>)}</ul></div>
+        <div class="pl-grup"><h3>{g.ad}</h3><ul>{g.liste.map((p) => <li>{BAG[p] ? <a href={BAG[p]}>{p}</a> : p}</li>)}</ul></div>
       ))}
     </div>
-    <p class="pl-not">Marka adları sahiplerine aittir; listedeki platformlarla resmî iş ortaklığı belirtmez.</p>
+    <p class="pl-not">Marka adları sahiplerine aittir; listedeki platformlarla resmî iş ortaklığı belirtilmez.</p>
   </div>
 </section>
 <style>
@@ -26,6 +36,10 @@ const GRUPLAR = [
   .pl-grup h3{margin:0 0 14px;font-size:15px;letter-spacing:.02em;color:var(--acc)}
   .pl-grup ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
   .pl-grup li{padding:8px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--line);font-weight:600;font-size:14px;color:var(--head)}
+  .pl-grup li:has(a){padding:0}
+  .pl-grup li a{display:block;padding:8px 12px;border-radius:10px;color:inherit;text-decoration:none;transition:color .2s}
+  .pl-grup li:has(a):hover{border-color:var(--brand)}
+  .pl-grup li a:hover{color:var(--acc)}
   .pl-not{margin:0;font-size:12.5px;color:var(--tx2)}
   @media (max-width:1100px){.pl-izgara{grid-template-columns:1fr 1fr}}
   @media (max-width:600px){.pl-izgara{grid-template-columns:1fr}.pl-ic{padding-top:64px;padding-bottom:64px}}

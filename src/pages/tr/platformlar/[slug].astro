@@ -1,0 +1,97 @@
+---
+// Platform ayrıntı sayfası (Muhittin, 28 Eki 2026): ana sayfadaki "Çalıştığımız platformlar" şeridinden açılır.
+// İçerik: src/data/platformlar.json. İlgili hizmet ve paketler kendi veri dosyalarından bağlanır; resmî iş ortaklığı iddiası yoktur.
+import Site from '../../../layouts/Site.astro';
+import CagriKutusu from '../../../components/CagriKutusu.astro';
+import platformlar from '../../../data/platformlar.json';
+import gruplar from '../../../data/hizmetler.json';
+import paketler from '../../../data/paketler.json';
+import yazilar from '../../../data/yazilar.json';
+export function getStaticPaths() {
+  return platformlar.map((p) => ({ params: { slug: p.slug }, props: { p } }));
+}
+const { p } = Astro.props;
+const tumHizmet = gruplar.flatMap((g) => g.hizmetler.map((h) => ({ ...h, alan: g.ad })));
+const hizmetler = p.hizmetler.map((s) => tumHizmet.find((h) => h.slug === s)).filter(Boolean);
+const ilgiliPaket = p.paketler.map((id) => paketler.find((x) => x.id === id)).filter(Boolean);
+const ad = p.kisaAd || p.ad;
+// İlgili yazılar: aynı kategorideki yazılar; ölçüm platformlarında platform adının geçtiği yazılar.
+const ilgiliYazi = yazilar.filter((y) => y.kategori === p.kategori || (p.kategori === 'Ölçüm' && JSON.stringify(y.govde || '').includes(ad))).slice(0, 3);
+const digerleri = platformlar.filter((x) => x.slug !== p.slug);
+const ld = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.sss.map((x) => ({ '@type': 'Question', name: x.soru, acceptedAnswer: { '@type': 'Answer', text: x.cevap } })) };
+const OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
+---
+<Site baslik={`${p.ad} yönetimi ve ölçümü`} aciklama={p.kisa} aktif="Hizmetler">
+<section class="pf-ust">
+  <div class="pf-ic">
+    <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/platformlar/">Platformlar</a><span aria-hidden="true">›</span><span aria-current="page">{ad}</span></nav>
+    <span class="pf-etiket">{p.kategori}</span>
+    <h1>{p.ad}</h1>
+    <p class="pf-giris">{p.kisa}</p>
+    <div class="pf-eylem"><a href="#analiz" class="pf-ana">Ücretsiz analiz iste</a>{ilgiliPaket[0] && <a href={`/tr/paketler#${ilgiliPaket[0].id}`} class="pf-ikincil">İlgili paketleri incele</a>}</div>
+  </div>
+</section>
+<nav class="pf-sayfa-ici" aria-label="Bu sayfada"><div class="pf-ic"><a href="#nedir">Nedir?</a><a href="#neler">Neler yapıyoruz?</a><a href="#dikkat">Nelere dikkat ediyoruz?</a><a href="#ilgili">İlgili hizmet ve paketler</a><a href="#sss">Sorular</a></div></nav>
+<div class="pf-ic pf-govde">
+  <section id="nedir" class="pf-bolum pf-iki">
+    <div><h2>{ad} nedir?</h2><p class="pf-metin">{p.nedir}</p></div>
+    <aside class="pf-kutu"><b>Kısaca</b><ul><li>Hesaplar sizin adınıza açılır.</li><li>Değişiklikler onayınızla yapılır.</li><li>Sonuçlar IDOS panelinde görünür.</li></ul></aside>
+  </section>
+  <section id="neler" class="pf-bolum">
+    <h2>{ad} için neler yapıyoruz?</h2>
+    <ol class="pf-liste">{p.yapilanlar.map((x, i) => <li><i>{String(i + 1).padStart(2, '0')}</i><span>{x}</span></li>)}</ol>
+  </section>
+  <section id="dikkat" class="pf-bolum">
+    <h2>Nelere dikkat ediyoruz?</h2>
+    <div class="pf-kartlar">{p.dikkat.map((x) => <div class="pf-dikkat">{x}</div>)}</div>
+  </section>
+  <section id="ilgili" class="pf-bolum">
+    <h2>İlgili hizmet ve paketler</h2>
+    <div class="pf-kartlar">
+      {hizmetler.map((h) => <a href={`/tr/hizmet/${h.slug}`} class="pf-bag"><small>Hizmet · {h.alan}</small><strong>{h.ad}</strong>{h.ozet && <span>{h.ozet}</span>}<em>Hizmeti incele<Fragment set:html={OK} /></em></a>)}
+      {ilgiliPaket.map((k) => <a href={`/tr/paketler#${k.id}`} class="pf-bag"><small>Paket</small><strong>{k.ad}</strong><span>{k.ozet}</span><em>Paketi incele<Fragment set:html={OK} /></em></a>)}
+      {ilgiliYazi.map((y) => <a href={`/tr/haber/${y.slug}`} class="pf-bag"><small>Yazı · {y.kategori}</small><strong>{y.baslik}</strong><span>{y.ozet}</span><em>Yazıyı oku<Fragment set:html={OK} /></em></a>)}
+    </div>
+  </section>
+  <section id="sss" class="pf-bolum">
+    <h2>Sık sorulan sorular</h2>
+    <div class="pf-sss">{p.sss.map((x) => <details><summary>{x.soru}</summary><p>{x.cevap}</p></details>)}</div>
+  </section>
+  <section class="pf-bolum">
+    <h2>Diğer platformlar</h2>
+    <div class="pf-cipler">{digerleri.map((x) => <a href={`/tr/platformlar/${x.slug}`}>{x.kisaAd || x.ad}</a>)}<a href="/tr/platformlar/">Tümü</a></div>
+    <p class="pf-not">Marka adları sahiplerine aittir; listedeki platformlarla resmî iş ortaklığı belirtilmez.</p>
+  </section>
+</div>
+<div id="analiz"><CagriKutusu baslik={`${ad} hesabınızı birlikte inceleyelim`} /></div>
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+</Site>
+<style is:global>
+.pf-ic{max-width:1240px;margin:0 auto;padding:0 24px;box-sizing:border-box}
+.pf-ust{padding:56px 0 48px;background:radial-gradient(700px 360px at 85% 0%,var(--blob),transparent 70%),var(--bg)}
+.pf-yol{display:flex;flex-wrap:wrap;gap:8px;font-size:14px;color:var(--tx2);margin-bottom:22px}.pf-yol a{color:var(--tx2)}
+.pf-etiket{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
+.pf-ust h1{margin:8px 0 12px;font-size:clamp(34px,5vw,56px);line-height:1.08;letter-spacing:-.03em;color:var(--head)}
+.pf-giris{margin:0;max-width:720px;font-size:19px;line-height:1.6;color:var(--tx2)}
+.pf-eylem{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.pf-ana,.pf-ikincil{min-height:50px;display:inline-flex;align-items:center;padding:0 22px;border-radius:12px;font-weight:700;text-decoration:none}
+.pf-ana{background:var(--fill);color:#FFFFFF}.pf-ikincil{border:1px solid var(--line);background:var(--card);color:var(--head)}
+.pf-sayfa-ici{position:sticky;top:76px;z-index:5;background:color-mix(in srgb,var(--bg) 94%,transparent);backdrop-filter:blur(10px);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.pf-sayfa-ici .pf-ic{display:flex;gap:22px;overflow-x:auto;padding-top:12px;padding-bottom:12px}.pf-sayfa-ici a{white-space:nowrap;font-size:14px;font-weight:600;color:var(--tx2);text-decoration:none}.pf-sayfa-ici a:hover{color:var(--acc)}
+.pf-govde{display:flex;flex-direction:column;gap:56px;padding-top:56px;padding-bottom:56px}
+.pf-bolum h2{margin:0 0 18px;font-size:clamp(24px,3vw,32px);letter-spacing:-.02em;color:var(--head)}
+.pf-iki{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr);gap:28px;align-items:start}
+@media (max-width:860px){.pf-iki{grid-template-columns:1fr}}
+.pf-metin{margin:0;font-size:17px;line-height:1.75;color:var(--tx);text-align:justify;hyphens:auto}
+.pf-kutu{padding:20px;border-radius:16px;background:var(--card);border:1px solid var(--line)}.pf-kutu b{font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--acc)}.pf-kutu ul{margin:10px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:6px;color:var(--tx2)}
+.pf-liste{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.pf-liste li{display:flex;gap:14px;padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line);line-height:1.55}.pf-liste i{font-style:normal;font-weight:700;font-size:20px;color:var(--brand);opacity:.7}
+.pf-kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.pf-dikkat{padding:18px;border-radius:16px;background:var(--tint);color:var(--tx);line-height:1.55}
+.pf-bag{display:flex;flex-direction:column;gap:6px;padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--tx);transition:transform .2s,border-color .2s}
+.pf-bag:hover{transform:translateY(-3px);border-color:var(--brand)}.pf-bag small{font-size:12px;font-weight:700;color:var(--acc)}.pf-bag strong{font-size:17px;color:var(--head)}.pf-bag span{font-size:14px;color:var(--tx2);line-height:1.5}
+.pf-bag em{margin-top:auto;display:inline-flex;align-items:center;gap:6px;font-style:normal;font-size:14px;font-weight:700;color:var(--acc)}
+.pf-sss{display:flex;flex-direction:column;gap:8px}.pf-sss details{padding:16px 18px;border-radius:14px;background:var(--card);border:1px solid var(--line)}.pf-sss summary{cursor:pointer;font-weight:700;color:var(--head)}.pf-sss p{margin:10px 0 0;color:var(--tx2);line-height:1.6}
+.pf-cipler{display:flex;flex-wrap:wrap;gap:8px}.pf-cipler a{padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--head);font-weight:600;text-decoration:none}.pf-cipler a:hover{border-color:var(--brand);color:var(--acc)}
+.pf-not{margin:12px 0 0;font-size:13px;color:var(--tx2)}
+</style>
