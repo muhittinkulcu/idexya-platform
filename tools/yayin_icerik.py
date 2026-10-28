@@ -28,6 +28,16 @@ DEGISIM['src/pages/tr/paketler.astro'] = [
     ('Formu gönderdikten sonra size dönüş yaparız. [Dönüş süresi doğrulanacak]', 'Formu gönderdikten sonra 1 iş günü içinde size dönüş yaparız.'),
     ('en az [X ay] ile başlamayı öneriyoruz.', 'en az 3 ay ile başlamayı öneriyoruz; süre ihtiyacınıza göre görüşülebilir.'),
 ]
+# Ana sayfa açılışı: rakamlar tıklanabilir, platform şeridindeki adlar platform sayfalarına bağlanır (Muhittin, 28 Eki 2026).
+_RAKAM = 'style="display: flex; flex-direction: column; padding-{}: 28px{}"><span style="font-size: 32px; font-weight: 700; color: var(--head)">{}</span><span style="font-size: 14px; color: var(--tx2)">{}</span></div>'
+DEGISIM['src/pages/index.astro'] = [
+    ('<div ' + _RAKAM.format('right', '; border-right: 1px solid var(--line)', '10+ yıl', 'e-ticaret ve dijital pazarlama'),
+     '<a href="/tr/sayfa/hakkimizda" class="ust-rakam" ' + _RAKAM.format('right', '; border-right: 1px solid var(--line)', '10+ yıl', 'e-ticaret ve dijital pazarlama deneyimi').replace('</div>', '</a>')),
+    ('<div ' + _RAKAM.format('left', '', '5 alan', 'tek ekipte yönetilir'),
+     '<a href="/tr/platformlar/" class="ust-rakam" ' + _RAKAM.format('left', '', '5+ platform', 'ayrı dijital platform tek ekipte bir arada').replace('</div>', '</a>')),
+    ('<span>Google Ads</span><span>Meta</span><span>Google Analytics 4</span><span>Search Console</span><span>Tag Manager</span><span>ikas</span><span>Ticimax</span>',
+     '<a class="ust-platform" href="/tr/platformlar/google-ads">Google Ads</a><a class="ust-platform" href="/tr/platformlar/meta">Meta</a><a class="ust-platform" href="/tr/platformlar/google-analytics-4">Google Analytics 4</a><a class="ust-platform" href="/tr/platformlar/search-console">Search Console</a><a class="ust-platform" href="/tr/platformlar/tag-manager">Tag Manager</a><a class="ust-platform" href="/tr/platformlar/ikas">ikas</a><a class="ust-platform" href="/tr/platformlar/ticimax">Ticimax</a><a class="ust-platform ust-platform-tum" href="/tr/platformlar/">Tümü →</a>'),
+]
 CEVAP = [
     'Doğru bütçe; sektörünüze, hedef bölgenize, rekabete ve hedeflediğiniz satış ya da talep sayısına göre değişir. Akıllı teklif stratejilerinin öğrenebilmesi için kampanyanın düzenli dönüşüm toplayabileceği bir bütçeyle başlamak gerekir. Ücretsiz analizde hesabınızı ve pazarınızı inceleyip gerekçesiyle bir başlangıç bütçesi öneririz.',
     'Tıklama ve ziyaretler kampanya yayına girdiği gün başlar. Teklif stratejilerinin öğrenme dönemi ve anlamlı iyileştirmeler için genellikle birkaç hafta gerekir; kesin süre sektöre, bütçeye ve dönüşüm sayısına bağlıdır. Bu yüzden ilk dönemi ölçüm ve öğrenme, sonrasını büyüme dönemi olarak planlarız.',

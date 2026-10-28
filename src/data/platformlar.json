@@ -1,0 +1,181 @@
+[
+  {
+    "slug": "google-ads",
+    "ad": "Google Ads",
+    "kategori": "Reklam",
+    "kisa": "Arama, alışveriş, YouTube ve görüntülü reklamlarla satın almaya hazır kişilere ulaşın.",
+    "nedir": "Google Ads, Google aramalarında, Alışveriş sekmesinde, YouTube’da ve Google’ın iş ortağı sitelerinde reklam yayınlamayı sağlayan reklam platformudur. Reklamlar, kullanıcının o an aradığı ya da ilgilendiği konuya göre gösterilir; ödeme çoğunlukla tıklama veya dönüşüm üzerinden yapılır.",
+    "yapilanlar": [
+      "Hesap denetimi: kampanya yapısı, teklif stratejisi, anahtar kelimeler ve dönüşüm ayarları",
+      "Arama, Alışveriş, Performance Max ve YouTube kampanyalarının kurulumu ve yönetimi",
+      "Negatif anahtar kelime ve arama terimi temizliği; boşa giden harcamanın azaltılması",
+      "GA4 ve Tag Manager ile dönüşümlerin doğru ölçülmesi; satış, form ve arama ayrımı",
+      "Haftalık optimizasyon ve aylık rapor; her değişiklik onayınızla"
+    ],
+    "dikkat": [
+      "Dönüşüm doğru ölçülmeden akıllı teklif stratejileri yanlış hedefe öğrenir.",
+      "Geniş eşleme, negatif kelime listesi olmadan bütçeyi alakasız aramalara harcayabilir.",
+      "Bütçeyi bir anda büyük oranda artırmak öğrenme dönemini yeniden başlatabilir."
+    ],
+    "hizmetler": ["google-ads-yonetimi", "dijital-pazarlama-yonetimi"],
+    "paketler": ["google-ads", "birlesik"],
+    "sss": [
+      { "soru": "Reklam hesabı kime ait olur?", "cevap": "Hesap sizin adınıza açılır ve size aittir. Biz yönetici olarak erişiriz; çalışma bittiğinde erişimimiz kaldırılır." },
+      { "soru": "Sonuçlar ne zaman görülür?", "cevap": "Tıklamalar yayına girildiği gün başlar. Teklif stratejilerinin öğrenmesi ve anlamlı iyileşme genellikle birkaç hafta sürer; süre sektöre, bütçeye ve dönüşüm sayısına bağlıdır." }
+    ]
+  },
+  {
+    "slug": "meta",
+    "ad": "Meta (Facebook ve Instagram)",
+    "kisaAd": "Meta",
+    "kategori": "Reklam",
+    "kisa": "Facebook ve Instagram’da doğru kitleye görsel ve video reklamlarla ulaşın.",
+    "nedir": "Meta reklamları; Facebook, Instagram, Messenger ve Audience Network’te yayınlanan reklamlardır. Hedefleme, ilgi alanları, benzer kitleler ve sitenizi ziyaret edenler gibi sinyallere dayanır; kreatifin kalitesi sonucu doğrudan etkiler.",
+    "yapilanlar": [
+      "İşletme portföyü, reklam hesabı, sayfa ve Instagram bağlantılarının düzenlenmesi",
+      "Piksel ve Dönüşüm API’si (CAPI) kurulumu; olay kalitesinin kontrolü",
+      "Satış hunisine göre kampanya yapısı: bilinirlik, değerlendirme ve dönüşüm",
+      "Kreatif testleri; görsel, video ve metin varyasyonlarının ölçülmesi",
+      "Sıklık, kitle çakışması ve öğrenme durumunun takibi; aylık rapor"
+    ],
+    "dikkat": [
+      "Piksel tek başına tarayıcı kısıtlamaları nedeniyle olayların bir kısmını kaçırabilir; Dönüşüm API’si önerilir.",
+      "Aynı kitleye çok sık gösterilen reklam yorulur; maliyet artar.",
+      "Mesaj ya da form sayısı tek başına başarı ölçütü değildir; nitelikli talep oranına bakılmalıdır."
+    ],
+    "hizmetler": ["meta-business-ads-yonetimi", "dijital-pazarlama-yonetimi"],
+    "paketler": ["meta-ads", "birlesik"],
+    "sss": [
+      { "soru": "Instagram ve Facebook’u ayrı mı yönetiyorsunuz?", "cevap": "Aynı reklam hesabından yönetilir; yerleşimler ve kreatifler kitlenin davrandığı yere göre ayrı ayrı değerlendirilir." },
+      { "soru": "Reklam görsellerini siz mi hazırlıyorsunuz?", "cevap": "İsterseniz tasarım ve içerik hizmetimizle hazırlarız; elinizdeki görsellerle de çalışabiliriz." }
+    ]
+  },
+  {
+    "slug": "google-analytics-4",
+    "ad": "Google Analytics 4",
+    "kisaAd": "GA4",
+    "kategori": "Ölçüm",
+    "kisa": "Sitenizde ziyaretçinin ne yaptığını ve hangi kanalın satış getirdiğini ölçün.",
+    "nedir": "Google Analytics 4 (GA4), web sitesi ve uygulamalardaki kullanıcı davranışını olay temelli ölçen analiz aracıdır. Hangi kanaldan gelen ziyaretçinin satın aldığı, form doldurduğu ya da aradığı burada görülür; Google Ads ile bağlanarak reklam kararlarına veri sağlar.",
+    "yapilanlar": [
+      "Mülk ve veri akışı kurulumu ya da mevcut kurulumun denetimi",
+      "Önemli olayların (satın alma, form, arama, WhatsApp) tanımlanması",
+      "E-ticaret olayları ve sepet değerlerinin doğru gönderilmesi",
+      "Google Ads ve Search Console bağlantıları; dönüşümlerin içe aktarılması",
+      "İzin modu (Consent Mode) ve çerez onayıyla uyumlu ölçüm"
+    ],
+    "dikkat": [
+      "Aynı olayın iki kez gönderilmesi dönüşümleri şişirir ve reklam kararlarını bozar.",
+      "Çerez onayı olmadan veri eksik gelir; izin modu doğru kurulmalıdır.",
+      "Varsayılan veri saklama süresi kısa olabilir; ayarlardan kontrol edilmelidir."
+    ],
+    "hizmetler": ["dijital-pazarlama-yonetimi", "google-ads-yonetimi"],
+    "paketler": ["google-ads", "birlesik"],
+    "sss": [
+      { "soru": "Mevcut GA4 kurulumumuz doğru mu?", "cevap": "Ücretsiz analizde olayları, dönüşümleri ve bağlantıları kontrol edip eksikleri gerekçesiyle anlatırız." },
+      { "soru": "GA4 ile reklam panelindeki sayılar neden farklı?", "cevap": "İlişkilendirme modeli, zaman dilimi ve çerez onayı gibi farklar sayıları değiştirir. Hangi sayının neyi gösterdiğini birlikte netleştiririz." }
+    ]
+  },
+  {
+    "slug": "search-console",
+    "ad": "Google Search Console",
+    "kisaAd": "Search Console",
+    "kategori": "Ölçüm",
+    "kisa": "Sitenizin Google aramalarında nasıl göründüğünü ve hangi sorgulardan tıklama aldığını izleyin.",
+    "nedir": "Google Search Console, sitenizin Google arama sonuçlarındaki görünürlüğünü, tıklamaları, dizine eklenme durumunu ve teknik sorunları gösteren ücretsiz araçtır. SEO çalışmasının sonucunu ölçmenin temel kaynağıdır.",
+    "yapilanlar": [
+      "Mülk doğrulama ve site haritasının gönderilmesi",
+      "Dizine eklenmeyen sayfaların ve tarama hatalarının giderilmesi",
+      "Sorgu ve sayfa bazında tıklama, gösterim ve sıralama analizi",
+      "Sayfa deneyimi ve mobil uyumluluk sorunlarının takibi",
+      "Site taşımalarında yönlendirme ve görünürlük kontrolü"
+    ],
+    "dikkat": [
+      "Dizine eklenmeyen önemli sayfalar aramada hiç görünmez.",
+      "Yanlış yönlendirmeler site taşımasından sonra trafik kaybına yol açar.",
+      "Veriler gecikmeli gelir; kısa dönemli dalgalanmalara göre karar verilmemelidir."
+    ],
+    "hizmetler": ["teknik-seo", "seo-icerik-optimizasyonu", "site-ici-seo-on-page-seo"],
+    "paketler": ["seo"],
+    "sss": [
+      { "soru": "Search Console ücretli mi?", "cevap": "Hayır, Google’ın ücretsiz aracıdır. Kurulum ve düzenli takibini SEO çalışmasının parçası olarak yaparız." },
+      { "soru": "SEO sonuçları ne zaman görülür?", "cevap": "Teknik düzeltmelerin etkisi birkaç haftada, içerik çalışmalarının etkisi genellikle birkaç ayda görülür; rekabete göre değişir." }
+    ]
+  },
+  {
+    "slug": "tag-manager",
+    "ad": "Google Etiket Yöneticisi",
+    "kisaAd": "Tag Manager",
+    "kategori": "Ölçüm",
+    "kisa": "Ölçüm ve reklam etiketlerini sitenin koduna dokunmadan tek yerden yönetin.",
+    "nedir": "Google Etiket Yöneticisi (Google Tag Manager, GTM), GA4, Google Ads, Meta pikseli gibi ölçüm ve reklam etiketlerini sitenin koduna her seferinde müdahale etmeden yönetmeyi sağlayan araçtır. Değişiklikler önizlemede denenip sürüm olarak yayınlanır ve geri alınabilir.",
+    "yapilanlar": [
+      "Kapsayıcı kurulumu ya da mevcut kapsayıcının denetimi ve sadeleştirilmesi",
+      "GA4, Google Ads ve Meta etiketlerinin olay bazında kurulması",
+      "Çerez onayı ve izin moduna göre etiketlerin tetiklenmesi",
+      "Önizleme ile test; sürüm notlarıyla yayın ve geri alma planı",
+      "Sunucu taraflı ölçüm ihtiyacının değerlendirilmesi"
+    ],
+    "dikkat": [
+      "Test edilmeden yayınlanan etiketler dönüşümleri çift sayabilir ya da hiç saymayabilir.",
+      "Birden fazla kapsayıcı aynı olayı gönderirse veriler karışır.",
+      "Kimin hangi değişikliği yaptığı sürüm notlarıyla kayıt altında tutulmalıdır."
+    ],
+    "hizmetler": ["dijital-pazarlama-yonetimi", "google-ads-yonetimi", "meta-business-ads-yonetimi"],
+    "paketler": ["birlesik", "google-ads"],
+    "sss": [
+      { "soru": "Sitemize kod eklemek gerekir mi?", "cevap": "Yalnız ilk kurulumda GTM kodu bir kez eklenir; sonraki etiketler GTM üzerinden yönetilir." },
+      { "soru": "Mevcut etiketlerimizi bozar mısınız?", "cevap": "Her değişiklik önce önizlemede denenir, sürüm olarak yayınlanır ve gerekirse önceki sürüme dönülür." }
+    ]
+  },
+  {
+    "slug": "ikas",
+    "ad": "ikas",
+    "kategori": "E-ticaret",
+    "kisa": "ikas altyapısıyla satışa hazır, yönetimi kolay bir e-ticaret mağazası kurun.",
+    "nedir": "ikas, Türkiye’de yaygın kullanılan bir e-ticaret altyapısıdır. Tema, ürün, ödeme, kargo ve pazaryeri entegrasyonlarını tek panelden yönetmeyi sağlar. Platform lisansı ikas’a ayrıca ödenir.",
+    "yapilanlar": [
+      "Mağaza kurulumu, tema seçimi ve marka uyarlaması",
+      "Ürün ve kategori yapısının kurulması; ürün içeriklerinin hazırlanması",
+      "Ödeme, kargo ve fatura ayarları",
+      "GA4, Google Ads ve Meta ölçümünün kurulması",
+      "Eski siteden geçişte SEO yönlendirmeleri"
+    ],
+    "dikkat": [
+      "Eski siteden geçişte yönlendirme yapılmazsa arama trafiği kaybedilir.",
+      "Ürün ve kategori yapısı baştan doğru kurulmazsa sonradan düzeltmek zordur.",
+      "E-ticaret olayları doğru ölçülmezse reklam bütçesi körlemesine harcanır."
+    ],
+    "hizmetler": ["e-ticaret-yonetimi", "e-ticaret-urun-kategori-yonetimi", "e-ticaret-entegrasyon-yonetimi", "web-tasarim-hizmetleri"],
+    "paketler": ["eticaret-site", "eticaret-yonetim"],
+    "sss": [
+      { "soru": "ikas lisans ücreti pakete dahil mi?", "cevap": "Hayır. Platform lisansı ikas’a ayrıca ödenir; kurulum ve yönetim hizmetimiz ayrıdır." },
+      { "soru": "Mevcut mağazamızı ikas’a taşıyabilir misiniz?", "cevap": "Evet. Ürün, kategori ve yönlendirme planıyla taşıma yaparız; arama görünürlüğünü korumak için adresleri eşleştiririz." }
+    ]
+  },
+  {
+    "slug": "ticimax",
+    "ad": "Ticimax",
+    "kategori": "E-ticaret",
+    "kisa": "Ticimax altyapılı mağazanızı satış, ölçüm ve pazaryeri tarafında büyütün.",
+    "nedir": "Ticimax, Türkiye’de kullanılan bir e-ticaret altyapısıdır. Mağaza yönetimi, ödeme, kargo ve pazaryeri entegrasyonları için hazır modüller sunar.",
+    "yapilanlar": [
+      "Mevcut Ticimax mağazasının denetimi: ürün, kategori, hız ve ölçüm",
+      "Ürün içerikleri ve kategori yapısının iyileştirilmesi",
+      "Pazaryeri entegrasyonlarında stok ve fiyat eşitliğinin kontrolü",
+      "GA4 e-ticaret olayları ve reklam dönüşümlerinin doğru kurulması",
+      "Reklam ve kampanya takvimiyle satış odaklı yönetim"
+    ],
+    "dikkat": [
+      "Entegrasyonda stok eşitlenmezse olmayan ürün satılır ve mağaza puanı düşer.",
+      "Ürün sayfası içerikleri zayıfsa reklam trafiği satışa dönmez.",
+      "Ölçüm eksikse hangi kanalın satış getirdiği bilinmez."
+    ],
+    "hizmetler": ["e-ticaret-yonetimi", "e-ticaret-pazaryeri-yonetimi", "e-ticaret-entegrasyon-yonetimi"],
+    "paketler": ["eticaret-yonetim", "pazaryeri"],
+    "sss": [
+      { "soru": "Altyapıyı değiştirmemiz gerekir mi?", "cevap": "Gerekmez. Mevcut Ticimax mağazanız üzerinde çalışırız; altyapı değişikliği yalnız ihtiyaç varsa gerekçesiyle önerilir." },
+      { "soru": "Pazaryeri hesaplarımızı da yönetir misiniz?", "cevap": "Evet. Trendyol, Hepsiburada, Amazon ve diğer pazaryerlerini mağazanızla birlikte yönetebiliriz." }
+    ]
+  }
+]
