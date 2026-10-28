@@ -2,7 +2,10 @@
 // - ANTHROPIC_API_KEY gizli değişkeni yoksa yapay zekâ kapalıdır; pencere hızlı seçeneklerle çalışmaya devam eder.
 // - Asistan talebi kendisi KAYDETMEZ: bilgileri bir onay kartında gösterir, ziyaretçi KVKK onayıyla kendisi gönderir (/api/talep).
 // - Her sohbet panelde okunabilir; IP yalnız tuzlu özet olarak saklanır.
-import { json, hata, simdi, kimlik, kirp, ozet, ayniKaynak, govdeOku, ipAl } from './ortak.js';
+// - Sohbet, ziyaretçi KVKK aydınlatma metnini onaylamadan başlamaz (asistan_onay). Ziyaretçi yazışmanın dökümünü kendi
+//   e-postasına isteyebilir (/api/asistan/dokum); kötüye kullanıma karşı IP başına günde 3, sohbet başına 2 gönderim.
+import { json, hata, simdi, kimlik, kirp, ozet, ayniKaynak, govdeOku, ipAl, robotDogrula, EPOSTA_DESEN } from './ortak.js';
+import { epostaGonder } from './eposta.js';
 import gruplar from '../src/data/hizmetler.json';
 
 const MODEL = 'claude-haiku-5-5';
@@ -63,10 +66,12 @@ async function claude(env, mesajlar) {
 export async function asistanApi(istek, env, yol) {
   const db = env.DB;
   if (yol === 'durum' && istek.method === 'GET') return json({ ok: true, yapayZeka: !!env.ANTHROPIC_API_KEY });
+  if (yol === 'dokum' && istek.method === 'POST') return dokumGonder(istek, env);
   if (yol !== 'mesaj' || istek.method !== 'POST') return hata('Bulunamadı', 404);
   if (!ayniKaynak(istek)) return hata('Geçersiz kaynak', 403);
   const { g, hata: h } = await govdeOku(istek, 40000);
   if (h) return h;
+  if (g.kvkk !== true) return hata('Sohbete başlamak için KVKK aydınlatma metnini onaylamanız gerekiyor.', 422);
   const gecmis = Array.isArray(g.mesajlar) ? g.mesajlar.slice(-EN_FAZLA_TUR) : [];
   const temiz = gecmis.map((m) => ({ role: m.rol === 'asistan' ? 'assistant' : 'user', content: kirp(m.metin, 1500) })).filter((m) => m.content);
   if (!temiz.length || temiz[temiz.length - 1].role !== 'user') return hata('Mesaj boş', 422);
@@ -82,6 +87,7 @@ export async function asistanApi(istek, env, yol) {
   const sinir = Number(env.ASISTAN_AYLIK_SINIR || 3000);
   const kayit = async (rol, metin, ek) => db.prepare('INSERT INTO asistan_mesajlari (id, sohbet_id, zaman, rol, metin, ek, ip_ozet, sayfa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), sohbetId, simdi(), rol, metin, ek ? JSON.stringify(ek) : null, ipOzet, kirp(g.sayfa, 200) || null).run();
   await kayit('ziyaretci', temiz[temiz.length - 1].content);
+  await db.prepare('INSERT INTO asistan_onay (sohbet_id, zaman, ip_ozet, sayfa) VALUES (?, ?, ?, ?) ON CONFLICT(sohbet_id) DO NOTHING').bind(sohbetId, simdi(), ipOzet, kirp(g.sayfa, 200) || null).run();
 
   const yedek = (sebep) => ({ ok: true, sohbet: sohbetId, yapayZeka: false, metin: 'Şu anda sorularınızı otomatik yanıtlayamıyorum. Ekibimiz size hızla dönebilir: aşağıdan ücretsiz analiz isteyebilir ya da WhatsApp’tan yazabilirsiniz.', eylemler: ['analiz', 'whatsapp'], sebep });
   if (!env.ANTHROPIC_API_KEY) return json(yedek('kapali'));
@@ -102,6 +108,37 @@ export async function asistanApi(istek, env, yol) {
     console.error('asistan', e && e.message);
     return json(yedek('hata'));
   }
+}
+
+// Yazışma dökümünü ziyaretçinin kendi e-postasına gönderir. Yalnız sohbetin kendi kayıtları gönderilir.
+async function dokumGonder(istek, env) {
+  const db = env.DB;
+  if (!ayniKaynak(istek)) return hata('Geçersiz kaynak', 403);
+  const { g, hata: h } = await govdeOku(istek, 4000);
+  if (h) return h;
+  const eposta = kirp(g.eposta, 160).trim();
+  if (!EPOSTA_DESEN.test(eposta)) return hata('Geçerli bir e-posta adresi yazın.', 422);
+  if (!/^[\w-]{10,64}$/.test(g.sohbet || '')) return hata('Gönderilecek bir yazışma yok.', 422);
+  const ip = ipAl(istek), ipOzet = await ozet(ip + (env.IP_TUZ || 'idexya'));
+  if ((await robotDogrula(env, g.turnstile, ip)) === 'kaldi') return hata('Robot doğrulaması başarısız.', 403);
+  const gun = new Date(Date.now() - 86400000).toISOString();
+  const [ipSay, sohbetSay, onay, mesajlar] = await db.batch([
+    db.prepare("SELECT COUNT(*) AS n FROM asistan_dokum WHERE ip_ozet = ? AND zaman > ?").bind(ipOzet, gun),
+    db.prepare("SELECT COUNT(*) AS n FROM asistan_dokum WHERE sohbet_id = ?").bind(g.sohbet),
+    db.prepare('SELECT zaman FROM asistan_onay WHERE sohbet_id = ?').bind(g.sohbet),
+    db.prepare('SELECT zaman, rol, metin FROM asistan_mesajlari WHERE sohbet_id = ? ORDER BY zaman LIMIT 200').bind(g.sohbet)
+  ]);
+  if (ipSay.results[0].n >= 3 || sohbetSay.results[0].n >= 2) return hata('Bu yazışma için gönderim sınırına ulaşıldı. İsterseniz WhatsApp’tan yazın.', 429);
+  if (!onay.results.length || !mesajlar.results.length) return hata('Gönderilecek bir yazışma bulunamadı.', 404);
+  const saat = (z) => new Date(Date.parse(z) + 3 * 3600000).toISOString().slice(0, 16).replace('T', ' ');
+  const satirlar = mesajlar.results.map((m) => `[${saat(m.zaman)}] ${m.rol === 'asistan' ? 'IDOS' : 'Siz'}:\n${m.metin}`);
+  const text = ['Idexya | IDOS asistan yazışmanız', '', ...satirlar.flatMap((x) => [x, '']), '—', 'Bu e-postayı idexya.com’daki asistan penceresinden kendiniz istediniz. Yazışma kaydı KVKK aydınlatma metnimizde belirtilen süre (1 yıl) boyunca saklanır: https://idexya.com/tr/sayfa/kvkk-aydinlatma-metni', 'Sorularınız için: info@idexya.com · WhatsApp 0507 870 06 29'].join('\n');
+  const kac = (x) => String(x).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1F2A3A;max-width:620px"><h2 style="font-size:18px;margin:0 0 14px">IDOS asistan yazışmanız</h2>${mesajlar.results.map((m) => `<div style="margin:0 0 12px;padding:10px 14px;border-radius:12px;background:${m.rol === 'asistan' ? '#F2F5F9' : '#FDE7D6'}"><div style="font-size:12px;color:#5B6B80;margin-bottom:4px">${m.rol === 'asistan' ? 'IDOS' : 'Siz'} · ${saat(m.zaman)}</div><div style="white-space:pre-wrap">${kac(m.metin)}</div></div>`).join('')}<p style="font-size:12px;color:#8A96A8">Bu e-postayı idexya.com’daki asistan penceresinden kendiniz istediniz. Yazışma kaydı KVKK aydınlatma metnimizde belirtilen süre boyunca saklanır.</p></div>`;
+  const r = await epostaGonder(env, { to: eposta, subject: 'IDOS asistan yazışmanız', text, html });
+  await db.prepare('INSERT INTO asistan_dokum (id, sohbet_id, zaman, ip_ozet, sonuc) VALUES (?, ?, ?, ?, ?)').bind(kimlik(), g.sohbet, simdi(), ipOzet, r.ok ? 'gonderildi' : r.atlandi ? 'kapali' : 'hata').run();
+  if (r.ok) return json({ ok: true });
+  return hata(r.atlandi ? 'E-posta gönderimi şu an açık değil. Yazışmanızı kopyalayabilir ya da WhatsApp’tan bize yazabilirsiniz.' : 'E-posta gönderilemedi. Lütfen daha sonra tekrar deneyin.', 503);
 }
 
 export async function yonetimAsistanApi(db, yontem, yol) {
