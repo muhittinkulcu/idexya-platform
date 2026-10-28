@@ -2,7 +2,7 @@
 // Katmanlı sayfaların (platform, paket kategorisi, paket ayrıntısı) ortak görünümü.
 ---
 <style is:global>
-.pf-ic{max-width:1240px;margin:0 auto;padding:0 24px;box-sizing:border-box}
+.pf-ic{max-width:var(--kap);margin:0 auto;padding:0 var(--kenar);box-sizing:border-box}
 .pf-ust{padding:56px 0 48px;background:radial-gradient(700px 360px at 85% 0%,var(--blob),transparent 70%),var(--bg)}
 .pf-yol{display:flex;flex-wrap:wrap;gap:8px;font-size:14px;color:var(--tx2);margin-bottom:22px}.pf-yol a{color:var(--tx2)}
 .pf-etiket{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--acc)}
@@ -41,7 +41,7 @@
 .pk-not{margin:14px 0 0;font-size:14px;color:var(--tx2)}
 .pk-sonraki{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .kp-izgara{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:56px;align-items:center}
-.kp-izgara .kg{max-width:600px;justify-self:end;width:100%}
+.kp-izgara .kg{max-width:680px;justify-self:end;width:100%}
 .kp-serit{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
 .kp-serit>div,.kp-serit>a{display:flex;flex-direction:column;gap:4px;padding:16px 20px;border-left:1px solid var(--line);text-decoration:none;color:var(--tx);min-width:0}
 .kp-serit>:first-child{border-left:0}
