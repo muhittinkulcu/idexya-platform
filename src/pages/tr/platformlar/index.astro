@@ -1,25 +1,73 @@
 ---
 // Platformlar dizini: ana sayfadaki şeritteki her platformun ayrıntı sayfasına giriş.
+// Her platform kapak görseli, kısa tanımı, yaptığımız ilk işleri ve ilgili hizmet/paket bağlantılarıyla gösterilir.
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
+import KatmanStil from '../../../components/KatmanStil.astro';
+import KapakGorsel from '../../../components/KapakGorsel.astro';
 import platformlar from '../../../data/platformlar.json';
+import paketler from '../../../data/paketler.json';
 const kategoriler = [...new Set(platformlar.map((p) => p.kategori))];
+const ACIKLAMA: Record<string, string> = {
+  Reklam: 'Satış, form ve mesaj hedefli kampanyaları kurduğumuz ve yönettiğimiz reklam platformları.',
+  'Ölçüm': 'Reklamın ve sitenin gerçekten ne getirdiğini doğru ölçmek için kurduğumuz ve izlediğimiz araçlar.',
+  'E-ticaret': 'Mağaza kurduğumuz, yönettiğimiz ve pazaryerlerine bağladığımız altyapılar.'
+};
+const paketAd = (id: string) => paketler.find((x) => x.id === id);
 ---
 <Site baslik="Çalıştığımız platformlar" aciklama="Google Ads, Meta, GA4, Search Console, Tag Manager, ikas ve Ticimax üzerinde neler yaptığımız." aktif="Hizmetler">
 <section class="pf-ust"><div class="pf-ic">
   <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page">Platformlar</span></nav>
-  <span class="pf-etiket">Platformlar</span>
-  <h1>Çalıştığımız platformlar</h1>
-  <p class="pf-giris">Reklam, ölçüm ve e-ticaret tarafında her gün kullandığımız platformlar. Her birinde ne yaptığımızı, nelere dikkat ettiğimizi ve ilgili hizmetleri inceleyin.</p>
+  <div class="kp-izgara">
+    <div>
+      <h1>Çalıştığımız platformlar</h1>
+      <p class="pf-giris">Reklam, ölçüm ve e-ticaret tarafında her gün kullandığımız {platformlar.length} platform. Her birinde ne yaptığımızı, nelere dikkat ettiğimizi ve ilgili hizmetleri inceleyin.</p>
+      <div class="pf-eylem"><a href="#analiz" class="pf-ana">Ücretsiz analiz iste</a><a href="/tr/paketler" class="pf-ikincil">Paketleri inceleyin</a></div>
+    </div>
+    <KapakGorsel tur="g:dijital-reklam" baslik="Çalıştığımız platformlar" />
+  </div>
+  <div class="kp-serit">
+    {kategoriler.map((k) => <a href={`#${k.toLocaleLowerCase('tr-TR').replace(/[^a-zçğıöşü0-9]+/g, '-')}`}><small>{platformlar.filter((p) => p.kategori === k).length} platform</small><strong>{k}</strong><span>{platformlar.filter((p) => p.kategori === k).map((p) => p.kisaAd || p.ad).join(', ')}</span></a>)}
+  </div>
 </div></section>
 <div class="pf-ic pf-govde">
   {kategoriler.map((k) => (
-    <section class="pf-bolum">
-      <h2>{k}</h2>
-      <div class="pf-kartlar">{platformlar.filter((p) => p.kategori === k).map((p) => <a href={`/tr/platformlar/${p.slug}`} class="pf-bag"><small>{p.kategori}</small><strong>{p.ad}</strong><span>{p.kisa}</span><em>Ayrıntılar →</em></a>)}</div>
+    <section class="pf-bolum pl-bolum" id={k.toLocaleLowerCase('tr-TR').replace(/[^a-zçğıöşü0-9]+/g, '-')}>
+      <div class="pl-bas"><h2>{k}</h2><p>{ACIKLAMA[k]}</p></div>
+      <div class="pl-liste">{platformlar.filter((p) => p.kategori === k).map((p) => (
+        <article class="pl-kart">
+          <a href={`/tr/platformlar/${p.slug}`} class="pl-kapak" tabindex="-1" aria-hidden="true"><KapakGorsel tur={`p:${p.slug}`} /></a>
+          <div class="pl-metin">
+            <h3><a href={`/tr/platformlar/${p.slug}`}>{p.ad}</a></h3>
+            <p>{p.kisa}</p>
+            <ul>{p.yapilanlar.slice(0, 3).map((x) => <li>{x}</li>)}</ul>
+            <div class="pl-alt">
+              <a href={`/tr/platformlar/${p.slug}`} class="pf-ana">{p.kisaAd || p.ad} sayfası</a>
+              {p.paketler.slice(0, 2).map((id) => paketAd(id)).filter(Boolean).map((x) => <a href={`/tr/paketler/${x.id}`} class="pl-paket">{x.ad}</a>)}
+            </div>
+          </div>
+        </article>))}
+      </div>
     </section>
   ))}
-  <p class="pf-not">Marka adları sahiplerine aittir; listedeki platformlarla resmî iş ortaklığı belirtilmez.</p>
+  <p class="pf-not">Marka adları sahiplerine aittir; listedeki platformlarla resmî iş ortaklığı belirtilmez. Görseller temsilîdir.</p>
 </div>
-<CagriKutusu />
+<div id="analiz"><CagriKutusu /></div>
+<KatmanStil />
+<style>
+  .pl-bas{max-width:720px;margin-bottom:24px}.pl-bas h2{margin:0 0 8px}.pl-bas p{margin:0;font-size:16.5px;line-height:1.6;color:var(--tx2)}
+  .pl-liste{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:20px}
+  .pl-kart{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:center;padding:20px;border-radius:24px;background:var(--card);border:1px solid var(--line)}
+  .pl-kapak{display:block}.pl-kapak :global(.kg){border-radius:18px;box-shadow:none}.pl-kapak :global(figcaption){display:none}
+  .pl-metin{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .pl-metin h3{margin:0;font-size:21px;line-height:1.25}.pl-metin h3 a{color:var(--head);text-decoration:none}.pl-metin h3 a:hover{color:var(--acc)}
+  .pl-metin>p{margin:0;font-size:15px;line-height:1.55;color:var(--tx2)}
+  .pl-metin ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--tx)}
+  .pl-metin li{position:relative;padding-left:20px;line-height:1.45}
+  .pl-metin li::before{content:"";position:absolute;left:0;top:5px;width:10px;height:6px;border-left:2.4px solid var(--ok);border-bottom:2.4px solid var(--ok);transform:rotate(-45deg)}
+  .pl-alt{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin-top:6px}
+  .pl-alt .pf-ana{min-height:42px;padding:0 16px;font-size:14px}
+  .pl-paket{font-size:14px;font-weight:600;color:var(--acc)}
+  @media (max-width:640px){.pl-kart{grid-template-columns:minmax(0,1fr)}}
+</style>
 </Site>
