@@ -52,7 +52,7 @@ export function formlar() {
       o.preventDefault();
       const v = new FormData(form);
       const g = { kaynak: form.dataset.talep, sayfa: location.pathname, kvkk: !!form.querySelector('[name=kvkk]:checked') };
-      ['ad', 'firma', 'eposta', 'telefon', 'konu', 'mesaj', 'site', 'alan', 'not', 'web_adresi_tekrar'].forEach((k) => { if (v.get(k)) g[k] = String(v.get(k)); });
+      ['ad', 'firma', 'eposta', 'telefon', 'konu', 'mesaj', 'site', 'alan', 'not', 'paket', 'web_adresi_tekrar'].forEach((k) => { if (v.get(k)) g[k] = String(v.get(k)); });
       const paket = document.getElementById('secili-paket');
       if (form.dataset.talep === 'paket' && paket && !/seçilmedi/i.test(paket.textContent)) g.paket = paket.textContent.trim();
       if (g.alan && !g.konu) g.konu = g.alan;
