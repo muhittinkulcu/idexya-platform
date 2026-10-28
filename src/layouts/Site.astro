@@ -1,5 +1,7 @@
 ---
 import HizliTalep from '../components/HizliTalep.astro';
+import DuyuruSerit from '../components/DuyuruSerit.astro';
+import DuyuruKutu from '../components/DuyuruKutu.astro';
 // Ortak yerleşim: üst menü, alt kısım, tema, çerez onayı.
 // gorsel: paylaşım görseli (/ ile başlayan site içi PNG/JPG yolu; yoksa sitenin genel görseli). ogTur: 'article' blog yazıları için.
 interface Props { baslik?: string; aciklama?: string; aktif?: string; dil?: 'tr' | 'en'; aramayaKapali?: boolean; gorsel?: string; ogTur?: 'website' | 'article'; }
@@ -605,6 +607,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <body class="acik">
 <script is:inline>if(document.documentElement.dataset.tema==='koyu'){document.body.className='koyu'}</script>
 <a href="#icerik" style="position: absolute; left: -9999px; top: 8px; padding: 8px 12px; background: var(--card); color: var(--head); border-radius: 8px; z-index: 100" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">İçeriğe geç</a>
+<DuyuruSerit />
 <header class={`site-ust${Astro.url.pathname === '/' ? ' ust-koyu' : ''}`}>
 <div class="ust kap">
 <a href="/" class="ust-logo" aria-label="Idexya ana sayfa">
@@ -882,7 +885,9 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </dialog>
 <main id="icerik">
+<DuyuruKutu konum="sayfaUstu" />
 <slot />
+<DuyuruKutu konum="icerikSonu" />
 </main>
 <footer style="background: var(--bg2); border-top: 1px solid var(--line)">
 <div style="max-width: 1240px; margin: 0 auto; padding: 60px 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">

@@ -1,0 +1,49 @@
+---
+// Sayfa içi kampanya kutusu: duyurular.json › kampanyalar. konum: sayfaUstu (ince kutu), icerikSonu (geniş kart), blogYan (dikey kart).
+// Hangi sayfalarda görüneceği kampanyanın "sayfalar" alanıyla belirlenir; tarih süzgeci tarayıcıda da uygulanır.
+import KapakGorsel from './KapakGorsel.astro';
+import { kampanyalar } from '../data/duyuru-sec.js';
+interface Props { konum: 'sayfaUstu' | 'icerikSonu' | 'blogYan'; }
+const { konum } = Astro.props;
+const liste = kampanyalar(konum, Astro.url.pathname).slice(0, konum === 'icerikSonu' ? 2 : 1);
+---
+{liste.length > 0 && (
+  <div class={`dk dk-${konum}`} data-dk>
+    {liste.map((k) => (
+      <aside class="dk-kart" aria-label={k.etiket || 'Duyuru'} data-bas={k.baslangic || undefined} data-bit={k.bitis || undefined}>
+        {konum !== 'sayfaUstu' && <div class="dk-gorsel">{k.gorsel ? <img src={k.gorsel} alt="" loading="lazy" decoding="async"> : <KapakGorsel tur={`d:${k.kapak || 'birlesik'}`} />}</div>}
+        <div class="dk-metin">
+          {k.etiket && <span class="dk-etiket">{k.etiket}</span>}
+          <strong>{k.baslik}</strong>
+          {k.metin && konum !== 'sayfaUstu' && <span>{k.metin}</span>}
+        </div>
+        <a href={k.bag} class="dk-dugme" data-hizli-talep={k.bag === '/tr/iletisim#form' ? 'analiz' : undefined}>{k.bagMetni}</a>
+      </aside>
+    ))}
+  </div>
+)}
+<script>
+  const g = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+  document.querySelectorAll<HTMLElement>('[data-dk]').forEach((k) => {
+    k.querySelectorAll<HTMLElement>('.dk-kart').forEach((c) => { if ((c.dataset.bas && c.dataset.bas > g) || (c.dataset.bit && c.dataset.bit < g)) c.remove(); });
+    if (!k.querySelector('.dk-kart')) k.remove();
+  });
+</script>
+<style is:global>
+.dk{max-width:var(--kap,1840px);margin:0 auto;padding:0 var(--kenar,24px);box-sizing:border-box;display:grid;gap:16px}
+.dk-kart{display:flex;align-items:center;gap:20px;border-radius:20px;background:linear-gradient(120deg,var(--tint),var(--card) 75%);border:1px solid var(--line)}
+.dk-etiket{align-self:flex-start;padding:3px 10px;border-radius:999px;background:var(--fill);color:#FFFFFF;font-size:12px;font-weight:700}
+.dk-metin{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+.dk-metin strong{color:var(--head);line-height:1.3}
+.dk-metin>span:not(.dk-etiket){font-size:14.5px;line-height:1.55;color:var(--tx2)}
+.dk-dugme{flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 18px;border-radius:12px;background:var(--fill);color:#FFFFFF!important;font-weight:700;text-decoration:none;font-size:14.5px}
+.dk-gorsel{flex:none}.dk-gorsel img{display:block;width:100%;border-radius:14px}
+.dk-gorsel .kg{border-radius:14px;box-shadow:none}.dk-gorsel figcaption{display:none}
+.dk-sayfaUstu{padding-top:16px}
+.dk-sayfaUstu .dk-kart{padding:10px 12px 10px 18px}.dk-sayfaUstu .dk-metin{flex-direction:row;align-items:center;flex-wrap:wrap;gap:10px}.dk-sayfaUstu .dk-etiket{align-self:center}
+.dk-icerikSonu{padding-top:8px;padding-bottom:48px;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr))}
+.dk-icerikSonu .dk-kart{padding:18px}.dk-icerikSonu .dk-gorsel{width:180px}.dk-icerikSonu strong{font-size:19px}
+.dk-blogYan{padding:0;max-width:none}
+.dk-blogYan .dk-kart{flex-direction:column;align-items:stretch;padding:16px;gap:12px}.dk-blogYan .dk-dugme{justify-content:center}
+@media (max-width:640px){.dk-kart{flex-direction:column;align-items:stretch}.dk-icerikSonu .dk-gorsel{width:auto}.dk-dugme{justify-content:center}}
+</style>

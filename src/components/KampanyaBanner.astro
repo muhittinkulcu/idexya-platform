@@ -1,0 +1,75 @@
+---
+// Ana sayfa kampanya bannerı: duyurular.json › kampanyalar (anaSayfa işaretli). Birden çoksa kaydırmalı gösterilir:
+// oklar, noktalar, 7 saniyede bir geçiş (üzerine gelince ve hareket azaltma tercihinde durur).
+import KapakGorsel from './KapakGorsel.astro';
+import { kampanyalar } from '../data/duyuru-sec.js';
+const liste = kampanyalar('anaSayfa');
+---
+{liste.length > 0 && (
+<section class="kb" aria-roledescription="kaydırmalı alan" aria-label="Kampanyalar ve duyurular" data-kb>
+  <div class="kb-ic">
+    <div class="kb-iz">
+      {liste.map((k, i) => (
+        <article class="kb-slayt" aria-roledescription="slayt" aria-label={`${i + 1} / ${liste.length}`} data-bas={k.baslangic || undefined} data-bit={k.bitis || undefined}>
+          <div class="kb-metin">
+            {k.etiket && <span class="kb-etiket">{k.etiket}</span>}
+            <h2>{k.baslik}</h2>
+            {k.metin && <p>{k.metin}</p>}
+            <a href={k.bag} class="kb-dugme" data-hizli-talep={k.bag === '/tr/iletisim#form' ? 'analiz' : undefined}>{k.bagMetni}</a>
+          </div>
+          <div class="kb-gorsel">{k.gorsel ? <img src={k.gorsel} alt="" loading="lazy" decoding="async"> : <KapakGorsel tur={`d:${k.kapak || 'birlesik'}`} />}</div>
+        </article>
+      ))}
+    </div>
+    {liste.length > 1 && (
+      <div class="kb-kontrol">
+        <button type="button" data-kb-onceki aria-label="Önceki">‹</button>
+        <span class="kb-noktalar">{liste.map((_, i) => <button type="button" data-kb-git={i} aria-label={`${i + 1}. kampanya`}></button>)}</span>
+        <button type="button" data-kb-sonraki aria-label="Sonraki">›</button>
+      </div>
+    )}
+  </div>
+</section>
+)}
+<script>
+  document.querySelectorAll<HTMLElement>('[data-kb]').forEach((kok) => {
+    const g = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+    kok.querySelectorAll<HTMLElement>('.kb-slayt').forEach((s, i) => { if ((s.dataset.bas && s.dataset.bas > g) || (s.dataset.bit && s.dataset.bit < g)) { s.remove(); kok.querySelector(`[data-kb-git="${i}"]`)?.remove(); } });
+    const slaytlar = [...kok.querySelectorAll<HTMLElement>('.kb-slayt')];
+    if (!slaytlar.length) { kok.remove(); return; }
+    const noktalar = [...kok.querySelectorAll<HTMLButtonElement>('[data-kb-git]')];
+    if (slaytlar.length < 2) kok.querySelector('.kb-kontrol')?.remove();
+    let i = 0;
+    const git = (n: number) => {
+      i = (n + slaytlar.length) % slaytlar.length;
+      slaytlar.forEach((s, j) => { s.hidden = j !== i; });
+      noktalar.forEach((d, j) => d.setAttribute('aria-current', String(j === i)));
+    };
+    kok.querySelector('[data-kb-onceki]')?.addEventListener('click', () => git(i - 1));
+    kok.querySelector('[data-kb-sonraki]')?.addEventListener('click', () => git(i + 1));
+    noktalar.forEach((d, j) => d.addEventListener('click', () => git(j)));
+    git(0);
+    if (slaytlar.length > 1 && !matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(() => { if (!kok.matches(':hover,:focus-within') && document.visibilityState === 'visible') git(i + 1); }, 7000);
+  });
+</script>
+<style is:global>
+.kb{padding:40px 0 8px}
+.kb-ic{max-width:var(--kap,1840px);margin:0 auto;padding:0 var(--kenar,24px);box-sizing:border-box;position:relative}
+.kb-slayt{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:40px;align-items:center;padding:36px 40px 72px;border-radius:28px;background:linear-gradient(120deg,var(--tint),var(--card) 70%);border:1px solid var(--line)}
+.kb-slayt[hidden]{display:none}
+@media (prefers-reduced-motion:no-preference){.kb-slayt:not([hidden]){animation:kbGir .5s cubic-bezier(.2,.7,.2,1)}}
+@keyframes kbGir{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:none}}
+.kb-metin{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.kb-etiket{padding:5px 12px;border-radius:999px;background:var(--fill);color:#FFFFFF;font-size:13px;font-weight:700}
+.kb-metin h2{margin:0;font-size:clamp(26px,3.2vw,40px);line-height:1.12;letter-spacing:-.02em;color:var(--head)}
+.kb-metin p{margin:0;max-width:560px;font-size:17px;line-height:1.6;color:var(--tx2)}
+.kb-dugme{margin-top:6px;min-height:50px;display:inline-flex;align-items:center;padding:0 22px;border-radius:12px;background:var(--fill);color:#FFFFFF!important;font-weight:700;text-decoration:none}
+.kb-gorsel img{display:block;width:100%;height:auto;border-radius:22px}
+.kb-gorsel .kg{max-width:520px;margin-left:auto}
+.kb-kontrol{position:absolute;left:calc(var(--kenar,24px) + 40px);bottom:22px;display:flex;align-items:center;gap:8px}
+.kb-kontrol>button{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--head);font-size:20px;line-height:1;cursor:pointer}
+.kb-noktalar{display:flex;gap:6px}
+.kb-noktalar button{width:9px;height:9px;padding:0;border-radius:50%;border:0;background:var(--line);cursor:pointer}
+.kb-noktalar button[aria-current=true]{width:24px;border-radius:5px;background:var(--brand)}
+@media (max-width:900px){.kb-slayt{grid-template-columns:minmax(0,1fr);padding:24px 22px 64px;gap:22px}.kb-gorsel .kg{margin:0}.kb-kontrol{left:50%;transform:translateX(-50%)}}
+</style>
