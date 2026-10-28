@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Reklam dönüşümleri" aktif="donusum" yol="Analiz" aciklama="Reklam tıklamasıyla gelip CRM’de “Kazanıldı” olan talepler. Google Ads çevrimdışı dönüşüm ve Meta çevrimdışı etkinlik dosyası olarak indirip platforma yükleyebilirsiniz.">
+<Yonetim baslik="Reklam dönüşümleri" aktif="donusum" yol="Analiz" aciklama="Reklam tıklamasıyla gelip CRM’de “Kazanıldı” olan talepler. Google Ads çevrim dışı dönüşüm ve Meta çevrim dışı etkinlik dosyası olarak indirip platforma yükleyebilirsiniz.">
 <style is:global>
   .dn-kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
   .dn-kpi>div{padding:14px 16px;display:flex;flex-direction:column;gap:4px}
@@ -16,16 +16,16 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div class="dn-kpi" data-kpi></div>
 <div class="kart dn-indir">
   <section>
-    <b>Google Ads çevrimdışı dönüşüm</b>
+    <b>Google Ads çevrim dışı dönüşüm</b>
     <label class="alan">Dönüşüm işleminin adı (Google Ads’teki ile aynı)<input data-ad-google value="Müşteri kazanıldı" maxlength="100"></label>
     <span style="display: flex; gap: 8px; flex-wrap: wrap"><a class="dugme ana" data-indir="google" href="#">CSV indir (yüklenmemişler)</a><button type="button" class="dugme" data-isaretle="google">Yüklendi olarak işaretle</button></span>
     <small style="color: var(--tx2)">Google Ads › Hedefler › Dönüşümler › Yüklemeler bölümünden yüklenir.</small>
   </section>
   <section>
-    <b>Meta çevrimdışı etkinlik</b>
+    <b>Meta çevrim dışı etkinlik</b>
     <label class="alan">Etkinlik adı<input data-ad-meta value="Purchase" maxlength="100"></label>
     <span style="display: flex; gap: 8px; flex-wrap: wrap"><a class="dugme ana" data-indir="meta" href="#">CSV indir (yüklenmemişler)</a><button type="button" class="dugme" data-isaretle="meta">Yüklendi olarak işaretle</button></span>
-    <small style="color: var(--tx2)">Meta Etkinlik Yöneticisi › veri seti › çevrimdışı etkinlik yükleme; sütun eşleştirmesini yükleme ekranında yapın (fbc = tıklama kimliği).</small>
+    <small style="color: var(--tx2)">Meta Etkinlik Yöneticisi › veri seti › çevrim dışı etkinlik yükleme; sütun eşleştirmesini yükleme ekranında yapın (fbc = tıklama kimliği).</small>
   </section>
 </div>
 <section class="kart" aria-label="Tıklama kimliği olan talepler" data-liste style="overflow-x: auto"></section>

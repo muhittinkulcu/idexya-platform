@@ -1,6 +1,6 @@
 // Reklam dönüşümü kapalı döngüsü (Muhittin, 26 Eki 2026). Ziyaretçi pazarlama çerezlerine izin verdiyse site, reklam tıklama
 // kimliklerini (gclid, gbraid, wbraid, fbclid) ve UTM bilgisini tarayıcıda saklar; form gönderilirse talebe eklenir (talep_reklam).
-// Talep CRM'de "Kazanıldı" olduğunda Google Ads çevrimdışı dönüşüm ve Meta çevrimdışı etkinlik CSV'si üretilir.
+// Talep CRM'de "Kazanıldı" olduğunda Google Ads çevrim dışı dönüşüm ve Meta çevrim dışı etkinlik CSV'si üretilir.
 // Dışa aktarılan dosyada e-posta ve telefon YOKTUR; eşleşme yalnız tıklama kimliğiyle yapılır. Platforma yükleme elle yapılır.
 import { json, hata, simdi, kirp, islemYaz } from './ortak.js';
 

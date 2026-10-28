@@ -119,7 +119,7 @@ export const SEMA = [
     id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL, musteri_id TEXT, baglanti TEXT NOT NULL, tarih TEXT NOT NULL,
     aciklama TEXT, olusturma TEXT NOT NULL, ekleyen TEXT NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS belge_tarih ON belgeler (tarih)`,
-  // Basit gelir-gider defteri (worker/muhasebe.js); resmî muhasebe değildir. tutar: KDV dahil, kuruş cinsinden tam sayı.
+  // Basit gelir-gider defteri (worker/muhasebe.js); resmî muhasebe değildir. tutar: KDV dâhil, kuruş cinsinden tam sayı.
   `CREATE TABLE IF NOT EXISTS muhasebe (
     id TEXT PRIMARY KEY, tur TEXT NOT NULL, tarih TEXT NOT NULL, tutar INTEGER NOT NULL, kdv_orani INTEGER NOT NULL DEFAULT 0,
     aciklama TEXT NOT NULL, kategori TEXT, musteri_id TEXT, belge_no TEXT, durum TEXT NOT NULL DEFAULT 'bekliyor',

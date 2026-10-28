@@ -30,7 +30,7 @@
     "kisaAd": "Meta",
     "kategori": "Reklam",
     "kisa": "Facebook ve Instagram’da doğru kitleye görsel ve video reklamlarla ulaşın.",
-    "nedir": "Meta reklamları; Facebook, Instagram, Messenger ve Audience Network’te yayınlanan reklamlardır. Hedefleme, ilgi alanları, benzer kitleler ve sitenizi ziyaret edenler gibi sinyallere dayanır; kreatifin kalitesi sonucu doğrudan etkiler.",
+    "nedir": "Meta reklamları Facebook, Instagram, Messenger ve Audience Network’te yayınlanan reklamlardır. Hedefleme, ilgi alanları, benzer kitleler ve sitenizi ziyaret edenler gibi sinyallere dayanır; kreatifin kalitesi sonucu doğrudan etkiler.",
     "yapilanlar": [
       "İşletme portföyü, reklam hesabı, sayfa ve Instagram bağlantılarının düzenlenmesi",
       "Piksel ve Dönüşüm API’si (CAPI) kurulumu; olay kalitesinin kontrolü",
@@ -149,7 +149,7 @@
     "hizmetler": ["e-ticaret-yonetimi", "e-ticaret-urun-kategori-yonetimi", "e-ticaret-entegrasyon-yonetimi", "web-tasarim-hizmetleri"],
     "paketler": ["eticaret-site", "eticaret-yonetim"],
     "sss": [
-      { "soru": "ikas lisans ücreti pakete dahil mi?", "cevap": "Hayır. Platform lisansı ikas’a ayrıca ödenir; kurulum ve yönetim hizmetimiz ayrıdır." },
+      { "soru": "ikas lisans ücreti pakete dâhil mi?", "cevap": "Hayır. Platform lisansı ikas’a ayrıca ödenir; kurulum ve yönetim hizmetimiz ayrıdır." },
       { "soru": "Mevcut mağazamızı ikas’a taşıyabilir misiniz?", "cevap": "Evet. Ürün, kategori ve yönlendirme planıyla taşıma yaparız; arama görünürlüğünü korumak için adresleri eşleştiririz." }
     ]
   },

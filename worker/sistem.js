@@ -19,7 +19,7 @@ export const AYARLAR = [
   { k: 'teklif_gecerlilik', ad: 'Teklif geçerlilik süresi (gün)', vars: '15', sinir: 4 },
   { k: 'bildirim_eposta', ad: 'Bildirim e-postası (yeni talep, destek, teklif kararı; boşsa gönderilmez)', vars: '', sinir: 160 },
   { k: 'eposta_uye_bildirim', ad: 'Destek yanıtında üyeye e-posta gönderilsin mi? (evet / hayır)', vars: 'hayır', sinir: 5 },
-  { k: 'teklif_notu', ad: 'Teklif alt notu', vars: 'Fiyatlara KDV dahil değildir. Reklam bütçesi hizmet bedeline dahil değildir.', sinir: 1000 }
+  { k: 'teklif_notu', ad: 'Teklif alt notu', vars: 'Fiyatlara KDV dâhil değildir. Reklam bütçesi hizmet bedeline dâhil değildir.', sinir: 1000 }
 ];
 
 export async function ayarlariOku(db) {

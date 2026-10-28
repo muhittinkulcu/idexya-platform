@@ -199,7 +199,7 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     // Müşteri günlüğü ve aşama
     const mus = await musteriVar(db, t.musteri_id);
     if (mus) {
-      const detay = `${t.no} · ${t.baslik} · Toplam ${tl(Math.round(t.toplam * 100))} (KDV dahil)`;
+      const detay = `${t.no} · ${t.baslik} · Toplam ${tl(Math.round(t.toplam * 100))} (KDV dâhil)`;
       const baslik = { gonderildi: 'Teklif gönderildi olarak işaretlendi', kabul: 'Teklif kabul edildi', red: 'Teklif reddedildi' }[ne];
       const sorgular = [kayitEkle(db, mus.id, z, baslik, detay, kim.eposta)];
       let yeniAsama = null;

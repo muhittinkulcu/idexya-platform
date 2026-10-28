@@ -8,8 +8,8 @@
         "ad": "360° e-ticaret yönetimi",
         "slug": "e-ticaret-yonetimi",
         "ozet": "Mağazanızın günlük işleyişi uçtan uca.",
-        "giris": "Mağazanızın günlük işleyişini tek ekip olarak yürütüyoruz: ürün, stok, kampanya, sipariş ve raporlama aynı elden, birbirine bağlı ilerler.",
-        "neden": "E-ticarette sorunlar genellikle tek bir yerde değil, parçalar arasındaki boşluklarda çıkar: reklam ekibi stokta olmayan ürünü öne çıkarır, kampanya fiyatı pazaryerine yansımaz, kargo gecikmesi yorumlara düşer. Tüm parçaları aynı ekibin yönetmesi bu boşlukları kapatır ve kararları tek bir gerçek veriye dayandırır.",
+        "giris": "Mağazanızın günlük işleyişini tek ekip olarak yürütüyoruz: Ürün, stok, kampanya, sipariş ve raporlama aynı elden, birbirine bağlı ilerler.",
+        "neden": "E-ticarette sorunlar genellikle tek bir yerde değil, parçalar arasındaki boşluklarda çıkar: Reklam ekibi stokta olmayan ürünü öne çıkarır, kampanya fiyatı pazaryerine yansımaz, kargo gecikmesi yorumlara düşer. Tüm parçaları aynı ekibin yönetmesi bu boşlukları kapatır ve kararları tek bir gerçek veriye dayandırır.",
         "yapilanlar": [
           {
             "baslik": "Mağaza sağlık kontrolü",
@@ -57,7 +57,7 @@
             "cevap": "Mağaza, pazaryeri ve reklam hesapları sizin adınıza açılır ve size aittir. Biz yetkili kullanıcı olarak çalışırız."
           },
           {
-            "soru": "Hizmete reklam yönetimi dahil mi?",
+            "soru": "Hizmete reklam yönetimi dâhil mi?",
             "cevap": "Kapsamı ihtiyacınıza göre birlikte belirleriz. Reklam yönetimi pakete eklenebilir ya da ayrı hizmet olarak alınabilir."
           }
         ]
@@ -67,7 +67,7 @@
         "slug": "e-ticaret-pazaryeri-yonetimi",
         "ozet": "Pazaryerlerinde ürün, fiyat ve sipariş yönetimi.",
         "giris": "Trendyol, Hepsiburada, Amazon, N11, Çiçeksepeti ve Pazarama’da mağazanızı günlük olarak yönetiyoruz: ürün, fiyat, stok, kampanya, sipariş ve mağaza puanı.",
-        "neden": "Pazaryerlerinde görünürlük; doğru kategori, eksiksiz ürün bilgisi, rekabetçi fiyat ve mağaza performansıyla belirlenir. Geciken gönderimler, cevapsız sorular ve stok hataları mağaza puanını düşürür ve ürünleri arama sonuçlarında geriye iter. Düzenli takip, satışın sürdürülebilir olmasını sağlar.",
+        "neden": "Pazaryerlerinde görünürlük, doğru kategori, eksiksiz ürün bilgisi, rekabetçi fiyat ve mağaza performansıyla belirlenir. Geciken gönderimler, cevapsız sorular ve stok hataları mağaza puanını düşürür ve ürünleri arama sonuçlarında geriye iter. Düzenli takip, satışın sürdürülebilir olmasını sağlar.",
         "yapilanlar": [
           {
             "baslik": "Mağaza kurulumu ve kategori eşleştirme",
@@ -111,7 +111,7 @@
             "cevap": "Trendyol, Hepsiburada, Amazon, N11, Çiçeksepeti ve Pazarama’da çalışıyoruz."
           },
           {
-            "soru": "Pazaryeri reklamları bu hizmete dahil mi?",
+            "soru": "Pazaryeri reklamları bu hizmete dâhil mi?",
             "cevap": "Pazaryeri içi reklamlar ayrı bir hizmettir (Pazaryeri reklam yönetimi); ikisi birlikte de alınabilir."
           },
           {
@@ -175,7 +175,7 @@
         "slug": "e-ticaret-urun-kategori-yonetimi",
         "ozet": "Ürün içerikleri, görseller ve kategori yapısı.",
         "giris": "Ürün içeriklerini, görsellerini ve kategori yapısını hem müşterinin hem de arama motorlarının anlayacağı şekilde düzenliyoruz.",
-        "neden": "Müşteri ürünü elle tutamadığı için kararını sayfadaki bilgiye göre verir. Eksik ölçü, belirsiz malzeme bilgisi ya da yanlış kategori; satışı düşürür, iadeyi artırır. İyi kurgulanmış kategori yapısı ise hem ziyaretçinin aradığını bulmasını hem de Google’da görünürlüğü kolaylaştırır.",
+        "neden": "Müşteri ürünü elle tutamadığı için kararını sayfadaki bilgiye göre verir. Eksik ölçü, belirsiz malzeme bilgisi ya da yanlış kategori, satışı düşürür, iadeyi artırır. İyi kurgulanmış kategori yapısı ise hem ziyaretçinin aradığını bulmasını hem de Google’da görünürlüğü kolaylaştırır.",
         "yapilanlar": [
           {
             "baslik": "Kategori ağacı",
@@ -339,7 +339,7 @@
           },
           {
             "soru": "Dönüşüm API neden gerekli?",
-            "cevap": "Tarayıcı kısıtlamaları nedeniyle yalnızca piksel bazı sonuçları kaçırır. Dönüşüm API, sonuçları sunucudan da ileterek ölçümü daha eksiksiz hale getirir."
+            "cevap": "Tarayıcı kısıtlamaları nedeniyle yalnızca piksel bazı sonuçları kaçırır. Dönüşüm API’si, sonuçları sunucudan da ileterek ölçümü daha eksiksiz hâle getirir."
           },
           {
             "soru": "Reklam hesabı kime ait olur?",
@@ -522,19 +522,19 @@
           },
           {
             "baslik": "Kârlılık raporu",
-            "metin": "Reklam maliyeti dahil ürün başına kâr düzenli raporlanır."
+            "metin": "Reklam maliyeti dâhil ürün başına kâr düzenli raporlanır."
           }
         ],
         "olcum": [
           "Reklam harcamasının getirisi",
-          "Reklam dahil ürün başına kâr",
+          "Reklam dâhil ürün başına kâr",
           "Reklam kaynaklı satış payı",
           "Arama terimi bazında maliyet"
         ],
         "kimler": [
           "Pazaryerinde rekabeti yoğun kategorilerde satanlar",
           "Yeni ürünlerini hızla görünür yapmak isteyen satıcılar",
-          "Reklam verdiği halde kârını göremeyen mağazalar"
+          "Reklam verdiği hâlde kârını göremeyen mağazalar"
         ],
         "sss": [
           {
@@ -551,7 +551,7 @@
     "baslik": "Dijital reklam",
     "neden": "Doğru ölçülmeyen bir hesapta bütçe, en çok satış getiren reklama değil en kolay tıklanan reklama akar. Satış, form, arama ve mesaj ayrı ayrı ölçüldüğünde kararlar gerçek ticari sonuca göre verilir; bütçe büyütülmeden önce neyin işe yaradığı bilinir.",
     "dikkat": [
-      "Her sonuç türünün ayrı ölçülmesi: satış, form, arama ve mesaj karışmaz",
+      "Her sonuç türünün ayrı ölçülmesi: Satış, form, arama ve mesaj karışmaz",
       "Kontrollü testler ve kademeli bütçe değişiklikleri",
       "Bütçe ve kampanya değişiklikleri onayınız olmadan yapılmaz"
     ]
@@ -607,7 +607,7 @@
           },
           {
             "soru": "İçerikler ne zaman sonuç verir?",
-            "cevap": "Bu; sitenin mevcut durumuna, rekabete ve içeriğin kapsamına bağlıdır. Genellikle aylar içinde gelişen bir süreçtir; sıralama garantisi vermeyiz."
+            "cevap": "Bu, sitenin mevcut durumuna, rekabete ve içeriğin kapsamına bağlıdır. Genellikle aylar içinde gelişen bir süreçtir; sıralama garantisi vermeyiz."
           }
         ]
       },
@@ -665,7 +665,7 @@
         "ad": "Teknik SEO",
         "slug": "teknik-seo",
         "ozet": "Hız, taranabilirlik ve site altyapısı.",
-        "giris": "Sitenizin hızını, taranabilirliğini ve altyapısını arama motorlarının sorunsuz okuyabileceği hale getiriyoruz.",
+        "giris": "Sitenizin hızını, taranabilirliğini ve altyapısını arama motorlarının sorunsuz okuyabileceği hâle getiriyoruz.",
         "neden": "İçerik ne kadar iyi olursa olsun, arama motoru sayfayı tarayamıyor, yanlış sürümünü görüyor ya da sayfa çok yavaş açılıyorsa görünürlük düşer. Site taşımalarında yapılan yönlendirme hataları ise yılların emeğini kısa sürede kaybettirebilir.",
         "yapilanlar": [
           {
@@ -774,7 +774,7 @@
           },
           {
             "baslik": "Tutarlı işletme bilgisi",
-            "metin": "Ad, adres ve telefon bilgisi site ve rehberlerde tutarlı hale getirilir."
+            "metin": "Ad, adres ve telefon bilgisi site ve rehberlerde tutarlı hâle getirilir."
           },
           {
             "baslik": "Yorum yönetimi",
@@ -852,7 +852,7 @@
         ],
         "sss": [
           {
-            "soru": "Paket halinde backlink satıyor musunuz?",
+            "soru": "Paket hâlinde backlink satıyor musunuz?",
             "cevap": "Hayır. Toplu ve ücretli bağlantı paketleri arama motoru kurallarına aykırıdır ve risk taşır."
           },
           {
@@ -1135,7 +1135,7 @@
     "dikkat": [
       "Hızlı ve önce telefona göre tasarlanmış sayfalar",
       "Ölçüm, form ve kişisel veri altyapısının baştan doğru kurulması",
-      "Yazılımlar arası bağlantı: aynı veri bir kez girilir"
+      "Yazılımlar arası bağlantı: Aynı veri bir kez girilir"
     ]
   },
   {
@@ -1288,7 +1288,7 @@
             "cevap": "Evet, mevcut logonuz korunarak etrafında kurumsal kimlik sistemi kurulabilir."
           },
           {
-            "soru": "Web sitesi tasarımı bu hizmete dahil mi?",
+            "soru": "Web sitesi tasarımı bu hizmete dâhil mi?",
             "cevap": "Değil; ancak kimlik çalışması web tasarımına doğrudan uygulanabilir şekilde hazırlanır."
           }
         ]
@@ -1329,7 +1329,7 @@
         ],
         "kimler": [
           "Instagram ve YouTube’da büyümek isteyen markalar",
-          "Ürününü hareket halinde göstermesi gereken işletmeler",
+          "Ürününü hareket hâlinde göstermesi gereken işletmeler",
           "Reklam için düzenli video ihtiyacı olanlar"
         ],
         "sss": [

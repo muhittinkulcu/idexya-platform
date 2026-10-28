@@ -68,7 +68,7 @@ export async function uyeMusteriApi(istek, env, yol) {
       const y = await yonetimTeklifApi(db, 'POST', `teklifler/${t.id}/${m[2]}`, {}, { eposta: 'üye: ' + u.eposta });
       if (y.ok) {
         const d = await db.prepare('SELECT no, baslik, toplam FROM teklifler WHERE id = ?').bind(t.id).first();
-        await ekibeBildir(env, `Teklif ${m[2] === 'kabul' ? 'kabul edildi' : 'reddedildi'}: ${d.no}`, [['Teklif', `${d.no} · ${d.baslik}`], ['Toplam (KDV dahil)', new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(d.toplam) + ' TL'], ['Karar veren', `${u.ad} (${u.eposta})`]],
+        await ekibeBildir(env, `Teklif ${m[2] === 'kabul' ? 'kabul edildi' : 'reddedildi'}: ${d.no}`, [['Teklif', `${d.no} · ${d.baslik}`], ['Toplam (KDV dâhil)', new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(d.toplam) + ' TL'], ['Karar veren', `${u.ad} (${u.eposta})`]],
           { metin: 'Teklifi aç', yol: `/yonetim/teklifler/?sekme=${m[2]}&id=${encodeURIComponent(t.id)}` });
       }
       return y;

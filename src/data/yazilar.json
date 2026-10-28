@@ -7,11 +7,11 @@
     "govde": [
       [
         "p",
-        "Reklam hesaplarında en sık gördüğümüz sorun, kararların sezgiyle ve dağınık zamanlarda alınmasıdır. Bir gün bütçe artırılır, ertesi gün kampanya kapatılır, bir hafta sonra yeni bir kitle denenir. Hangi değişikliğin neyi etkilediği anlaşılmaz. Performans ve hız odaklı optimizasyon modeli bu dağınıklığı düzenli bir döngüye çevirir: önce doğru ölçülür, sonra küçük ve ölçülebilir adımlarla hızlı ilerlenir."
+        "Reklam hesaplarında en sık gördüğümüz sorun, kararların sezgiyle ve dağınık zamanlarda alınmasıdır. Bir gün bütçe artırılır, ertesi gün kampanya kapatılır, bir hafta sonra yeni bir kitle denenir. Hangi değişikliğin neyi etkilediği anlaşılmaz. Performans ve hız odaklı optimizasyon modeli bu dağınıklığı düzenli bir döngüye çevirir: Önce doğru ölçülür, sonra küçük ve ölçülebilir adımlarla hızlı ilerlenir."
       ],
       [
         "h2",
-        "1. Önce ölçüm: yanlış veriyle hızlı olmak zarardır"
+        "1. Önce ölçüm: Yanlış veriyle hızlı olmak zarardır"
       ],
       [
         "p",
@@ -32,7 +32,7 @@
       ],
       [
         "p",
-        "Her kampanyanın tek bir ana başarı ölçütü olmalıdır: satış, nitelikli talep, randevu ya da mesaj. Tıklama ve gösterim gibi ara ölçütler yön gösterir ama karar vermek için yeterli değildir. Hedef belirlenirken işletmenin gerçek ticari hedefi esas alınır: bir talebin satışa dönüşme oranı düşükse ucuz talep, pahalı bir hatadır."
+        "Her kampanyanın tek bir ana başarı ölçütü olmalıdır: satış, nitelikli talep, randevu ya da mesaj. Tıklama ve gösterim gibi ara ölçütler yön gösterir ama karar vermek için yeterli değildir. Hedef belirlenirken işletmenin gerçek ticari hedefi esas alınır: Bir talebin satışa dönüşme oranı düşükse ucuz talep, pahalı bir hatadır."
       ],
       [
         "h2",
@@ -65,7 +65,7 @@
       ],
       [
         "p",
-        "İyi giden bir kampanyanın bütçesini bir anda katlamak çoğu zaman öğrenme dengesini bozar ve maliyeti yükseltir. Bütçe artışları küçük adımlarla yapılır ve her adımın etkisi izlenir. Aynı ilke kampanya kapatma kararları için de geçerlidir: kısa bir dönemin kötü sonucu, kalıcı bir sorun olduğu anlamına gelmeyebilir."
+        "İyi giden bir kampanyanın bütçesini bir anda katlamak çoğu zaman öğrenme dengesini bozar ve maliyeti yükseltir. Bütçe artışları küçük adımlarla yapılır ve her adımın etkisi izlenir. Aynı ilke kampanya kapatma kararları için de geçerlidir: Kısa bir dönemin kötü sonucu, kalıcı bir sorun olduğu anlamına gelmeyebilir."
       ],
       [
         "h2",
@@ -73,7 +73,7 @@
       ],
       [
         "p",
-        "Modelin hızı düzenli bir çalışma ritminden gelir: günlük kontroller anormal durumları yakalar, haftalık değerlendirmede test sonuçları ve bütçe kararları ele alınır, aylık raporda ise ticari sonuçlar konuşulur. Raporda yalnızca ne olduğu değil, neden olduğu ve bir sonraki adımın ne olacağı da yer alır."
+        "Modelin hızı düzenli bir çalışma ritminden gelir: Günlük kontroller anormal durumları yakalar, haftalık değerlendirmede test sonuçları ve bütçe kararları ele alınır, aylık raporda ise ticari sonuçlar konuşulur. Raporda yalnızca ne olduğu değil, neden olduğu ve bir sonraki adımın ne olacağı da yer alır."
       ],
       [
         "h2",
@@ -81,7 +81,7 @@
       ],
       [
         "p",
-        "Performans ve hız odaklı optimizasyon; doğru ölçüm, net hedef, sade yapı ve kontrollü testlerin birleşimidir. Hesabınızın bu döngüye ne kadar yakın olduğunu birlikte değerlendirmek isterseniz ücretsiz analiz talebinde bulunabilirsiniz."
+        "Performans ve hız odaklı optimizasyon, doğru ölçüm, net hedef, sade yapı ve kontrollü testlerin birleşimidir. Hesabınızın bu döngüye ne kadar yakın olduğunu birlikte değerlendirmek isterseniz ücretsiz analiz talebinde bulunabilirsiniz."
       ]
     ]
   },
@@ -114,7 +114,7 @@
       [
         "ul",
         [
-          "Gönderilen değer KDV ve kargo dahil mi, hariç mi? Tüm kanallarda aynı kural mı uygulanıyor?",
+          "Gönderilen değer KDV ve kargo dâhil mi, hariç mi? Tüm kanallarda aynı kural mı uygulanıyor?",
           "Para birimi doğru mu iletiliyor?",
           "İndirim ve kupon sonrası tutar mı, liste fiyatı mı gönderiliyor?",
           "İptal ve iadeler ölçüme nasıl yansıyor?"
@@ -130,7 +130,7 @@
       ],
       [
         "p",
-        "Tarayıcı kısıtlamaları ve çerez onayları nedeniyle tarayıcı taraflı ölçüm tek başına eksik kalabilir. Meta Dönüşüm API'si ve Google'ın gelişmiş dönüşümleri gibi sunucu taraflı yöntemler, kullanıcı izinleri çerçevesinde ölçümü güçlendirir. Kurulumdan sonra verinin gerçekten ulaştığı ve tekrar sayılmadığı mutlaka kontrol edilmelidir: bağlı görünmek, çalışıyor olmak anlamına gelmez."
+        "Tarayıcı kısıtlamaları ve çerez onayları nedeniyle tarayıcı taraflı ölçüm tek başına eksik kalabilir. Meta Dönüşüm API'si ve Google'ın gelişmiş dönüşümleri gibi sunucu taraflı yöntemler, kullanıcı izinleri çerçevesinde ölçümü güçlendirir. Kurulumdan sonra verinin gerçekten ulaştığı ve tekrar sayılmadığı mutlaka kontrol edilmelidir: Bağlı görünmek, çalışıyor olmak anlamına gelmez."
       ],
       [
         "h2",
@@ -171,7 +171,7 @@
     "govde": [
       [
         "p",
-        "E-ticarete başlarken ya da mevcut sitenizi taşımayı düşünürken en zor kararlardan biri altyapı seçimidir. Shopify, ikas, Ticimax ve WooCommerce gibi platformların her birinin güçlü ve zayıf yönleri vardır. Yanlış seçim; yüksek taşıma maliyetine, entegrasyon sorunlarına ve kaybedilen arama motoru sıralamasına yol açabilir. E-ticaret altyapı danışmanlığı hizmetimiz bu kararı verileriniz ve hedeflerinizle birlikte vermenizi sağlar."
+        "E-ticarete başlarken ya da mevcut sitenizi taşımayı düşünürken en zor kararlardan biri altyapı seçimidir. Shopify, ikas, Ticimax ve WooCommerce gibi platformların her birinin güçlü ve zayıf yönleri vardır. Yanlış seçim, yüksek taşıma maliyetine, entegrasyon sorunlarına ve kaybedilen arama motoru sıralamasına yol açabilir. E-ticaret altyapı danışmanlığı hizmetimiz bu kararı verileriniz ve hedeflerinizle birlikte vermenizi sağlar."
       ],
       [
         "h2",
@@ -180,12 +180,12 @@
       [
         "ul",
         [
-          "Toplam maliyet: Aylık ücretin yanında komisyon, tema, eklenti, ödeme altyapısı ve geliştirme maliyetleri.",
-          "Entegrasyonlar: Pazaryerleri, ERP veya ön muhasebe yazılımı, kargo firmaları ve ödeme altyapıları ile uyum.",
-          "Arama motoru uyumu: Adres yapısının yönetilebilmesi, 301 yönlendirme, site haritası ve hız.",
+          "Toplam maliyet: aylık ücretin yanında komisyon, tema, eklenti, ödeme altyapısı ve geliştirme maliyetleri.",
+          "Entegrasyonlar: pazaryerleri, ERP veya ön muhasebe yazılımı, kargo firmaları ve ödeme altyapıları ile uyum.",
+          "Arama motoru uyumu: adres yapısının yönetilebilmesi, 301 yönlendirme, site haritası ve hız.",
           "Ölçüm: Google Analytics, Google Ads, Meta ve sunucu taraflı ölçümün kurulabilmesi.",
-          "Ölçeklenebilirlik: Ürün sayısı, trafik ve satış arttığında performans ve maliyet.",
-          "Destek ve bağımsızlık: Teknik destek kalitesi, verilerinizi dışa aktarabilme ve başka platforma geçebilme kolaylığı."
+          "Ölçeklenebilirlik: ürün sayısı, trafik ve satış arttığında performans ve maliyet.",
+          "Destek ve bağımsızlık: teknik destek kalitesi, verilerinizi dışa aktarabilme ve başka platforma geçebilme kolaylığı."
         ]
       ],
       [

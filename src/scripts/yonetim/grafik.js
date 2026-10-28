@@ -17,7 +17,7 @@ const GUN_TAM = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma
 const sayi = (n) => new Intl.NumberFormat('tr-TR').format(n);
 const iki = (n) => String(n).padStart(2, '0');
 
-// bugun (YYYY-MM-DD, İstanbul) dahil geriye doğru n gün, eskiden yeniye
+// bugun (YYYY-MM-DD, İstanbul) dâhil geriye doğru n gün, eskiden yeniye
 export function gunler(bugun, n) {
   const son = new Date(bugun + 'T00:00:00Z');
   return Array.from({ length: n }, (_, i) => new Date(son.getTime() - (n - 1 - i) * 86400000).toISOString().slice(0, 10));

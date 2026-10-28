@@ -15,7 +15,7 @@ class Component extends DCLogic {
       { id: 'tur', baslik: 'İşletmeniz nasıl satış yapıyor?', secenekler: [
         { d: 'eticaret', ad: 'Kendi e-ticaret sitemden', aciklama: 'Online mağazam var' },
         { d: 'pazaryeri', ad: 'Pazaryerlerinden', aciklama: 'Trendyol, Hepsiburada, Amazon vb.' },
-        { d: 'yerel', ad: 'Hizmet veya yerel işletme', aciklama: 'Müşteri bana arıyor, yazıyor, geliyor' },
+        { d: 'yerel', ad: 'Hizmet veya yerel işletme', aciklama: 'Müşteri beni arıyor, bana yazıyor, bana geliyor' },
         { d: 'yok', ad: 'Henüz dijitalde yokum', aciklama: 'Web sitem veya mağazam yok' } ] },
       { id: 'hedef', baslik: 'Önümüzdeki 3 ayda en önemli hedefiniz ne?', secenekler: [
         { d: 'satis', ad: 'Daha fazla satış', aciklama: 'Ciroyu artırmak' },
