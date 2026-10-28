@@ -1,0 +1,71 @@
+---
+// Paket ayrıntı sayfası: kademeler, kimler için, ilgili hizmet ve platformlar, aynı kategorideki paketler, hızlı erişim.
+// İçerik src/data/paketler.json'dan gelir (panelden düzenlenir); bağlantılar src/data/paket-kategori.js.
+import Site from '../../../layouts/Site.astro';
+import CagriKutusu from '../../../components/CagriKutusu.astro';
+import KatmanStil from '../../../components/KatmanStil.astro';
+import paketler from '../../../data/paketler.json';
+import gruplar from '../../../data/hizmetler.json';
+import platformlar from '../../../data/platformlar.json';
+import { KATEGORILER, PAKET_BAG, kategoriBul } from '../../../data/paket-kategori.js';
+export function getStaticPaths() { return paketler.map((p) => ({ params: { id: p.id }, props: { p } })); }
+const { p } = Astro.props;
+const kat = kategoriBul(p.id);
+const bag = PAKET_BAG[p.id] || { hizmetler: [], platformlar: [] };
+const tumHizmet = gruplar.flatMap((g) => g.hizmetler.map((h) => ({ ...h, alan: g.ad })));
+const hizmetler = bag.hizmetler.map((s) => tumHizmet.find((h) => h.slug === s)).filter(Boolean);
+const plt = bag.platformlar.map((s) => platformlar.find((x) => x.slug === s)).filter(Boolean);
+const kardesler = kat ? kat.idler.filter((id) => id !== p.id).map((id) => paketler.find((x) => x.id === id)).filter(Boolean) : [];
+const digerKat = KATEGORILER.filter((k) => k !== kat);
+const teklif = (k) => `/tr/paketler?paket=${encodeURIComponent(p.birlesik ? k.ad : p.ad + ' · ' + k.ad)}#teklif`;
+const OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
+---
+<Site baslik={p.ad} aciklama={p.ozet} aktif="Paketler">
+<section class="pf-ust"><div class="pf-ic">
+  <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/paketler">Paketler</a>{kat && <><span aria-hidden="true">›</span><a href={`/tr/paketler/kategori/${kat.slug}`}>{kat.ad}</a></>}<span aria-hidden="true">›</span><span aria-current="page">{p.ad}</span></nav>
+  <span class="pf-etiket">{p.turEtiket}</span>
+  <h1>{p.ad}</h1>
+  <p class="pf-giris">{p.ozet}</p>
+  <div class="pf-eylem"><a href="#kademeler" class="pf-ana">Kademeleri karşılaştırın</a><a href="/tr/paketler#sihirbaz" class="pf-ikincil">Paket sihirbazı</a></div>
+  <div class="pf-hizli" aria-label="Hızlı erişim">{p.kademeler.map((k) => <a href={`#k-${k.ad.toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g, '-')}`}>{k.ad}</a>)}<a href="#ilgili">İlgili hizmetler</a>{kardesler.length > 0 && <a href="#benzer">Benzer paketler</a>}</div>
+</div></section>
+<nav class="pf-sayfa-ici" aria-label="Bu sayfada"><div class="pf-ic"><a href="#kademeler">Kademeler</a><a href="#ilgili">İlgili hizmet ve platformlar</a>{kardesler.length > 0 && <a href="#benzer">{kat.ad} paketleri</a>}<a href="#sonraki">Sonraki adım</a></div></nav>
+<div class="pf-ic pf-govde">
+  <section id="kademeler" class="pf-bolum">
+    <h2>Kademeler</h2>
+    <div class="pk-kademeler">{p.kademeler.map((k) => (
+      <article class={'pk-kademe' + (k.rozet ? ' one' : '')} id={`k-${k.ad.toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g, '-')}`}>
+        {k.rozet && <span class="pk-rozet">{k.rozet}</span>}
+        <h3>{k.ad}</h3>
+        {k.kimIcin && <p>{k.kimIcin}</p>}
+        <ul>{k.maddeler.map((m) => <li>{m}</li>)}</ul>
+        <a href={teklif(k)} class={k.rozet ? 'pf-ana' : 'pf-ikincil'}>Bu kademe için teklif al</a>
+      </article>))}
+    </div>
+    {p.ucretNotu && <p class="pk-not">{p.ucretNotu}. Kapsam ve fiyat ücretsiz analizden sonra netleşir; reklam bütçesi hizmet bedeline dâhil değildir.</p>}
+  </section>
+  <section id="ilgili" class="pf-bolum">
+    <h2>İlgili hizmet ve platformlar</h2>
+    <div class="pf-kartlar">
+      {hizmetler.map((h) => <a href={`/tr/hizmet/${h.slug}`} class="pf-bag"><small>Hizmet · {h.alan}</small><strong>{h.ad}</strong>{h.ozet && <span>{h.ozet}</span>}<em>Hizmeti incele<Fragment set:html={OK} /></em></a>)}
+      {plt.map((x) => <a href={`/tr/platformlar/${x.slug}`} class="pf-bag"><small>Platform · {x.kategori}</small><strong>{x.ad}</strong><span>{x.kisa}</span><em>Platformu incele<Fragment set:html={OK} /></em></a>)}
+    </div>
+  </section>
+  {kardesler.length > 0 && (
+  <section id="benzer" class="pf-bolum">
+    <h2>{kat.ad} kategorisindeki diğer paketler</h2>
+    <div class="pf-kartlar">{kardesler.map((x) => <a href={`/tr/paketler/${x.id}`} class="pf-bag"><small>{x.turEtiket}</small><strong>{x.ad}</strong><span>{x.ozet}</span><em>Paketi incele<Fragment set:html={OK} /></em></a>)}</div>
+  </section>)}
+  <section id="sonraki" class="pf-bolum">
+    <h2>Sonraki adım</h2>
+    <div class="pk-sonraki">
+      <a href="#analiz" class="pf-bag"><small>Önerilen</small><strong>Ücretsiz analiz</strong><span>Hesaplarınızı ve sitenizi inceleyip hangi kademenin uygun olduğunu gerekçesiyle anlatalım.</span><em>Analiz isteyin<Fragment set:html={OK} /></em></a>
+      <a href="/tr/paketler#sihirbaz" class="pf-bag"><small>Kararsızsanız</small><strong>Paket sihirbazı</strong><span>Dört soruyla size uygun paketi bulun.</span><em>Sihirbazı başlatın<Fragment set:html={OK} /></em></a>
+      {kat && <a href={`/tr/paketler/kategori/${kat.slug}`} class="pf-bag"><small>Kategori</small><strong>{kat.ad} paketleri</strong><span>{kat.alt}</span><em>Kategoriye dönün<Fragment set:html={OK} /></em></a>}
+    </div>
+    <div class="pf-cipler" style="margin-top: 18px">{digerKat.map((k) => <a href={`/tr/paketler/kategori/${k.slug}`}>{k.ad} paketleri</a>)}<a href="/tr/paketler">Bütün paketler</a></div>
+  </section>
+</div>
+<div id="analiz"><CagriKutusu baslik={`${p.ad} için nereden başlayalım?`} /></div>
+<KatmanStil />
+</Site>

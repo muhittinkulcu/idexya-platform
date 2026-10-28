@@ -52,6 +52,10 @@
           "href": "/tr/sayfa/hakkimizda"
         },
         {
+          "ad": "IDOS",
+          "href": "/tr/idos"
+        },
+        {
           "ad": "Blog",
           "href": "/tr/haberler"
         },
@@ -79,6 +83,60 @@
         {
           "ad": "Web ve yazılım",
           "href": "/tr/hizmetler#web-yazilim"
+        },
+        {
+          "ad": "Tasarım ve içerik",
+          "href": "/tr/hizmetler#tasarim-icerik"
+        }
+      ]
+    },
+    {
+      "baslik": "Paketler",
+      "baglantilar": [
+        {
+          "ad": "Reklam paketleri",
+          "href": "/tr/paketler/kategori/reklam"
+        },
+        {
+          "ad": "E-ticaret paketleri",
+          "href": "/tr/paketler/kategori/e-ticaret"
+        },
+        {
+          "ad": "Web ve SEO paketleri",
+          "href": "/tr/paketler/kategori/web-ve-seo"
+        },
+        {
+          "ad": "İçerik paketleri",
+          "href": "/tr/paketler/kategori/icerik"
+        },
+        {
+          "ad": "Paket sihirbazı",
+          "href": "/tr/paketler#sihirbaz"
+        }
+      ]
+    },
+    {
+      "baslik": "Platformlar",
+      "baglantilar": [
+        {
+          "ad": "Google Ads",
+          "href": "/tr/platformlar/google-ads"
+        },
+        {
+          "ad": "Meta",
+          "href": "/tr/platformlar/meta"
+        },
+        {
+          "ad": "Google Analytics 4",
+          "href": "/tr/platformlar/google-analytics-4"
+        },
+        {
+          "ad": "ikas ve Ticimax",
+          "href": "/tr/platformlar/ikas"
+        },
+        {
+          "ad": "Tüm platformlar",
+          "href": "/tr/platformlar/"
         }
       ]
     },

@@ -11,12 +11,7 @@ const kapali = YAYIN_ONCESI || aramayaKapali;
 const urunVar = urunVeri.urunler.some((u) => u.aktif !== false);
 const MENU = [...menuVeri.ust];
 // Üst menü açılır panelleri: paketler dört sütunda kategoriye göre, blog son yazılar ve konularla.
-const PAKET_SUTUN = [
-  { ad: 'Reklam', alt: 'Google, Meta ve birleşik paketler', idler: ['google-ads', 'meta-ads', 'birlesik'] },
-  { ad: 'E-ticaret', alt: 'Mağaza kurulumu, yönetim ve pazaryeri', idler: ['eticaret-site', 'eticaret-yonetim', 'pazaryeri'] },
-  { ad: 'Web ve SEO', alt: 'Kurumsal site ve arama görünürlüğü', idler: ['kurumsal-site', 'seo'] },
-  { ad: 'İçerik', alt: 'Sosyal medya ve içerik üretimi', idler: ['sosyal-medya'] }
-].map((s) => ({ ...s, paketler: s.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean) }));
+const PAKET_SUTUN = KATEGORILER.map((s) => ({ ...s, paketler: s.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean) }));
 const blogKonuSayi = Object.entries(yazilar.reduce((a, y) => ({ ...a, [y.kategori]: (a[y.kategori] || 0) + 1 }), {}));
 // Çekmece: yazı başına tahmini okuma süresi (dakikada ~200 kelime).
 const okumaDk = (y) => Math.max(1, Math.round(JSON.stringify(y.govde || '').split(/\s+/).length / 200));
@@ -52,6 +47,7 @@ import gruplar from '../data/hizmetler.json';
 import menuVeri from '../data/site-menu.json';
 import urunVeri from '../data/urunler.json';
 import paketVeri from '../data/paketler.json';
+import { KATEGORILER } from '../data/paket-kategori.js';
 import yazilar from '../data/yazilar.json';
 import menuAyar from '../data/menu.json';
 import { IKON } from '../data/hizmet-ikon';
@@ -157,6 +153,8 @@ main p{max-width:76ch}
 .bolum-bas>p{max-width:560px!important;line-height:1.6;padding-left:28px;border-left:2px solid var(--line)}
 @media (max-width:900px){.bolum-bas{grid-template-columns:1fr}.bolum-bas>p{padding-left:0;border-left:0}}
 .acik .site-ust.kaydi{background:var(--bg)!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.ust-menu .up-sutun-bag{display:flex;flex-direction:column;gap:2px;padding:6px 8px 8px;border-radius:10px;text-decoration:none;transition:background .2s}
+.ust-menu .up-sutun-bag:hover{background:var(--card)}.ust-menu .up-sutun-bag::after{display:none}.up-sutun-bag b span{display:inline-block;transition:transform .2s}.up-sutun-bag:hover b span{transform:translateX(3px)}
 .ust-kat{list-style:none;margin:0;padding:0;position:relative;min-height:280px;width:260px}
 .ust-menu .ust-kat-bas{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;color:var(--head);font-weight:600}
 .ust-menu .ust-kat-bas::after,.ust-menu .ust-alt a::after,.ust-menu .ust-panel-dip a::after{display:none}
@@ -607,8 +605,8 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div class="ust-panel ust-genis-panel" id="paket-menu" data-acilir-panel>
 <div class="up-sutunlar">{PAKET_SUTUN.map((s) => (
   <div class="up-sutun">
-    <span class="up-sutun-bas"><b>{s.ad}</b><small>{s.alt}</small></span>
-    <ul>{s.paketler.map((p) => <li><a href={`/tr/paketler#${p.id}`}><strong>{p.ad}</strong><span>{p.ozet}</span><em>{p.kademeler.map((k) => k.ad).join(' · ')}</em></a></li>)}</ul>
+    <a href={`/tr/paketler/kategori/${s.slug}`} class="up-sutun-bas up-sutun-bag"><b>{s.ad} <span aria-hidden="true">→</span></b><small>{s.alt}</small></a>
+    <ul>{s.paketler.map((p) => <li><a href={`/tr/paketler/${p.id}`}><strong>{p.ad}</strong><span>{p.ozet}</span><em>{p.kademeler.map((k) => k.ad).join(' · ')}</em></a></li>)}</ul>
   </div>))}
   <a href="/tr/paketler#sihirbaz" class="up-sihirbaz"><small>Kararsız mısınız?</small><strong>Paket sihirbazı</strong><span>Dört soruyla işletmenize uygun paketi bulun.</span><span class="up-ok">Sihirbazı başlatın<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
 </div>
@@ -705,7 +703,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <section data-pano="paketler" class="cm-pano" hidden>
 <div class="cm-pano-bas"><strong>Paketler</strong><span class="cm-pano-eylem"><a href="/tr/paketler#sihirbaz" class="cm-sihirbaz">Paket sihirbazı</a><a href="/tr/paketler">Tüm paketler</a></span></div>
 <ul class="cm-paketler" aria-label="Paket önizlemeleri">{paketOnizleme.map((p) => (
-  <li><a href={`/tr/paketler#${p.id}`} class="cm-paket">
+  <li><a href={`/tr/paketler/${p.id}`} class="cm-paket">
     <small class="cm-paket-tur">{p.etiket}</small>
     <strong>{p.ad}</strong>
     <span class="cm-paket-ozet">{p.ozet}</span>
