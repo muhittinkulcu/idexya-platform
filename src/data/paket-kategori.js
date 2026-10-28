@@ -19,3 +19,46 @@ export const PAKET_BAG = {
   'sosyal-medya': { hizmetler: ['instagram-reels-youtube-shorts-cekimleri', 'grafik-tasarim-hizmetleri', 'urun-fotograf-video-cekimleri'], platformlar: ['meta'] }
 };
 export const kategoriBul = (paketId) => KATEGORILER.find((k) => k.idler.includes(paketId));
+
+// Kademe karşılaştırma tablosu: "<önceki kademe> kapsamı" maddesi o kademenin bütün maddelerini devralır;
+// "Ayda 8 gönderi", "2–3 pazaryeri", "15 sayfaya kadar" gibi miktarlı maddeler aynı satırda kademeye göre değeri gösterir.
+const ETIKET = { 'sayfaya kadar': 'Sayfa sayısı (en çok)', pazaryeri: 'Pazaryeri sayısı' };
+function satirAnahtar(m) {
+  let r = m.match(/^Ayda (\d+) (.+)$/);
+  if (r) return { anahtar: r[2], deger: 'Ayda ' + r[1] };
+  r = m.match(/^(\d+(?:[–-]\d+)?(?: ve üzeri)?) (pazaryeri|sayfaya kadar)$/);
+  if (r) return { anahtar: r[2], deger: r[1] };
+  return { anahtar: m, deger: null };
+}
+export function kademeTablosu(p) {
+  if (p.birlesik) return null;
+  const cozulmus = [], satirlar = new Map();
+  p.kademeler.forEach((k, i) => {
+    const hucre = new Map(i > 0 && k.maddeler.some((m) => m === p.kademeler[i - 1].ad + ' kapsamı') ? cozulmus[i - 1] : []);
+    for (const m of k.maddeler) {
+      if (/ kapsamı$/.test(m)) continue;
+      const { anahtar, deger } = satirAnahtar(m);
+      if (!satirlar.has(anahtar)) satirlar.set(anahtar, { ad: deger ? ETIKET[anahtar] || anahtar.charAt(0).toLocaleUpperCase('tr-TR') + anahtar.slice(1) : m, miktar: !!deger });
+      hucre.set(anahtar, deger || true);
+    }
+    cozulmus.push(hucre);
+  });
+  // Her kademe bir öncekini devralmıyorsa "yok" işareti yanıltıcı olur; o zaman yalnız miktarlı satırlar gösterilir.
+  const tam = p.kademeler.every((k, i) => i === 0 || k.maddeler.includes(p.kademeler[i - 1].ad + ' kapsamı'));
+  const liste = [...satirlar].map(([anahtar, s]) => ({ ...s, hucreler: cozulmus.map((h) => h.get(anahtar) ?? false) })).filter((s) => tam || s.miktar);
+  return liste.length ? { tam, satirlar: liste } : null;
+}
+// Kademenin önceki kademeden devraldığı kapsam adı (yoksa null) ve yalnız kendi maddeleri.
+export function kademeOzet(p, i) {
+  const k = p.kademeler[i], once = i > 0 ? p.kademeler[i - 1].ad : null;
+  const miras = once && k.maddeler.includes(once + ' kapsamı') ? once : null;
+  return { miras, maddeler: k.maddeler.filter((m) => !/ kapsamı$/.test(m) || (p.birlesik && m !== once + ' kapsamı')) };
+}
+// Paket türüne göre ilgili sık sorulan sorular (src/data/sss.json sırası).
+export function paketSss(sss, idler) {
+  const soru = (parca) => sss.find((x) => x.soru.includes(parca));
+  const reklam = idler.some((id) => ['google-ads', 'meta-ads', 'birlesik'].includes(id));
+  const seo = idler.some((id) => ['seo', 'kurumsal-site'].includes(id));
+  const sec = ['Ücretsiz analizde', reklam ? 'Reklam hesabı kime' : null, reklam ? 'Bütçe veya kampanya' : null, seo ? 'SEO çalışmasının' : null, seo ? 'GEO nedir' : null, 'En az ne kadar', 'Sadece tek bir hizmet', 'Sonuçları nasıl'];
+  return [...new Set(sec.filter(Boolean).map(soru).filter(Boolean))].slice(0, 6);
+}

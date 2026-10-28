@@ -1,0 +1,57 @@
+---
+// Paket ve kategori sayfalarında ortak: her kademede geçerli kurallar ve başlama adımları.
+// Metinler yalnız src/data/sss.json ve paketler.json'da yazanlara dayanır; yeni taahhüt eklemeyin.
+interface Props { idler: string[]; }
+const { idler } = Astro.props;
+const reklam = idler.some((id) => ['google-ads', 'meta-ads', 'birlesik'].includes(id));
+const seo = idler.includes('seo');
+const kurulum = idler.every((id) => ['kurumsal-site', 'eticaret-site'].includes(id));
+const ikas = idler.includes('eticaret-site');
+const kurallar = [
+  { b: 'Fiyat analizden sonra netleşir', m: 'Kapsam ve fiyat ücretsiz analizde ihtiyacınıza göre belirlenir; teklifi yazılı olarak iletiriz.' },
+  reklam && { b: 'Hesaplar ve veriler sizde kalır', m: 'Reklam hesabı sizin adınıza açılır. Çalışma bittiğinde erişimimiz kaldırılır; hesap ve geçmiş veriler sizde kalır.' },
+  reklam && { b: 'Değişiklikler onayınızla', m: 'Bütçe, teklif stratejisi ve kampanya açma-kapatma kararları gerekçesiyle sunulur, onayınızla uygulanır.' },
+  reklam && { b: 'Reklam bütçesi ayrıdır', m: 'Platforma ödenen reklam bütçesi hizmet bedeline dâhil değildir.' },
+  ikas && { b: 'Platform lisansı ayrıdır', m: 'ikas lisans ücreti doğrudan ikas’a ödenir; kurulum bedeline dâhil değildir.' },
+  !kurulum && { b: 'Sonuçlar tek panelde', m: 'Reklam ve analiz verileri IDOS panelinde bir arada görünür; satış, form, arama ve mesaj ayrı izlenir.' },
+  (reklam || seo) && { b: 'En az 3 ay önerilir', m: 'Reklam ve SEO çalışmalarının öğrenme ve ölçüm dönemi vardır; süre ihtiyacınıza göre görüşülebilir.' }
+].filter(Boolean);
+const adimlar = [
+  { b: 'Ücretsiz analiz', m: 'Formu gönderin; hesaplarınızı, ölçüm altyapınızı ve sitenizi inceleyip 1 iş günü içinde dönüş yapalım.' },
+  { b: 'Kademe ve teklif', m: 'Hangi kademenin uygun olduğunu gerekçesiyle anlatır, kapsamı ve fiyatı yazılı teklif olarak iletiriz.' },
+  { b: kurulum ? 'Kurulum' : 'Kurulum ve ölçüm kontrolü', m: kurulum ? 'Onayınızdan sonra kuruluma başlarız; ara aşamaları sizinle paylaşırız.' : 'Gerekli erişimleri alır, dönüş ölçümünü kontrol eder ve çalışmayı başlatırız.' },
+  { b: kurulum ? 'Teslim' : 'Düzenli rapor ve görüşme', m: kurulum ? 'Siteyi birlikte kontrol eder, yayına alır ve teslim ederiz.' : 'Sonuçları kademenizdeki sıklıkta raporlar, bir sonraki dönemin önceliklerini birlikte belirleriz.' }
+];
+---
+<div class="ps">
+  <section class="ps-kural" aria-labelledby="ps-k">
+    <h2 id="ps-k">Her kademede geçerli</h2>
+    <dl>{kurallar.map((k) => <div><dt>{k.b}</dt><dd>{k.m}</dd></div>)}</dl>
+  </section>
+  <section class="ps-adim" aria-labelledby="ps-a">
+    <h2 id="ps-a">Nasıl başlıyoruz?</h2>
+    <ol>{adimlar.map((a) => <li><b>{a.b}</b><span>{a.m}</span></li>)}</ol>
+    <a href="#analiz" class="pf-ana">Ücretsiz analizle başlayın</a>
+  </section>
+</div>
+<style>
+  .ps{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;align-items:start}
+  .ps h2{margin:0 0 20px;font-size:clamp(24px,3vw,30px);letter-spacing:-.02em;color:var(--head)}
+  .ps-kural dl{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
+  .ps-kural dl>div{padding:18px 20px 18px 0;border-bottom:1px solid var(--line)}
+  .ps-kural dl>div:nth-child(even){padding-left:20px;padding-right:0;border-left:1px solid var(--line)}
+  .ps-kural dt{font-weight:700;color:var(--head);margin-bottom:6px}
+  .ps-kural dd{margin:0;font-size:14.5px;line-height:1.6;color:var(--tx2)}
+  .ps-adim{padding:28px;border-radius:20px;background:#002559;color:#E6ECF4}
+  :global(.koyu) .ps-adim{background:var(--card2,var(--card));border:1px solid var(--line)}
+  .ps-adim h2{color:#FFFFFF}
+  .ps-adim ol{margin:0 0 24px;padding:0;list-style:none;counter-reset:a;display:flex;flex-direction:column}
+  .ps-adim li{counter-increment:a;position:relative;display:flex;flex-direction:column;gap:4px;padding:0 0 18px 48px}
+  .ps-adim li::before{content:counter(a);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:50%;background:#F07A23;color:#1A1206;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .ps-adim li:not(:last-child)::after{content:"";position:absolute;left:14.5px;top:34px;bottom:4px;width:1px;background:rgba(255,255,255,.25)}
+  .ps-adim b{color:#FFFFFF;font-size:16px}
+  .ps-adim span{font-size:14.5px;line-height:1.55;color:#C6D2E3}
+  .ps-adim .pf-ana{background:#F07A23;color:#1A1206}
+  @media (max-width:900px){.ps{grid-template-columns:minmax(0,1fr)}}
+  @media (max-width:560px){.ps-kural dl{grid-template-columns:minmax(0,1fr)}.ps-kural dl>div:nth-child(even){padding-left:0;border-left:0}.ps-adim{padding:22px}}
+</style>

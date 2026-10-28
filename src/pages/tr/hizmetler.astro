@@ -1,6 +1,7 @@
 ---
 import Site from '../../layouts/Site.astro';
 import HizmetAlanEk from '../../components/HizmetAlanEk.astro';
+import HizmetAlanSag from '../../components/HizmetAlanSag.astro';
 // Tasarım verisi derleme anında üretilir (tools/dc2astro.py).
 class DCLogic { constructor(p) { this.props = p || {}; this.state = {}; } setState() {} }
 class Component extends DCLogic {
@@ -86,7 +87,8 @@ const gruplar = __v.gruplar;
 <HizmetAlanEk id={g.id} />
 <a href="#basla" style="align-self: flex-start; min-height: 48px; display: flex; align-items: center; padding: 0 20px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--head); text-decoration: none; font-weight: 600">Bu alanda analiz iste</a>
 </div>
-<ul style="flex: 2 1 560px; min-width: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px; align-content: flex-start; align-self: flex-start">
+<div style="flex: 2 1 560px; min-width: 0; align-self: flex-start">
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">
 {(g.hizmetler || []).map((h) => (<Fragment>
 <li style="flex: 1 1 300px; min-width: 0; display: flex">
 <a href={`/tr/hizmet/${__slug(h.slug)}`} style="flex: 1; display: flex; flex-direction: column; gap: 6px; padding: 22px 24px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); text-decoration: none; color: var(--tx)">
@@ -96,6 +98,8 @@ const gruplar = __v.gruplar;
 </li>
 </Fragment>))}
 </ul>
+<HizmetAlanSag id={g.id} />
+</div>
 </div>
 </section>
 </Fragment>))}
