@@ -1,10 +1,11 @@
 // Panelden düzenlenen site içerik dosyalarının şeması. Aynı tanım hem paneldeki düzenleyiciyi kurar hem de
 // sunucuda (worker/yayin.js) GitHub'a yazmadan önce veriyi doğrular. Şemada olmayan alan kaydedilmez.
-// Türler: metin, uzun (çok satırlı), mantik, slug, yol (/… iç adres), url (https://… veya /…), gorsel (medya adresi),
+// Türler: metin, uzun (çok satırlı), zengin (yazı düzenleyicili biçimli metin: ## başlık, **kalın**, - madde…), mantik, slug, yol (/… iç adres), url (https://… veya /…), gorsel (medya adresi),
 // metinListe, liste (oge şemasıyla), nesne (alanlar).
 
 const m = (etiket, sinir = 200, ek = {}) => ({ tur: 'metin', etiket, sinir, ...ek });
 const u = (etiket, sinir = 2000, ek = {}) => ({ tur: 'uzun', etiket, sinir, ...ek });
+const z = (etiket, sinir = 30000, ek = {}) => ({ tur: 'zengin', etiket, sinir, ...ek });
 const ml = (etiket, oge = 'madde', sinir = 400, enCok = 40) => ({ tur: 'metinListe', etiket, oge, sinir, enCok });
 
 const SSS_OGE = { tur: 'nesne', baslikAlan: 'soru', alanlar: { soru: m('Soru', 200, { zorunlu: true }), cevap: u('Cevap', 1500, { zorunlu: true }) } };
@@ -75,6 +76,21 @@ export const DOSYALAR = {
     aciklama: 'Ana sayfadaki “Birlikte büyüdüğümüz markalar” bölümü. Liste boşsa bölüm görünmez. Yalnız izin aldığınız markaları ekleyin.',
     sema: { tur: 'liste', etiket: 'Markalar', oge: 'marka', enCok: 60, ogeSema: { tur: 'nesne', baslikAlan: 'ad', alanlar: { ad: m('Marka adı', 80, { zorunlu: true }), logo: { tur: 'gorsel', etiket: 'Logo (isteğe bağlı)' } } } }
   },
+  yazilar: {
+    ad: 'Blog yazıları', yol: 'src/data/yazilar.json',
+    aciklama: 'Blog yazıları. Metni yazı düzenleyiciyle yazın; ara başlıklar yazının içindekiler listesini oluşturur. Bağlantı adı (slug) yazının adresidir; yayındaki bir yazının adresini değiştirmeyin.',
+    sema: { tur: 'liste', etiket: 'Yazılar', oge: 'yazı', enCok: 200, ogeSema: { tur: 'nesne', baslikAlan: 'baslik', alanlar: {
+      slug: { tur: 'slug', etiket: 'Bağlantı adı (adres)', zorunlu: true },
+      baslik: m('Başlık', 140, { zorunlu: true }),
+      kategori: m('Konu (ör. Reklam, E-ticaret, Ölçüm, SEO)', 40, { zorunlu: true }),
+      ozet: u('Özet (arama sonuçlarında ve kartlarda görünür)', 300, { zorunlu: true }),
+      govde: z('Metin', 30000, { zorunlu: true }),
+      yazar: m('Yazar adı (boşsa “Idexya ekibi”)', 80),
+      tarih: m('Yayın tarihi (YYYY-AA-GG)', 10, { desen: '^\\d{4}-\\d{2}-\\d{2}$', desenHata: 'YYYY-AA-GG biçiminde olmalı (ör. 2026-10-28)' }),
+      guncelleme: m('Son güncelleme tarihi (YYYY-AA-GG)', 10, { desen: '^\\d{4}-\\d{2}-\\d{2}$', desenHata: 'YYYY-AA-GG biçiminde olmalı (ör. 2026-10-28)' }),
+      kapak: m('Kapak çizimi (arama, sosyal, analitik, konsol, etiket, magaza, pazaryeri, yonetim, birlesik, site, seo, icerik)', 20)
+    } } }
+  },
   sss: {
     ad: 'Sık sorulan sorular', yol: 'src/data/sss.json',
     aciklama: 'Ana sayfadaki sık sorulan sorular. Hizmet sayfalarındaki sorular Hizmetler içinden düzenlenir.',
@@ -135,9 +151,10 @@ export function dogrula(sema, deger, kok = deger, yol = '') {
     if (s.tur === 'mantik') return v === undefined ? (s.varsayilan ?? false) : !!v;
     if (v === undefined || v === null || v === '') return s.zorunlu ? h('boş bırakılamaz') : '';
     if (typeof v !== 'string') return h('metin bekleniyor');
-    const t = s.tur === 'uzun' ? v.replace(/\r\n/g, '\n').trim() : v.replace(/\s+/g, ' ').trim();
+    const t = s.tur === 'uzun' || s.tur === 'zengin' ? v.replace(/\r\n/g, '\n').trim() : v.replace(/\s+/g, ' ').trim();
     if (!t && s.zorunlu) return h('boş bırakılamaz');
     if (t.length > (s.sinir || 300)) return h(`en fazla ${s.sinir || 300} karakter`);
+    if (s.desen && t && !new RegExp(s.desen).test(t)) return h(s.desenHata || 'biçim geçersiz');
     if (s.tur === 'slug' && !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(t)) return h('yalnız küçük harf (Türkçe karaktersiz), rakam ve tire');
     if (s.tur === 'yol' && !/^\/[^\s<>"']*$/.test(t)) return h('/ ile başlayan site içi adres olmalı');
     if ((s.tur === 'url' || s.tur === 'gorsel') && !/^(https:\/\/[^\s<>"']+|\/[^\s<>"']*)$/.test(t)) return h('https:// ile ya da / ile başlayan adres olmalı');
@@ -156,5 +173,6 @@ export function ekDenetim(ad, veri) {
   if (ad === 'urunler') { tekil(veri.kategoriler, 'id', 'Kategori kimliği'); tekil(veri.urunler, 'slug', 'Ürün bağlantı adı'); }
   if (ad === 'paketler') { tekil(veri, 'id', 'Paket kimliği'); for (const k of DOSYALAR.paketler.zorunluKimlikler) if (!veri.some((p) => p.id === k)) h.push(`Paket sihirbazı “${k}” kimlikli paketi kullanıyor; silinemez`); }
   if (ad === 'site-menu') tekil(veri.ust, 'k', 'Menü kimliği');
+  if (ad === 'yazilar') tekil(veri, 'slug', 'Yazı bağlantı adı');
   return h;
 }
