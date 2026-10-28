@@ -1,34 +1,105 @@
 ---
-// Blog listesi: yalnız gerçek yazılar (src/data/yazilar.json). Tasarım dosyasındaki örnek yazılar, öne çıkan kart ve
-// henüz bağlı olmayan e-posta aboneliği yayında gösterilmez (Muhittin, 22 Eki 2026); bu sayfa tools/donustur.sh ile üretilmez.
+// Blog listesi: yalnız gerçek yazılar (src/data/yazilar.json); bu sayfa tools/donustur.sh ile üretilmez.
+// Öne çıkan yazı (ilk yazı), konu süzgeci, kapaklı kartlar, konular ve bülten kutusu.
 import Site from '../../layouts/Site.astro';
+import CagriKutusu from '../../components/CagriKutusu.astro';
+import KatmanStil from '../../components/KatmanStil.astro';
+import KapakGorsel from '../../components/KapakGorsel.astro';
+import Bulten from '../../components/ana/Bulten.astro';
 import YAZILAR from '../../data/yazilar.json';
-const ZEMIN = { 'Reklam': 'linear-gradient(135deg, #F07A23, #B84406)', 'E-ticaret': 'linear-gradient(135deg, #1F4E8C, #002559)', 'Ölçüm': 'linear-gradient(135deg, #2F7D5B, #174B36)', 'SEO': 'linear-gradient(135deg, #6B5BA8, #3C3170)' };
+import { yaziKapak, okumaDakika } from '../../data/yazi-kapak.js';
+const [one, ...kalan] = YAZILAR as any[];
+const konular = [...new Set(YAZILAR.map((y) => y.kategori))].map((k) => ({ ad: k, n: YAZILAR.filter((y) => y.kategori === k).length }));
 ---
-<Site baslik="Blog" aciklama="Reklam, e-ticaret ve ölçüm üzerine notlar." aktif="Blog">
+<Site baslik="Blog" aciklama="Reklam, e-ticaret ve ölçüm üzerine uygulanabilir notlar." aktif="Blog">
+<section class="pf-ust"><div class="pf-ic">
+  <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page">Blog</span></nav>
+  <div class="bl-ust">
+    <div>
+      <h1>Reklam, e-ticaret ve ölçüm üzerine notlar</h1>
+      <p class="pf-giris">Hesap yönetirken karşılaştığımız soruları ve işe yarayan yöntemleri, uygulanabilir adımlarla yazıyoruz.</p>
+      <div class="bl-konular" role="group" aria-label="Konuya göre süzün">
+        <button type="button" data-konu="" aria-pressed="true">Tümü <span>{YAZILAR.length}</span></button>
+        {konular.map((k) => <button type="button" data-konu={k.ad} aria-pressed="false">{k.ad} <span>{k.n}</span></button>)}
+      </div>
+    </div>
+    {one && (
+      <a href={`/tr/haber/${one.slug}`} class="bl-one" data-yazi={one.kategori}>
+        <span class="bl-one-kapak"><KapakGorsel tur={`d:${yaziKapak(one)}`} baslik={one.baslik} /></span>
+        <span class="bl-one-metin"><small>Öne çıkan · {one.kategori}</small><strong>{one.baslik}</strong><span>{one.ozet}</span><em>{okumaDakika(one)} dakikalık okuma</em></span>
+      </a>
+    )}
+  </div>
+</div></section>
 
-<section style="position: relative">
-<svg aria-hidden="true" viewBox="0 0 1440 420" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0"><path d="M820 0 C 1000 110 1120 50 1440 120 L1440 0 Z" fill="var(--blob2)"></path></svg>
-<div style="position: relative; z-index: 1; max-width: 1240px; margin: 0 auto; padding: 36px 24px 40px; box-sizing: border-box; display: flex; flex-direction: column; gap: 22px">
-<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><span aria-current="page" style="color: var(--head); font-weight: 600">Blog</span></nav>
-<div style="display: flex; align-items: center; gap: 12px"><span style="width: 36px; height: 2px; background: var(--brand)"></span><span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">BLOG</span></div>
-<h1 style="margin: 0; font-size: clamp(36px, 7vw, 58px); line-height: 1.06; letter-spacing: -0.03em; color: var(--head); max-width: 860px">Reklam, e-ticaret ve ölçüm üzerine notlar</h1>
+<div class="pf-ic bl-govde">
+  <div class="bl-sol">
+  <div class="bl-izgara">
+    {kalan.map((y) => (
+      <a href={`/tr/haber/${y.slug}`} class="bl-kart" data-yazi={y.kategori}>
+        <span class="bl-kart-kapak"><KapakGorsel tur={`d:${yaziKapak(y)}`} /></span>
+        <small>{y.kategori}</small>
+        <strong>{y.baslik}</strong>
+        <span>{y.ozet}</span>
+        <em>{okumaDakika(y)} dakikalık okuma</em>
+      </a>
+    ))}
+  </div>
+  <div class="bl-bulten"><Bulten /></div>
+  </div>
+  <aside class="bl-yan" aria-label="Blog hakkında">
+    <div class="bl-kutu"><b>Konular</b><ul>{konular.map((k) => <li><button type="button" data-konu={k.ad}>{k.ad}<span>{k.n} yazı</span></button></li>)}</ul></div>
+    <div class="bl-kutu bl-koyu"><b>Yazıdakileri kendi hesabınızda görün</b><p>Reklam hesaplarınızı, ölçüm altyapınızı ve sitenizi ücretsiz inceleyip 1 iş günü içinde dönelim.</p><a href="#analiz" class="pf-ana">Ücretsiz analiz iste</a></div>
+    <div class="bl-kutu"><b>Bunlar da ilginizi çekebilir</b><ul><li><a href="/tr/paketler">Paketler ve kademeler</a></li><li><a href="/tr/platformlar/">Çalıştığımız platformlar</a></li><li><a href="/tr/idos">IDOS paneli</a></li></ul></div>
+  </aside>
 </div>
-</section>
-
-<section style="padding: 0 24px 88px">
-<div style="max-width: 1192px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px">
-{YAZILAR.map((y) => (
-<a href={`/tr/haber/${y.slug}`} style="display: flex; flex-direction: column; border-radius: 20px; overflow: hidden; background: var(--card); border: 1px solid var(--line); text-decoration: none; color: var(--tx)">
-<div aria-hidden="true" style={`height: 170px; background: ${ZEMIN[y.kategori] || ZEMIN['Reklam']}; position: relative`}><span style="position: absolute; left: 18px; bottom: 14px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.92); color: #002559; font-size: 12px; font-weight: 700">{y.kategori}</span></div>
-<div style="padding: 20px 22px 24px; display: flex; flex-direction: column; gap: 10px; flex: 1">
-<h2 style="margin: 0; font-size: 20px; line-height: 1.3; color: var(--head)">{y.baslik}</h2>
-<p style="margin: 0; color: var(--tx2); font-size: 15px">{y.ozet}</p>
-<span style="margin-top: auto; font-weight: 600; color: var(--acc)">Yazıyı oku →</span>
-</div>
-</a>
-))}
-</div>
-</section>
-
+<div id="analiz"><CagriKutusu /></div>
+<KatmanStil />
+<script>
+  const dugmeler = [...document.querySelectorAll<HTMLButtonElement>('[data-konu]')];
+  dugmeler.forEach((d) => d.addEventListener('click', () => {
+    const k = d.dataset.konu || '';
+    document.querySelectorAll<HTMLElement>('[data-yazi]').forEach((e) => { e.hidden = !!k && e.dataset.yazi !== k; });
+    dugmeler.forEach((x) => x.hasAttribute('aria-pressed') && x.setAttribute('aria-pressed', String((x.dataset.konu || '') === k)));
+  }));
+</script>
+<style>
+  .bl-ust{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:center}
+  .bl-ust h1{margin:0 0 14px;font-size:clamp(34px,4.6vw,56px);line-height:1.06;letter-spacing:-.03em;color:var(--head)}
+  .bl-konular{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px}
+  .bl-konular button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--head);font:inherit;font-size:14.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .bl-konular button span{font-size:12px;color:var(--tx2)}
+  .bl-konular button[aria-pressed=true]{background:var(--fill);border-color:var(--fill);color:#FFFFFF}.bl-konular button[aria-pressed=true] span{color:rgba(255,255,255,.8)}
+  .bl-one{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center;padding:18px;border-radius:26px;background:var(--card);border:1px solid var(--line);box-shadow:0 30px 60px -40px var(--shadow);text-decoration:none;color:var(--tx)}
+  .bl-one-kapak :global(.kg),.bl-kart-kapak :global(.kg){border-radius:18px;box-shadow:none}
+  .bl-one-kapak :global(figcaption),.bl-kart-kapak :global(figcaption){display:none}
+  .bl-one-metin{display:flex;flex-direction:column;gap:10px}
+  .bl-one small,.bl-kart small{font-size:13px;font-weight:700;color:var(--acc)}
+  .bl-one strong{font-size:clamp(22px,2vw,28px);line-height:1.22;color:var(--head)}
+  .bl-one-metin>span{font-size:15.5px;line-height:1.6;color:var(--tx2)}
+  .bl-one em,.bl-kart em{font-style:normal;font-size:13.5px;color:var(--tx2)}
+  .bl-one:hover strong,.bl-kart:hover strong{color:var(--acc)}
+  .bl-govde{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;align-items:start;padding-top:56px;padding-bottom:72px}
+  .bl-izgara{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:20px}
+  .bl-kart{display:flex;flex-direction:column;gap:8px;padding:16px 16px 22px;border-radius:22px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--tx)}
+  .bl-kart[hidden]{display:none}
+  .bl-kart-kapak{display:block;margin-bottom:8px}
+  .bl-kart>small,.bl-kart>strong,.bl-kart>span,.bl-kart>em{padding:0 6px}
+  .bl-kart strong{font-size:20px;line-height:1.3;color:var(--head)}
+  .bl-kart>span{font-size:15px;line-height:1.55;color:var(--tx2)}
+  .bl-kart em{margin-top:auto;padding-top:6px}
+  .bl-sol{display:flex;flex-direction:column;gap:24px;min-width:0}
+  .bl-yan{display:flex;flex-direction:column;gap:18px}
+  .bl-kutu{padding:20px 22px;border-radius:18px;background:var(--card);border:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+  .bl-kutu b{font-size:16px;color:var(--head)}.bl-kutu p{margin:0;font-size:14.5px;line-height:1.55;color:var(--tx2)}
+  .bl-kutu ul{margin:0;padding:0;list-style:none}
+  .bl-kutu li{border-top:1px solid var(--line)}.bl-kutu li:first-child{border-top:0}
+  .bl-kutu li a,.bl-kutu li button{display:flex;justify-content:space-between;width:100%;padding:10px 0;border:0;background:none;font:inherit;font-size:15px;color:var(--tx);text-decoration:none;cursor:pointer;text-align:left}
+  .bl-kutu li button span{font-size:13px;color:var(--tx2)}
+  .bl-kutu li a:hover,.bl-kutu li button:hover{color:var(--acc)}
+  .bl-koyu{background:#002559;border-color:#002559}.bl-koyu b{color:#FFFFFF}.bl-koyu p{color:#C6D2E3}.bl-koyu .pf-ana{align-self:flex-start;background:#F07A23;color:#1A1206}
+  @media (max-width:1200px){.bl-ust{grid-template-columns:minmax(0,1fr)}}
+  @media (max-width:1000px){.bl-govde{grid-template-columns:minmax(0,1fr)}}
+  @media (max-width:640px){.bl-one{grid-template-columns:minmax(0,1fr)}}
+</style>
 </Site>

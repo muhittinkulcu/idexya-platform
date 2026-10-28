@@ -1,26 +1,205 @@
 ---
-// Eski siteden gelen yazı adresleri korunur; metinler src/data/yazilar.json'dan gelir (govde: [tür, metin] blokları).
+// Blog yazısı. Eski siteden gelen adresler korunur; metinler src/data/yazilar.json'dan gelir (govde: [tür, metin] blokları).
+// Kapak: temsilî çizim (KapakGorsel) ve paylaşım görseli public/kapak/haber/<slug>.png (tools/og-gorsel.mjs ile üretilir).
+// Yapılandırılmış veri: BlogPosting ve BreadcrumbList. Yayın tarihi ve yazar adı veride olmadığı için uydurulmaz;
+// yazilar.json'a "tarih" (YYYY-AA-GG) ve "guncelleme" eklenirse sayfada ve yapılandırılmış veride görünür.
+import fs from 'node:fs';
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
+import KatmanStil from '../../../components/KatmanStil.astro';
+import KapakGorsel from '../../../components/KapakGorsel.astro';
+import Bulten from '../../../components/ana/Bulten.astro';
 import YAZILAR from '../../../data/yazilar.json';
+import { yaziKapak } from '../../../data/yazi-kapak.js';
+import gruplar from '../../../data/hizmetler.json';
+import paketler from '../../../data/paketler.json';
 export function getStaticPaths() {
   return YAZILAR.map((y) => ({ params: { slug: y.slug } }));
 }
-const y = YAZILAR.find((x) => x.slug === Astro.params.slug);
-const kelime = y.govde.flatMap(([, m]) => (Array.isArray(m) ? m : [m])).join(' ').split(/\s+/).length;
+const y: any = YAZILAR.find((x) => x.slug === Astro.params.slug);
+const metinler = y.govde.flatMap(([, m]) => (Array.isArray(m) ? m : [m]));
+const kelime = metinler.join(' ').split(/\s+/).length;
 const dakika = Math.max(1, Math.round(kelime / 200));
+const capa = (t: string) => t.toLocaleLowerCase('tr-TR').replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const basliklar = y.govde.filter(([t]) => t === 'h2').map(([, m]) => ({ ad: m, id: capa(m) }));
+// Konuya göre kapak çizimi, ilgili hizmet ve paket
+const KONU: Record<string, { hizmetler: string[]; paket: string }> = {
+  Reklam: { hizmetler: ['google-ads-yonetimi', 'meta-business-ads-yonetimi', 'dijital-pazarlama-yonetimi'], paket: 'birlesik' },
+  'E-ticaret': { hizmetler: ['e-ticaret-yonetimi', 'e-ticaret-pazaryeri-yonetimi', 'e-ticaret-entegrasyon-yonetimi'], paket: 'eticaret-yonetim' }
+};
+const konu = KONU[y.kategori] || KONU.Reklam;
+const tumHizmet = gruplar.flatMap((g) => g.hizmetler);
+const hizmetler = konu.hizmetler.map((s) => tumHizmet.find((h) => h.slug === s)).filter(Boolean);
+const paket = paketler.find((p) => p.id === konu.paket);
+const digerleri = [...YAZILAR.filter((x) => x.slug !== y.slug && x.kategori === y.kategori), ...YAZILAR.filter((x) => x.slug !== y.slug && x.kategori !== y.kategori)].slice(0, 3);
+const gorsel = fs.existsSync(`public/kapak/haber/${y.slug}.png`) ? `/kapak/haber/${y.slug}.png` : '/kapak/idexya.png';
+const tarihYaz = (t: string) => new Date(t + 'T12:00:00').toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+const adres = new URL(Astro.url.pathname, Astro.site).href;
+const e = encodeURIComponent;
+const PAYLAS = [
+  ['WhatsApp', `https://wa.me/?text=${e(y.baslik + ' ' + adres)}`, '<path d="M3 21l1.6-4.7A8.5 8.5 0 1 1 8 19.6z"></path><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1.2-1.4-2-1-1 .8a4 4 0 0 1-2.1-2.1l.8-1-1-2z"></path>'],
+  ['LinkedIn', `https://www.linkedin.com/sharing/share-offsite/?url=${e(adres)}`, '<rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"></path>'],
+  ['X', `https://x.com/intent/post?text=${e(y.baslik)}&url=${e(adres)}`, '<path d="M4 4l16 16M20 4L4 20"></path>'],
+  ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${e(adres)}`, '<path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z"></path>'],
+  ['E-posta', `mailto:?subject=${e(y.baslik)}&body=${e(adres)}`, '<rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path>']
+];
+const ikon = (yol: string) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${yol}</svg>`;
+const ld = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    { '@type': 'BlogPosting', headline: y.baslik, description: y.ozet, image: new URL(gorsel, Astro.site).href, inLanguage: 'tr-TR', articleSection: y.kategori, wordCount: kelime, mainEntityOfPage: adres,
+      ...(y.tarih ? { datePublished: y.tarih, dateModified: y.guncelleme || y.tarih } : {}),
+      author: y.yazar ? { '@type': 'Person', name: y.yazar } : { '@type': 'Organization', name: 'Idexya | Good Things', url: new URL('/', Astro.site).href },
+      publisher: { '@type': 'Organization', name: 'Idexya | Good Things', url: new URL('/', Astro.site).href, logo: { '@type': 'ImageObject', url: new URL('/favicon.svg', Astro.site).href } } },
+    { '@type': 'BreadcrumbList', itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Ana sayfa', item: new URL('/', Astro.site).href },
+      { '@type': 'ListItem', position: 2, name: 'Blog', item: new URL('/tr/haberler', Astro.site).href },
+      { '@type': 'ListItem', position: 3, name: y.baslik, item: adres }] }
+  ]
+};
 ---
-<Site baslik={y.baslik} aciklama={y.ozet} aktif="Blog">
-<article style="max-width: 820px; margin: 0 auto; padding: 36px 24px 64px; display: flex; flex-direction: column; gap: 18px">
-<nav aria-label="Sayfa yolu" style="font-size: 14px; color: var(--tx2); display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><a href="/" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/haberler" style="color: var(--tx2); text-decoration: none; padding: 6px 0">Blog</a></nav>
-<span style="font-size: 14px; font-weight: 600; letter-spacing: 0.06em; color: var(--acc)">{y.kategori.toLocaleUpperCase('tr-TR')} · {dakika} dk okuma</span>
-<h1 style="margin: 0; font-size: clamp(32px, 6vw, 46px); line-height: 1.1; letter-spacing: -0.02em; color: var(--head)">{y.baslik}</h1>
-<p style="margin: 0; font-size: 20px; line-height: 1.6; color: var(--tx2)">{y.ozet}</p>
-{y.govde.map(([tur, m]) =>
-  tur === 'h2' ? <h2 style="margin: 18px 0 0; font-size: 26px; line-height: 1.25; color: var(--head)">{m}</h2>
-  : tur === 'ul' ? <ul style="margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 18px; line-height: 1.7">{m.map((x) => <li>{x}</li>)}</ul>
-  : <p style="margin: 0; font-size: 18px; line-height: 1.75; text-align: justify">{m}</p>
-)}
-</article>
-<CagriKutusu />
+<Site baslik={y.baslik} aciklama={y.ozet} aktif="Blog" gorsel={gorsel} ogTur="article">
+<script type="application/ld+json" set:html={JSON.stringify(ld)} />
+<section class="pf-ust bh-ust"><div class="pf-ic">
+  <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/haberler">Blog</a><span aria-hidden="true">›</span><span aria-current="page">{y.kategori}</span></nav>
+  <div class="kp-izgara">
+    <div class="bh-bas">
+      <a class="bh-konu" href="/tr/haberler">{y.kategori}</a>
+      <h1>{y.baslik}</h1>
+      <p class="pf-giris">{y.ozet}</p>
+      <p class="bh-meta">
+        <span>{y.yazar || 'Idexya ekibi'}</span>
+        {y.tarih && <time datetime={y.tarih}>{tarihYaz(y.tarih)}</time>}
+        {y.guncelleme && y.guncelleme !== y.tarih && <span>Güncellendi: <time datetime={y.guncelleme}>{tarihYaz(y.guncelleme)}</time></span>}
+        <span>{dakika} dakikalık okuma</span>
+      </p>
+      <div class="bh-paylas" aria-label="Yazıyı paylaşın">{PAYLAS.map(([ad, url, yol]) => <a href={url} target="_blank" rel="noopener" aria-label={`${ad} ile paylaşın`} title={ad}><Fragment set:html={ikon(yol)} /></a>)}<button type="button" data-kopyala={adres} aria-label="Bağlantıyı kopyalayın" title="Bağlantıyı kopyalayın"><Fragment set:html={ikon('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>')} /></button></div>
+    </div>
+    <KapakGorsel tur={`d:${yaziKapak(y)}`} baslik={y.baslik} />
+  </div>
+</div></section>
+
+<div class="pf-ic bh-govde">
+  <aside class="bh-sol" aria-label="İçindekiler">
+    {basliklar.length > 1 && (
+      <nav class="bh-icindekiler"><b>Bu yazıda</b><ol>{basliklar.map((b) => <li><a href={`#${b.id}`}>{b.ad}</a></li>)}</ol></nav>
+    )}
+    <div class="bh-sol-paylas"><b>Paylaşın</b><div class="bh-paylas" aria-label="Yazıyı paylaşın">{PAYLAS.map(([ad, url, yol]) => <a href={url} target="_blank" rel="noopener" aria-label={`${ad} ile paylaşın`} title={ad}><Fragment set:html={ikon(yol)} /></a>)}<button type="button" data-kopyala={adres} aria-label="Bağlantıyı kopyalayın" title="Bağlantıyı kopyalayın"><Fragment set:html={ikon('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>')} /></button></div></div>
+  </aside>
+  <article class="bh-yazi">
+    {basliklar.length > 1 && (
+      <nav class="bh-icindekiler bh-mobil" aria-label="İçindekiler"><b>Bu yazıda</b><ol>{basliklar.map((b) => <li><a href={`#${b.id}`}>{b.ad}</a></li>)}</ol></nav>
+    )}
+    {y.govde.map(([tur, m]) =>
+      tur === 'h2' ? <h2 id={capa(m)}>{m}</h2>
+      : tur === 'ul' ? <ul>{m.map((x) => <li>{x}</li>)}</ul>
+      : <p>{m}</p>
+    )}
+    <div class="bh-paylas-son"><b>Bu yazıyı paylaşın</b><div class="bh-paylas" aria-label="Yazıyı paylaşın">{PAYLAS.map(([ad, url, yol]) => <a href={url} target="_blank" rel="noopener" aria-label={`${ad} ile paylaşın`} title={ad}><Fragment set:html={ikon(yol)} /></a>)}<button type="button" data-kopyala={adres} aria-label="Bağlantıyı kopyalayın" title="Bağlantıyı kopyalayın"><Fragment set:html={ikon('<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path>')} /></button></div></div>
+    <aside class="bh-son" aria-label="Sonraki adım">
+      <h2>Bunu kendi hesabınızda görmek ister misiniz?</h2>
+      <p>Reklam hesaplarınızı, ölçüm altyapınızı ve sitenizi ücretsiz inceleyip bu yazıdaki konuların sizde nasıl durduğunu gerekçesiyle anlatalım. Formu gönderdikten sonra 1 iş günü içinde dönüş yapıyoruz.</p>
+      <div class="pf-eylem"><a href="#analiz" class="pf-ana">Ücretsiz analiz iste</a>{paket && <a href={`/tr/paketler/${paket.id}`} class="pf-ikincil">{paket.ad}</a>}</div>
+    </aside>
+    <Bulten />
+  </article>
+  <aside class="bh-yan" aria-label="Yazıyla ilgili">
+    <form data-talep="analiz" novalidate class="bh-form" aria-label="Ücretsiz analiz formu">
+      <b>Ücretsiz analiz isteyin</b>
+      <span>Hesaplarınızı ve sitenizi inceleyip 1 iş günü içinde dönelim.</span>
+      <label>Ad soyad<input type="text" name="ad" autocomplete="name" required></label>
+      <label>E-posta<input type="email" name="eposta" autocomplete="email"></label>
+      <label>Telefon (isteğe bağlı)<input type="tel" name="telefon" autocomplete="tel"></label>
+      <input type="hidden" name="konu" value={`Blog: ${y.baslik}`}>
+      <label class="bh-onay"><input type="checkbox" name="kvkk"><span><a href="/tr/sayfa/kvkk-aydinlatma-metni" target="_blank" rel="noopener">KVKK aydınlatma metnini</a> okudum, iletişim için bilgilerimin işlenmesini kabul ediyorum.</span></label>
+      <label aria-hidden="true" class="bh-tuzak">Bu alanı boş bırakın<input type="text" name="web_adresi_tekrar" tabindex="-1" autocomplete="off"></label>
+      <div data-turnstile></div>
+      <p data-form-durum role="status" aria-live="polite" hidden class="bh-durum"></p>
+      <button type="submit">Analiz isteyin</button>
+    </form>
+    <div class="bh-kutu">
+      <b>İlgili hizmetler</b>
+      <ul>{hizmetler.map((h) => <li><a href={`/tr/hizmet/${h.slug}`}><strong>{h.ad}</strong><span>{h.ozet}</span></a></li>)}</ul>
+    </div>
+  </aside>
+</div>
+
+{digerleri.length > 0 && (
+<section class="bh-diger"><div class="pf-ic">
+  <div class="bh-diger-bas"><h2>Diğer yazılar</h2><a href="/tr/haberler">Bütün yazılar</a></div>
+  <div class="bh-kartlar">{digerleri.map((x) => (
+    <a href={`/tr/haber/${x.slug}`} class="bh-kart">
+      <span class="bh-kart-kapak"><KapakGorsel tur={`d:${yaziKapak(x)}`} /></span>
+      <small>{x.kategori}</small><strong>{x.baslik}</strong><span>{x.ozet}</span>
+    </a>))}
+  </div>
+</div></section>)}
+<div id="analiz"><CagriKutusu /></div>
+<KatmanStil />
+<script>
+  document.querySelectorAll('[data-kopyala]').forEach((d) => d.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(d.getAttribute('data-kopyala')); d.setAttribute('data-tamam', ''); d.setAttribute('aria-label', 'Bağlantı kopyalandı'); setTimeout(() => { d.removeAttribute('data-tamam'); d.setAttribute('aria-label', 'Bağlantıyı kopyalayın'); }, 2000); } catch {}
+  }));
+</script>
+<style>
+  .bh-ust h1{margin:10px 0 14px;font-size:clamp(32px,4.4vw,52px);line-height:1.08;letter-spacing:-.025em;color:var(--head)}
+  .bh-konu{display:inline-flex;padding:5px 12px;border-radius:999px;background:var(--tint);color:var(--tintx);font-size:13px;font-weight:700;text-decoration:none}
+  .bh-meta{margin:20px 0 0;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14.5px;color:var(--tx2)}
+  .bh-meta>*:not(:first-child)::before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;background:var(--line);margin-right:18px;vertical-align:middle}
+  .bh-meta>span:first-child{font-weight:600;color:var(--head)}
+  .bh-govde{display:grid;grid-template-columns:240px minmax(0,1fr) 320px;gap:48px;align-items:start;padding-top:56px;padding-bottom:72px}
+  .bh-sol{position:sticky;top:96px;display:flex;flex-direction:column;gap:18px}
+  .bh-sol-paylas b{display:block;margin-bottom:8px;font-size:14px;color:var(--head)}.bh-sol-paylas .bh-paylas{margin-top:0}
+  .bh-yazi{min-width:0;display:flex;flex-direction:column;gap:20px;font-size:18.5px;line-height:1.75;color:var(--tx)}
+  .bh-yazi>h2{margin:22px 0 0;font-size:clamp(24px,2.6vw,30px);line-height:1.25;letter-spacing:-.015em;color:var(--head);scroll-margin-top:96px}
+  .bh-yazi>p{margin:0}
+  .bh-yazi>ul{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:10px}
+  .bh-yazi>ul li::marker{color:var(--brand)}
+  .bh-son{margin-top:28px;padding:28px;border-radius:22px;background:var(--tint)}
+  .bh-son h2{margin:0 0 10px;font-size:24px;line-height:1.25;color:var(--head)}
+  .bh-son p{margin:0;font-size:16.5px;line-height:1.65}
+  .bh-yan{display:flex;flex-direction:column;gap:18px}
+  .bh-icindekiler{padding:20px 22px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+  .bh-icindekiler b,.bh-kutu b{display:block;margin-bottom:10px;font-size:15px;color:var(--head)}
+  .bh-icindekiler ol{margin:0;padding:0;list-style:none;counter-reset:b;display:flex;flex-direction:column}
+  .bh-icindekiler li{counter-increment:b;display:grid;grid-template-columns:24px minmax(0,1fr);padding:7px 0;border-top:1px solid var(--line);font-size:14.5px;line-height:1.4}
+  .bh-icindekiler li:first-child{border-top:0}
+  .bh-icindekiler li::before{content:counter(b);color:var(--acc);font-weight:700}
+  .bh-icindekiler a{color:var(--tx);text-decoration:none}.bh-icindekiler a:hover{color:var(--acc)}
+  .bh-mobil{display:none}
+  .bh-kutu{padding:20px 22px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+  .bh-kutu ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+  .bh-kutu li{border-top:1px solid var(--line)}.bh-kutu li:first-child{border-top:0}
+  .bh-kutu a{display:flex;flex-direction:column;gap:2px;padding:10px 0;text-decoration:none}
+  .bh-kutu strong{font-size:15px;color:var(--head)}.bh-kutu span{font-size:13.5px;line-height:1.45;color:var(--tx2)}
+  .bh-kutu a:hover strong{color:var(--acc)}
+  .bh-diger{padding:64px 0;background:var(--bg2,var(--bg));border-top:1px solid var(--line)}
+  .bh-diger-bas{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:24px}
+  .bh-diger-bas h2{margin:0;font-size:clamp(26px,3vw,34px);color:var(--head)}.bh-diger-bas a{font-weight:600;color:var(--acc)}
+  .bh-kartlar{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px}
+  .bh-kart{display:flex;flex-direction:column;gap:8px;padding:16px 16px 22px;border-radius:22px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--tx)}
+  .bh-kart-kapak{display:block;margin-bottom:8px}.bh-kart-kapak :global(.kg){border-radius:16px;box-shadow:none}.bh-kart-kapak :global(figcaption){display:none}
+  .bh-kart small{padding:0 6px;font-size:13px;font-weight:700;color:var(--acc)}
+  .bh-kart strong{padding:0 6px;font-size:19px;line-height:1.3;color:var(--head)}
+  .bh-kart>span:last-child{padding:0 6px;font-size:15px;line-height:1.55;color:var(--tx2)}
+  .bh-kart:hover strong{color:var(--acc)}
+  .bh-paylas{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .bh-paylas a,.bh-paylas button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--head);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .bh-paylas a:hover,.bh-paylas button:hover{border-color:var(--brand);color:var(--acc)}
+  .bh-paylas button[data-tamam]{border-color:var(--ok);color:var(--ok)}
+  .bh-paylas-son{margin-top:24px;padding-top:22px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+  .bh-paylas-son b{font-size:16px;color:var(--head)}.bh-paylas-son .bh-paylas{margin-top:0}
+  .bh-form{padding:20px 22px;border-radius:18px;background:#002559;color:#E6ECF4;display:flex;flex-direction:column;gap:10px;font-size:14px}
+  .bh-form>b{font-size:17px;color:#FFFFFF}.bh-form>span{color:#C6D2E3;line-height:1.5}
+  .bh-form label{display:flex;flex-direction:column;gap:5px;font-weight:600}
+  .bh-form input:is([type=text],[type=email],[type=tel]){min-height:42px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);color:#FFFFFF;font:inherit}
+  .bh-form input:is([type=text],[type=email],[type=tel]):focus{outline:2px solid #F07A23;outline-offset:1px}
+  .bh-onay{flex-direction:row!important;align-items:flex-start;font-weight:400!important;font-size:12.5px;line-height:1.45;color:#C6D2E3}.bh-onay a{color:#FFB58A}
+  .bh-tuzak{position:absolute;left:-9999px}
+  .bh-form button{min-height:44px;border:0;border-radius:12px;background:#F07A23;color:#1A1206;font:inherit;font-weight:700;cursor:pointer}
+  .bh-durum{margin:0;padding:8px 10px;border-radius:8px;font-size:13px}
+  .bh-yazi :global(.bt){margin-top:12px}
+  @media (max-width:1280px){.bh-govde{grid-template-columns:minmax(0,1fr) 300px}.bh-sol{display:none}.bh-mobil{display:block}}
+  @media (max-width:1000px){.bh-govde{grid-template-columns:minmax(0,1fr)}}
+</style>
 </Site>

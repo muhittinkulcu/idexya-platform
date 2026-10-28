@@ -1,7 +1,8 @@
 ---
 // Ortak yerleşim: üst menü, alt kısım, tema, çerez onayı.
-interface Props { baslik?: string; aciklama?: string; aktif?: string; dil?: 'tr' | 'en'; aramayaKapali?: boolean; }
-const { baslik = '', aciklama = '', aktif = '', dil = 'tr', aramayaKapali = false } = Astro.props;
+// gorsel: paylaşım görseli (/ ile başlayan site içi PNG/JPG yolu; yoksa sitenin genel görseli). ogTur: 'article' blog yazıları için.
+interface Props { baslik?: string; aciklama?: string; aktif?: string; dil?: 'tr' | 'en'; aramayaKapali?: boolean; gorsel?: string; ogTur?: 'website' | 'article'; }
+const { baslik = '', aciklama = '', aktif = '', dil = 'tr', aramayaKapali = false, gorsel = '/kapak/idexya.png', ogTur = 'website' } = Astro.props;
 // Yayın öncesi: true iken tüm site arama motorlarına kapalıdır. idexya.com yayında olduğu için false;
 // aramayaKapali olan sayfalar (ör. IDOS tanıtımı, Muhittin 19 Eki 2026) yine kapalı kalır.
 const YAYIN_ONCESI = false;
@@ -67,7 +68,13 @@ const ikon = (id: string, b = 20) => `<svg width="${b}" height="${b}" viewBox="0
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <meta property="og:title" content={tamBaslik}>
 {aciklama && <meta property="og:description" content={aciklama}>}
-<meta property="og:type" content="website">
+<meta property="og:type" content={ogTur}>
+<meta property="og:url" content={kanonik.href}>
+<meta property="og:site_name" content="Idexya | Good Things">
+<meta property="og:image" content={new URL(gorsel, Astro.site).href}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta property="og:locale" content={dil === 'en' ? 'en_US' : 'tr_TR'}>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

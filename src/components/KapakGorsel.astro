@@ -19,7 +19,8 @@ const HARITA: Record<string, string> = {
   'h:web-tasarim-hizmetleri': 'site', 'h:teknik-seo': 'konsol', 'h:seo-anahtar-kelime-analizi': 'konsol'
 };
 const [onek] = tur.split(':');
-const ciz = HARITA[tur] || (onek === 'h' && grup ? HARITA['g:' + grup] : undefined) || 'birlesik';
+// 'd:<çizim>' doğrudan çizim adıdır (ör. blog yazıları için d:analitik).
+const ciz = HARITA[tur] || (onek === 'd' ? tur.slice(2) : undefined) || (onek === 'h' && grup ? HARITA['g:' + grup] : undefined) || 'birlesik';
 const ARIA: Record<string, string> = {
   arama: 'Google arama sonuçlarında sponsorlu reklam ve alışveriş reklamları',
   sosyal: 'Telefonda Instagram akışında reklam, hikâye ve hedef kitle seçenekleri',
