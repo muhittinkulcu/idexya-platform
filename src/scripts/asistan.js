@@ -1,4 +1,4 @@
-// IDOS asistan sohbet penceresi (eski adı Idexya Asistan). Düğme sürüklenebilir; bırakılınca en yakın kenara yapışır,
+// IDOS asistan sohbet penceresi (maskot: public/maskot/idos-kedi.webp, Ankara kedisi) (eski adı Idexya Asistan). Düğme sürüklenebilir; bırakılınca en yakın kenara yapışır,
 // konum bu tarayıcıda hatırlanır. Pencere düğmenin bulunduğu kenara ve yüksekliğe göre açılır. Metinler güvenli biçimde (textContent) yazılır; yalnız site içi ve https bağlantıları tıklanır olur.
 import { reklamBilgisi } from './reklam-iz.js';
 import { robotBagla } from './form.js';
@@ -6,7 +6,6 @@ const ANAHTAR = 'idx-asistan';
 const oku = () => { try { return JSON.parse(sessionStorage.getItem(ANAHTAR) || 'null'); } catch (e) { return null; } };
 const yaz = (v) => { try { sessionStorage.setItem(ANAHTAR, JSON.stringify(v)); } catch (e) {} };
 const el = (t, o = {}, ...c) => { const e = document.createElement(t); for (const [k, v] of Object.entries(o)) { if (v == null || v === false) continue; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); } c.flat().forEach((x) => x != null && x !== false && e.append(x)); return e; };
-const IKON = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="8" width="16" height="12" rx="4"></rect><path d="M12 8V4M12 4h.01"></path><path d="M9 13.5v1M15 13.5v1"></path><path d="M2 13v3M22 13v3"></path></svg>';
 const KONUM = 'idx-asistan-konum';
 let BASLIKLAR = {};
 fetch('/arama.json').then((r) => r.json()).then((d) => { BASLIKLAR = Object.fromEntries(d.map((x) => [x.u, x.t])); }).catch(() => {});
@@ -43,7 +42,7 @@ export function asistan() {
   let durum = oku() || { sohbet: null, mesajlar: [], acik: false };
   let yapayZeka = null, bekliyor = false;
   const dugme = el('button', { type: 'button', class: 'as-dugme', 'aria-label': 'IDOS’a sor: asistanı aç (sürükleyerek yerini değiştirebilirsiniz)', 'aria-expanded': 'false', 'aria-controls': 'asistan' });
-  dugme.innerHTML = '<i class="as-robot">' + IKON + '</i><span class="as-ipucu">IDOS’a sor</span>';
+  dugme.innerHTML = '<img class="as-maskot" src="/maskot/idos-kedi.webp" alt="" width="50" height="50" draggable="false"><span class="as-ipucu">IDOS’a sor</span>';
   const liste = el('div', { class: 'as-liste', role: 'log', 'aria-live': 'polite' });
   const girdi = el('textarea', { rows: '1', placeholder: 'Sorunuzu yazın…', 'aria-label': 'Mesajınız', maxlength: '1500' });
   const gonder = el('button', { type: 'submit', class: 'as-gonder', 'aria-label': 'Gönder' });
@@ -52,7 +51,7 @@ export function asistan() {
   const durumYazi = el('span', { class: 'as-durum' }, 'Genelde birkaç saniyede yanıt verir');
   const panel = el('section', { id: 'asistan', class: 'as-panel', role: 'dialog', 'aria-label': 'IDOS asistan', hidden: true },
     el('header', { class: 'as-bas' },
-      (() => { const a = el('span', { class: 'as-avatar', 'aria-hidden': 'true' }); a.innerHTML = IKON; return a; })(),
+      el('img', { class: 'as-avatar', src: '/maskot/idos-kedi.webp', alt: '', width: '38', height: '38' }),
       el('span', { class: 'as-baslik' }, el('strong', {}, 'IDOS asistan'), durumYazi),
       el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Seçenekler', 'aria-haspopup': 'menu', 'aria-expanded': 'false', onclick: (o) => menuAc(o.currentTarget) }, '⋯'),
       el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Pencereyi kapat', onclick: () => ac(false) }, '×')),
@@ -138,6 +137,7 @@ export function asistan() {
     const bas = el('button', { type: 'button', class: 'as-kart-gonder', disabled: true, onclick: () => { durum.onay = new Date().toISOString(); yaz(durum); form.hidden = false; ciz(); setTimeout(() => girdi.focus(), 50); } }, 'Sohbete başla');
     kutu.addEventListener('change', () => { bas.disabled = !kutu.checked; });
     liste.replaceChildren(el('div', { class: 'as-kart as-onay-ekran' },
+      el('img', { class: 'as-onay-maskot', src: '/maskot/idos-kedi.webp', alt: 'IDOS, Idexya’nın asistanı', width: '72', height: '72' }),
       el('strong', {}, 'Sohbete başlamadan önce'),
       el('p', {}, 'IDOS, Idexya’nın yapay zekâ asistanıdır. Yanıtlar otomatik üretilir ve hata içerebilir. Yazışmanız hizmet kalitesi için kaydedilir ve 1 yıl saklanır. Şifre, kart bilgisi gibi gizli bilgileri paylaşmayın.'),
       el('label', { class: 'as-onay', for: 'as-kvkk' }, kutu, el('span', {}, el('a', { href: '/tr/sayfa/kvkk-aydinlatma-metni', target: '_blank', rel: 'noopener' }, 'KVKK aydınlatma metnini'), ' okudum; yazışmamın bu amaçla kaydedilmesini kabul ediyorum.')),
