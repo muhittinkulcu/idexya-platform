@@ -251,6 +251,13 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 }
 @media (min-width:861px){.mobil{display:none!important}}
 @media print{.yan,.ust,.ust-ac{display:none}.kabuk{background:#FFFFFF;color:#000000}}
+.yeni-menu{position:relative}
+.yeni-menu summary{list-style:none;cursor:pointer}.yeni-menu summary::-webkit-details-marker{display:none}
+.yeni-liste{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:320px;padding:8px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:0 24px 60px var(--shadow);display:flex;flex-direction:column}
+.yeni-liste b{padding:8px 10px 4px;font-size:11.5px;font-weight:700;color:var(--tx2)}
+.yeni-liste a{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--tx)}
+.yeni-liste a:hover,.yeni-liste a:focus-visible{background:var(--card2,var(--bg))}
+.yeni-liste strong{font-size:14px;color:var(--head)}.yeni-liste span{font-size:12.5px;color:var(--tx2)}
 </style>
 <script is:inline>(function(){var t='acik';try{t=localStorage.getItem('idx-tema')==='koyu'?'koyu':'acik'}catch(e){}document.documentElement.dataset.tema=t})()</script>
 </head>
@@ -338,7 +345,21 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
       </div>
       <span style="flex: 1 1 0"></span>
       <span class="masa" data-u="hizli" style="display: inline-flex; gap: 8px">
-        <a class="dugme ana" href="/yonetim/icerikler/">+ Yeni içerik</a>
+        <details class="yeni-menu" data-yeni-menu>
+          <summary class="dugme ana">+ Yeni oluştur</summary>
+          <div class="yeni-liste" role="menu" aria-label="Ne oluşturmak istiyorsunuz?">
+            <b>Web sitesi</b>
+            <a role="menuitem" href="/yonetim/site-icerik/?dosya=yazilar&yeni=1"><strong>Blog yazısı</strong><span>Sitedeki blogda yayınlanır</span></a>
+            <a role="menuitem" href="/yonetim/icerikler/?yeni=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
+            <a role="menuitem" href="/yonetim/site-icerik/?dosya=paketler&yeni=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
+            <a role="menuitem" href="/yonetim/site-icerik/?dosya=hizmetler"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
+            <a role="menuitem" href="/yonetim/site-icerik/?dosya=sss&yeni=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
+            <b>Satış ve iş</b>
+            <a role="menuitem" href="/yonetim/crm/?yeni=1"><strong>Müşteri</strong><span>CRM’e elle müşteri kaydı</span></a>
+            <a role="menuitem" href="/yonetim/teklifler/?yeni=1"><strong>Teklif</strong><span>Kalemli, KDV’li teklif hazırlayın</span></a>
+            <a role="menuitem" href="/yonetim/gorevler/?yeni=1"><strong>Görev</strong><span>Takvime görev ve hatırlatma</span></a>
+          </div>
+        </details>
         <a class="dugme ikincil" href="/" target="_blank" rel="noopener">Siteyi aç ↗</a>
       </span>
       <button type="button" class="ikon" data-tema-dugme aria-label="Temayı değiştir"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
@@ -414,6 +435,29 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 </aside>
 </div>
 
+<script>
+  // "+ Yeni oluştur" menüsü: dışarı tıklayınca ya da Esc ile kapanır. ?yeni=1 ile açılan sayfada o sayfanın "yeni" düğmesine basılır.
+  {
+    const m = document.querySelector<HTMLDetailsElement>('[data-yeni-menu]');
+    if (m) {
+      document.addEventListener('click', (o) => { if (m.open && !m.contains(o.target as Node)) m.open = false; });
+      m.addEventListener('keydown', (o) => { if (o.key === 'Escape') { m.open = false; m.querySelector('summary')!.focus(); } });
+      // Bazı sayfalar adres çubuğunu yeniden yazdığı için "yeni" isteği oturumda da tutulur
+      m.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => a.addEventListener('click', () => { try { if (a.search.includes('yeni=1')) sessionStorage.setItem('idx-yeni', a.pathname); } catch (e) {} }));
+    }
+    let yeniIstek = new URLSearchParams(location.search).get('yeni') === '1';
+    try { if (sessionStorage.getItem('idx-yeni') === location.pathname) { yeniIstek = true; } sessionStorage.removeItem('idx-yeni'); } catch (e) {}
+    if (yeniIstek && !location.pathname.startsWith('/yonetim/teklifler')) {
+      let deneme = 0;
+      const bas = () => {
+        const d = document.querySelector<HTMLElement>('main [data-yeni], main [data-yeni-ac]') || [...document.querySelectorAll<HTMLButtonElement>('main .si-liste ~ button, main button')].filter((b) => /^\+ Yeni /.test(b.textContent || '')).pop();
+        if (d) { d.click(); d.scrollIntoView({ block: 'center' }); return; }
+        if (++deneme < 40) setTimeout(bas, 150);
+      };
+      setTimeout(bas, 200);
+    }
+  }
+</script>
 <script>
   import { kabuk } from '../scripts/yonetim/ortak.js';
   kabuk();
