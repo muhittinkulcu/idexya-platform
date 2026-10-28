@@ -3,7 +3,6 @@
 // Metin worker/asistan.js ve worker/saklama.js'teki gerçek davranışı anlatır; davranış değişirse burası da güncellenmelidir.
 import Site from '../../../layouts/Site.astro';
 import KatmanStil from '../../../components/KatmanStil.astro';
-import KapakGorsel from '../../../components/KapakGorsel.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
 const yapar = ['Hizmetlerimiz, paketlerimiz ve çalışma biçimimiz hakkındaki sorularınızı yanıtlar.', 'İhtiyacınıza uygun hizmet ve paket sayfalarına yönlendirir.', 'İsterseniz bilgilerinizi bir talep kartına yazar; kartı siz kontrol edip KVKK onayınızla gönderirsiniz.', 'Yazışmanın bir kopyasını kendi e-posta adresinize gönderebilir, sizi aramamızı isteyebilirsiniz.'];
 const yapmaz = ['Fiyat taahhüdü vermez; fiyat ücretsiz analizden sonra yazılı teklifle netleşir.', 'Reklam hesaplarınıza, sitenize ya da müşteri verilerinize erişmez ve değişiklik yapmaz.', 'Siz göndermeden talep oluşturmaz, size e-posta ya da mesaj göndermez.', 'Yanıtları yapay zekâ üretir; hata içerebilir. Önemli kararlar için ekibimizle görüşün.'];
@@ -17,7 +16,7 @@ const yapmaz = ['Fiyat taahhüdü vermez; fiyat ücretsiz analizden sonra yazıl
       <p class="pf-giris">IDOS, sitemizdeki yapay zekâ asistanıdır. Sorularınızı günün her saatinde yanıtlar, doğru sayfaya yönlendirir ve isterseniz ekibimize ulaşmanızı kolaylaştırır. Sohbete başlamadan önce KVKK aydınlatma metnini onaylamanız istenir.</p>
       <div class="pf-eylem"><a href="https://wa.me/905078700629" class="pf-ana" rel="noopener">WhatsApp’tan yazın</a><a href="/tr/sayfa/kvkk-aydinlatma-metni" class="pf-ikincil">KVKK aydınlatma metni</a></div>
     </div>
-    <KapakGorsel tur="d:icerik" baslik="IDOS asistan" />
+    <figure class="ia-maskot"><img src="/maskot/idos-kedi.webp" alt="IDOS’un maskotu: kulaklık takan beyaz Ankara kedisi" width="200" height="200"><figcaption>Merhaba, ben IDOS. Sayfanın köşesindeki kedi simgesinden bana ulaşabilirsiniz.</figcaption></figure>
   </div>
 </div></section>
 <div class="pf-ic pf-govde">
@@ -50,6 +49,9 @@ const yapmaz = ['Fiyat taahhüdü vermez; fiyat ücretsiz analizden sonra yazıl
 <div id="analiz"><CagriKutusu /></div>
 <KatmanStil />
 <style>
+  .ia-maskot{margin:0;justify-self:center;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;max-width:340px}
+  .ia-maskot img{width:220px;height:220px;border-radius:50%;object-fit:cover;border:6px solid #F07A23;box-shadow:0 30px 60px -30px rgba(0,37,89,.5);background:#fff}
+  .ia-maskot figcaption{font-size:15px;line-height:1.5;color:var(--tx2)}
   .ia-liste{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:12px;font-size:16.5px;line-height:1.6}
   .ia-liste li{position:relative;padding-left:30px}
   .ia-liste li::before{content:"";position:absolute;left:0;top:4px;width:18px;height:18px;border-radius:50%;background:var(--okb)}
