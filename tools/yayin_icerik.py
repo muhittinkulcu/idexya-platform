@@ -147,6 +147,20 @@ if '<HizmetAlanEk' not in s:
     open(p, 'w', encoding='utf-8').write(s)
 print('Hizmetler sayfası alan görselleri uygulandı')
 
+# Hizmet kartlarının altı boş kalmasın (Muhittin, 28 Eki 2026): sağ sütunda dikkat ettiklerimiz, alanın paketleri ve platformlar.
+p = 'src/pages/tr/hizmetler.astro'
+s = open(p, encoding='utf-8').read()
+if '<HizmetAlanSag' not in s:
+    liste = '<ul style="flex: 2 1 560px; min-width: 0; margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px; align-content: flex-start; align-self: flex-start">'
+    assert s.count(liste) == 1, 'hizmetler sağ liste'
+    s = s.replace(liste, '<div style="flex: 2 1 560px; min-width: 0; align-self: flex-start">\n<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 14px">', 1)
+    kapa = '</Fragment>))}\n</ul>\n</div>\n</section>'
+    assert s.count(kapa) == 1, 'hizmetler sağ kapanış'
+    s = s.replace(kapa, '</Fragment>))}\n</ul>\n<HizmetAlanSag id={g.id} />\n</div>\n</div>\n</section>', 1)
+    s = s.replace("import HizmetAlanEk from '../../components/HizmetAlanEk.astro';", "import HizmetAlanEk from '../../components/HizmetAlanEk.astro';\nimport HizmetAlanSag from '../../components/HizmetAlanSag.astro';", 1)
+    open(p, 'w', encoding='utf-8').write(s)
+print('Hizmetler sayfası sağ sütun uygulandı')
+
 # Panelden düzenlenen içerik (Muhittin, 23 Eki 2026): tasarımdan üretilen sayfalardaki gömülü veriler src/data/*.json'dan okunur.
 import json as _json
 def _blok_degistir(s, bas_metni, ac, kapa, yeni):

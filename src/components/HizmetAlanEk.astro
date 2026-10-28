@@ -1,5 +1,5 @@
 ---
-// Hizmetler sayfası: her alanın solunda temsilî görsel, "neden önemli" ve "dikkat ettiklerimiz" (src/data/hizmetler.json).
+// Hizmetler sayfası: her alanın solunda temsilî görsel, "neden önemli" (dikkat ettiklerimiz sağ sütunda: HizmetAlanSag) (src/data/hizmetler.json).
 import MenuGorsel from './MenuGorsel.astro';
 import gruplar from '../data/hizmetler.json';
 interface Props { id: string; }
@@ -11,8 +11,6 @@ const a = gruplar.find((g) => g.id === Astro.props.id && g.neden);
     <details class="hae-detay">
       <summary>Neden önemli?</summary>
       <p>{a.neden}</p>
-      <b>Neye dikkat ediyoruz?</b>
-      <ul>{(a.dikkat || []).map((x) => <li>{x}</li>)}</ul>
     </details>
   </div>
 )}
@@ -25,7 +23,5 @@ const a = gruplar.find((g) => g.id === Astro.props.id && g.neden);
   .hae-detay summary::-webkit-details-marker{display:none}
   .hae-detay summary::after{content:"+";width:26px;height:26px;border-radius:50%;background:var(--tint);color:var(--tintx);display:flex;align-items:center;justify-content:center;transition:transform .2s}
   .hae-detay[open] summary::after{transform:rotate(45deg)}
-  .hae-detay p{margin:0;padding:0 18px 12px;font-size:15px;line-height:1.6;color:var(--tx);text-align:left}
-  .hae-detay b{display:block;padding:0 18px 8px;color:var(--head);font-size:14px}
-  .hae-detay ul{margin:0;padding:0 18px 16px 36px;display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--tx2)}
+  .hae-detay p{margin:0;padding:0 18px 16px;font-size:15px;line-height:1.6;color:var(--tx);text-align:left}
 </style>
