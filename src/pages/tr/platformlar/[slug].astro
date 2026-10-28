@@ -4,6 +4,7 @@
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
 import KatmanStil from '../../../components/KatmanStil.astro';
+import KapakGorsel from '../../../components/KapakGorsel.astro';
 import platformlar from '../../../data/platformlar.json';
 import gruplar from '../../../data/hizmetler.json';
 import paketler from '../../../data/paketler.json';
@@ -26,10 +27,20 @@ const OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="
 <section class="pf-ust">
   <div class="pf-ic">
     <nav aria-label="Sayfa yolu" class="pf-yol"><a href="/">Ana sayfa</a><span aria-hidden="true">›</span><a href="/tr/platformlar/">Platformlar</a><span aria-hidden="true">›</span><span aria-current="page">{ad}</span></nav>
-    <span class="pf-etiket">{p.kategori}</span>
-    <h1>{p.ad}</h1>
-    <p class="pf-giris">{p.kisa}</p>
-    <div class="pf-eylem"><a href="#analiz" class="pf-ana">Ücretsiz analiz iste</a>{ilgiliPaket[0] && <a href={`/tr/paketler#${ilgiliPaket[0].id}`} class="pf-ikincil">İlgili paketleri incele</a>}</div>
+    <div class="kp-izgara">
+      <div>
+        <h1>{p.ad}</h1>
+        <p class="pf-giris">{p.kisa}</p>
+        <div class="pf-eylem"><a href="#analiz" class="pf-ana">Ücretsiz analiz iste</a>{ilgiliPaket[0] && <a href={`/tr/paketler/${ilgiliPaket[0].id}`} class="pf-ikincil">İlgili paketi inceleyin</a>}</div>
+      </div>
+      <KapakGorsel tur={`p:${p.slug}`} baslik={p.ad} />
+    </div>
+    <div class="kp-serit">
+      <div><small>Alan</small><b>{p.kategori}</b></div>
+      <div><small>İlgili hizmetler</small><span class="kp-linkler">{hizmetler.slice(0, 3).map((h) => <a href={`/tr/hizmet/${h.slug}`}>{h.ad}</a>)}</span></div>
+      {ilgiliPaket.length > 0 && <div><small>İlgili paketler</small><span class="kp-linkler">{ilgiliPaket.map((k) => <a href={`/tr/paketler/${k.id}`}>{k.ad}</a>)}</span></div>}
+      <div><small>Çalışma ilkesi</small><b>Hesap sizde, değişiklik onayınızla</b></div>
+    </div>
   </div>
 </section>
 <nav class="pf-sayfa-ici" aria-label="Bu sayfada"><div class="pf-ic"><a href="#nedir">Nedir?</a><a href="#neler">Neler yapıyoruz?</a><a href="#dikkat">Nelere dikkat ediyoruz?</a><a href="#ilgili">İlgili hizmet ve paketler</a><a href="#sss">Sorular</a></div></nav>
@@ -50,7 +61,7 @@ const OK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="
     <h2>İlgili hizmet ve paketler</h2>
     <div class="pf-kartlar">
       {hizmetler.map((h) => <a href={`/tr/hizmet/${h.slug}`} class="pf-bag"><small>Hizmet · {h.alan}</small><strong>{h.ad}</strong>{h.ozet && <span>{h.ozet}</span>}<em>Hizmeti incele<Fragment set:html={OK} /></em></a>)}
-      {ilgiliPaket.map((k) => <a href={`/tr/paketler#${k.id}`} class="pf-bag"><small>Paket</small><strong>{k.ad}</strong><span>{k.ozet}</span><em>Paketi incele<Fragment set:html={OK} /></em></a>)}
+      {ilgiliPaket.map((k) => <a href={`/tr/paketler/${k.id}`} class="pf-bag"><small>Paket</small><strong>{k.ad}</strong><span>{k.ozet}</span><em>Paketi incele<Fragment set:html={OK} /></em></a>)}
       {ilgiliYazi.map((y) => <a href={`/tr/haber/${y.slug}`} class="pf-bag"><small>Yazı · {y.kategori}</small><strong>{y.baslik}</strong><span>{y.ozet}</span><em>Yazıyı oku<Fragment set:html={OK} /></em></a>)}
     </div>
   </section>

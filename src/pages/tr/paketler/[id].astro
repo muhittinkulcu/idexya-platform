@@ -7,6 +7,7 @@ import CagriKutusu from '../../../components/CagriKutusu.astro';
 import KatmanStil from '../../../components/KatmanStil.astro';
 import PaketStil from '../../../components/PaketStil.astro';
 import PaketSurec from '../../../components/PaketSurec.astro';
+import KapakGorsel from '../../../components/KapakGorsel.astro';
 import paketler from '../../../data/paketler.json';
 import gruplar from '../../../data/hizmetler.json';
 import platformlar from '../../../data/platformlar.json';
@@ -41,15 +42,14 @@ const TIK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke=
       </div>
       <p class="pd-yardim">Hangisinin uygun olduğundan emin değilseniz <a href="/tr/paketler#sihirbaz">paket sihirbazı</a> dört soruda önerir.</p>
     </div>
-    <aside class="pd-kunye" aria-label="Paket künyesi">
-      <dl>
-        {kat && <div><dt>Kategori</dt><dd><a href={`/tr/paketler/kategori/${kat.slug}`}>{kat.ad}</a></dd></div>}
-        <div><dt>Ücretlendirme</dt><dd>{p.ucretNotu}</dd></div>
-        <div><dt>{p.birlesik ? 'Setler' : 'Kademeler'}</dt><dd>{p.kademeler.map((k) => <a href={`#${capa(k)}`}>{k.ad}</a>)}</dd></div>
-        {onerilen.rozet && <div><dt>{onerilen.rozet}</dt><dd><b>{onerilen.ad}</b><span>{onerilen.kimIcin}</span></dd></div>}
-        {plt.length > 0 && <div><dt>Platformlar</dt><dd>{plt.map((x) => <a href={`/tr/platformlar/${x.slug}`}>{x.kisaAd || x.ad}</a>)}</dd></div>}
-      </dl>
-    </aside>
+    <KapakGorsel tur={`k:${p.id}`} baslik={p.ad} />
+  </div>
+  <div class="kp-serit" aria-label="Paket künyesi">
+    {kat && <a href={`/tr/paketler/kategori/${kat.slug}`}><small>Kategori</small><strong>{kat.ad}</strong><span>{kat.alt}</span></a>}
+    <div><small>Ücretlendirme</small><b>{p.ucretNotu}</b></div>
+    <div><small>{p.birlesik ? 'Setler' : 'Kademeler'}</small><span class="kp-linkler">{p.kademeler.map((k) => <a href={`#${capa(k)}`}>{k.ad}</a>)}</span></div>
+    {onerilen.rozet && <a href={`#${capa(onerilen)}`}><small>{onerilen.rozet}</small><strong>{onerilen.ad}</strong><span>{onerilen.kimIcin}</span></a>}
+    {plt.length > 0 && <div><small>Platformlar</small><span class="kp-linkler">{plt.map((x) => <a href={`/tr/platformlar/${x.slug}`}>{x.kisaAd || x.ad}</a>)}</span></div>}
   </div>
 </div></section>
 <nav class="pf-sayfa-ici" aria-label="Bu sayfada"><div class="pf-ic"><a href="#kademeler">{p.birlesik ? 'Setler' : 'Kademeler'}</a>{tablo && <a href="#karsilastirma">Karşılaştırma</a>}<a href="#kurallar">Kurallar ve adımlar</a>{sorular.length > 0 && <a href="#sorular">Sorular</a>}<a href="#ilgili">İlgili hizmetler</a>{kardesler.length > 0 && <a href="#benzer">{kat.ad} paketleri</a>}</div></nav>

@@ -40,4 +40,16 @@
 .pk-kademe .pf-ana{margin-top:auto;justify-content:center}.pk-kademe .pf-ikincil{margin-top:auto;justify-content:center}
 .pk-not{margin:14px 0 0;font-size:14px;color:var(--tx2)}
 .pk-sonraki{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.kp-izgara{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:56px;align-items:center}
+.kp-izgara .kg{max-width:600px;justify-self:end;width:100%}
+.kp-serit{margin-top:40px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));border:1px solid var(--line);border-radius:18px;background:var(--card);overflow:hidden}
+.kp-serit>div,.kp-serit>a{display:flex;flex-direction:column;gap:4px;padding:16px 20px;border-left:1px solid var(--line);text-decoration:none;color:var(--tx);min-width:0}
+.kp-serit>:first-child{border-left:0}
+.kp-serit small{font-size:12.5px;color:var(--tx2)}
+.kp-serit b,.kp-serit strong{font-size:15px;color:var(--head);line-height:1.35}
+.kp-serit span{font-size:13.5px;color:var(--tx2);line-height:1.45}
+.kp-serit a:hover strong{color:var(--acc)}
+.kp-serit .kp-linkler{display:flex;flex-wrap:wrap;gap:4px 10px}.kp-serit .kp-linkler a{font-weight:600;color:var(--head);font-size:14.5px}.kp-serit .kp-linkler a:hover{color:var(--acc)}
+@media (max-width:960px){.kp-izgara{grid-template-columns:minmax(0,1fr);gap:32px}.kp-izgara .kg{justify-self:stretch;max-width:none}}
+@media (max-width:640px){.kp-serit{grid-template-columns:minmax(0,1fr)}.kp-serit>div,.kp-serit>a{border-left:0;border-top:1px solid var(--line)}.kp-serit>:first-child{border-top:0}}
 </style>

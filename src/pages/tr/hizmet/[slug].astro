@@ -1,9 +1,9 @@
 ---
 // Hizmet sayfası şablonu. Özel tasarımı olan hizmetler (ör. google-ads-yonetimi) kendi dosyasından gelir.
-// İçerik: src/data/hizmetler.json (hizmete ve alana özel metinler; panelden düzenlenir), görsel: MenuGorsel.
+// İçerik: src/data/hizmetler.json (hizmete ve alana özel metinler; panelden düzenlenir), görsel: KapakGorsel.
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
-import MenuGorsel from '../../../components/MenuGorsel.astro';
+import KapakGorsel from '../../../components/KapakGorsel.astro';
 import InstagramAkis from '../../../components/InstagramAkis.astro';
 import Baslik from '../../../components/ana/Baslik.astro';
 import gruplar from '../../../data/hizmetler.json';
@@ -47,10 +47,7 @@ const ld = {
           <li>Hesaplar sizin adınıza</li><li>Onaysız değişiklik yok</li><li>1 iş günü içinde dönüş</li>
         </ul>
       </div>
-      <figure class="hd-gorsel">
-        <MenuGorsel id={g.id} />
-        <figcaption>Temsilî görsel</figcaption>
-      </figure>
+      <KapakGorsel tur={`h:${h.slug}`} grup={g.id} baslik={h.ad} />
     </div>
   </div>
 </section>
@@ -141,7 +138,7 @@ const ld = {
   .hd-ust-ic{position:relative;z-index:1;padding-top:36px;padding-bottom:64px;display:flex;flex-direction:column;gap:28px}
   .hd-yol{font-size:14px;color:var(--tx2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .hd-yol a{color:var(--tx2);text-decoration:none;padding:6px 0}
-  .hd-ust-izgara{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:48px;align-items:center}
+  .hd-ust-izgara{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:48px;align-items:center}
   .hd-ust-metin{display:flex;flex-direction:column;gap:20px}
   .hd-etiket{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--acc);text-transform:uppercase}
   .hd-ikon{flex:none;width:36px;height:36px;border-radius:10px;background:var(--tint);color:var(--tintx);display:inline-flex;align-items:center;justify-content:center}

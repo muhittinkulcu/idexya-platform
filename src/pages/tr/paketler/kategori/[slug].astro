@@ -6,6 +6,7 @@ import CagriKutusu from '../../../../components/CagriKutusu.astro';
 import KatmanStil from '../../../../components/KatmanStil.astro';
 import PaketStil from '../../../../components/PaketStil.astro';
 import PaketSurec from '../../../../components/PaketSurec.astro';
+import KapakGorsel from '../../../../components/KapakGorsel.astro';
 import paketler from '../../../../data/paketler.json';
 import gruplar from '../../../../data/hizmetler.json';
 import platformlar from '../../../../data/platformlar.json';
@@ -39,15 +40,10 @@ const kademeSayisi = liste.reduce((t, p) => t + p.kademeler.length, 0);
       </div>
       <p class="pd-yardim">Bu kategoride {liste.length} paket ve toplam {kademeSayisi} {liste.some((p) => p.birlesik) ? 'kademe ve set' : 'kademe'} var. Fiyat, ücretsiz analizden sonra ihtiyacınıza göre netleşir.</p>
     </div>
-    <aside class="pk-dizin" aria-label="Bu kategorideki paketler">
-      <ol>{liste.map((p) => (
-        <li><a href={`#p-${p.id}`}>
-          <strong>{p.ad}</strong>
-          <span>{p.ucretNotu}</span>
-          <small>{p.kademeler.length} {p.birlesik ? 'set' : 'kademe'}</small>
-        </a></li>))}
-      </ol>
-    </aside>
+    <KapakGorsel tur={`c:${k.slug}`} baslik={`${k.ad} paketleri`} />
+  </div>
+  <div class="kp-serit" aria-label="Bu kategorideki paketler">
+    {liste.map((p) => <a href={`#p-${p.id}`}><small>{p.kademeler.length} {p.birlesik ? 'set' : 'kademe'}</small><strong>{p.ad}</strong><span>{p.ucretNotu}</span></a>)}
   </div>
 </div></section>
 <nav class="pf-sayfa-ici" aria-label="Bu sayfada"><div class="pf-ic">{liste.length > 1 && <a href="#karsilastirma">Karşılaştırma</a>}{liste.map((p) => <a href={`#p-${p.id}`}>{p.ad}</a>)}<a href="#kurallar">Kurallar ve adımlar</a>{sorular.length > 0 && <a href="#sorular">Sorular</a>}<a href="#ilgili">İlgili hizmetler</a></div></nav>
