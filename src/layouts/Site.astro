@@ -12,6 +12,15 @@ const kapali = YAYIN_ONCESI || aramayaKapali;
 // Yayında ürün varsa "Ürünler" menüye kendiliğinden eklenir.
 const urunVar = urunVeri.urunler.some((u) => u.aktif !== false);
 const MENU = [...menuVeri.ust];
+// Mobil akordiyon menü (900 px altı): her ana başlığın altındaki bağlantı grupları.
+const AKORDIYON = {
+  hizmetler: gruplar.map((g) => ({ baslik: g.ad, href: `/tr/hizmetler#${g.id}`, linkler: g.hizmetler.map((h) => ({ ad: h.ad, href: `/tr/hizmet/${h.slug}` })) })),
+  paketler: [...KATEGORILER.map((k) => ({ baslik: k.ad, href: `/tr/paketler/kategori/${k.slug}`, linkler: k.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean).map((p) => ({ ad: p.ad, href: `/tr/paketler/${p.id}` })) })), { baslik: 'Kararsız mısınız?', linkler: [{ ad: 'Paket sihirbazı', href: '/tr/paketler#sihirbaz' }, { ad: 'Bütün paketler', href: '/tr/paketler' }] }],
+  idos: [{ linkler: [{ ad: 'IDOS nedir?', href: '/tr/idos' }, { ad: 'Canlı demoyu deneyin', href: '/tr/idos#demo' }, { ad: 'Çalıştığımız platformlar', href: '/tr/platformlar/' }] }],
+  blog: [{ baslik: 'Son yazılar', linkler: yazilar.slice(0, 4).map((y) => ({ ad: y.baslik, href: `/tr/haber/${y.slug}` })) }, { linkler: [{ ad: 'Bütün yazılar', href: '/tr/haberler' }] }],
+  hakkimizda: [{ linkler: [{ ad: 'Hakkımızda', href: '/tr/sayfa/hakkimizda' }, { ad: 'Çalıştığımız platformlar', href: '/tr/platformlar/' }, { ad: 'Hizmetler', href: '/tr/hizmetler' }] }],
+  iletisim: [{ linkler: [{ ad: 'Talep formu (bu sayfada açılır)', href: '/tr/iletisim#form', talep: 'analiz' }, { ad: 'WhatsApp: 0507 870 06 29', href: 'https://wa.me/905078700629' }, { ad: 'info@idexya.com', href: 'mailto:info@idexya.com' }, { ad: 'İletişim sayfası', href: '/tr/iletisim' }] }]
+};
 // Üst menü açılır panelleri: paketler dört sütunda kategoriye göre, blog son yazılar ve konularla.
 const PAKET_SUTUN = KATEGORILER.map((s) => ({ ...s, paketler: s.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean) }));
 const blogKonuSayi = Object.entries(yazilar.reduce((a, y) => ({ ...a, [y.kategori]: (a[y.kategori] || 0) + 1 }), {}));
@@ -238,6 +247,22 @@ main p{max-width:76ch}
 .cm-liste a[aria-current=page] .cm-ad{color:var(--acc)}
 .cm-liste a.etkin::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:3px;background:var(--brand)}
 .cm-sahne{min-width:0}
+.cm-akordiyon{display:none;flex-direction:column}
+.cm-ak{border-bottom:1px solid var(--line)}
+.cm-ak summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;align-items:center;column-gap:12px;padding:14px 4px;color:var(--head)}
+.cm-ak summary::-webkit-details-marker{display:none}
+.cm-ak summary .cm-ad{grid-column:1}.cm-ak summary .cm-alt{grid-column:1}
+.cm-ak-ok{grid-column:2;grid-row:1/3;width:30px;height:30px;border-radius:50%;background:var(--tint);position:relative;transition:transform .2s}
+.cm-ak-ok::before{content:"";position:absolute;left:10px;top:9px;width:8px;height:8px;border-right:2px solid var(--acc);border-bottom:2px solid var(--acc);transform:rotate(45deg)}
+.cm-ak[open] .cm-ak-ok{transform:rotate(180deg)}
+.cm-ak-ic{display:flex;flex-direction:column;gap:14px;padding:0 4px 18px}
+.cm-ak-ana{align-self:flex-start;font-size:14px;font-weight:700;color:var(--acc)}
+.cm-ak-grup{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.cm-ak-baslik{font-size:14px;font-weight:700;color:var(--head);text-decoration:none}
+.cm-ak-grup ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.cm-ak-grup li a{display:block;padding:8px 0;border-top:1px solid var(--line);font-size:15px;color:var(--tx);text-decoration:none}
+.cm-ak-grup li:first-child a{border-top:0}
+.cm-ak-grup a:hover{color:var(--acc)}
 .cm-pano{display:flex;flex-direction:column;gap:18px}
 .cm-pano-bas{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
 .cm-pano-bas strong{font-size:15px;color:var(--tx2);font-weight:600}.cm-pano-bas a{font-size:14px;font-weight:600}
@@ -376,6 +401,7 @@ main p{max-width:76ch}
 @media (max-width:900px){
   .cm-govde{grid-template-columns:1fr}
   .cm-sahne{display:none}
+  .cm-liste{display:none}.cm-akordiyon{display:flex}
   .cm-liste a{padding:14px 4px;border-radius:0;border-bottom:1px solid var(--line)}.cm-liste a.etkin{box-shadow:none;background:transparent}.cm-liste a.etkin::before{display:none}
   .cm-ok{opacity:1;transform:none}
   .cm-ara span{font-size:14px}.cm-ara kbd{display:none}
@@ -694,6 +720,22 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div class="kap cm-govde">
 <nav aria-label="Site menüsü" class="cm-liste">
 {MENU.map((m, i) => <a href={m.href} data-onizle={m.k} aria-current={aktif === m.ad ? 'page' : undefined} style={`--s:${i}`}><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>)}
+</nav>
+<nav class="cm-akordiyon" aria-label="Site menüsü (mobil)">
+{MENU.map((m) => (
+  <details class="cm-ak" name="cm-ak" open={aktif === m.ad}>
+    <summary><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ak-ok" aria-hidden="true"></span></summary>
+    <div class="cm-ak-ic">
+      <a href={m.href} class="cm-ak-ana">{m.ad} sayfasına gidin</a>
+      {(AKORDIYON[m.k] || []).map((g) => (
+        <div class="cm-ak-grup">
+          {g.baslik && (g.href ? <a href={g.href} class="cm-ak-baslik">{g.baslik}</a> : <b class="cm-ak-baslik">{g.baslik}</b>)}
+          <ul>{g.linkler.map((l) => <li><a href={l.href} data-hizli-talep={l.talep}>{l.ad}</a></li>)}</ul>
+        </div>
+      ))}
+    </div>
+  </details>
+))}
 </nav>
 <div class="cm-mobil"><a href="/tr/iletisim#form" class="ust-cta" data-hizli-talep="analiz">Ücretsiz analiz iste</a><a href="/giris" data-uye-baglanti class="ust-giris">Giriş</a></div>
 <div class="cm-sahne" aria-live="polite">
