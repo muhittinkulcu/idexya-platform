@@ -52,6 +52,10 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS asistan_mesajlari (id TEXT PRIMARY KEY, sohbet_id TEXT NOT NULL, zaman TEXT NOT NULL, rol TEXT NOT NULL, metin TEXT NOT NULL, ek TEXT, ip_ozet TEXT, sayfa TEXT)`,
   `CREATE INDEX IF NOT EXISTS asistan_sohbet ON asistan_mesajlari (sohbet_id, zaman)`,
   `CREATE INDEX IF NOT EXISTS asistan_ip ON asistan_mesajlari (ip_ozet, zaman)`,
+  // Asistan: sohbet öncesi KVKK onayı ve ziyaretçinin kendi e-postasına istediği yazışma dökümleri (Muhittin, 28 Eki 2026)
+  `CREATE TABLE IF NOT EXISTS asistan_onay (sohbet_id TEXT PRIMARY KEY, zaman TEXT NOT NULL, ip_ozet TEXT, sayfa TEXT)`,
+  `CREATE TABLE IF NOT EXISTS asistan_dokum (id TEXT PRIMARY KEY, sohbet_id TEXT NOT NULL, zaman TEXT NOT NULL, ip_ozet TEXT, sonuc TEXT)`,
+  `CREATE INDEX IF NOT EXISTS asistan_dokum_ip ON asistan_dokum (ip_ozet, zaman)`,
   // IDOS reklam özeti: IDOS BigQuery görünümünden günde bir kez okunur (worker/reklam.js); IDP'de yalnız okunur.
   `CREATE TABLE IF NOT EXISTS reklam_ozet (
     gun TEXT NOT NULL, platform TEXT NOT NULL, hesap TEXT NOT NULL, para TEXT NOT NULL, musteri_id TEXT, marka TEXT,

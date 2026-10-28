@@ -42,8 +42,8 @@ export function asistan() {
   if (document.querySelector('.as-dugme')) return;
   let durum = oku() || { sohbet: null, mesajlar: [], acik: false };
   let yapayZeka = null, bekliyor = false;
-  const dugme = el('button', { type: 'button', class: 'as-dugme', 'aria-label': 'IDOS asistanı aç (sürükleyerek yerini değiştirebilirsiniz)', title: 'Sürükleyerek yerini değiştirebilirsiniz', 'aria-expanded': 'false', 'aria-controls': 'asistan' });
-  dugme.innerHTML = '<i class="as-robot">' + IKON + '</i><span>IDOS’a sor</span>';
+  const dugme = el('button', { type: 'button', class: 'as-dugme', 'aria-label': 'IDOS’a sor: asistanı aç (sürükleyerek yerini değiştirebilirsiniz)', 'aria-expanded': 'false', 'aria-controls': 'asistan' });
+  dugme.innerHTML = '<i class="as-robot">' + IKON + '</i><span class="as-ipucu">IDOS’a sor</span>';
   const liste = el('div', { class: 'as-liste', role: 'log', 'aria-live': 'polite' });
   const girdi = el('textarea', { rows: '1', placeholder: 'Sorunuzu yazın…', 'aria-label': 'Mesajınız', maxlength: '1500' });
   const gonder = el('button', { type: 'submit', class: 'as-gonder', 'aria-label': 'Gönder' });
@@ -54,7 +54,13 @@ export function asistan() {
     el('header', { class: 'as-bas' },
       (() => { const a = el('span', { class: 'as-avatar', 'aria-hidden': 'true' }); a.innerHTML = IKON; return a; })(),
       el('span', { class: 'as-baslik' }, el('strong', {}, 'IDOS asistan'), durumYazi),
+      el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Seçenekler', 'aria-haspopup': 'menu', 'aria-expanded': 'false', onclick: (o) => menuAc(o.currentTarget) }, '⋯'),
       el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Pencereyi kapat', onclick: () => ac(false) }, '×')),
+    el('div', { class: 'as-menu', role: 'menu', hidden: true },
+      el('button', { type: 'button', role: 'menuitem', onclick: () => { menuKapat(); dokumKarti(); } }, 'Yazışmayı e-postama gönder'),
+      el('button', { type: 'button', role: 'menuitem', onclick: () => { menuKapat(); kartGoster({ konu: 'Aranma talebi', mesaj: '' }, true); } }, 'Beni arayın'),
+      el('a', { role: 'menuitem', href: '/tr/sayfa/idos-asistan', target: '_blank', rel: 'noopener' }, 'Asistan hakkında'),
+      el('button', { type: 'button', role: 'menuitem', onclick: () => { menuKapat(); if (confirm('Bu penceredeki yazışma temizlensin mi? Kayıt bizde KVKK metnindeki süre boyunca saklanır.')) { durum = { sohbet: null, mesajlar: [], acik: true, onay: durum.onay }; yaz(durum); ciz(); } } }, 'Yeni sohbet başlat')),
     liste, form,
     el('p', { class: 'as-not' }, 'Yanıtları yapay zekâ üretir, hata içerebilir. Sohbet hizmet kalitesi için kaydedilir; ', el('a', { href: '/tr/sayfa/kvkk-aydinlatma-metni', target: '_blank', rel: 'noopener' }, 'KVKK'), '.'));
   document.body.append(dugme, panel);
@@ -65,14 +71,15 @@ export function asistan() {
     ? el('a', { class: 'as-cip', href: 'https://wa.me/905078700629', target: '_blank', rel: 'noopener' }, 'WhatsApp’tan yaz')
     : el('button', { type: 'button', class: 'as-cip', onclick: () => kartGoster({ konu: 'Ücretsiz analiz', mesaj: '' }) }, 'Ücretsiz analiz iste')));
 
-  function kartGoster(v) {
+  function kartGoster(v, aranma) {
     const alan = (ad, etiket, deger, tip = 'text', zorunlu) => el('label', {}, etiket, el('input', { name: ad, type: tip, value: deger || '', required: zorunlu, autocomplete: { ad: 'name', eposta: 'email', telefon: 'tel', firma: 'organization' }[ad] || 'off' }));
     const durumP = el('p', { 'data-form-durum': '', role: 'status', hidden: true });
     const k = el('form', { class: 'as-kart', novalidate: true },
-      el('strong', {}, 'Talebinizi kontrol edin'),
-      alan('ad', 'Ad soyad', v.ad, 'text', true), alan('eposta', 'E-posta', v.eposta, 'email'), alan('telefon', 'Telefon', v.telefon, 'tel'), alan('firma', 'Firma (isteğe bağlı)', v.firma),
-      el('label', {}, 'Konu', el('input', { name: 'konu', value: v.konu || '' })),
-      el('label', {}, 'Not', (() => { const t = el('textarea', { name: 'mesaj', rows: '3' }); t.value = v.mesaj || ''; return t; })()),
+      el('strong', {}, aranma ? 'Sizi arayalım' : 'Talebinizi kontrol edin'),
+      alan('ad', 'Ad soyad', v.ad, 'text', true), aranma ? null : alan('eposta', 'E-posta', v.eposta, 'email'), alan('telefon', 'Telefon', v.telefon, 'tel', aranma), alan('firma', 'Firma (isteğe bağlı)', v.firma),
+      aranma ? el('label', {}, 'Ne zaman arayalım?', el('select', { name: 'zaman' }, ['Hafta içi sabah (09.00–12.00)', 'Hafta içi öğleden sonra (13.00–18.00)', 'Fark etmez'].map((x) => el('option', {}, x)))) : el('label', {}, 'Konu', el('input', { name: 'konu', value: v.konu || '' })),
+      aranma ? el('input', { type: 'hidden', name: 'konu', value: 'Aranma talebi' }) : null,
+      el('label', {}, aranma ? 'Hangi konuda? (isteğe bağlı)' : 'Not', (() => { const t = el('textarea', { name: 'mesaj', rows: '3' }); t.value = v.mesaj || ''; return t; })()),
       el('label', { class: 'as-onay' }, el('input', { type: 'checkbox', name: 'kvkk' }), el('span', {}, el('a', { href: '/tr/sayfa/kvkk-aydinlatma-metni', target: '_blank', rel: 'noopener' }, 'KVKK aydınlatma metnini'), ' okudum, iletişim için bilgilerimin işlenmesini kabul ediyorum.')),
       el('div', { 'data-turnstile': '' }), durumP,
       el('button', { type: 'submit', class: 'as-kart-gonder' }, 'Talebi gönder'));
@@ -80,7 +87,8 @@ export function asistan() {
     k.addEventListener('submit', async (o) => {
       o.preventDefault();
       const f = Object.fromEntries(new FormData(k));
-      const sorun = !f.ad.trim() ? 'Adınızı yazın.' : !f.eposta.trim() && !f.telefon.trim() ? 'E-posta veya telefon yazın.' : !k.kvkk.checked ? 'KVKK onayını işaretleyin.' : robot.gerekli && !robot.jeton() ? 'Robot doğrulamasını bekleyin.' : null;
+      if (aranma) { f.mesaj = `Uygun zaman: ${f.zaman}${f.mesaj ? '\n' + f.mesaj : ''}`; delete f.zaman; f.eposta = ''; }
+      const sorun = !f.ad.trim() ? 'Adınızı yazın.' : aranma && !f.telefon.trim() ? 'Telefon numaranızı yazın.' : !(f.eposta || '').trim() && !f.telefon.trim() ? 'E-posta veya telefon yazın.' : !k.kvkk.checked ? 'KVKK onayını işaretleyin.' : robot.gerekli && !robot.jeton() ? 'Robot doğrulamasını bekleyin.' : null;
       const yazDurum = (m, ok) => { durumP.hidden = false; durumP.textContent = m; durumP.className = ok ? 'as-ok' : 'as-hata'; };
       if (sorun) return yazDurum(sorun);
       const b = k.querySelector('.as-kart-gonder'); b.disabled = true; b.textContent = 'Gönderiliyor…';
@@ -96,7 +104,54 @@ export function asistan() {
     const ilk = k.querySelector('input:not([value]), input[value=""]'); if (ilk) setTimeout(() => ilk.focus(), 50);
   }
 
+  const menu = panel.querySelector('.as-menu');
+  function menuAc(b) { const ac = menu.hidden; menu.hidden = !ac; b.setAttribute('aria-expanded', String(ac)); if (ac) menu.querySelector('button').focus(); }
+  function menuKapat() { menu.hidden = true; panel.querySelector('[aria-haspopup=menu]').setAttribute('aria-expanded', 'false'); }
+  panel.addEventListener('click', (o) => { if (!menu.hidden && !menu.contains(o.target) && !o.target.closest('[aria-haspopup=menu]')) menuKapat(); });
+  // Yazışma dökümü: ziyaretçinin kendi e-postasına (yalnız bu sohbet)
+  function dokumKarti() {
+    if (!durum.sohbet) { liste.append(balon('asistan', 'Henüz kayıtlı bir yazışma yok. Bir soru sorduktan sonra yazışmayı e-postanıza gönderebilirim.')); kaydir(); return; }
+    const durumP = el('p', { role: 'status', hidden: true });
+    const k = el('form', { class: 'as-kart', novalidate: true }, el('strong', {}, 'Yazışmayı e-postanıza gönderelim'),
+      el('label', {}, 'E-posta adresiniz', el('input', { name: 'eposta', type: 'email', autocomplete: 'email', required: true })),
+      el('span', { style: 'font-size: 12.5px; color: var(--tx2)' }, 'Yalnız bu penceredeki yazışma gönderilir. Adresiniz pazarlama için kullanılmaz.'),
+      el('div', { 'data-turnstile': '' }), durumP, el('button', { type: 'submit', class: 'as-kart-gonder' }, 'Gönder'));
+    const robot = robotBagla(k);
+    k.addEventListener('submit', async (o) => {
+      o.preventDefault();
+      const yazD = (m, ok) => { durumP.hidden = false; durumP.textContent = m; durumP.className = ok ? 'as-ok' : 'as-hata'; };
+      if (robot.gerekli && !robot.jeton()) return yazD('Robot doğrulamasını bekleyin.');
+      const b = k.querySelector('.as-kart-gonder'); b.disabled = true;
+      try {
+        const r = await fetch('/api/asistan/dokum', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, eposta: k.eposta.value, turnstile: robot.jeton() }) });
+        const s = await r.json().catch(() => ({}));
+        if (!r.ok || !s.ok) throw new Error(s.hata || 'Gönderilemedi.');
+        k.replaceWith(balon('asistan', 'Yazışmanın bir kopyasını ' + k.eposta.value + ' adresine gönderdim.')); kaydir();
+      } catch (e) { yazD(e.message); b.disabled = false; robot.sifirla(); }
+    });
+    liste.append(k); kaydir(); setTimeout(() => k.eposta.focus(), 50);
+  }
+  // Sohbet öncesi KVKK onayı: onaylamayan ziyaretçi WhatsApp, telefon ya da e-postayla ulaşır.
+  function onayEkrani() {
+    form.hidden = true;
+    const kutu = el('input', { type: 'checkbox', id: 'as-kvkk' });
+    const bas = el('button', { type: 'button', class: 'as-kart-gonder', disabled: true, onclick: () => { durum.onay = new Date().toISOString(); yaz(durum); form.hidden = false; ciz(); setTimeout(() => girdi.focus(), 50); } }, 'Sohbete başla');
+    kutu.addEventListener('change', () => { bas.disabled = !kutu.checked; });
+    liste.replaceChildren(el('div', { class: 'as-kart as-onay-ekran' },
+      el('strong', {}, 'Sohbete başlamadan önce'),
+      el('p', {}, 'IDOS, Idexya’nın yapay zekâ asistanıdır. Yanıtlar otomatik üretilir ve hata içerebilir. Yazışmanız hizmet kalitesi için kaydedilir ve 1 yıl saklanır. Şifre, kart bilgisi gibi gizli bilgileri paylaşmayın.'),
+      el('label', { class: 'as-onay', for: 'as-kvkk' }, kutu, el('span', {}, el('a', { href: '/tr/sayfa/kvkk-aydinlatma-metni', target: '_blank', rel: 'noopener' }, 'KVKK aydınlatma metnini'), ' okudum; yazışmamın bu amaçla kaydedilmesini kabul ediyorum.')),
+      bas,
+      el('a', { href: '/tr/sayfa/idos-asistan', target: '_blank', rel: 'noopener', class: 'as-bilgi' }, 'Asistan nasıl çalışır?'),
+      el('div', { class: 'as-alternatif' }, el('span', {}, 'Onaylamak istemiyorsanız bize doğrudan ulaşın:'),
+        el('a', { class: 'as-cip', href: 'https://wa.me/905078700629', target: '_blank', rel: 'noopener' }, 'WhatsApp’tan yazın'),
+        el('a', { class: 'as-cip', href: 'tel:+905078700629' }, 'Arayın: 0507 870 06 29'),
+        el('a', { class: 'as-cip', href: 'mailto:info@idexya.com' }, 'info@idexya.com'))));
+  }
+
   function ciz() {
+    if (!durum.onay) return onayEkrani();
+    form.hidden = false;
     liste.replaceChildren();
     if (!durum.mesajlar.length) {
       liste.append(balon('asistan', 'Merhaba, ben IDOS, Idexya’nın asistanıyım. Reklam, e-ticaret, SEO veya paketlerimizle ilgili sorularınızı yanıtlayabilir, size uygun hizmeti bulmanıza yardım edebilirim.'));
@@ -115,7 +170,7 @@ export function asistan() {
     liste.append(yaziyor); kaydir();
     bekliyor = true; gonder.disabled = true;
     try {
-      const r = await fetch('/api/asistan/mesaj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, sayfa: location.pathname, mesajlar: durum.mesajlar }) });
+      const r = await fetch('/api/asistan/mesaj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, sayfa: location.pathname, mesajlar: durum.mesajlar, kvkk: !!durum.onay }) });
       const s = await r.json().catch(() => ({}));
       yaziyor.remove();
       if (!r.ok || !s.ok) throw new Error(s.hata || 'Yanıt alınamadı.');
@@ -136,7 +191,7 @@ export function asistan() {
     panel.hidden = !acik; dugme.setAttribute('aria-expanded', String(acik)); dugme.classList.toggle('as-acik', acik);
     document.body.classList.toggle('as-gorunur', acik);
     if (acik) {
-      ciz(); setTimeout(() => girdi.focus(), 60);
+      ciz(); if (durum.onay) setTimeout(() => girdi.focus(), 60);
       if (yapayZeka === null) fetch('/api/asistan/durum').then((r) => r.json()).then((s) => { yapayZeka = !!s.yapayZeka; if (!yapayZeka) durumYazi.textContent = 'Şu an ekibimize yönlendiriyor'; }).catch(() => {});
     } else dugme.focus();
   }

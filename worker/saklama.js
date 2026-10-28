@@ -7,6 +7,8 @@ const YIL = 365 * 86400000;
 export const KURALLAR = [
   { ad: 'Müşteriye dönüşmeyen talepler (2 yıl)', sql: "DELETE FROM talepler WHERE durum IN ('yeni', 'spam') AND olusturma < ?", sure: 2 * YIL },
   { ad: 'Yapay zekâ asistanı sohbetleri (1 yıl)', sql: 'DELETE FROM asistan_mesajlari WHERE zaman < ?', sure: YIL },
+  { ad: 'Asistan KVKK onay kayıtları (1 yıl)', sql: 'DELETE FROM asistan_onay WHERE zaman < ?', sure: YIL },
+  { ad: 'Asistan yazışma dökümü gönderimleri (1 yıl)', sql: 'DELETE FROM asistan_dokum WHERE zaman < ?', sure: YIL },
   { ad: 'Giriş denemeleri ve IP özetleri (2 yıl)', sql: 'DELETE FROM giris_denemeleri WHERE zaman < ?', sure: 2 * YIL },
   { ad: 'Bültenden ayrılanların onay kayıtları (3 yıl)', sql: "DELETE FROM bulten WHERE durum = 'ayrildi' AND ayrilma_zamani < ?", sure: 3 * YIL },
   { ad: 'Süresi dolmuş oturumlar', sql: 'DELETE FROM oturumlar WHERE bitis < ?', sure: 0 },
