@@ -38,6 +38,11 @@ DEGISIM['src/pages/index.astro'] = [
     ('<span>Google Ads</span><span>Meta</span><span>Google Analytics 4</span><span>Search Console</span><span>Tag Manager</span><span>ikas</span><span>Ticimax</span>',
      '<a class="ust-platform" href="/tr/platformlar/google-ads">Google Ads</a><a class="ust-platform" href="/tr/platformlar/meta">Meta</a><a class="ust-platform" href="/tr/platformlar/google-analytics-4">Google Analytics 4</a><a class="ust-platform" href="/tr/platformlar/search-console">Search Console</a><a class="ust-platform" href="/tr/platformlar/tag-manager">Tag Manager</a><a class="ust-platform" href="/tr/platformlar/ikas">ikas</a><a class="ust-platform" href="/tr/platformlar/ticimax">Ticimax</a><a class="ust-platform ust-platform-tum" href="/tr/platformlar/">Tümü →</a>'),
 ]
+# Bölüm başlığı: açıklama başlığın hemen yanında, ince ayraçla (boşluk kalmasın; Muhittin, 28 Eki 2026). Biçim Site.astro'da .bolum-bas.
+DEGISIM['src/pages/index.astro'] += [
+    ('<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">', '<div class="bolum-bas" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">'),
+    ('<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">', '<div class="bolum-bas" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">'),
+]
 CEVAP = [
     'Doğru bütçe sektörünüze, hedef bölgenize, rekabete ve hedeflediğiniz satış ya da talep sayısına göre değişir. Akıllı teklif stratejilerinin öğrenebilmesi için kampanyanın düzenli dönüşüm toplayabileceği bir bütçeyle başlamak gerekir. Ücretsiz analizde hesabınızı ve pazarınızı inceleyip gerekçesiyle bir başlangıç bütçesi öneririz.',
     'Tıklama ve ziyaretler kampanya yayına girdiği gün başlar. Teklif stratejilerinin öğrenme dönemi ve anlamlı iyileştirmeler için genellikle birkaç hafta gerekir; kesin süre sektöre, bütçeye ve dönüşüm sayısına bağlıdır. Bu yüzden ilk dönemi ölçüm ve öğrenme, sonrasını büyüme dönemi olarak planlarız.',
