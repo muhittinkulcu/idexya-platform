@@ -1,4 +1,5 @@
 import { asistan } from './asistan.js';
+import { bannerlariKur } from './banner.js';
 import { formlar } from './form.js';
 import { reklamIzBaslat } from './reklam-iz.js';
 // Ortak istemci davranışları: tema, çerez onayı, sekme ve süzgeçler.
@@ -227,7 +228,7 @@ function yasla() {
   let z; window.addEventListener('resize', () => { clearTimeout(z); z = setTimeout(isle, 150); });
 }
 
-export function baslat() { tema(); reklamIzBaslat(); cerez(); suzgecler(); menu(); arama(); yasla(); formlar(); efektler(); uyeBaglantisi(); asistan(); }
+export function baslat() { tema(); reklamIzBaslat(); cerez(); suzgecler(); menu(); arama(); yasla(); formlar(); efektler(); uyeBaglantisi(); asistan(); bannerlariKur(); }
 
 // Kaydırınca üst menü yarı saydam ve gölgeli olur; süreç adımları sırayla görününce yanar; koyu bölümdeki kartlarda imleci izleyen ışık.
 function efektler() {

@@ -92,35 +92,6 @@ export const DOSYALAR = {
       kapak: m('Kapak çizimi (arama, sosyal, analitik, konsol, etiket, magaza, pazaryeri, yonetim, birlesik, site, seo, icerik)', 20)
     } } }
   },
-  duyurular: {
-    ad: 'Duyurular ve kampanyalar', yol: 'src/data/duyurular.json',
-    aciklama: 'Üstteki kayan duyuru şeridi ve görselli kampanya kartları. Başlangıç/bitiş tarihi verirseniz yalnız o tarihler arasında görünür (tarih boşsa hep görünür). Kampanyanın nerede görüneceğini kutucuklarla seçin; “Hangi sayfalarda” boşsa seçilen konum bütün sayfalarda çıkar.',
-    sema: { tur: 'nesne', alanlar: {
-      serit: { tur: 'nesne', etiket: 'Üst duyuru şeridi', alanlar: {
-        aktif: { tur: 'mantik', etiket: 'Şerit açık', varsayilan: true },
-        kayan: { tur: 'mantik', etiket: 'Yazılar kayarak aksın (kapalıysa sırayla değişir)', varsayilan: true },
-        ogeler: { tur: 'liste', etiket: 'Duyurular', oge: 'duyuru', enCok: 10, ogeSema: { tur: 'nesne', baslikAlan: 'metin', alanlar: {
-          metin: m('Duyuru metni', 160, { zorunlu: true }), bag: { tur: 'url', etiket: 'Bağlantı (isteğe bağlı)' }, bagMetni: m('Bağlantı yazısı', 40),
-          baslangic: m('Başlangıç tarihi (YYYY-AA-GG)', 10, TARIH), bitis: m('Bitiş tarihi (YYYY-AA-GG)', 10, TARIH)
-        } } }
-      } },
-      kampanyalar: { tur: 'liste', etiket: 'Kampanya ve duyuru kartları', oge: 'kampanya', enCok: 20, ogeSema: { tur: 'nesne', baslikAlan: 'baslik', alanlar: {
-        aktif: { tur: 'mantik', etiket: 'Yayında', varsayilan: true },
-        etiket: m('Küçük etiket (ör. Yeni, Kampanya, Duyuru)', 30),
-        baslik: m('Başlık', 90, { zorunlu: true }),
-        metin: u('Kısa metin', 260),
-        gorsel: { tur: 'gorsel', etiket: 'Görsel (isteğe bağlı; yoksa kapak çizimi kullanılır)' },
-        kapak: m('Kapak çizimi (görsel yoksa): arama, sosyal, analitik, konsol, etiket, magaza, pazaryeri, yonetim, birlesik, site, seo, icerik', 20),
-        bag: { tur: 'url', etiket: 'Bağlantı', zorunlu: true }, bagMetni: m('Düğme yazısı', 40, { zorunlu: true }),
-        baslangic: m('Başlangıç tarihi (YYYY-AA-GG)', 10, TARIH), bitis: m('Bitiş tarihi (YYYY-AA-GG)', 10, TARIH),
-        anaSayfa: { tur: 'mantik', etiket: 'Ana sayfa kampanya bannerında' },
-        sayfaUstu: { tur: 'mantik', etiket: 'Sayfaların üstünde ince kutu olarak' },
-        icerikSonu: { tur: 'mantik', etiket: 'Sayfaların sonunda (alt bilginin üstünde)' },
-        blogYan: { tur: 'mantik', etiket: 'Blog yazılarının yan sütununda' },
-        sayfalar: m('Hangi sayfalarda (boşsa hepsi). Virgülle ayırın; * ile başlayanlar: /tr/hizmet/*, /tr/paketler/*', 400)
-      } } }
-    } }
-  },
   sss: {
     ad: 'Sık sorulan sorular', yol: 'src/data/sss.json',
     aciklama: 'Ana sayfadaki sık sorulan sorular. Hizmet sayfalarındaki sorular Hizmetler içinden düzenlenir.',

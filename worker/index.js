@@ -8,6 +8,7 @@ import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, is
 import { yonetimReklamApi, reklamCek, reklamKurulu } from './reklam.js';
 import { saklamaUygula } from './saklama.js';
 import { bultenApi, yonetimBultenApi } from './bulten.js';
+import { bannerApi, yonetimBannerApi } from './banner.js';
 import { instagramApi, yonetimInstagramApi, akisKurulu, akisCek } from './instagram.js';
 import { medyaApi, yonetimSistemApi } from './sistem.js';
 import { yonetimYayinApi } from './yayin.js';
@@ -248,7 +249,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
     || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim)) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
@@ -271,6 +272,7 @@ export default {
       if (yol === '/api/instagram' || yol.startsWith('/api/instagram/')) { await semaKur(env.DB); return await instagramApi(istek, env, yol.slice('/api/instagram'.length).replace(/^\/|\/$/g, ''), ctx); }
       if (yol === '/api/bulten' || yol.startsWith('/api/bulten/')) { await semaKur(env.DB); return await bultenApi(istek, env, yol.slice('/api/bulten'.length).replace(/^\/|\/$/g, '')); }
       if (yol === '/api/olcum') { await semaKur(env.DB); return await olcumAl(istek, env); }
+      if (yol === '/api/bannerlar' || yol.startsWith('/api/bannerlar/')) { await semaKur(env.DB); return await bannerApi(istek, env, yol.slice('/api/bannerlar'.length).replace(/^\/|\/$/g, ''), ctx); }
       if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
       if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
       if (/^\/uye\/uye-icerik\/?$/.test(yol)) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
