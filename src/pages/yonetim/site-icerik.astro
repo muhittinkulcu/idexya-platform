@@ -39,6 +39,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
   import { DOSYALAR, dogrula, ekDenetim } from '../../data/icerik-sema.js';
+  import { yaziEditoru } from '../../scripts/yonetim/editor.js';
   const q = (s) => document.querySelector(s);
   const parametre = new URLSearchParams(location.search);
   let ad = DOSYALAR[parametre.get('dosya')] ? parametre.get('dosya') : 'hizmetler';
@@ -64,6 +65,16 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (s.tur === 'nesne') return nesne(s, deger || {}, ata, kok);
     if (s.tur === 'liste') return liste(s, deger || [], ata, kok);
     const id = 'a' + Math.random().toString(36).slice(2);
+    if (s.tur === 'zengin') {
+      // Yazı düzenleyici: araç çubuğu, kısayollar, tam ekran; kayıt biçimi ## başlık / **kalın** / - madde
+      const kutu = el('div', { class: 'si-alan', role: 'group', 'aria-label': s.etiket }, el('span', {}, s.etiket + (s.zorunlu ? ' *' : '')));
+      const t = el('textarea', { id, 'aria-label': s.etiket });
+      t.value = deger || '';
+      kutu.append(t, el('small', {}, 'Ctrl+B kalın, Ctrl+I eğik, Ctrl+K bağlantı, Ctrl+Alt+2 ara başlık, Ctrl+F bul, F11 tam ekran. Word veya Google Dokümanlar’dan yapıştırdığınız metin sadeleştirilir.'));
+      t.addEventListener('input', () => { ata(t.value); isaretle(); });
+      yaziEditoru(t, { sinir: s.sinir });
+      return kutu;
+    }
     const etiket = el('label', { class: 'si-alan', for: id }, s.etiket + (s.zorunlu ? ' *' : ''));
     if (s.tur === 'mantik') {
       const k = el('input', { id, type: 'checkbox', checked: deger ?? s.varsayilan ?? false, style: 'width: 20px; height: 20px; min-height: 0' });
@@ -97,7 +108,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const buyukler = [];
     for (const [k, alt] of Object.entries(s.alanlar)) {
       const e = alan(alt, deger[k], (v) => { deger[k] = v; ata(deger); }, kok);
-      if (alt.tur === 'liste' || alt.tur === 'nesne' || alt.tur === 'uzun' || alt.tur === 'metinListe') buyukler.push([k, alt, e]); else kutu.append(e);
+      if (alt.tur === 'liste' || alt.tur === 'nesne' || alt.tur === 'uzun' || alt.tur === 'zengin' || alt.tur === 'metinListe') buyukler.push([k, alt, e]); else kutu.append(e);
     }
     return el('div', { style: 'display: flex; flex-direction: column; gap: 12px' }, kutu.childNodes.length ? kutu : null,
       ...buyukler.map(([k, alt, e]) => alt.tur === 'liste' || alt.tur === 'nesne' ? el('div', { class: 'si-grup', 'data-alan': k }, el('b', {}, alt.etiket), e) : e));

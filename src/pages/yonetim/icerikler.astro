@@ -14,7 +14,7 @@ import IcerikStil from '../../components/IcerikStil.astro';
 </div>
 <script>
   import { api, el, tarih, once, genelHata, sayacGuncelle } from '../../scripts/yonetim/ortak.js';
-  import { metinHtml } from '../../../worker/metin.js';
+  import { yaziEditoru } from '../../scripts/yonetim/editor.js';
   const $ = (s) => document.querySelector(s);
   const liste = $('[data-liste]'), duzen = $('[data-duzen]'), sekmeler = $('[data-sekmeler]');
   let tum = [], adlar = { gorunurluk: {}, etkilesim: {} }, uyeler = null, gruplar = null, sekme = 'Tümü', secili = new URLSearchParams(location.search).get('id');
@@ -54,9 +54,8 @@ import IcerikStil from '../../components/IcerikStil.astro';
     const kisa = el('input', { value: ic.kisa_ad, maxlength: 80, placeholder: 'boş bırakılırsa başlıktan oluşur' });
     const ozet = el('textarea', { rows: 2, maxlength: 500 }); ozet.value = ic.ozet || '';
     const kategori = el('input', { value: ic.kategori || '', maxlength: 60, placeholder: 'ör. Reklam' });
-    const govde = el('textarea', { rows: 14, style: 'font-family: inherit; line-height: 1.6' }); govde.value = ic.govde || '';
-    const onizleme = el('div', { class: 'icerik-metin', hidden: true, style: 'padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg)' });
-    const onizDugme = el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { const g = onizleme.hidden; onizleme.hidden = !g; govde.hidden = g; if (g) onizleme.innerHTML = metinHtml(govde.value) || '<p>Metin boş.</p>'; onizDugme.textContent = g ? 'Düzenle' : 'Önizle'; } }, 'Önizle');
+    const govde = el('textarea', { rows: 14, 'aria-label': 'Metin' }); govde.value = ic.govde || '';
+    let duzenleyici = null;
     let gor = ic.gorunurluk, etk = ic.etkilesim;
     const secUye = new Set(v.erisim.filter((e) => e.tur === 'uye').map((e) => e.hedef_id)), secGrup = new Set(v.erisim.filter((e) => e.tur === 'grup').map((e) => e.hedef_id));
     const arama = el('input', { type: 'checkbox', checked: ic.arama === 1 });
@@ -79,7 +78,7 @@ import IcerikStil from '../../components/IcerikStil.astro';
       if (zamanIleri.checked && !zaman.value) return bildir('İleri tarihli yayın için tarih ve saat seçin.', 'hata');
       const g = { baslik: baslik.value, kisa_ad: kisa.value, ozet: ozet.value, govde: govde.value, kategori: kategori.value, gorunurluk: gor, etkilesim: etk, arama: arama.checked, yayin_zamani: zamanIleri.checked ? new Date(zaman.value).toISOString() : (ic.yayin_zamani && ic.yayin_zamani <= new Date().toISOString() ? ic.yayin_zamani : new Date().toISOString()), uyeler: [...secUye], gruplar: [...secGrup] };
       o.currentTarget.disabled = true;
-      try { const r = await api(id ? 'icerikler/' + encodeURIComponent(id) : 'icerikler', g); await yenileListe(); await ac(r.id); duzen.querySelector('[role=status]').hidden = false; Object.assign(duzen.querySelector('[role=status]'), { className: 'uyari ok', textContent: 'Kaydedildi.' }); }
+      try { const r = await api(id ? 'icerikler/' + encodeURIComponent(id) : 'icerikler', g); duzenleyici && duzenleyici.kaydedildi(); await yenileListe(); await ac(r.id); duzen.querySelector('[role=status]').hidden = false; Object.assign(duzen.querySelector('[role=status]'), { className: 'uyari ok', textContent: 'Kaydedildi.' }); }
       catch (h) { bildir(h.message, 'hata'); o.currentTarget.disabled = false; }
     } }, id ? 'Kaydet' : 'Oluştur');
     const arsiv = id ? el('button', { type: 'button', class: 'dugme', onclick: async () => {
@@ -93,8 +92,8 @@ import IcerikStil from '../../components/IcerikStil.astro';
       ic.arsiv ? el('div', { class: 'uyari hata' }, 'Bu içerik arşivde: kimse göremez. Ayarları değiştirebilirsiniz; yayına dönmesi için “Arşivden çıkar”a basın.') : '',
       mesaj,
       el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px' }, el('label', { class: 'alan', style: 'grid-column: 1 / -1' }, 'Başlık', baslik), el('label', { class: 'alan' }, 'Kısa ad (adres)', kisa), el('label', { class: 'alan' }, 'Kategori', kategori), el('label', { class: 'alan', style: 'grid-column: 1 / -1' }, 'Özet', ozet)),
-      el('div', { style: 'display: flex; flex-direction: column; gap: 6px' }, el('div', { style: 'display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap' }, el('span', { style: 'font-size: 13px; font-weight: 600; color: var(--head)' }, 'Metin'), onizDugme),
-        el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Biçim: “## Ara başlık”, “**kalın**”, “_eğik_”, “- madde”, “> alıntı”, “[bağlantı metni](https://...)”. Paragraflar arasında boş satır bırakın.'), govde, onizleme),
+      el('div', { style: 'display: flex; flex-direction: column; gap: 6px' }, el('span', { style: 'font-size: 13px; font-weight: 600; color: var(--head)' }, 'Metin'),
+        el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Kısayollar: Ctrl+B kalın, Ctrl+I eğik, Ctrl+K bağlantı, Ctrl+Alt+2 ara başlık, Ctrl+F bul, Ctrl+S kaydet, F11 tam ekran. Word veya Google Dokümanlar’dan yapıştırdığınız metin sadeleştirilir.'), govde),
       bolum('Kim görsün?', ...Object.entries(adlar.gorunurluk).map(([k, a]) => secenek(a, k, a, ACIKLAMA[k], 'gor', gor, gorDegisti)), secAlan),
       bolum('Kim yorum yapabilsin?', ...Object.entries(adlar.etkilesim).map(([k, a]) => secenek(a, k, a, k === 'uyeler' ? '“Üyelere özel içerikler” bölümünde “kullan” yetkisi olanlar veya erişim listesindekiler. Üye yorumları hemen yayınlanır.' : k === 'herkes' ? 'Ziyaretçi yorumları sizin onayınızdan sonra yayınlanır.' : '', 'etk', etk, (d) => (etk = d)))),
       bolum('Arama motorları', aramaSatir),
@@ -110,6 +109,7 @@ import IcerikStil from '../../components/IcerikStil.astro';
       id ? bolum('Geçmiş', ...v.kayitlar.map((k) => el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 6px 0; border-top: 1px solid var(--line); font-size: 13px' }, el('span', {}, el('strong', {}, ISLEM[k.islem] || k.islem), k.detay && !k.islem.startsWith('yorum') && k.islem !== 'icerik_olustur' ? ' · ' + k.detay : ''), el('span', { style: 'color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim)))) : ''
     );
     gorDegisti(gor);
+    duzenleyici = yaziEditoru(govde, { anahtar: 'icerik:' + (id || 'yeni'), ipucu: 'Yazınızı buraya yazın ya da yapıştırın…', kaydet: () => kaydet.click() });
   }
   $('[data-yeni]').addEventListener('click', () => ac(null));
   (async () => {
