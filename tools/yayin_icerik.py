@@ -233,3 +233,15 @@ for p in YASAL:
         s = s.replace("import Site from '../../../layouts/Site.astro';", "import Site from '../../../layouts/Site.astro';\nimport YasalYan from '../../../components/YasalYan.astro';", 1)
         open(p, 'w', encoding='utf-8').write(s)
 print('Yasal sayfalar genişletildi')
+
+# Ana sayfa kampanya bannerı (Muhittin, 28 Eki 2026): açılış bölümünün hemen altında; içerik src/data/duyurular.json.
+p = 'src/pages/index.astro'
+s = open(p, encoding='utf-8').read()
+if '<KampanyaBanner' not in s:
+    hedef = '</section>\n\n<section id="hizmetler"'
+    assert s.count(hedef) == 1, 'ana sayfa banner yeri'
+    s = s.replace(hedef, '</section>\n<KampanyaBanner />\n\n<section id="hizmetler"', 1)
+    i = s.index('---') + 3
+    s = s[:i] + "\nimport KampanyaBanner from '../components/KampanyaBanner.astro';" + s[i:]
+    open(p, 'w', encoding='utf-8').write(s)
+print('Ana sayfa kampanya bannerı uygulandı')

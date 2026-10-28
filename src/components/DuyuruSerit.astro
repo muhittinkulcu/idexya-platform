@@ -1,0 +1,59 @@
+---
+// Üst duyuru şeridi: src/data/duyurular.json › serit (panelde Site içeriği › Duyurular ve kampanyalar).
+// Kayan modda içerik iki kez yazılır ve sonsuz akar (üzerine gelince durur); hareket azaltma tercihinde ya da kayan kapalıyken
+// duyurular sırayla değişir. Kapatılınca aynı içerik bu tarayıcıda bir daha gösterilmez.
+import { DUYURU, tarihteMi } from '../data/duyuru-sec.js';
+const s = DUYURU.serit;
+const ogeler = s.aktif ? s.ogeler.filter((x) => tarihteMi(x)) : [];
+const imza = ogeler.map((x) => x.metin).join('|');
+---
+{ogeler.length > 0 && (
+  <div class="dy-serit" data-dy-serit data-imza={imza} data-kayan={s.kayan ? '' : undefined} role="region" aria-label="Duyurular">
+    <div class="dy-pencere">
+      <div class="dy-iz">{ogeler.map((x) => <span class="dy-oge" data-bas={x.baslangic || undefined} data-bit={x.bitis || undefined}><span class="dy-nokta" aria-hidden="true"></span>{x.metin}{x.bag && <a href={x.bag} data-hizli-talep={x.bag === '/tr/iletisim#form' ? 'analiz' : undefined}>{x.bagMetni || 'Ayrıntılar'}</a>}</span>)}{s.kayan && <span class="dy-tekrar" aria-hidden="true">{ogeler.map((x) => <span class="dy-oge" data-bas={x.baslangic || undefined} data-bit={x.bitis || undefined}><span class="dy-nokta" aria-hidden="true"></span>{x.metin}{x.bag && <a href={x.bag} data-hizli-talep={x.bag === '/tr/iletisim#form' ? 'analiz' : undefined}>{x.bagMetni || 'Ayrıntılar'}</a>}</span>)}</span>}</div>
+    </div>
+    <button type="button" class="dy-kapat" data-dy-kapat aria-label="Duyuruları kapat">×</button>
+  </div>
+)}
+<script>
+  const s = document.querySelector<HTMLElement>('[data-dy-serit]');
+  if (s) {
+    const anahtar = 'idx-serit-kapali';
+    let kapali = ''; try { kapali = localStorage.getItem(anahtar) || ''; } catch (e) {}
+    const g = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
+    s.querySelectorAll<HTMLElement>('.dy-oge').forEach((o) => { if ((o.dataset.bas && o.dataset.bas > g) || (o.dataset.bit && o.dataset.bit < g)) o.remove(); });
+    const ilk = [...s.querySelectorAll<HTMLElement>('.dy-iz > .dy-oge')];
+    if (!ilk.length || kapali === s.dataset.imza) s.remove();
+    else {
+      s.querySelector('[data-dy-kapat]')!.addEventListener('click', () => { try { localStorage.setItem(anahtar, s.dataset.imza || ''); } catch (e) {} s.remove(); });
+      const hareketYok = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (s.hasAttribute('data-kayan') && !hareketYok) {
+        const iz = s.querySelector<HTMLElement>('.dy-iz')!;
+        iz.style.setProperty('--sure', Math.max(18, Math.round(iz.scrollWidth / 2 / 60)) + 's');
+        s.classList.add('dy-akar');
+      } else {
+        s.querySelector('.dy-tekrar')?.remove();
+        s.classList.add('dy-sirali');
+        let i = 0; ilk.forEach((o, j) => (o.hidden = j !== 0));
+        if (ilk.length > 1) setInterval(() => { if (s.matches(':hover,:focus-within')) return; ilk[i].hidden = true; i = (i + 1) % ilk.length; ilk[i].hidden = false; }, 5000);
+      }
+    }
+  }
+</script>
+<style is:global>
+.dy-serit{position:relative;z-index:51;display:flex;align-items:center;min-height:38px;background:#002559;color:#E6ECF4;font-size:14px}
+.dy-pencere{flex:1;min-width:0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(90deg,transparent,#000 40px,#000 calc(100% - 40px),transparent)}
+.dy-iz{display:flex;width:max-content}
+.dy-tekrar{display:flex}
+.dy-oge{display:inline-flex;align-items:center;gap:10px;padding:9px 32px;white-space:nowrap}
+.dy-oge a{color:#FFB58A;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.dy-nokta{width:6px;height:6px;border-radius:50%;background:#F07A23;flex:none}
+.dy-akar .dy-iz{animation:dyKay var(--sure,30s) linear infinite}
+.dy-akar:hover .dy-iz,.dy-akar:focus-within .dy-iz{animation-play-state:paused}
+@keyframes dyKay{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.dy-sirali .dy-iz{width:auto;justify-content:center}.dy-sirali .dy-oge{white-space:normal;justify-content:center;text-align:center}
+.dy-oge[hidden]{display:none}
+.dy-kapat{flex:none;width:38px;height:38px;border:0;background:transparent;color:#C6D2E3;font-size:20px;cursor:pointer}
+.dy-kapat:hover{color:#FFFFFF}
+@media print{.dy-serit{display:none}}
+</style>
