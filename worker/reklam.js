@@ -33,7 +33,10 @@ function satirlar(schema, rows) {
 }
 
 export async function bigqueryOku(env) {
-  const anahtar = JSON.parse(env.IDOS_BQ_ANAHTAR);
+  // Hata mesajı gizli değerden parça içermesin diye JSON.parse hatası olduğu gibi aktarılmaz.
+  let anahtar;
+  try { anahtar = JSON.parse(String(env.IDOS_BQ_ANAHTAR).trim()); } catch { throw new Error('IDOS_BQ_ANAHTAR geçerli bir JSON değil; servis hesabı JSON dosyasının tüm içeriği girilmeli'); }
+  if (!anahtar || anahtar.type !== 'service_account' || !anahtar.client_email || !anahtar.private_key) throw new Error('IDOS_BQ_ANAHTAR bir servis hesabı anahtarı değil (type, client_email, private_key bekleniyor)');
   const gorunum = String(env.IDOS_BQ_GORUNUM).trim();
   if (!GORUNUM_DESEN.test(gorunum)) throw new Error('IDOS_BQ_GORUNUM biçimi proje.veriseti.gorunum olmalı');
   const proje = gorunum.split('.')[0];
