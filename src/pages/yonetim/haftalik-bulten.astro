@@ -53,11 +53,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </style>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { kreatifStudyosu } from '../../scripts/yonetim/bulten-kreatif.js';
   const gor = document.querySelector('[data-gorunum]'), sekmeKutu = document.querySelector('[data-sekmeler]');
   const ETKI = { yuksek: 'Yüksek etki', orta: 'Orta etki', dusuk: 'Düşük etki' };
   const DURUM = { taslak: 'Taslak', onayli: 'Onaylı', cikarildi: 'Çıkarıldı' };
   const GUVEN = { 'tek-kaynak': 'Yalnız ikincil kaynak', 'tarih-belirsiz': 'Tarih belirsiz' };
-  let veri = null, sekme = 'sayilar', acik = null, suzgec = 'hepsi', duzenlenen = null;
+  let veri = null, sekme = 'sayilar', acik = null, suzgec = 'hepsi', duzenlenen = null, kreatif = false;
   const konuAl = (id) => veri.konular.find((k) => k.id === id) || { ad: id, renk: '#888' };
   const gunYaz = (g) => (g ? g.split('-').reverse().join('.') : '—');
 
@@ -71,6 +72,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   }
   function ciz() {
     sekmeCiz();
+    if (acik && kreatif) { gor.replaceChildren(kreatifStudyosu({ sayi: acik.sayi, maddeler: acik.maddeler, konuAl, kapat: () => { kreatif = false; ciz(); } })); return; }
     if (acik) return editorCiz();
     if (sekme === 'konular') return konularCiz();
     if (!veri.sayilar.length) { gor.replaceChildren(el('div', { class: 'kart bos' }, 'Henüz sayı yok. “+ Geçen haftanın sayısı” ile başlayın; haftalık araştırma taslakları da buraya düşer.')); return; }
@@ -120,7 +122,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     gor.replaceChildren(el('div', { class: 'hb-y-editor' },
       el('div', { style: 'display:flex;flex-direction:column;gap:14px;min-width:0' },
         el('div', { class: 'kart', style: 'padding:16px;display:flex;flex-direction:column;gap:10px' },
-          el('div', { class: 'hb-y-satir' }, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { acik = null; duzenlenen = null; ciz(); } }, '← Sayılar'), el('b', { style: 'color:var(--acc)' }, `Sayı #${sayi.no} · ${gunYaz(sayi.hafta_bas)} – ${gunYaz(sayi.hafta_bit)}`), el('span', { class: 'cip ' + (yayinda ? 'kazanildi' : 'gorusme') }, yayinda ? 'Yayında' : 'Taslak')),
+          el('div', { class: 'hb-y-satir' }, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { acik = null; duzenlenen = null; kreatif = false; ciz(); } }, '← Sayılar'), el('b', { style: 'color:var(--acc)' }, `Sayı #${sayi.no} · ${gunYaz(sayi.hafta_bas)} – ${gunYaz(sayi.hafta_bit)}`), el('span', { class: 'cip ' + (yayinda ? 'kazanildi' : 'gorusme') }, yayinda ? 'Yayında' : 'Taslak')),
           el('label', { class: 'alan' }, 'Sayı başlığı', baslik), el('label', { class: 'alan' }, 'Özet', ozet), el('div', {}, kaydetSayi)),
         el('div', { class: 'hb-y-ust' },
           el('div', { class: 'hb-y-suzgec' }, ...[['hepsi', `Tümü ${maddeler.length}`], ['taslak', `Taslak ${say('taslak')}`], ['onayli', `Onaylı ${say('onayli')}`], ['cikarildi', `Çıkarılan ${say('cikarildi')}`]].map(([k, a]) => el('button', { type: 'button', class: 'hb-y-cip', 'aria-pressed': String(suzgec === k), onclick: () => { suzgec = k; ciz(); } }, a))),
@@ -132,6 +134,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('div', { class: 'hb-y-sayac' }, ...[['taslak', 'Taslak'], ['onayli', 'Onaylı'], ['cikarildi', 'Çıkarılan']].map(([k, a]) => el('div', {}, el('b', {}, say(k)), el('span', {}, a)))),
         el('p', { style: 'margin:0;font-size:13px;color:var(--tx2);line-height:1.5' }, 'Sitede yalnız onaylı maddeler görünür. Taslak ve çıkarılan maddeler yayında gösterilmez.'),
         el('a', { class: 'dugme', href: `/tr/bulten/${sayi.slug}/?onizleme=1`, target: '_blank', rel: 'noopener' }, 'Önizle ↗'),
+        el('button', { type: 'button', class: 'dugme', onclick: () => { kreatif = true; ciz(); scrollTo({ top: 0 }); } }, 'Kreatifleri hazırla (Instagram, LinkedIn)'),
         yayinda ? el('a', { class: 'dugme', href: `/tr/bulten/${sayi.slug}/`, target: '_blank', rel: 'noopener' }, 'Sitede gör ↗') : null,
         yayin)));
   }
