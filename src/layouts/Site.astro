@@ -26,6 +26,13 @@ const AKORDIYON = {
 // Paket kategorisi → menü simgesi (src/data/hizmet-ikon.ts).
 const PAKET_IKON = { reklam: 'dijital-reklam', 'e-ticaret': 'e-ticaret', 'web-ve-seo': 'seo', icerik: 'tasarim-icerik' };
 const PAKET_SUTUN = KATEGORILER.map((s) => ({ ...s, paketler: s.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean) }));
+// Mega menü sütun kartlarının temsilî görselleri (public/kapak/cizim/*.webp, KapakGorsel'den üretildi).
+const PAKET_GORSEL = { 'google-ads': 'arama', 'meta-ads': 'sosyal', birlesik: 'birlesik', 'kurumsal-site': 'site', 'eticaret-site': 'magaza', 'eticaret-yonetim': 'yonetim', pazaryeri: 'pazaryeri', seo: 'seo', 'sosyal-medya': 'icerik' };
+const kademeCapa = (k) => 'k-' + k.ad.toLocaleLowerCase('tr-TR').replace(/[^a-z0-9çğıöşü]+/g, '-');
+// Blog mega menüsü: solda "Son yazılar" ve konular, sağda konunun yazıları kapaklı sütunlarda.
+const BLOG_KONU = { Reklam: { ikon: 'dijital-reklam', aciklama: 'Google ve Meta’da bütçe, teklif ve kreatif kararları' }, 'E-ticaret': { ikon: 'e-ticaret', aciklama: 'Mağaza, pazaryeri ve satış değeri' }, 'Ölçüm': { ikon: 'olcum', aciklama: 'GA4, Tag Manager ve dönüşüm ölçümü' }, SEO: { ikon: 'seo', aciklama: 'Arama ve yapay zekâ görünürlüğü' } };
+const BLOG_SEKME = [{ ad: 'Son yazılar', ikon: 'yazi', aciklama: 'Bütün konulardan en yeniler', yazilar: yazilar, href: '/tr/haberler' },
+  ...[...new Set(yazilar.map((y) => y.kategori))].map((k) => ({ ad: k, ikon: BLOG_KONU[k]?.ikon || 'yazi', aciklama: BLOG_KONU[k]?.aciklama || `${k} üzerine yazılar`, yazilar: yazilar.filter((y) => y.kategori === k), href: `/tr/haberler?konu=${encodeURIComponent(k)}` }))];
 const blogKonuSayi = Object.entries(yazilar.reduce((a, y) => ({ ...a, [y.kategori]: (a[y.kategori] || 0) + 1 }), {}));
 // Çekmece: yazı başına tahmini okuma süresi (dakikada ~200 kelime).
 const okumaDk = (y) => Math.max(1, Math.round(JSON.stringify(y.govde || '').split(/\s+/).length / 200));
@@ -65,6 +72,7 @@ import { KATEGORILER } from '../data/paket-kategori.js';
 import yazilar from '../data/yazilar.json';
 import menuAyar from '../data/menu.json';
 import { IKON } from '../data/hizmet-ikon';
+import { yaziKapak } from '../data/yazi-kapak.js';
 import MenuGorsel from '../components/MenuGorsel.astro';
 // Hizmetler menüsü görünümü (standart / orta / mega): src/data/menu.json. Simge kutusu ortak.
 const ikon = (id: string, b = 20) => `<svg width="${b}" height="${b}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IKON[id] || ''}</svg>`;
@@ -222,6 +230,52 @@ main p{max-width:76ch}
 [data-mk=mega] .ust-ozet{grid-area:o;display:block;margin:0 10px 10px;font-size:14px;line-height:1.55;color:var(--tx2);max-width:62ch}
 [data-mk=mega] .ust-alt ul{grid-area:u;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:8px}
 [data-mk=mega] .ust-alt .ust-alt-tum{grid-area:t;justify-self:start}
+/* Sütunlu mega menü (Paketler, Blog): solda kategori, sağda kartlar (görsel, başlık, kısa metin, tıklanabilir alt bağlantılar) ve özet kartı. */
+.mk-kartlar,.mk-alt-liste,.mk-adimlar{list-style:none;margin:0;padding:0}
+.ust-alt .mk-adimlar{display:flex}
+.mk-gorsel,.mk-kart p,.mk-ozet-kart,.mk-baslik small,.mk-alt-liste{display:none}
+.ust-menu .mk-baslik{display:block;padding:9px 10px;border-radius:10px;color:var(--tx);font-weight:500}
+.ust-menu .mk-baslik:hover{background:var(--bg);color:var(--acc)}
+.mk-baslik b{font-weight:inherit}
+[data-mk=mega] .ust-alt.mk-sutunlu{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-areas:none;column-gap:14px;row-gap:0;align-items:stretch;padding:4px 6px}
+[data-mk=mega] .mk-sutunlu>strong{display:none}
+[data-mk=mega] .ust-alt .mk-kartlar{display:contents;grid-area:auto}
+[data-mk=mega] .mk-kart{display:flex;flex-direction:column;gap:8px;min-width:0;padding:10px 10px 14px;border:1px solid var(--line);border-radius:18px;background:var(--card);transition:border-color .2s,box-shadow .2s,transform .2s}
+[data-mk=mega] .mk-kart:hover{border-color:color-mix(in srgb,var(--brand) 55%,var(--line));box-shadow:0 18px 40px -26px var(--shadow);transform:translateY(-2px)}
+[data-mk=mega] .mk-genis{grid-column:span 2}
+[data-mk=mega] .mk-genis .mk-gorsel{aspect-ratio:33/10}
+[data-mk=mega] .mk-gorsel{display:block;overflow:hidden;border-radius:12px;background:var(--bg);aspect-ratio:16/10}
+[data-mk=mega] .mk-gorsel img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+[data-mk=mega] .mk-kart:hover .mk-gorsel img{transform:scale(1.04)}
+[data-mk=mega] .mk-svg{display:flex;align-items:center;justify-content:center;padding:10px}.mk-svg .mg{width:100%;height:100%}
+.ust-menu [data-mk] .mk-gorsel::after{display:none}
+[data-mk=mega] .ust-menu .mk-baslik{display:flex;flex-direction:column;gap:3px;padding:2px 4px;background:transparent;color:var(--head)}
+[data-mk=mega] .mk-baslik small{display:block;font-size:11.5px;font-weight:600;color:var(--acc)}
+[data-mk=mega] .mk-baslik b{font-size:15.5px;font-weight:700;line-height:1.3;letter-spacing:-.01em}
+[data-mk=mega] .ust-menu .mk-baslik:hover b{color:var(--acc)}
+[data-mk=mega] .mk-kart p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:0 4px;font-size:13px;line-height:1.5;color:var(--tx2)}
+[data-mk=mega] .ust-alt .mk-alt-liste{display:flex;flex-direction:row;flex-wrap:wrap;gap:6px;grid-area:auto;margin:auto 4px 0;padding-top:2px}
+[data-mk=mega] .ust-menu .mk-alt-liste a{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card2,var(--bg));color:var(--head);font-size:12.5px;font-weight:600}
+[data-mk=mega] .ust-menu .mk-sutunlu a:hover{background:transparent}
+[data-mk=mega] .ust-menu .mk-sutunlu .mk-alt-liste a:hover{border-color:var(--brand);background:var(--tint);color:var(--tintx)}
+.mk-alt-liste em{font-style:normal;padding:1px 6px;border-radius:999px;background:var(--brand);color:#1A1206;font-size:10.5px;font-weight:700}
+[data-mk=mega] .mk-ozet-kart{grid-column:span var(--s,1);display:flex;flex-direction:column;gap:12px;min-width:0;padding:18px;border-radius:18px;border:1px solid var(--line);background:linear-gradient(150deg,var(--tint),var(--card) 70%);container-type:inline-size}
+.mk-ozet-kart>b{font-size:17px;color:var(--head);letter-spacing:-.01em}
+.mk-ozet-kart>p{margin:0;font-size:13.5px;line-height:1.55;color:var(--tx2)}
+.mk-adimlar{display:flex;flex-direction:column;gap:10px;counter-reset:adim}
+.mk-adimlar li{counter-increment:adim;display:grid;grid-template-columns:26px 1fr;column-gap:10px;align-items:start}
+.mk-adimlar li::before{content:counter(adim);grid-row:span 2;width:26px;height:26px;border-radius:50%;background:var(--card);border:1px solid var(--btnline);color:var(--acc);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.mk-adimlar b{font-size:13.5px;color:var(--head)}.mk-adimlar span{font-size:12.5px;color:var(--tx2);line-height:1.45}
+@container (min-width:520px){.mk-adimlar{flex-direction:row}.mk-adimlar li{flex:1 1 0}}
+.mk-eylem{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-top:auto}
+.ust-menu .mk-ozet-kart .ust-alt-tum{margin:0;padding:0;color:var(--acc);font-weight:700}
+.ust-menu .mk-ikincil{padding:0;color:var(--tx2);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
+.ust-menu .mk-ikincil:hover{color:var(--acc)}
+.mk-cipler{display:flex;flex-wrap:wrap;gap:6px}
+.ust-menu .mk-cipler a{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--card);border:1px solid var(--line);color:var(--head);font-size:12.5px;font-weight:600}
+.ust-menu .mk-cipler a[aria-current=true],[data-mk=mega] .ust-menu .mk-sutunlu .mk-cipler a:hover{background:var(--card);border-color:var(--brand);color:var(--tintx)}
+.mk-cipler small{color:var(--tx2);font-weight:500}
+@media (max-width:1360px){[data-mk=mega] .mk-adimlar span{display:none}}
 .ust-menu .ust-paket-liste a{display:flex;flex-direction:column;gap:2px}
 .ust-paket-liste b{font-weight:600;color:var(--head)}.ust-paket-liste small{font-size:12px;font-weight:500;color:var(--acc)}
 .ust-menu .ust-paket-liste a:hover b{color:var(--acc)}
@@ -668,23 +722,48 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 {PAKET_SUTUN.map((s, i) => (
 <li class={i === 0 ? 'etkin' : undefined} data-kat>
 <a href={`/tr/paketler/kategori/${s.slug}`} class="ust-kat-bas"><span class="uk-ikon" set:html={ikon(PAKET_IKON[s.slug], 18)}></span><span class="uk-ad"><span>{s.ad}</span><em>{s.alt}</em></span><small>{s.paketler.length}</small></a>
-<div class="ust-alt">
-<div class="ust-gorsel"><MenuGorsel id="paket" baslik={s.paketler[0].ad} kademeler={s.paketler[0].kademeler.map((k) => k.ad)} /><span>Temsilî görsel</span></div>
+<div class="ust-alt mk-sutunlu" style={`--s:${Math.max(1, 4 - s.paketler.length)}`}>
 <strong>{s.ad} paketleri</strong>
-<p class="ust-ozet">{s.aciklama}</p>
-<ul class="ust-paket-liste">{s.paketler.map((p) => <li><a href={`/tr/paketler/${p.id}`}><b>{p.ad}</b><small>{p.kademeler.map((k) => k.ad).join(' · ')}</small></a></li>)}</ul>
-<a href={`/tr/paketler/kategori/${s.slug}`} class="ust-alt-tum">{s.ad} paketlerinin tümü →</a>
+<ul class="mk-kartlar">{s.paketler.map((p) => (
+  <li class="mk-kart">
+    <a href={`/tr/paketler/${p.id}`} class="mk-gorsel" tabindex="-1" aria-hidden="true"><img src={`/kapak/cizim/${PAKET_GORSEL[p.id] || 'birlesik'}.webp`} alt="" width="640" height="480" loading="lazy" decoding="async" /></a>
+    <a href={`/tr/paketler/${p.id}`} class="mk-baslik"><small>{p.birlesik ? 'Birleşik setler' : `${p.kademeler.length} kademe`}</small><b>{p.ad}</b></a>
+    <p>{p.ozet}</p>
+    <ul class="mk-alt-liste">{p.kademeler.map((k) => <li><a href={`/tr/paketler/${p.id}#${kademeCapa(k)}`}>{k.ad}{k.rozet && <em>{k.rozet}</em>}</a></li>)}</ul>
+  </li>))}
+</ul>
+<div class="mk-ozet-kart">
+  <b>{s.ad} paketleri</b>
+  <p>{s.aciklama}</p>
+  <ol class="mk-adimlar"><li><b>Ücretsiz analiz</b><span>Hesaplarınızı ve sitenizi inceleriz</span></li><li><b>Kademe önerisi</b><span>İhtiyaca uygun kapsamı gerekçesiyle sunarız</span></li><li><b>Onay ve başlangıç</b><span>Onayınızla kurulum ve yönetime başlarız</span></li></ol>
+  <span class="mk-eylem"><a href={`/tr/paketler/kategori/${s.slug}`} class="ust-alt-tum">{s.ad} paketlerinin tümü →</a><a href="/tr/paketler#sihirbaz" class="mk-ikincil">Emin değilseniz sihirbaz</a></span>
+</div>
 </div>
 </li>
 ))}
 <li data-kat class="ust-kat-sihirbaz">
 <a href="/tr/paketler#sihirbaz" class="ust-kat-bas"><span class="uk-ikon" set:html={ikon('sihirbaz', 18)}></span><span class="uk-ad"><span>Paket sihirbazı</span><em>Kararsızsanız dört soruda bulun</em></span></a>
-<div class="ust-alt">
-<div class="ust-gorsel"><MenuGorsel id="sihirbaz" /><span>Temsilî görsel</span></div>
+<div class="ust-alt mk-sutunlu" style="--s:1">
 <strong>Paket sihirbazı</strong>
-<p class="ust-ozet">İşletme türünüzü, hedefinizi, kanallarınızı ve bütçe aralığınızı seçin; size uygun paketi ve kademeyi gerekçesiyle önerelim.</p>
-<ul class="ust-paket-liste"><li><a href="/tr/paketler#sihirbaz"><b>Sihirbazı başlatın</b><small>Yaklaşık bir dakika</small></a></li><li><a href="/tr/paketler"><b>Paketleri karşılaştırın</b><small>Bütün kademeler tek sayfada</small></a></li></ul>
-<a href="/tr/iletisim#form" class="ust-alt-tum" data-hizli-talep="teklif">Doğrudan teklif isteyin →</a>
+<ul class="mk-kartlar">
+  <li class="mk-kart mk-genis">
+    <a href="/tr/paketler#sihirbaz" class="mk-gorsel mk-svg" tabindex="-1" aria-hidden="true"><MenuGorsel id="sihirbaz" /></a>
+    <a href="/tr/paketler#sihirbaz" class="mk-baslik"><small>Yaklaşık bir dakika</small><b>Dört soruda doğru paket</b></a>
+    <p>İşletme türünüzü, hedefinizi, kanallarınızı ve bütçe aralığınızı seçin; size uygun paketi ve kademeyi gerekçesiyle önerelim.</p>
+    <ul class="mk-alt-liste"><li><a href="/tr/paketler#sihirbaz">Sihirbazı başlatın</a></li></ul>
+  </li>
+  <li class="mk-kart">
+    <a href="/tr/paketler" class="mk-gorsel" tabindex="-1" aria-hidden="true"><img src="/kapak/cizim/yonetim.webp" alt="" width="640" height="480" loading="lazy" decoding="async" /></a>
+    <a href="/tr/paketler" class="mk-baslik"><small>{paketVeri.length} paket</small><b>Paketleri karşılaştırın</b></a>
+    <p>Bütün paketler ve kademeler tek sayfada, kapsamlarıyla yan yana.</p>
+    <ul class="mk-alt-liste"><li><a href="/tr/paketler">Bütün paketler</a></li></ul>
+  </li>
+</ul>
+<div class="mk-ozet-kart">
+  <b>Doğrudan konuşalım</b>
+  <p>Paket seçmeden önce hesaplarınıza bakmamızı isterseniz ücretsiz analizle başlayalım.</p>
+  <span class="mk-eylem"><a href="/tr/iletisim#form" class="ust-alt-tum" data-hizli-talep="teklif">Teklif isteyin →</a><a href="/tr/iletisim#form" class="mk-ikincil" data-hizli-talep="analiz">Ücretsiz analiz</a></span>
+</div>
 </div>
 </li>
 </ul>
@@ -692,21 +771,34 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </div>
 ) : m.k === 'blog' ? (
-<div class="ust-acilir genis" data-acilir>
+<div class="ust-acilir" data-acilir>
 <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
 <button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="blog-menu" aria-label="Blog içeriklerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
-<div class="ust-panel ust-genis-panel" id="blog-menu" data-acilir-panel>
-<div class="ub-izgara">
-  <div class="ub-yazilar">
-    <span class="up-sutun-bas"><b>Son yazılar</b><small>Reklam, e-ticaret ve ölçüm üzerine</small></span>
-    <ul>{yazilar.map((y) => <li><a href={`/tr/haber/${y.slug}`}><small>{y.kategori} · {okumaDk(y)} dk okuma</small><strong>{y.baslik}</strong><span>{y.ozet}</span></a></li>)}</ul>
-  </div>
-  <div class="ub-yan">
-    <span class="up-sutun-bas"><b>Konular</b><small>Kategoriye göre yazılar</small></span>
-    <ul class="ub-konular">{blogKonuSayi.map(([k, n]) => <li><a href="/tr/haberler"><span>{k}</span><small>{n} yazı</small></a></li>)}</ul>
-    <a href="/icerik/" class="up-sihirbaz"><small>Üyelere özel</small><strong>İçerikler ve rehberler</strong><span>Ücretsiz üye olun; yalnız üyelere açılan yazılar, rehberler ve dosyalar.</span><span class="up-ok">İçeriklere göz atın<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
-  </div>
+<div class="ust-panel ust-blog" id="blog-menu" data-acilir-panel>
+<ul class="ust-kat">
+{BLOG_SEKME.map((k, i) => (
+<li class={i === 0 ? 'etkin' : undefined} data-kat>
+<a href={k.href} class="ust-kat-bas"><span class="uk-ikon" set:html={ikon(k.ikon, 18)}></span><span class="uk-ad"><span>{k.ad}</span><em>{k.aciklama}</em></span><small>{k.yazilar.length}</small></a>
+<div class="ust-alt mk-sutunlu" style={`--s:${Math.max(1, 4 - Math.min(3, k.yazilar.length))}`}>
+<strong>{k.ad}</strong>
+<ul class="mk-kartlar">{k.yazilar.slice(0, 3).map((y) => (
+  <li class="mk-kart">
+    <a href={`/tr/haber/${y.slug}`} class="mk-gorsel" tabindex="-1" aria-hidden="true"><img src={`/kapak/cizim/${yaziKapak(y)}.webp`} alt="" width="640" height="480" loading="lazy" decoding="async" /></a>
+    <a href={`/tr/haber/${y.slug}`} class="mk-baslik"><small>{y.kategori} · {okumaDk(y)} dk okuma</small><b>{y.baslik}</b></a>
+    <p>{y.ozet}</p>
+    <ul class="mk-alt-liste"><li><a href={`/tr/haber/${y.slug}`}>Yazıyı okuyun</a></li></ul>
+  </li>))}
+</ul>
+<div class="mk-ozet-kart">
+  <b>{i === 0 ? 'Blog' : k.ad}</b>
+  <p>{i === 0 ? 'Reklam, e-ticaret ve ölçüm üzerine; kendi hesaplarımızda denediğimiz yöntemler.' : k.aciklama + '.'}</p>
+  <span class="mk-cipler">{BLOG_SEKME.slice(1).map((x) => <a href={x.href} aria-current={x.ad === k.ad ? 'true' : undefined}>{x.ad} <small>{x.yazilar.length}</small></a>)}</span>
+  <span class="mk-eylem"><a href={k.href} class="ust-alt-tum">{i === 0 ? 'Bütün yazılar' : `${k.ad} yazılarının tümü`} →</a><a href="/icerik/" class="mk-ikincil">Üyelere özel içerikler</a></span>
 </div>
+</div>
+</li>
+))}
+</ul>
 <div class="ust-panel-dip"><a href="/tr/haberler">Tüm yazılar <span aria-hidden="true">→</span></a><a href="/#bt-eposta" class="ust-dip-cta">Bültene abone olun</a></div>
 </div>
 </div>

@@ -7,4 +7,7 @@ export const IKON: Record<string, string> = {
   'tasarim-icerik': '<path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.6 7.6"></path><circle cx="11" cy="11" r="2"></circle>',
   // Paket sihirbazı (üst menü): sihirli değnek.
   sihirbaz: '<path d="M4 20L15 9"></path><path d="M13 7l4 4"></path><path d="M18 3v3M16.5 4.5h3M20 9v2M19 10h2M10 3v2M9 4h2"></path>',
+  // Blog mega menüsü: yazılar ve ölçüm konusu.
+  yazi: '<path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 12h7M9 16h5"></path>',
+  olcum: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>',
 };
