@@ -23,6 +23,8 @@ const AKORDIYON = {
   iletisim: [{ linkler: [{ ad: 'Talep formu (bu sayfada açılır)', href: '/tr/iletisim#form', talep: 'analiz' }, { ad: 'WhatsApp: 0507 870 06 29', href: 'https://wa.me/905078700629' }, { ad: 'info@idexya.com', href: 'mailto:info@idexya.com' }, { ad: 'İletişim sayfası', href: '/tr/iletisim' }] }]
 };
 // Üst menü açılır panelleri: paketler dört sütunda kategoriye göre, blog son yazılar ve konularla.
+// Paket kategorisi → menü simgesi (src/data/hizmet-ikon.ts).
+const PAKET_IKON = { reklam: 'dijital-reklam', 'e-ticaret': 'e-ticaret', 'web-ve-seo': 'seo', icerik: 'tasarim-icerik' };
 const PAKET_SUTUN = KATEGORILER.map((s) => ({ ...s, paketler: s.idler.map((id) => paketVeri.find((p) => p.id === id)).filter(Boolean) }));
 const blogKonuSayi = Object.entries(yazilar.reduce((a, y) => ({ ...a, [y.kategori]: (a[y.kategori] || 0) + 1 }), {}));
 // Çekmece: yazı başına tahmini okuma süresi (dakikada ~200 kelime).
@@ -220,6 +222,12 @@ main p{max-width:76ch}
 [data-mk=mega] .ust-ozet{grid-area:o;display:block;margin:0 10px 10px;font-size:14px;line-height:1.55;color:var(--tx2);max-width:62ch}
 [data-mk=mega] .ust-alt ul{grid-area:u;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:8px}
 [data-mk=mega] .ust-alt .ust-alt-tum{grid-area:t;justify-self:start}
+.ust-menu .ust-paket-liste a{display:flex;flex-direction:column;gap:2px}
+.ust-paket-liste b{font-weight:600;color:var(--head)}.ust-paket-liste small{font-size:12px;font-weight:500;color:var(--acc)}
+.ust-menu .ust-paket-liste a:hover b{color:var(--acc)}
+.ust-kat-sihirbaz{margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+[data-mk=orta] .ust-kat-sihirbaz{margin-top:0;padding-top:0;border-top:0}
+[data-mk=orta] .ust-paket .ust-kat{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media (max-width:1100px){.ust-menu{display:none}}
 @media (max-width:760px){.ust-eylem .ust-giris,.ust-eylem .ust-cta,.ust-eylem [data-tema-dugme]{display:none}.menu-yazi{display:none}.ust{min-height:64px}}
 /* Menü (Muhittin, 20 Eki 2026): tam ekran açılır; üstte sabit çubuk, solda bölümler, sağda üzerine gelinen bölümün önizlemesi. */
@@ -652,17 +660,34 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </div>
 ) : m.k === 'paketler' ? (
-<div class="ust-acilir genis" data-acilir>
+<div class="ust-acilir" data-acilir>
 <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
 <button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="paket-menu" aria-label="Paket kategorilerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
-<div class="ust-panel ust-genis-panel" id="paket-menu" data-acilir-panel>
-<div class="up-sutunlar">{PAKET_SUTUN.map((s) => (
-  <div class="up-sutun">
-    <a href={`/tr/paketler/kategori/${s.slug}`} class="up-sutun-bas up-sutun-bag"><b>{s.ad} <span aria-hidden="true">→</span></b><small>{s.alt}</small></a>
-    <ul>{s.paketler.map((p) => <li><a href={`/tr/paketler/${p.id}`}><strong>{p.ad}</strong><span>{p.ozet}</span><em>{p.kademeler.map((k) => k.ad).join(' · ')}</em></a></li>)}</ul>
-  </div>))}
-  <a href="/tr/paketler#sihirbaz" class="up-sihirbaz"><small>Kararsız mısınız?</small><strong>Paket sihirbazı</strong><span>Dört soruyla işletmenize uygun paketi bulun.</span><span class="up-ok">Sihirbazı başlatın<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+<div class="ust-panel ust-paket" id="paket-menu" data-acilir-panel>
+<ul class="ust-kat">
+{PAKET_SUTUN.map((s, i) => (
+<li class={i === 0 ? 'etkin' : undefined} data-kat>
+<a href={`/tr/paketler/kategori/${s.slug}`} class="ust-kat-bas"><span class="uk-ikon" set:html={ikon(PAKET_IKON[s.slug], 18)}></span><span class="uk-ad"><span>{s.ad}</span><em>{s.alt}</em></span><small>{s.paketler.length}</small></a>
+<div class="ust-alt">
+<div class="ust-gorsel"><MenuGorsel id="paket" baslik={s.paketler[0].ad} kademeler={s.paketler[0].kademeler.map((k) => k.ad)} /><span>Temsilî görsel</span></div>
+<strong>{s.ad} paketleri</strong>
+<p class="ust-ozet">{s.aciklama}</p>
+<ul class="ust-paket-liste">{s.paketler.map((p) => <li><a href={`/tr/paketler/${p.id}`}><b>{p.ad}</b><small>{p.kademeler.map((k) => k.ad).join(' · ')}</small></a></li>)}</ul>
+<a href={`/tr/paketler/kategori/${s.slug}`} class="ust-alt-tum">{s.ad} paketlerinin tümü →</a>
 </div>
+</li>
+))}
+<li data-kat class="ust-kat-sihirbaz">
+<a href="/tr/paketler#sihirbaz" class="ust-kat-bas"><span class="uk-ikon" set:html={ikon('sihirbaz', 18)}></span><span class="uk-ad"><span>Paket sihirbazı</span><em>Kararsızsanız dört soruda bulun</em></span></a>
+<div class="ust-alt">
+<div class="ust-gorsel"><MenuGorsel id="sihirbaz" /><span>Temsilî görsel</span></div>
+<strong>Paket sihirbazı</strong>
+<p class="ust-ozet">İşletme türünüzü, hedefinizi, kanallarınızı ve bütçe aralığınızı seçin; size uygun paketi ve kademeyi gerekçesiyle önerelim.</p>
+<ul class="ust-paket-liste"><li><a href="/tr/paketler#sihirbaz"><b>Sihirbazı başlatın</b><small>Yaklaşık bir dakika</small></a></li><li><a href="/tr/paketler"><b>Paketleri karşılaştırın</b><small>Bütün kademeler tek sayfada</small></a></li></ul>
+<a href="/tr/iletisim#form" class="ust-alt-tum" data-hizli-talep="teklif">Doğrudan teklif isteyin →</a>
+</div>
+</li>
+</ul>
 <div class="ust-panel-dip"><a href="/tr/paketler">Bütün paketler <span aria-hidden="true">→</span></a><a href="/tr/iletisim#form" class="ust-dip-cta">Teklif isteyin</a></div>
 </div>
 </div>
