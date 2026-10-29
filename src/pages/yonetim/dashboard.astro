@@ -144,9 +144,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 
   <section class="kart modul" data-m="kure" aria-label="Bekleyen talepler">
-    <div class="modul-bas"><h2>Bekleyen talepler</h2><a href="/yonetim/talepler/?sekme=yeni" class="bk-bag">Talepleri aç →</a></div>
+    <div class="modul-bas"><h2>Bekleyen talepler</h2><a href="/leads?sekme=yeni" class="bk-bag">Talepleri aç →</a></div>
     <div class="bk">
-      <a class="bk-halka" href="/yonetim/talepler/?sekme=yeni" aria-label="Yanıt bekleyen talepler">
+      <a class="bk-halka" href="/leads?sekme=yeni" aria-label="Yanıt bekleyen talepler">
         <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="bk-iz"/><circle cx="60" cy="60" r="50" class="bk-dolu" data-bk-taze/><circle cx="60" cy="60" r="50" class="bk-gec" data-bk-gec/></svg>
         <span class="bk-ic"><b data-v="bekleyen">—</b><small>yanıt bekleyen</small></span>
       </a>
@@ -162,7 +162,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 
   <section class="kart modul" data-m="huni" aria-label="Satış hunisi">
-    <div class="modul-bas"><h2>Satış hunisi</h2><a href="/yonetim/crm/" style="font-size: 13px; font-weight: 600">CRM panosu →</a></div>
+    <div class="modul-bas"><h2>Satış hunisi</h2><a href="/crm" style="font-size: 13px; font-weight: 600">CRM panosu →</a></div>
     <ol class="hn" data-huni></ol>
     <div data-huni-alt style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"></div>
   </section>
@@ -197,10 +197,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <section class="kart modul" data-m="hizli" aria-label="Hızlı işlemler">
     <div class="modul-bas"><h2>Hızlı işlemler</h2></div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px">
-      <a class="kpi" href="/yonetim/talepler/?sekme=yeni"><span style="font-weight: 700; color: var(--head)">Talepleri ayıkla</span><span style="font-size: 12px; color: var(--tx2)">Yeni gelenleri CRM’e al veya spam’e ayır</span></a>
-      <a class="kpi" href="/yonetim/icerikler/"><span style="font-weight: 700; color: var(--head)">İçerik yayınla</span><span style="font-size: 12px; color: var(--tx2)">Yazı ve kaynak ekle, görünürlüğü seç</span></a>
-      <a class="kpi" href="/yonetim/uyeler/"><span style="font-weight: 700; color: var(--head)">Üyeleri onayla</span><span style="font-size: 12px; color: var(--tx2)">Başvuruları incele, bölüm aç</span></a>
-      <a class="kpi" href="/yonetim/asistan/"><span style="font-weight: 700; color: var(--head)">Sohbetleri oku</span><span style="font-size: 12px; color: var(--tx2)">Asistanın ziyaretçilerle konuşmaları</span></a>
+      <a class="kpi" href="/leads?sekme=yeni"><span style="font-weight: 700; color: var(--head)">Talepleri ayıkla</span><span style="font-size: 12px; color: var(--tx2)">Yeni gelenleri CRM’e al veya spam’e ayır</span></a>
+      <a class="kpi" href="/articles"><span style="font-weight: 700; color: var(--head)">İçerik yayınla</span><span style="font-size: 12px; color: var(--tx2)">Yazı ve kaynak ekle, görünürlüğü seç</span></a>
+      <a class="kpi" href="/members"><span style="font-weight: 700; color: var(--head)">Üyeleri onayla</span><span style="font-size: 12px; color: var(--tx2)">Başvuruları incele, bölüm aç</span></a>
+      <a class="kpi" href="/assistant"><span style="font-weight: 700; color: var(--head)">Sohbetleri oku</span><span style="font-size: 12px; color: var(--tx2)">Asistanın ziyaretçilerle konuşmaları</span></a>
     </div>
   </section>
 </div>
@@ -291,7 +291,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       us.hidden = false;
       us.replaceChildren(el('span', { class: 'simge', 'aria-hidden': 'true' }, '!'),
         el('span', { style: 'flex: 1; min-width: 200px' }, el('b', {}, `Uyarı: ${b24.n} talep 24 saattir yanıtlanmadı.`), ' En eskisi ', once(b24.en_eski), ' geldi.'),
-        el('a', { class: 'dugme kucuk', href: '/yonetim/talepler/?sekme=yeni' }, 'Talepleri aç →'));
+        el('a', { class: 'dugme kucuk', href: '/leads?sekme=yeni' }, 'Talepleri aç →'));
     }
 
     // Temel sayılar: son 7 gün ve önceki 7 gün; kıvılcım son 30 günün günlük toplamı
@@ -304,12 +304,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const kaz = gr.asamalar.find((a) => a.asama === 'kazanildi') || { n: 0, deger: 0 };
     const yuzde = (x) => (x === null ? '—' : '%' + Math.round(x * 100));
     $('[data-kpi]').replaceChildren(
-      kpiKart({ ad: 'Yeni talep · 7 gün', deger: topla(gunT, g14.slice(7)), onceki: topla(gunT, g14.slice(0, 7)), seri: g30.map((x) => gunT[x] || 0), href: '/yonetim/talepler/?sekme=hepsi', alt: 'önceki 7 güne göre' }),
-      kpiKart({ ad: 'CRM’e alınan · 7 gün', deger: topla(gunM, g14.slice(7)), onceki: topla(gunM, g14.slice(0, 7)), seri: g30.map((x) => gunM[x] || 0), href: '/yonetim/crm/', alt: 'önceki 7 güne göre' }),
-      kpiKart({ ad: 'Talepten müşteriye · 30 gün', metin: yuzde(oran('simdi')), oncekiMetin: 'Önceki 30 gün: ' + yuzde(oran('once')), aciklama: 'CRM’e alınan ÷ spam olmayan talep', href: '/yonetim/talepler/?sekme=crm' }),
-      kpiKart({ ad: 'Yanıt bekleyen', metin: String(bekleyen), aciklama: b24.n ? `${b24.n} tanesi 24 saati geçti` : 'Ayıklanmayı bekliyor', href: '/yonetim/talepler/?sekme=yeni' }),
-      kpiKart({ ad: 'Açık fırsat değeri', metin: o.musteri.n ? para(o.musteri.hat || 0) : '—', aciklama: `${acik} açık fırsat · tahmini aylık`, href: '/yonetim/crm/' }),
-      kpiKart({ ad: 'Kazanılan', metin: kaz.n ? para(kaz.deger) : '—', aciklama: `${kaz.n} müşteri · tüm zamanlar`, href: '/yonetim/crm/' })
+      kpiKart({ ad: 'Yeni talep · 7 gün', deger: topla(gunT, g14.slice(7)), onceki: topla(gunT, g14.slice(0, 7)), seri: g30.map((x) => gunT[x] || 0), href: '/leads?sekme=hepsi', alt: 'önceki 7 güne göre' }),
+      kpiKart({ ad: 'CRM’e alınan · 7 gün', deger: topla(gunM, g14.slice(7)), onceki: topla(gunM, g14.slice(0, 7)), seri: g30.map((x) => gunM[x] || 0), href: '/crm', alt: 'önceki 7 güne göre' }),
+      kpiKart({ ad: 'Talepten müşteriye · 30 gün', metin: yuzde(oran('simdi')), oncekiMetin: 'Önceki 30 gün: ' + yuzde(oran('once')), aciklama: 'CRM’e alınan ÷ spam olmayan talep', href: '/leads?sekme=crm' }),
+      kpiKart({ ad: 'Yanıt bekleyen', metin: String(bekleyen), aciklama: b24.n ? `${b24.n} tanesi 24 saati geçti` : 'Ayıklanmayı bekliyor', href: '/leads?sekme=yeni' }),
+      kpiKart({ ad: 'Açık fırsat değeri', metin: o.musteri.n ? para(o.musteri.hat || 0) : '—', aciklama: `${acik} açık fırsat · tahmini aylık`, href: '/crm' }),
+      kpiKart({ ad: 'Kazanılan', metin: kaz.n ? para(kaz.deger) : '—', aciklama: `${kaz.n} müşteri · tüm zamanlar`, href: '/crm' })
     );
 
     trend();
@@ -339,7 +339,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
     const har = $('[data-hareket]');
     if (!o.sonKayitlar.length) har.append(el('div', { class: 'bos' }, 'Henüz hareket yok. Siteden gelen ilk talep CRM’e alındığında burada görünür.'));
-    o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid var(--line); text-decoration: none; color: inherit' },
+    o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/customer?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid var(--line); text-decoration: none; color: inherit' },
       el('span', { style: 'width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; background: ' + (k.tur === 'talep' ? '#F07A23' : k.tur === 'sistem' ? 'var(--ok)' : 'var(--info)') }),
       el('span', { style: 'flex: 1; display: flex; flex-direction: column; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, k.firma || k.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, k.baslik + ' · ' + k.kim)),
       el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(k.zaman)))));

@@ -124,7 +124,7 @@ export function reklamTablosu(r, yenile) {
   function sutunlar(o) {
     const pl = (o) => [...o.platformlar].map((p) => PLATFORM[p] || p).join(', ') || PLATFORM[o.platform] || o.platform;
     if (durum.sekme === 'hesap') return [
-      { k: 'musteri', ad: 'Müşteri / marka', v: o.crm ? el('a', { href: `/yonetim/musteri/?id=${encodeURIComponent(o.crm)}` }, o.musteri) : o.musteri || el('span', { class: 'rt-soluk' }, 'Atanmamış'), metin: o.musteri || '', sol: true },
+      { k: 'musteri', ad: 'Müşteri / marka', v: o.crm ? el('a', { href: `/customer?id=${encodeURIComponent(o.crm)}` }, o.musteri) : o.musteri || el('span', { class: 'rt-soluk' }, 'Atanmamış'), metin: o.musteri || '', sol: true },
       { k: 'ad', ad: 'Hesap', v: hesapHucre(o), metin: (o.ad || '') + ' ' + o.hesap, sol: true },
       { k: 'platform', ad: 'Platform', v: PLATFORM[o.platform] || o.platform, metin: o.platform, sol: true },
       ...metrik(o)];
@@ -244,7 +244,7 @@ export function reklamTablosu(r, yenile) {
     alt.replaceChildren(...[
       el('span', {}, `${sayi(tumu.length)} satır · ${durum.sekme === 'gun' ? `son ${durum.donem} gün, bugün hariç` : `son ${durum.donem} gün (bugün hariç), önceki ${durum.donem} günle karşılaştırılır`}`),
       digerPara.length ? el('span', {}, ` · ${digerPara.join(', ')} hesapları toplama katılmadı`) : null,
-      adsiz ? el('span', {}, ' · Adsız hesaplara ✎ ile panelde ad verebilir, müşteri adını ', el('a', { href: '/yonetim/crm-idos/' }, 'IDOS eşleştirmesinden'), ' bağlayabilirsiniz') : null].filter(Boolean));
+      adsiz ? el('span', {}, ' · Adsız hesaplara ✎ ile panelde ad verebilir, müşteri adını ', el('a', { href: '/crm-sync' }, 'IDOS eşleştirmesinden'), ' bağlayabilirsiniz') : null].filter(Boolean));
   }
 
   function panelCiz() {

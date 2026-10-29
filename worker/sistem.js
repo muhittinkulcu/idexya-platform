@@ -59,56 +59,56 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       db.prepare('SELECT zaman, durum, mesaj FROM reklam_cekim ORDER BY zaman DESC LIMIT 1')
     ]);
     const t = talep.results[0], u = uye.results[0], y = yorum.results[0];
-    if (t.n) onay.push({ tur: 'talep', baslik: `${t.n} yeni talep yanıt bekliyor`, detay: t.gec ? `${t.gec} talep 24 saatten eski; 1 iş günü içinde dönüş sözü veriliyor.` : 'Hepsi son 24 saat içinde geldi.', zaman: t.en_eski, href: '/yonetim/talepler/?sekme=yeni', onem: t.gec ? 'kritik' : 'normal' });
-    if (u.n) onay.push({ tur: 'uye', baslik: `${u.n} üyelik başvurusu onay bekliyor`, detay: 'Başvuruyu onaylayın ya da reddedin.', zaman: u.en_eski, href: '/yonetim/uyeler/', onem: 'normal' });
-    if (y.n) onay.push({ tur: 'yorum', baslik: `${y.n} yorum yayın onayı bekliyor`, detay: 'Yorumlar onaylanmadan sitede görünmez.', zaman: y.en_eski, href: '/yonetim/icerikler/', onem: 'normal' });
+    if (t.n) onay.push({ tur: 'talep', baslik: `${t.n} yeni talep yanıt bekliyor`, detay: t.gec ? `${t.gec} talep 24 saatten eski; 1 iş günü içinde dönüş sözü veriliyor.` : 'Hepsi son 24 saat içinde geldi.', zaman: t.en_eski, href: '/leads?sekme=yeni', onem: t.gec ? 'kritik' : 'normal' });
+    if (u.n) onay.push({ tur: 'uye', baslik: `${u.n} üyelik başvurusu onay bekliyor`, detay: 'Başvuruyu onaylayın ya da reddedin.', zaman: u.en_eski, href: '/members', onem: 'normal' });
+    if (y.n) onay.push({ tur: 'yorum', baslik: `${y.n} yorum yayın onayı bekliyor`, detay: 'Yorumlar onaylanmadan sitede görünmez.', zaman: y.en_eski, href: '/articles', onem: 'normal' });
     // Diğer modüllerin tabloları varsa onlardan da bildirim üret (modüller ayrı ayrı kurulabilir).
     if (await tabloVar(db, 'gorevler')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM gorevler WHERE durum = 'acik' AND tarih < ?").bind(new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10)).first();
-      if (g && g.n) onay.push({ tur: 'gorev', baslik: `${g.n} görevin tarihi geçti`, detay: 'Tamamlayın ya da yeni tarih verin.', href: '/yonetim/gorevler/', onem: 'kritik' });
+      if (g && g.n) onay.push({ tur: 'gorev', baslik: `${g.n} görevin tarihi geçti`, detay: 'Tamamlayın ya da yeni tarih verin.', href: '/tasks', onem: 'kritik' });
     }
     if (await tabloVar(db, 'teklifler')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM teklifler WHERE durum = 'gonderildi' AND gecerlilik IS NOT NULL AND gecerlilik < ?").bind(new Date().toISOString().slice(0, 10)).first();
-      if (g && g.n) onay.push({ tur: 'teklif', baslik: `${g.n} gönderilen teklifin geçerlilik süresi doldu`, detay: 'Müşteriyle görüşüp kabul ya da red olarak işaretleyin.', href: '/yonetim/teklifler/?sekme=gonderildi', onem: 'normal' });
+      if (g && g.n) onay.push({ tur: 'teklif', baslik: `${g.n} gönderilen teklifin geçerlilik süresi doldu`, detay: 'Müşteriyle görüşüp kabul ya da red olarak işaretleyin.', href: '/proposals?sekme=gonderildi', onem: 'normal' });
     }
     if (await tabloVar(db, 'hesap_envanteri')) {
       const u = await envanterUyarilari(db);
       const kritik = u.filter((x) => x.onem === 'kritik').length;
-      if (u.length) onay.push({ tur: 'envanter', baslik: `Hesap envanterinde ${u.length} uyarı`, detay: kritik ? `${kritik} kritik: biten müşteride açık erişim ya da IDOS ile çelişen hesap.` : 'Uzun süredir bekleyen erişim istekleri var.', href: '/yonetim/hesaplar/', onem: kritik ? 'kritik' : 'normal' });
+      if (u.length) onay.push({ tur: 'envanter', baslik: `Hesap envanterinde ${u.length} uyarı`, detay: kritik ? `${kritik} kritik: biten müşteride açık erişim ya da IDOS ile çelişen hesap.` : 'Uzun süredir bekleyen erişim istekleri var.', href: '/accounts', onem: kritik ? 'kritik' : 'normal' });
     }
     if (await tabloVar(db, 'site_saglik_hedef')) {
       const u = await siteSaglikUyarilari(db), kritik = u.filter((x) => x.son_durum === 'kritik');
-      if (u.length) onay.push({ tur: 'site', baslik: kritik.length ? `${kritik.length} müşteri sitesinde kritik sorun` : `${u.length} müşteri sitesinde uyarı`, detay: u.slice(0, 3).map((x) => `${x.firma || x.ad || ''} ${new URL(x.adres).hostname}`.trim()).join(' · '), href: '/yonetim/site-saglik/', onem: kritik.length ? 'kritik' : 'normal' });
+      if (u.length) onay.push({ tur: 'site', baslik: kritik.length ? `${kritik.length} müşteri sitesinde kritik sorun` : `${u.length} müşteri sitesinde uyarı`, detay: u.slice(0, 3).map((x) => `${x.firma || x.ad || ''} ${new URL(x.adres).hostname}`.trim()).join(' · '), href: '/client-sites', onem: kritik.length ? 'kritik' : 'normal' });
     }
     if (await tabloVar(db, 'destek_talepleri')) {
       const g = await db.prepare("SELECT COUNT(*) AS n, MIN(guncelleme) AS en_eski FROM destek_talepleri WHERE durum = 'acik'").first();
-      if (g && g.n) onay.push({ tur: 'destek', baslik: `${g.n} destek talebi yanıt bekliyor`, detay: 'Müşteri alanından gelen talepleri yanıtlayın.', zaman: g.en_eski, href: '/yonetim/destek/', onem: 'normal' });
+      if (g && g.n) onay.push({ tur: 'destek', baslik: `${g.n} destek talebi yanıt bekliyor`, detay: 'Müşteri alanından gelen talepleri yanıtlayın.', zaman: g.en_eski, href: '/support', onem: 'normal' });
     }
     if (await tabloVar(db, 'muhasebe')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM muhasebe WHERE tur = 'gelir' AND durum = 'bekliyor' AND vade IS NOT NULL AND vade < ?").bind(new Date().toISOString().slice(0, 10)).first();
       const yakin = await db.prepare("SELECT COUNT(*) AS n FROM muhasebe WHERE tur = 'gelir' AND durum = 'bekliyor' AND vade IS NOT NULL AND vade >= ? AND vade <= ?")
         .bind(new Date().toISOString().slice(0, 10), new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10)).first();
-      if (yakin && yakin.n) onay.push({ tur: 'muhasebe', baslik: `${yakin.n} alacağın vadesi 3 gün içinde doluyor`, detay: 'Müşteriye ödeme hatırlatması yapmayı unutmayın.', href: '/yonetim/muhasebe/', onem: 'normal' });
-      if (g && g.n) onay.push({ tur: 'muhasebe', baslik: `${g.n} alacağın vadesi geçti`, detay: 'Tahsilatı takip edin.', href: '/yonetim/muhasebe/', onem: 'kritik' });
+      if (yakin && yakin.n) onay.push({ tur: 'muhasebe', baslik: `${yakin.n} alacağın vadesi 3 gün içinde doluyor`, detay: 'Müşteriye ödeme hatırlatması yapmayı unutmayın.', href: '/accounting', onem: 'normal' });
+      if (g && g.n) onay.push({ tur: 'muhasebe', baslik: `${g.n} alacağın vadesi geçti`, detay: 'Tahsilatı takip edin.', href: '/accounting', onem: 'kritik' });
     }
     // Sistem uyarıları
-    if (!env.TURNSTILE_SECRET) uyari.push({ baslik: 'Robot doğrulaması (Turnstile) kapalı', detay: 'Formlar yalnız hız sınırıyla korunuyor. Cloudflare Turnstile anahtarlarını tanımlayın.', href: '/yonetim/entegrasyonlar/', onem: 'uyari' });
-    if (!env.IP_TUZ) uyari.push({ baslik: 'IP_TUZ gizli değeri tanımlı değil', detay: 'IP adresleri varsayılan tuzla özetleniyor. Cloudflare’de rastgele bir IP_TUZ gizli değeri girin.', href: '/yonetim/entegrasyonlar/', onem: 'uyari' });
-    if (!reklamKurulu(env)) uyari.push({ baslik: 'IDOS reklam verisi bağlı değil', detay: 'Genel bakıştaki reklam grafikleri boş kalır. IDOS_BQ_GORUNUM ve IDOS_BQ_ANAHTAR tanımlanmalı.', href: '/yonetim/entegrasyonlar/', onem: 'bilgi' });
+    if (!env.TURNSTILE_SECRET) uyari.push({ baslik: 'Robot doğrulaması (Turnstile) kapalı', detay: 'Formlar yalnız hız sınırıyla korunuyor. Cloudflare Turnstile anahtarlarını tanımlayın.', href: '/integrations', onem: 'uyari' });
+    if (!env.IP_TUZ) uyari.push({ baslik: 'IP_TUZ gizli değeri tanımlı değil', detay: 'IP adresleri varsayılan tuzla özetleniyor. Cloudflare’de rastgele bir IP_TUZ gizli değeri girin.', href: '/integrations', onem: 'uyari' });
+    if (!reklamKurulu(env)) uyari.push({ baslik: 'IDOS reklam verisi bağlı değil', detay: 'Genel bakıştaki reklam grafikleri boş kalır. IDOS_BQ_GORUNUM ve IDOS_BQ_ANAHTAR tanımlanmalı.', href: '/integrations', onem: 'bilgi' });
     if (akisKurulu(env)) {
       const ih = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'instagram_son_hata'").first();
-      if (ih && ih.deger) uyari.push({ baslik: 'Instagram akışı güncellenemedi', detay: ih.deger, zaman: ih.guncelleme, href: '/yonetim/instagram/', onem: 'uyari' });
+      if (ih && ih.deger) uyari.push({ baslik: 'Instagram akışı güncellenemedi', detay: ih.deger, zaman: ih.guncelleme, href: '/instagram', onem: 'uyari' });
     }
     const eh = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'eposta_son_hata'").first();
-    if (eh && eh.deger) uyari.push({ baslik: 'Bildirim e-postası gönderilemedi', detay: eh.deger + ' — idexya.com alan adının Cloudflare Email Sending’e eklendiğini kontrol edin.', zaman: eh.guncelleme, href: '/yonetim/ayarlar/', onem: 'uyari' });
+    if (eh && eh.deger) uyari.push({ baslik: 'Bildirim e-postası gönderilemedi', detay: eh.deger + ' — idexya.com alan adının Cloudflare Email Sending’e eklendiğini kontrol edin.', zaman: eh.guncelleme, href: '/settings', onem: 'uyari' });
     const yd = await yedekDurum(env);
-    if (!yd.kurulu) uyari.push({ baslik: 'Otomatik veritabanı yedeği kapalı', detay: 'Cloudflare R2 deposu (YEDEK) bağlı değil. Şimdilik Yedekler sayfasından elle yedek indirebilirsiniz.', href: '/yonetim/yedekler/', onem: 'bilgi' });
-    else if (!yd.son || Date.parse(yd.son.zaman) < Date.now() - 36 * 3600000) uyari.push({ baslik: 'Son 36 saatte veritabanı yedeği alınmadı', detay: yd.son ? `Son yedek: ${yd.son.anahtar}` : 'Henüz hiç yedek yok.', zaman: yd.son ? yd.son.zaman : null, href: '/yonetim/yedekler/', onem: 'uyari' });
+    if (!yd.kurulu) uyari.push({ baslik: 'Otomatik veritabanı yedeği kapalı', detay: 'Cloudflare R2 deposu (YEDEK) bağlı değil. Şimdilik Yedekler sayfasından elle yedek indirebilirsiniz.', href: '/backups', onem: 'bilgi' });
+    else if (!yd.son || Date.parse(yd.son.zaman) < Date.now() - 36 * 3600000) uyari.push({ baslik: 'Son 36 saatte veritabanı yedeği alınmadı', detay: yd.son ? `Son yedek: ${yd.son.anahtar}` : 'Henüz hiç yedek yok.', zaman: yd.son ? yd.son.zaman : null, href: '/backups', onem: 'uyari' });
     const c = cekim.results[0];
-    if (c && c.durum !== 'tamam') uyari.push({ baslik: 'Son IDOS veri çekimi başarısız', detay: c.mesaj || 'Ayrıntı için Veri eşitleme sayfasına bakın.', zaman: c.zaman, href: '/yonetim/veri-esitleme/', onem: 'kritik' });
+    if (c && c.durum !== 'tamam') uyari.push({ baslik: 'Son IDOS veri çekimi başarısız', detay: c.mesaj || 'Ayrıntı için Veri eşitleme sayfasına bakın.', zaman: c.zaman, href: '/data-sync', onem: 'kritik' });
     if (await tabloVar(db, 'denetimler')) {
       const d = await db.prepare('SELECT zaman, ozet FROM denetimler ORDER BY zaman DESC LIMIT 1').first();
-      if (d) { try { const o = JSON.parse(d.ozet || '{}'); const kritik = (o.agirlik && o.agirlik.kritik) || 0; if (kritik) uyari.push({ baslik: 'Site denetiminde kritik sorunlar var', detay: `${kritik} kritik sorun · site puanı ${o.puan}`, zaman: d.zaman, href: '/yonetim/seo/', onem: 'uyari' }); } catch (e) { /* özet okunamadı */ } }
+      if (d) { try { const o = JSON.parse(d.ozet || '{}'); const kritik = (o.agirlik && o.agirlik.kritik) || 0; if (kritik) uyari.push({ baslik: 'Site denetiminde kritik sorunlar var', detay: `${kritik} kritik sorun · site puanı ${o.puan}`, zaman: d.zaman, href: '/seo', onem: 'uyari' }); } catch (e) { /* özet okunamadı */ } }
     }
     return json({ ok: true, onay, uyari });
   }

@@ -13,7 +13,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; align-items: flex-start' }, el('b', {}, b.ad), el('span', { class: 'cip ' + DURUM[b.durum][1], style: 'flex: none' }, DURUM[b.durum][0])),
         el('span', { style: 'color: var(--tx2); font-size: 14px' }, b.detay),
         b.ayar ? el('code', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, 'Ayar: ' + b.ayar) : null,
-        b.k === 'idos' ? el('a', { href: '/yonetim/veri-esitleme/', style: 'font-size: 14px; font-weight: 600' }, 'Veri eşitleme geçmişi →') : null)));
+        b.k === 'idos' ? el('a', { href: '/data-sync', style: 'font-size: 14px; font-weight: 600' }, 'Veri eşitleme geçmişi →') : null)));
     } catch (h) { genelHata('Entegrasyonlar yüklenemedi: ' + h.message); }
   })();
 </script>

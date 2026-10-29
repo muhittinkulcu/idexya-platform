@@ -21,7 +21,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
   let tum = [], gorunum = 'pano';
   try { gorunum = localStorage.getItem('idx-crm-gorunum') || 'pano'; } catch (e) {}
-  const bag = (m) => '/yonetim/musteri/?id=' + encodeURIComponent(m.id);
+  const bag = (m) => '/customer?id=' + encodeURIComponent(m.id);
   const baslik = (m) => m.firma || m.ad || m.eposta || '—';
 
   async function asamaDegis(m, yeni, sec) {
@@ -70,7 +70,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   form.addEventListener('submit', async (o) => {
     o.preventDefault();
     const v = Object.fromEntries(new FormData(form));
-    try { const s = await api('musteriler', v); location.href = '/yonetim/musteri/?id=' + encodeURIComponent(s.musteri_id) + (s.mevcut ? '&mevcut=1' : ''); }
+    try { const s = await api('musteriler', v); location.href = '/customer?id=' + encodeURIComponent(s.musteri_id) + (s.mevcut ? '&mevcut=1' : ''); }
     catch (h) { fdurum.hidden = false; fdurum.textContent = h.message; }
   });
   (async () => {

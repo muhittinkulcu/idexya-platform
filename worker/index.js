@@ -28,6 +28,7 @@ import { yonetimSiteSaglikApi, siteSaglikCron } from './site-saglik.js';
 import { yonetimDonusumApi, reklamTemizle, talepReklamSorgu } from './donusum.js';
 import { ekibeBildir } from './eposta.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
+import { panelAlani, panelKoku, eskiYol, SAYFALAR } from './panel-yollar.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -38,7 +39,7 @@ const ALAN_ADI = { firma: 'Firma', ad: 'Yetkili kişi', eposta: 'E-posta', telef
 let jwks = null;
 async function yonetici(istek, env) {
   const url = new URL(istek.url);
-  if (env.YEREL_GIRIS === 'evet' && (url.hostname === 'localhost' || url.hostname === '127.0.0.1')) return { eposta: 'yerel@gelistirme' };
+  if (env.YEREL_GIRIS === 'evet' && (['localhost', '127.0.0.1', 'panel.localhost'].includes(url.hostname))) return { eposta: 'yerel@gelistirme' };
   if (!env.TEAM_DOMAIN || !env.POLICY_AUD) return null;
   const jeton = istek.headers.get('cf-access-jwt-assertion');
   if (!jeton) return null;
@@ -99,7 +100,7 @@ async function talepAl(istek, env) {
   const KAYNAK_ADI = { iletisim: 'İletişim formu', analiz: 'Ücretsiz analiz formu', paket: 'Paket teklif formu', sihirbaz: 'Paket sihirbazı', asistan: 'Yapay zekâ asistanı', form: 'Site formu' };
   await ekibeBildir(env, `Yeni talep: ${ad}${kirp(g.firma, 160) ? ' · ' + kirp(g.firma, 160) : ''}`, [['Kaynak', KAYNAK_ADI[kaynak] || kaynak], ['Ad', ad], ['Firma', kirp(g.firma, 160) || '—'],
     ['E-posta', eposta || '—'], ['Telefon', telefon || '—'], ['Konu', kirp(g.konu, 120) || '—'], ['Mesaj', kirp(g.mesaj, 1500) || '—'], ['Sayfa', kirp(g.sayfa, 200) || '—']],
-    { metin: 'Panelde aç', yol: '/yonetim/talepler/?sekme=yeni' }, eposta || undefined);
+    { metin: 'Panelde aç', yol: '/leads?sekme=yeni' }, eposta || undefined);
   return json({ ok: true });
 }
 
@@ -257,17 +258,24 @@ async function yonetimApi(istek, env, yol, kim) {
   return hata('Bulunamadı', 404);
 }
 
-const PANEL_ALAN = 'panel.idexya.com';
-
 export default {
   async fetch(istek, env, ctx) {
     const url = new URL(istek.url);
     const yol = url.pathname;
     try {
-      // Yönetim paneli girişi panel.idexya.com (Muhittin, 29 Eki 2026). Kök adres panele gider; ?tema=… (tema önizlemesi) sitenin kendisini açar.
-      if (url.hostname === PANEL_ALAN && yol === '/' && !url.searchParams.has('tema')) return Response.redirect(`${url.origin}/yonetim/`, 302);
-      // Eski adres: PANEL_YONLENDIR=evet olduğunda idexya.com/yonetim… panel.idexya.com'a taşınır (Access ayarı tamamlanınca açılır).
-      if (env.PANEL_YONLENDIR === 'evet' && url.hostname === 'idexya.com' && (yol === '/yonetim' || yol.startsWith('/yonetim/'))) return Response.redirect(`https://${PANEL_ALAN}${yol}${url.search}`, 301);
+      // Yönetim paneli yalnız panel.idexya.com'da, İngilizce adreslerle açılır (worker/panel-yollar.js).
+      const panel = panelAlani(url, env);
+      if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${panelKoku(url, env)}${eskiYol(yol)}${url.search}`, 301);
+      let panelSayfa = null;
+      if (panel) {
+        // Kök adres panele gider; ?tema=… (tema düzenleyici önizlemesi) sitenin kendisini açar.
+        if (yol === '/' && !url.searchParams.has('tema')) return Response.redirect(`${url.origin}/dashboard`, 302);
+        const m = yol.match(/^\/([a-z-]+)(\/?)$/);
+        if (m && SAYFALAR.has(m[1])) {
+          if (m[2]) return Response.redirect(`${url.origin}/${m[1]}${url.search}`, 301);
+          panelSayfa = m[1];
+        }
+      }
       if (yol === '/api/talep') {
         if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
         return await talepAl(istek, env);
@@ -295,14 +303,14 @@ export default {
         const uyeYol = yol.slice('/api/uye/'.length).replace(/\/$/, '');
         return (await uyeMusteriApi(istek, env, uyeYol)) || (await uyeApi(istek, env, uyeYol));
       }
-      if (yol.startsWith('/api/yonetim/') || yol === '/yonetim' || yol.startsWith('/yonetim/')) {
+      if (yol.startsWith('/api/yonetim/') || yol.startsWith('/yonetim/') || panelSayfa) {
         const kim = await yonetici(istek, env);
         if (!kim) {
           if (yol.startsWith('/api/')) return hata('Giriş gerekli', 401);
           return new Response('Bu sayfa için giriş gerekli.', { status: 401, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
         }
         if (yol.startsWith('/api/yonetim/')) return await yonetimApi(istek, env, yol.slice('/api/yonetim/'.length).replace(/\/$/, ''), kim);
-        const yanit = await env.ASSETS.fetch(istek);
+        const yanit = await env.ASSETS.fetch(panelSayfa ? new Request(new URL(`/yonetim/${panelSayfa}/`, url), istek) : istek);
         const y = new Response(yanit.body, yanit);
         Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => y.headers.set(k, v));
         y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
