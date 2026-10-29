@@ -1,0 +1,217 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+import menuVeri from '../../data/site-menu.json';
+// Tema düzenleyici: üst menü, üst alan düğmeleri ve altbilgi. Varsayılanlar derlenmiş siteden (site-menu.json) gelir;
+// kayıt worker/tema-ayar.js'de tutulur, site tarayıcıda uygular (src/scripts/tema-ayar.js).
+const ACILIR = ['hizmetler', 'paketler', 'blog'];
+const varsayilan = {
+  menu: { stil: 'mega', ogeler: menuVeri.ust.map((m) => ({ k: m.k, ad: m.ad, gorunur: m.ust !== false, acilir: true, acilirOlabilir: ACILIR.includes(m.k), varsayilanAd: m.ad })) },
+  ust: { ctaMetin: 'Ücretsiz analiz iste', ctaEylem: 'analiz', ctaHref: '', giris: true, arama: true, temaDugme: true },
+  alt: { tanitim: menuVeri.tanitim, telif: '© 2026 Idexya | Good Things', sosyal: true, sutunlar: menuVeri.alt.map((s) => ({ baslik: s.baslik, baglantilar: s.baglantilar.map((b) => ({ ad: b.ad, href: b.href })) })) }
+};
+---
+<Yonetim baslik="Tema düzenleyici" aktif="tema" yol="Web sitesi" aciklama="Üst menüyü, üst alandaki düğmeleri ve altbilgiyi düzenleyin. Sağdaki önizleme değişiklikleri anında gösterir; “Kaydet ve yayınla” ile en geç bir dakika içinde sitede görünür.">
+<script type="application/json" id="tema-varsayilan" set:html={JSON.stringify(varsayilan)}></script>
+<div class="te">
+  <div class="te-sol">
+    <div role="tablist" aria-label="Bölüm" class="te-sekme" data-sekmeler></div>
+    <div data-panel></div>
+  </div>
+  <div class="te-sag kart">
+    <div class="te-sag-ust">
+      <b>Canlı önizleme</b>
+      <span style="flex:1"></span>
+      <select data-sayfa aria-label="Önizlenen sayfa"><option value="/">Ana sayfa</option><option value="/tr/hizmetler">Hizmetler</option><option value="/tr/paketler">Paketler</option><option value="/tr/haberler">Blog</option></select>
+      <div class="te-seg" role="group" aria-label="Cihaz"><button type="button" data-cihaz="masa" aria-pressed="true">Masaüstü</button><button type="button" data-cihaz="tel" aria-pressed="false">Telefon</button></div>
+    </div>
+    <div class="te-cerceve-kap" data-kap><iframe title="Site önizlemesi" data-iframe loading="lazy"></iframe></div>
+    <p class="te-not">Önizlemede açılır menüleri görmek için menü başlığının üzerine gelin. Önizleme yalnız sizin tarayıcınızdadır; kaydedene kadar ziyaretçiler eski hâli görür.</p>
+  </div>
+  <div class="te-alt kart">
+    <span data-mesaj class="te-mesaj" role="status"></span>
+    <span style="flex:1"></span>
+    <button type="button" class="dugme" data-sifirla>Varsayılana dön</button>
+    <button type="button" class="dugme" data-vazgec>Değişiklikleri geri al</button>
+    <button type="button" class="dugme birincil" data-kaydet>Kaydet ve yayınla</button>
+  </div>
+</div>
+<style is:global>
+  .te{display:grid;grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr);gap:16px;align-items:start;padding-bottom:80px}
+  .te-sol{display:flex;flex-direction:column;gap:12px;min-width:0}
+  .te-sekme,.te-seg{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--track,var(--card2));align-self:flex-start}
+  .te-sekme button,.te-seg button{min-height:34px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+  .te-sekme button[aria-selected=true],.te-seg button[aria-pressed=true]{background:var(--card);color:var(--head);box-shadow:0 1px 3px var(--shadow)}
+  .te-bolum{padding:16px;display:flex;flex-direction:column;gap:12px}
+  .te-bolum>h3{margin:0;font-size:15px;color:var(--head)}.te-bolum>p{margin:0;font-size:13px;color:var(--tx2);line-height:1.5}
+  .te-stil{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .te-stil button{display:flex;flex-direction:column;gap:6px;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--tx);font:inherit;text-align:left;cursor:pointer}
+  .te-stil button[aria-pressed=true]{border-color:var(--brand);box-shadow:0 0 0 3px var(--tint)}
+  .te-stil b{font-size:13px;color:var(--head)}.te-stil span{font-size:12px;color:var(--tx2);line-height:1.4}
+  .te-stil i{display:block;height:46px;border-radius:8px;background:var(--card2);position:relative;overflow:hidden}
+  .te-stil i::before,.te-stil i::after{content:"";position:absolute;background:var(--line);border-radius:3px}
+  .te-stil .s-mega i::before{left:6px;top:6px;bottom:6px;width:30%}.te-stil .s-mega i::after{right:6px;top:6px;bottom:6px;width:56%;background:linear-gradient(90deg,var(--line) 30%,transparent 30% 35%,var(--line) 35% 65%,transparent 65% 70%,var(--line) 70%)}
+  .te-stil .s-orta i::before{left:6px;right:6px;top:6px;height:12px}.te-stil .s-orta i::after{left:6px;right:6px;top:22px;bottom:6px;background:repeating-linear-gradient(90deg,var(--line) 0 18%,transparent 18% 21%)}
+  .te-stil .s-standart i::before{left:6px;top:6px;bottom:6px;width:40%}.te-stil .s-standart i::after{left:48%;top:6px;width:30%;bottom:6px}
+  .te-oge{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  .te-oge.gizli{opacity:.55}
+  .te-sutun input,.te-oge input[type=text],.te-oge input[type=url],.te-alan input,.te-alan textarea,.te-alan select,.te-sag-ust select{min-height:36px;padding:6px 10px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;width:100%;box-sizing:border-box}
+  .te-oge .te-ozel{grid-column:3/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
+  .te-sira{display:flex;flex-direction:column}.te-sira button{width:26px;height:18px;border:0;background:transparent;color:var(--tx2);cursor:pointer;font-size:11px;line-height:1}.te-sira button:hover{color:var(--acc)}
+  .te-anahtar{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--head);white-space:nowrap;cursor:pointer}
+  .te-mini{min-height:30px;padding:0 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--tx2);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  .te-mini:hover{border-color:var(--brand);color:var(--acc)}
+  .te-alan{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--head)}
+  .te-izgara{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .te-sutun{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card2)}
+  .te-sutun-ust{display:flex;gap:6px;align-items:center}
+  .te-bag{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1fr) auto;gap:6px}
+  .te-sag{position:sticky;top:84px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+  .te-sag-ust{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.te-sag-ust select{width:auto}
+  .te-cerceve-kap{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line);background:var(--card2);height:640px}
+  .te-cerceve-kap iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#fff}
+  .te-not{margin:0;font-size:12px;color:var(--tx2)}
+  .te-alt{position:fixed;left:auto;right:24px;bottom:16px;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;box-shadow:0 20px 50px -20px var(--shadow);max-width:calc(100vw - 48px)}.te-alt .dugme{white-space:nowrap}
+  .te-mesaj{font-size:13px;color:var(--tx2)}
+  @media (max-width:1200px){.te{grid-template-columns:1fr}.te-sag{position:static}}
+</style>
+<script>
+  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  const VARS = JSON.parse(document.getElementById('tema-varsayilan').textContent);
+  const kopya = (x) => JSON.parse(JSON.stringify(x));
+  let kayitli = null, taslak = null, sekme = 'menu', cihaz = 'masa', degisti = false;
+  const $ = (s) => document.querySelector(s);
+  const panel = $('[data-panel]'), mesaj = $('[data-mesaj]'), iframe = $('[data-iframe]'), kap = $('[data-kap]');
+
+  // Kayıtlı ayar varsayılanın üzerine giydirilir: yeni menü öğeleri listede kalır, kaldırılmışlar düşer.
+  function birlestir(t) {
+    const v = kopya(VARS);
+    if (!t) return v;
+    if (t.menu) {
+      v.menu.stil = t.menu.stil || v.menu.stil;
+      const vm = new Map(v.menu.ogeler.map((o) => [o.k, o]));
+      const sirali = [];
+      for (const o of t.menu.ogeler || []) {
+        if (o.k.startsWith('ozel-')) sirali.push({ ...o, ozel: true });
+        else if (vm.has(o.k)) { sirali.push({ ...vm.get(o.k), ad: o.ad || vm.get(o.k).ad, gorunur: o.gorunur !== false, acilir: o.acilir !== false }); vm.delete(o.k); }
+      }
+      v.menu.ogeler = [...sirali, ...vm.values()];
+    }
+    if (t.ust) v.ust = { ...v.ust, ...t.ust, ctaHref: t.ust.ctaHref || '' };
+    if (t.alt) v.alt = { ...v.alt, ...Object.fromEntries(Object.entries(t.alt).filter(([, x]) => x !== '' && x !== null)) };
+    return v;
+  }
+  const kayitBicimi = (t) => ({
+    menu: { stil: t.menu.stil, ogeler: t.menu.ogeler.map((o) => o.ozel ? { k: o.k, ad: o.ad, href: o.href, yeniSekme: !!o.yeniSekme, gorunur: o.gorunur !== false } : { k: o.k, ad: o.ad === o.varsayilanAd ? '' : o.ad, gorunur: o.gorunur, acilir: o.acilir }) },
+    ust: { ...t.ust }, alt: kopya(t.alt)
+  });
+
+  let zamanlayici;
+  function degis() {
+    degisti = true; mesaj.textContent = 'Kaydedilmemiş değişiklik var · önizleme güncel';
+    clearTimeout(zamanlayici);
+    zamanlayici = setTimeout(() => { try { localStorage.setItem('idx-tema-onizleme', JSON.stringify({ tema: kayitBicimi(taslak) })); } catch {} }, 250);
+    // Odak kaybında (change) çizim, olay bittikten sonra yapılır
+    setTimeout(ciz, 0);
+  }
+
+  function sekmeCiz() {
+    $('[data-sekmeler]').replaceChildren(...[['menu', 'Üst menü'], ['ust', 'Üst alan'], ['alt', 'Altbilgi']].map(([k, a]) => el('button', { type: 'button', role: 'tab', 'aria-selected': String(sekme === k), onclick: () => { sekme = k; ciz(); } }, a)));
+  }
+
+  function menuCiz() {
+    const m = taslak.menu;
+    const STIL = [['mega', 'Mega menü', 'Solda kategoriler, sağda görselli kartlar'], ['orta', 'Sütunlu', 'Bütün alt bağlantılar tek panelde'], ['standart', 'Klasik açılır', 'Kategori ve alt bağlantı listesi']];
+    const tasi = (i, d) => { const j = i + d; if (j < 0 || j >= m.ogeler.length) return; [m.ogeler[i], m.ogeler[j]] = [m.ogeler[j], m.ogeler[i]]; degis(); };
+    return [
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Açılır menü stili'), el('p', {}, 'Hizmetler, Paketler ve Blog gibi alt bağlantısı olan başlıklar üzerine gelindiğinde nasıl açılsın?'),
+        el('div', { class: 'te-stil' }, ...STIL.map(([k, a, d]) => el('button', { type: 'button', class: 's-' + k, 'aria-pressed': String(m.stil === k), onclick: () => { m.stil = k; degis(); } }, el('i'), el('b', {}, a), el('span', {}, d))))),
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Menü öğeleri'), el('p', {}, 'Sırayı oklarla değiştirin; adı düzenleyin, gizleyin ya da açılır menüyü kapatıp düz bağlantıya çevirin. Mobil menü de aynı sırayı izler.'),
+        ...m.ogeler.map((o, i) => el('div', { class: 'te-oge' + (o.gorunur === false ? ' gizli' : '') },
+          el('div', { class: 'te-sira' }, el('button', { type: 'button', 'aria-label': 'Yukarı taşı', onclick: () => tasi(i, -1) }, '▲'), el('button', { type: 'button', 'aria-label': 'Aşağı taşı', onclick: () => tasi(i, 1) }, '▼')),
+          el('label', { class: 'te-anahtar', title: 'Menüde göster' }, el('input', { type: 'checkbox', checked: o.gorunur !== false, onchange: (e) => { o.gorunur = e.target.checked; degis(); } }), 'Göster'),
+          el('input', { type: 'text', value: o.ad, maxlength: '40', 'aria-label': 'Menü adı', placeholder: o.varsayilanAd || 'Ad', onchange: (e) => { o.ad = e.target.value.trim() || o.varsayilanAd || ''; degis(); } }),
+          o.acilirOlabilir ? el('label', { class: 'te-anahtar', title: 'Kapalıysa yalnız bağlantı olur' }, el('input', { type: 'checkbox', checked: o.acilir !== false, onchange: (e) => { o.acilir = e.target.checked; degis(); } }), 'Açılır menü') : el('span', { style: 'font-size:12px;color:var(--tx2)' }, o.ozel ? 'Özel bağlantı' : 'Bağlantı'),
+          o.ozel ? el('button', { type: 'button', class: 'te-mini', onclick: () => { m.ogeler.splice(i, 1); degis(); } }, 'Sil') : el('span'),
+          o.ozel ? el('div', { class: 'te-ozel' }, el('input', { type: 'url', value: o.href || '', placeholder: '/tr/sayfa/… ya da https://…', 'aria-label': 'Bağlantı adresi', onchange: (e) => { o.href = e.target.value.trim(); degis(); } }),
+            el('label', { class: 'te-anahtar' }, el('input', { type: 'checkbox', checked: !!o.yeniSekme, onchange: (e) => { o.yeniSekme = e.target.checked; degis(); } }), 'Yeni sekmede')) : null)),
+        el('button', { type: 'button', class: 'dugme kucuk', style: 'align-self:flex-start', onclick: () => { if (m.ogeler.filter((o) => o.ozel).length >= 4) { alert('En çok 4 özel bağlantı eklenebilir.'); return; } m.ogeler.push({ k: 'ozel-' + Date.now().toString(36), ad: 'Yeni bağlantı', href: '/', gorunur: true, ozel: true }); degis(); } }, '+ Özel bağlantı ekle'))
+    ];
+  }
+
+  function ustCiz() {
+    const u = taslak.ust;
+    const href = el('input', { type: 'url', value: u.ctaHref || '', placeholder: '/tr/iletisim ya da https://…', disabled: u.ctaEylem !== 'bag', onchange: (e) => { u.ctaHref = e.target.value.trim(); degis(); } });
+    return [
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Öne çıkan düğme'), el('p', {}, 'Menünün sağındaki turuncu düğme ve mobil menüdeki karşılığı.'),
+        el('div', { class: 'te-izgara' },
+          el('label', { class: 'te-alan' }, 'Düğme yazısı', el('input', { value: u.ctaMetin, maxlength: '40', onchange: (e) => { u.ctaMetin = e.target.value.trim() || VARS.ust.ctaMetin; degis(); } })),
+          el('label', { class: 'te-alan' }, 'Tıklayınca', el('select', { onchange: (e) => { u.ctaEylem = e.target.value; degis(); } }, ...[['analiz', 'Ücretsiz analiz penceresi açılsın'], ['teklif', 'Teklif penceresi açılsın'], ['bag', 'Bir sayfaya gitsin']].map(([v, a]) => el('option', { value: v, selected: u.ctaEylem === v }, a)))),
+          el('label', { class: 'te-alan', style: 'grid-column:1/-1' }, 'Sayfa adresi (yalnız “Bir sayfaya gitsin” seçiliyse)', href))),
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Üst alandaki öğeler'),
+        ...[['arama', 'Arama kutusu'], ['giris', 'Giriş bağlantısı (üye girişi)'], ['temaDugme', 'Açık/koyu tema düğmesi']].map(([k, a]) => el('label', { class: 'te-anahtar', style: 'font-size:14px' }, el('input', { type: 'checkbox', checked: u[k] !== false, onchange: (e) => { u[k] = e.target.checked; degis(); } }), a))),
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Duyuru şeritleri'), el('p', {}, 'Menünün üstündeki ve altındaki kayan/sabit şeritler, açılır pencereler ve köşe kutuları Banner stüdyosundan yönetilir.'), el('a', { class: 'dugme kucuk', href: '/yonetim/bannerlar/', style: 'align-self:flex-start' }, 'Banner stüdyosunu aç'))
+    ];
+  }
+
+  function altCiz() {
+    const a = taslak.alt;
+    const tasi = (i, d) => { const j = i + d; if (j < 0 || j >= a.sutunlar.length) return; [a.sutunlar[i], a.sutunlar[j]] = [a.sutunlar[j], a.sutunlar[i]]; degis(); };
+    return [
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Marka alanı'),
+        el('label', { class: 'te-alan' }, 'Tanıtım metni', el('textarea', { rows: '3', maxlength: '300', onchange: (e) => { a.tanitim = e.target.value.trim(); degis(); } }, a.tanitim)),
+        el('label', { class: 'te-anahtar', style: 'font-size:14px' }, el('input', { type: 'checkbox', checked: a.sosyal !== false, onchange: (e) => { a.sosyal = e.target.checked; degis(); } }), 'Sosyal medya simgelerini göster'),
+        el('label', { class: 'te-alan' }, 'Alt satır (telif) metni', el('input', { value: a.telif, maxlength: '120', onchange: (e) => { a.telif = e.target.value.trim(); degis(); } }))),
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Bağlantı sütunları'), el('p', {}, 'En çok 6 sütun, sütun başına en çok 12 bağlantı. Adres “/” ile başlayan site içi yol ya da https:// olmalı.'),
+        el('div', { class: 'te-izgara' }, ...a.sutunlar.map((s, i) => el('div', { class: 'te-sutun' },
+          el('div', { class: 'te-sutun-ust' }, el('input', { value: s.baslik, maxlength: '40', 'aria-label': 'Sütun başlığı', style: 'font-weight:700', onchange: (e) => { s.baslik = e.target.value.trim(); degis(); } }),
+            el('button', { type: 'button', class: 'te-mini', 'aria-label': 'Sola taşı', onclick: () => tasi(i, -1) }, '◀'), el('button', { type: 'button', class: 'te-mini', 'aria-label': 'Sağa taşı', onclick: () => tasi(i, 1) }, '▶'),
+            el('button', { type: 'button', class: 'te-mini', onclick: () => { if (confirm(`“${s.baslik}” sütunu silinsin mi?`)) { a.sutunlar.splice(i, 1); degis(); } } }, 'Sil')),
+          ...s.baglantilar.map((b, j) => el('div', { class: 'te-bag' },
+            el('input', { value: b.ad, maxlength: '60', 'aria-label': 'Bağlantı adı', onchange: (e) => { b.ad = e.target.value.trim(); degis(); } }),
+            el('input', { value: b.href, 'aria-label': 'Bağlantı adresi', onchange: (e) => { b.href = e.target.value.trim(); degis(); } }),
+            el('button', { type: 'button', class: 'te-mini', 'aria-label': 'Bağlantıyı kaldır', onclick: () => { s.baglantilar.splice(j, 1); degis(); } }, '×'))),
+          el('button', { type: 'button', class: 'te-mini', style: 'align-self:flex-start', onclick: () => { s.baglantilar.push({ ad: 'Yeni bağlantı', href: '/' }); degis(); } }, '+ Bağlantı')))),
+        a.sutunlar.length < 6 ? el('button', { type: 'button', class: 'dugme kucuk', style: 'align-self:flex-start', onclick: () => { a.sutunlar.push({ baslik: 'Yeni sütun', baglantilar: [{ ad: 'Yeni bağlantı', href: '/' }] }); degis(); } }, '+ Sütun ekle') : null)
+    ];
+  }
+
+  function ciz() {
+    sekmeCiz();
+    panel.replaceChildren(el('div', { style: 'display:flex;flex-direction:column;gap:12px' }, ...(sekme === 'menu' ? menuCiz() : sekme === 'ust' ? ustCiz() : altCiz())));
+  }
+
+  // Önizleme çerçevesi: masaüstü 1366 px genişlikte çizilip ölçeklenir
+  function cerceve() {
+    const g = cihaz === 'masa' ? 1366 : 390, h = cihaz === 'masa' ? 900 : 844;
+    const olcek = Math.min(1, kap.clientWidth / g);
+    iframe.style.width = g + 'px'; iframe.style.height = (kap.clientHeight / olcek) + 'px'; iframe.style.transform = `scale(${olcek})`;
+    if (cihaz === 'tel') { iframe.style.left = Math.max(0, (kap.clientWidth - g * olcek) / 2) + 'px'; } else iframe.style.left = '0';
+    void h;
+  }
+  function yukleIframe() { const s = $('[data-sayfa]').value; iframe.src = `${s}${s.includes('?') ? '&' : '?'}tema=onizleme`; cerceve(); }
+  document.querySelectorAll('[data-cihaz]').forEach((d) => d.addEventListener('click', () => { cihaz = d.dataset.cihaz; document.querySelectorAll('[data-cihaz]').forEach((x) => x.setAttribute('aria-pressed', String(x === d))); cerceve(); }));
+  $('[data-sayfa]').addEventListener('change', yukleIframe);
+  addEventListener('resize', cerceve);
+
+  $('[data-kaydet]').addEventListener('click', async () => {
+    const d = $('[data-kaydet]'); d.disabled = true;
+    try { const s = await api('tema', { tema: kayitBicimi(taslak) }); kayitli = s.tema; degisti = false; mesaj.textContent = 'Kaydedildi. En geç bir dakika içinde sitede.'; genelHata(''); }
+    catch (h) { genelHata('Kaydedilemedi: ' + h.message); }
+    d.disabled = false;
+  });
+  $('[data-vazgec]').addEventListener('click', () => { taslak = birlestir(kayitli); degis(); degisti = false; mesaj.textContent = 'Son kaydedilen hâle dönüldü.'; });
+  $('[data-sifirla]').addEventListener('click', async () => {
+    if (!confirm('Bütün tema ayarları silinip sitenin varsayılan menüsü ve altbilgisine dönülsün mü?')) return;
+    try { await api('tema', { sifirla: true }); kayitli = null; taslak = birlestir(null); degis(); degisti = false; mesaj.textContent = 'Varsayılana dönüldü ve yayınlandı.'; }
+    catch (h) { genelHata(h.message); }
+  });
+  addEventListener('beforeunload', (o) => { if (degisti) { o.preventDefault(); o.returnValue = ''; } });
+
+  (async () => {
+    try { kayitli = (await api('tema')).tema; } catch (h) { genelHata('Tema ayarları alınamadı: ' + h.message); }
+    taslak = birlestir(kayitli);
+    try { localStorage.setItem('idx-tema-onizleme', JSON.stringify({ tema: kayitBicimi(taslak) })); } catch {}
+    ciz(); yukleIframe();
+  })();
+</script>
+</Yonetim>
