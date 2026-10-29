@@ -37,66 +37,66 @@ const I = {
 // Menü ağacı. href'i olmayan modül veya alt sayfa henüz yapılmadı ("Yakında" görünür, tıklanmaz).
 const MENU = [
   { grup: 'ÖZET', ad: 'Özet', ogeler: [
-    { k: 'genel', ad: 'Genel bakış', href: '/yonetim/', sabit: true },
-    { k: 'bildirim', ad: 'Bildirimler', href: '/yonetim/bildirimler/', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/yonetim/bildirimler/#onay' }, { ad: 'Sistem uyarıları', href: '/yonetim/bildirimler/#uyari' }] }
+    { k: 'genel', ad: 'Genel bakış', href: '/dashboard', sabit: true },
+    { k: 'bildirim', ad: 'Bildirimler', href: '/notifications', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/notifications#onay' }, { ad: 'Sistem uyarıları', href: '/notifications#uyari' }] }
   ] },
   // Satış: talep gelir → müşteri olur → teklif verilir → işler planlanır
   { grup: 'SATIŞ', ad: 'Satış', ogeler: [
-    { k: 'talepler', ad: 'Talepler', href: '/yonetim/talepler/', i: 'talep', sayac: 'talep', altlar: [
-      { ad: 'Yeni', href: '/yonetim/talepler/?sekme=yeni' }, { ad: 'CRM’e alınan', href: '/yonetim/talepler/?sekme=crm' },
-      { ad: 'Spam', href: '/yonetim/talepler/?sekme=spam' }, { ad: 'Tümü', href: '/yonetim/talepler/?sekme=hepsi' }] },
-    { k: 'crm', ad: 'Müşteriler (CRM)', href: '/yonetim/crm/', i: 'crm', altlar: [
-      { ad: 'Satış panosu', href: '/yonetim/crm/' }, { ad: 'IDOS eşitleme', href: '/yonetim/crm-idos/' }, { ad: 'Çakışmalar', href: '/yonetim/crm-cakisma/' }] },
-    { k: 'hesaplar', ad: 'Hesap envanteri', href: '/yonetim/hesaplar/', i: 'anahtar' },
-    { k: 'teklif', ad: 'Teklifler', href: '/yonetim/teklifler/', i: 'teklif', altlar: [
-      { ad: 'Taslaklar', href: '/yonetim/teklifler/?sekme=taslak' }, { ad: 'Gönderilenler', href: '/yonetim/teklifler/?sekme=gonderildi' },
-      { ad: 'Kabul edilenler', href: '/yonetim/teklifler/?sekme=kabul' }] },
-    { k: 'gorev', ad: 'Görevler ve takvim', href: '/yonetim/gorevler/', i: 'gorev' }
+    { k: 'talepler', ad: 'Talepler', href: '/leads', i: 'talep', sayac: 'talep', altlar: [
+      { ad: 'Yeni', href: '/leads?sekme=yeni' }, { ad: 'CRM’e alınan', href: '/leads?sekme=crm' },
+      { ad: 'Spam', href: '/leads?sekme=spam' }, { ad: 'Tümü', href: '/leads?sekme=hepsi' }] },
+    { k: 'crm', ad: 'Müşteriler (CRM)', href: '/crm', i: 'crm', altlar: [
+      { ad: 'Satış panosu', href: '/crm' }, { ad: 'IDOS eşitleme', href: '/crm-sync' }, { ad: 'Çakışmalar', href: '/crm-conflicts' }] },
+    { k: 'hesaplar', ad: 'Hesap envanteri', href: '/accounts', i: 'anahtar' },
+    { k: 'teklif', ad: 'Teklifler', href: '/proposals', i: 'teklif', altlar: [
+      { ad: 'Taslaklar', href: '/proposals?sekme=taslak' }, { ad: 'Gönderilenler', href: '/proposals?sekme=gonderildi' },
+      { ad: 'Kabul edilenler', href: '/proposals?sekme=kabul' }] },
+    { k: 'gorev', ad: 'Görevler ve takvim', href: '/tasks', i: 'gorev' }
   ] },
   // Pazarlama ve iletişim: ziyaretçiyle ve abonelerle temas
   { grup: 'PAZARLAMA VE İLETİŞİM', ad: 'Pazarlama ve iletişim', ogeler: [
-    { k: 'asistan', ad: 'Asistan sohbetleri', href: '/yonetim/asistan/', i: 'asistan' },
-    { k: 'eposta', ad: 'Bülten listesi', href: '/yonetim/bulten/', i: 'eposta' },
-    { k: 'instagram', ad: 'Instagram gönderileri', href: '/yonetim/instagram/', i: 'medya' }
+    { k: 'asistan', ad: 'Asistan sohbetleri', href: '/assistant', i: 'asistan' },
+    { k: 'eposta', ad: 'Bülten listesi', href: '/subscribers', i: 'eposta' },
+    { k: 'instagram', ad: 'Instagram gönderileri', href: '/instagram', i: 'medya' }
   ] },
   // Web sitesi: sitede görünen her şey
   { grup: 'WEB SİTESİ', ad: 'Web sitesi', ogeler: [
-    { k: 'site', ad: 'Site içeriği', href: '/yonetim/site-icerik/', i: 'icerik', altlar: [
-      { ad: 'Hizmetler', href: '/yonetim/site-icerik/?dosya=hizmetler' }, { ad: 'Paketler', href: '/yonetim/site-icerik/?dosya=paketler' },
-      { ad: 'Ürünler', href: '/yonetim/site-icerik/?dosya=urunler#urunler' }, { ad: 'Kategoriler', href: '/yonetim/site-icerik/?dosya=urunler#kategoriler' },
-      { ad: 'Referanslar', href: '/yonetim/site-icerik/?dosya=referanslar' }, { ad: 'Blog yazıları', href: '/yonetim/site-icerik/?dosya=yazilar' }, { ad: 'Menüler', href: '/yonetim/site-icerik/?dosya=site-menu' },
-      { ad: 'Sık sorulan sorular', href: '/yonetim/site-icerik/?dosya=sss' }, { ad: 'Yasal sayfalar', href: '/yonetim/site-icerik/?dosya=yasal' }] },
-    { k: 'icerikler', ad: 'Yazılar ve kaynaklar', href: '/yonetim/icerikler/', i: 'belge', sayac: 'yorum' },
-    { k: 'tema', ad: 'Tema düzenleyici', href: '/yonetim/tema/', i: 'tema' },
-    { k: 'haftalik-bulten', ad: 'Haftalık Bülten', href: '/yonetim/haftalik-bulten/', i: 'radar' },
-    { k: 'bannerlar', ad: 'Banner stüdyosu', href: '/yonetim/bannerlar/', i: 'banner' },
-    { k: 'medya', ad: 'Medya kütüphanesi', href: '/yonetim/medya/', i: 'medya' }
+    { k: 'site', ad: 'Site içeriği', href: '/site-content', i: 'icerik', altlar: [
+      { ad: 'Hizmetler', href: '/site-content?dosya=hizmetler' }, { ad: 'Paketler', href: '/site-content?dosya=paketler' },
+      { ad: 'Ürünler', href: '/site-content?dosya=urunler#urunler' }, { ad: 'Kategoriler', href: '/site-content?dosya=urunler#kategoriler' },
+      { ad: 'Referanslar', href: '/site-content?dosya=referanslar' }, { ad: 'Blog yazıları', href: '/site-content?dosya=yazilar' }, { ad: 'Menüler', href: '/site-content?dosya=site-menu' },
+      { ad: 'Sık sorulan sorular', href: '/site-content?dosya=sss' }, { ad: 'Yasal sayfalar', href: '/site-content?dosya=yasal' }] },
+    { k: 'icerikler', ad: 'Yazılar ve kaynaklar', href: '/articles', i: 'belge', sayac: 'yorum' },
+    { k: 'tema', ad: 'Tema düzenleyici', href: '/theme', i: 'tema' },
+    { k: 'haftalik-bulten', ad: 'Haftalık Bülten', href: '/weekly-newsletter', i: 'radar' },
+    { k: 'bannerlar', ad: 'Banner stüdyosu', href: '/banners', i: 'banner' },
+    { k: 'medya', ad: 'Medya kütüphanesi', href: '/media', i: 'medya' }
   ] },
   // Analiz: sitenin nasıl performans gösterdiği
   { grup: 'ANALİZ', ad: 'Analiz', ogeler: [
-    { k: 'ziyaret', ad: 'Ziyaretçiler', href: '/yonetim/ziyaretciler/', i: 'ziyaret' },
-    { k: 'seo', ad: 'SEO ve GEO', href: '/yonetim/seo/', i: 'seo' },
-    { k: 'hiz', ad: 'Hız ve güvenlik', href: '/yonetim/hiz/', i: 'hiz' },
-    { k: 'siteler', ad: 'Müşteri siteleri', href: '/yonetim/site-saglik/', i: 'nabiz' },
-    { k: 'donusum', ad: 'Reklam dönüşümleri', href: '/yonetim/donusum/', i: 'hedef' }
+    { k: 'ziyaret', ad: 'Ziyaretçiler', href: '/visitors', i: 'ziyaret' },
+    { k: 'seo', ad: 'SEO ve GEO', href: '/seo', i: 'seo' },
+    { k: 'hiz', ad: 'Hız ve güvenlik', href: '/performance', i: 'hiz' },
+    { k: 'siteler', ad: 'Müşteri siteleri', href: '/client-sites', i: 'nabiz' },
+    { k: 'donusum', ad: 'Reklam dönüşümleri', href: '/conversions', i: 'hedef' }
   ] },
   // Üyelik: kimin neye erişebildiği
   { grup: 'ÜYELİK VE ERİŞİM', ad: 'Üyelik ve erişim', ogeler: [
-    { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/yonetim/uyeler/', i: 'uye', sayac: 'uye' },
-    { k: 'portal', ad: 'Müşteri alanı', href: '/yonetim/portal/', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/yonetim/portal/?sekme=erisim' }, { ad: 'Davetler', href: '/yonetim/portal/?sekme=davet' }] },
-    { k: 'destek', ad: 'Destek talepleri', href: '/yonetim/destek/', i: 'destek', sayac: 'destek' }
+    { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/members', i: 'uye', sayac: 'uye' },
+    { k: 'portal', ad: 'Müşteri alanı', href: '/client-portal', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/client-portal?sekme=erisim' }, { ad: 'Davetler', href: '/client-portal?sekme=davet' }] },
+    { k: 'destek', ad: 'Destek talepleri', href: '/support', i: 'destek', sayac: 'destek' }
   ] },
   { grup: 'FİNANS', ad: 'Finans', ogeler: [
-    { k: 'muhasebe', ad: 'Muhasebe', href: '/yonetim/muhasebe/', i: 'muhasebe' },
-    { k: 'belge', ad: 'Belgeler', href: '/yonetim/belgeler/', i: 'belge' }
+    { k: 'muhasebe', ad: 'Muhasebe', href: '/accounting', i: 'muhasebe' },
+    { k: 'belge', ad: 'Belgeler', href: '/documents', i: 'belge' }
   ] },
   // Sistem: panelin kendisi ve bağlantıları
   { grup: 'SİSTEM', ad: 'Sistem', ogeler: [
-    { k: 'ayar', ad: 'Ayarlar', href: '/yonetim/ayarlar/', i: 'ayar' },
-    { k: 'entegre', ad: 'Entegrasyonlar', href: '/yonetim/entegrasyonlar/', i: 'entegre' },
-    { k: 'esitle', ad: 'Veri eşitleme', href: '/yonetim/veri-esitleme/', i: 'esitle' },
-    { k: 'yedek', ad: 'Yedekler', href: '/yonetim/yedekler/', i: 'yedek' },
-    { k: 'gecmis', ad: 'İşlem geçmişi', href: '/yonetim/gecmis/', i: 'gecmis' }
+    { k: 'ayar', ad: 'Ayarlar', href: '/settings', i: 'ayar' },
+    { k: 'entegre', ad: 'Entegrasyonlar', href: '/integrations', i: 'entegre' },
+    { k: 'esitle', ad: 'Veri eşitleme', href: '/data-sync', i: 'esitle' },
+    { k: 'yedek', ad: 'Yedekler', href: '/backups', i: 'yedek' },
+    { k: 'gecmis', ad: 'İşlem geçmişi', href: '/activity-log', i: 'gecmis' }
   ] }
 ];
 // Sayfa yolu (üst çubuk) her zaman menüdeki grup adından gelir; sayfaların kendi yol metni yalnız grubu olmayan sayfalarda kullanılır.
@@ -272,7 +272,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 <script is:inline>document.getElementById('kabuk').className='kabuk '+(document.documentElement.dataset.tema||'acik')</script>
 <aside class="yan sabit" id="yan" aria-label="Yan menü">
   <div class="logo">
-    <a href="/yonetim/" class="logo-baglanti" aria-label="IDPANEL · Genel bakış" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit">
+    <a href="/dashboard" class="logo-baglanti" aria-label="IDPANEL · Genel bakış" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#F07A23" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>
       <b class="etiket">ID<span>PANEL</span></b>
     </a>
@@ -355,17 +355,17 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
           <summary class="dugme ana">+ Yeni oluştur</summary>
           <div class="yeni-liste" role="menu" aria-label="Ne oluşturmak istiyorsunuz?">
             <b>Web sitesi</b>
-            <a role="menuitem" href="/yonetim/site-icerik/?dosya=yazilar&yeni=1"><strong>Blog yazısı</strong><span>Sitedeki blogda yayınlanır</span></a>
-            <a role="menuitem" href="/yonetim/icerikler/?yeni=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
-            <a role="menuitem" href="/yonetim/site-icerik/?dosya=paketler&yeni=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
-            <a role="menuitem" href="/yonetim/site-icerik/?dosya=hizmetler"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
-            <a role="menuitem" href="/yonetim/haftalik-bulten/?yeni=1"><strong>Haftalık Bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
-            <a role="menuitem" href="/yonetim/bannerlar/?yeni=1"><strong>Banner, duyuru ya da açılır pencere</strong><span>Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu</span></a>
-            <a role="menuitem" href="/yonetim/site-icerik/?dosya=sss&yeni=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
+            <a role="menuitem" href="/site-content?dosya=yazilar&yeni=1"><strong>Blog yazısı</strong><span>Sitedeki blogda yayınlanır</span></a>
+            <a role="menuitem" href="/articles?yeni=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
+            <a role="menuitem" href="/site-content?dosya=paketler&yeni=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
+            <a role="menuitem" href="/site-content?dosya=hizmetler"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
+            <a role="menuitem" href="/weekly-newsletter?yeni=1"><strong>Haftalık Bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
+            <a role="menuitem" href="/banners?yeni=1"><strong>Banner, duyuru ya da açılır pencere</strong><span>Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu</span></a>
+            <a role="menuitem" href="/site-content?dosya=sss&yeni=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
             <b>Satış ve iş</b>
-            <a role="menuitem" href="/yonetim/crm/?yeni=1"><strong>Müşteri</strong><span>CRM’e elle müşteri kaydı</span></a>
-            <a role="menuitem" href="/yonetim/teklifler/?yeni=1"><strong>Teklif</strong><span>Kalemli, KDV’li teklif hazırlayın</span></a>
-            <a role="menuitem" href="/yonetim/gorevler/?yeni=1"><strong>Görev</strong><span>Takvime görev ve hatırlatma</span></a>
+            <a role="menuitem" href="/crm?yeni=1"><strong>Müşteri</strong><span>CRM’e elle müşteri kaydı</span></a>
+            <a role="menuitem" href="/proposals?yeni=1"><strong>Teklif</strong><span>Kalemli, KDV’li teklif hazırlayın</span></a>
+            <a role="menuitem" href="/tasks?yeni=1"><strong>Görev</strong><span>Takvime görev ve hatırlatma</span></a>
           </div>
         </details>
         <a class="dugme ikincil" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
@@ -378,9 +378,9 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
         <button type="button" class="avatar" data-kim-avatar aria-haspopup="menu" aria-expanded="false" aria-controls="profil-menu" aria-label="Hesap menüsü"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></button>
         <div class="profil-menu" id="profil-menu" role="menu" hidden>
           <div class="profil-bas"><small>Oturum açık</small><b data-kim-eposta>—</b></div>
-          <a role="menuitem" href="/yonetim/ayarlar/">Ayarlar</a>
-          <a role="menuitem" href="/yonetim/bildirimler/">Bildirimler</a>
-          <a role="menuitem" href="/yonetim/gecmis/">İşlem geçmişi</a>
+          <a role="menuitem" href="/settings">Ayarlar</a>
+          <a role="menuitem" href="/notifications">Bildirimler</a>
+          <a role="menuitem" href="/activity-log">İşlem geçmişi</a>
           <a role="menuitem" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
           <a role="menuitem" class="profil-cikis" href="/cdn-cgi/access/logout">Çıkış yap</a>
         </div>
@@ -455,7 +455,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
     }
     let yeniIstek = new URLSearchParams(location.search).get('yeni') === '1';
     try { if (sessionStorage.getItem('idx-yeni') === location.pathname) { yeniIstek = true; } sessionStorage.removeItem('idx-yeni'); } catch (e) {}
-    if (yeniIstek && !location.pathname.startsWith('/yonetim/teklifler')) {
+    if (yeniIstek && !location.pathname.startsWith('/proposals')) {
       let deneme = 0;
       const bas = () => {
         const d = document.querySelector<HTMLElement>('main [data-yeni], main [data-yeni-ac]') || [...document.querySelectorAll<HTMLButtonElement>('main .si-liste ~ button, main button')].filter((b) => /^\+ Yeni /.test(b.textContent || '')).pop();

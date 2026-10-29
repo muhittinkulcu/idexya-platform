@@ -14,7 +14,7 @@ export const kucuk = (s) => String(s || '').toLocaleLowerCase('tr-TR');
 
 export const musteriAdi = (k) => k.musteri_firma || k.musteri_ad || '';
 export const musteriBag = (k) => k.musteri_id && musteriAdi(k)
-  ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(k.musteri_id), style: 'text-decoration: none; font-weight: 600' }, musteriAdi(k)) : null;
+  ? el('a', { href: '/customer?id=' + encodeURIComponent(k.musteri_id), style: 'text-decoration: none; font-weight: 600' }, musteriAdi(k)) : null;
 
 // CRM müşterilerini bir ya da daha çok <select> kutusuna doldurur. İlk seçenek: bos (ör. "Müşteri yok").
 export async function musterileriDoldur(secimler) {

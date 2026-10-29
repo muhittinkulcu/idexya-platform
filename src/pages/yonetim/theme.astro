@@ -149,7 +149,7 @@ const varsayilan = {
           el('label', { class: 'te-alan', style: 'grid-column:1/-1' }, 'Sayfa adresi (yalnız “Bir sayfaya gitsin” seçiliyse)', href))),
       el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Üst alandaki öğeler'),
         ...[['arama', 'Arama kutusu'], ['giris', 'Giriş bağlantısı (üye girişi)'], ['temaDugme', 'Açık/koyu tema düğmesi']].map(([k, a]) => el('label', { class: 'te-anahtar', style: 'font-size:14px' }, el('input', { type: 'checkbox', checked: u[k] !== false, onchange: (e) => { u[k] = e.target.checked; degis(); } }), a))),
-      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Duyuru şeritleri'), el('p', {}, 'Menünün üstündeki ve altındaki kayan/sabit şeritler, açılır pencereler ve köşe kutuları Banner stüdyosundan yönetilir.'), el('a', { class: 'dugme kucuk', href: '/yonetim/bannerlar/', style: 'align-self:flex-start' }, 'Banner stüdyosunu aç'))
+      el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Duyuru şeritleri'), el('p', {}, 'Menünün üstündeki ve altındaki kayan/sabit şeritler, açılır pencereler ve köşe kutuları Banner stüdyosundan yönetilir.'), el('a', { class: 'dugme kucuk', href: '/banners', style: 'align-self:flex-start' }, 'Banner stüdyosunu aç'))
     ];
   }
 

@@ -56,9 +56,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     } else if (t.durum === 'spam') {
       dugmeler.push(el('button', { type: 'button', class: 'dugme', onclick: (o) => islem('geri', o.currentTarget) }, 'Spam değil, geri al'));
     } else if (t.musteri_id) {
-      dugmeler.push(el('a', { class: 'dugme ana', href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id) }, 'Müşteri kartını aç'));
+      dugmeler.push(el('a', { class: 'dugme ana', href: '/customer?id=' + encodeURIComponent(t.musteri_id) }, 'Müşteri kartını aç'));
     }
-    if (ek.sohbet) dugmeler.push(el('a', { class: 'dugme', href: '/yonetim/asistan/?id=' + encodeURIComponent(ek.sohbet) }, 'Asistan sohbetini oku'));
+    if (ek.sohbet) dugmeler.push(el('a', { class: 'dugme', href: '/assistant?id=' + encodeURIComponent(ek.sohbet) }, 'Asistan sohbetini oku'));
     if (t.eposta) dugmeler.push(el('a', { class: 'dugme', href: 'mailto:' + t.eposta }, 'E-postayla yanıtla'));
     if (t.telefon) dugmeler.push(el('a', { class: 'dugme', href: 'tel:' + t.telefon.replace(/[^\d+]/g, '') }, 'Ara'));
     ayr.replaceChildren(

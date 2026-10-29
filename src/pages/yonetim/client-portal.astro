@@ -21,7 +21,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { if (sekme === k) return; sekme = k; history.replaceState(null, '', '?sekme=' + k); bildir(''); yukle(); } }, ad);
     }));
     // Menüdeki alt sayfa işareti sekmeyle birlikte değişir.
-    document.querySelectorAll('[data-alt-link]').forEach((a) => { if (a.getAttribute('href').startsWith('/yonetim/portal/')) { if (a.getAttribute('href') === '/yonetim/portal/?sekme=' + sekme) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); } });
+    document.querySelectorAll('[data-alt-link]').forEach((a) => { if (a.getAttribute('href').startsWith('/client-portal')) { if (a.getAttribute('href') === '/client-portal?sekme=' + sekme) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); } });
   }
 
   // --- Erişimler ---
@@ -30,7 +30,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const katalog = Object.fromEntries(v.katalog.map((m) => [m.k, m]));
     const musAd = Object.fromEntries(v.musteriler.map((m) => [m.id, m.ad]));
     if (!v.uyeler.length) {
-      alan.replaceChildren(el('div', { class: 'kart bos' }, 'Onaylı üye yok. Üyelik talepleri ', el('a', { href: '/yonetim/uyeler/' }, 'Üyeler ve yetkiler'), ' sayfasında onaylanır; müşterinizi davetle üye yapmak için ', el('a', { href: '/yonetim/portal/?sekme=davet' }, 'Davetler'), ' sekmesini kullanın.'));
+      alan.replaceChildren(el('div', { class: 'kart bos' }, 'Onaylı üye yok. Üyelik talepleri ', el('a', { href: '/members' }, 'Üyeler ve yetkiler'), ' sayfasında onaylanır; müşterinizi davetle üye yapmak için ', el('a', { href: '/client-portal?sekme=davet' }, 'Davetler'), ' sekmesini kullanın.'));
       return;
     }
     const bagli = v.uyeler.filter((u) => u.musteri_id).length;
@@ -53,13 +53,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
         return el('div', { style: 'display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-top: 1px solid var(--line)' },
           el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap' },
             el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, u.ad), el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [u.eposta, u.firma].filter(Boolean).join(' · ')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, u.son_giris ? 'Son giriş ' + once(u.son_giris) : 'Hiç giriş yapmadı')),
-            el('a', { class: 'dugme kucuk', href: '/yonetim/uyeler/?id=' + encodeURIComponent(u.id), style: 'align-self: flex-start' }, 'Üye ayrıntısı')),
+            el('a', { class: 'dugme kucuk', href: '/members?id=' + encodeURIComponent(u.id), style: 'align-self: flex-start' }, 'Üye ayrıntısı')),
           el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px' },
             el('span', { style: 'color: var(--tx2)' }, 'Açık bölümler:'),
             ...(u.moduller.length ? u.moduller.map((m) => el('span', { class: 'cip crm' }, `${katalog[m.modul] ? katalog[m.modul].ad : m.modul} · ${v.yetkiler[m.yetki] || m.yetki}`)) : [el('span', { style: 'color: var(--tx2)' }, 'yok')])),
           el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
             u.musteri_id
-              ? el('span', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1 1 100%; font-size: 13px' }, el('span', { class: 'cip kazanildi' }, 'Bağlı'), el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(u.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, u.musteri_ad), el('span', { style: 'color: var(--tx2)' }, `${tarih(u.baglanma)} · ${u.baglayan}`))
+              ? el('span', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1 1 100%; font-size: 13px' }, el('span', { class: 'cip kazanildi' }, 'Bağlı'), el('a', { href: '/customer?id=' + encodeURIComponent(u.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, u.musteri_ad), el('span', { style: 'color: var(--tx2)' }, `${tarih(u.baglanma)} · ${u.baglayan}`))
               : el('span', { style: 'flex: 1 1 100%; font-size: 13px; color: var(--tx2)' }, u.oneri_id ? `Müşteriye bağlı değil · öneri: aynı e-postalı “${musAd[u.oneri_id]}” kartı` : 'Müşteriye bağlı değil'),
             v.musteriler.length ? sec : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'CRM’de müşteri yok.'), v.musteriler.length ? bagla : '', coz));
       })));
@@ -127,7 +127,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
              'Bölümler: ' + (d.moduller.length ? d.moduller.map((m) => `${katalog[m.modul] ? katalog[m.modul].ad : m.modul} (${v.yetkiler[m.yetki]})`).join(', ') : 'yok')].join(' · ')),
           el('span', { style: 'font-size: 12px; color: var(--tx2)' },
             `Oluşturma ${tarih(d.olusturma)} · ${d.olusturan} · `,
-            d.kullanildi ? el('span', {}, `kullanıldı ${tarih(d.kullanildi)}`, d.uye_id ? [' · ', el('a', { href: '/yonetim/uyeler/?id=' + encodeURIComponent(d.uye_id) }, d.uye_ad || 'üye')] : '')
+            d.kullanildi ? el('span', {}, `kullanıldı ${tarih(d.kullanildi)}`, d.uye_id ? [' · ', el('a', { href: '/members?id=' + encodeURIComponent(d.uye_id) }, d.uye_ad || 'üye')] : '')
               : d.iptal ? `iptal ${tarih(d.iptal)} · ${d.iptal_eden}` : `son geçerlilik ${tarih(d.bitis)}`)))
           : [el('div', { class: 'bos' }, 'Henüz davet oluşturulmadı.')]));
     }

@@ -9,7 +9,9 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/", "/api/*", "/yonetim", "/yonetim/*", "/icerik/*", "/kabuk/*", "/uye/*", "/tr/bulten", "/tr/bulten/*", "/sitemap-bulten.xml"],
+    "run_worker_first": ["/", "/api/*", "/yonetim", "/yonetim/*", "/icerik/*", "/kabuk/*", "/uye/*", "/tr/bulten", "/tr/bulten/*", "/sitemap-bulten.xml",
+      // Yönetim paneli (panel.idexya.com) İngilizce adresleri: worker/panel-yollar.js
+      "/accounting", "/accounting/*", "/accounts", "/accounts/*", "/activity-log", "/activity-log/*", "/articles", "/articles/*", "/assistant", "/assistant/*", "/backups", "/backups/*", "/banners", "/banners/*", "/client-portal", "/client-portal/*", "/client-sites", "/client-sites/*", "/conversions", "/conversions/*", "/crm", "/crm/*", "/crm-conflicts", "/crm-conflicts/*", "/crm-sync", "/crm-sync/*", "/customer", "/customer/*", "/dashboard", "/dashboard/*", "/data-sync", "/data-sync/*", "/documents", "/documents/*", "/instagram", "/instagram/*", "/integrations", "/integrations/*", "/leads", "/leads/*", "/media", "/media/*", "/members", "/members/*", "/notifications", "/notifications/*", "/performance", "/performance/*", "/proposal-print", "/proposal-print/*", "/proposals", "/proposals/*", "/seo", "/seo/*", "/settings", "/settings/*", "/site-content", "/site-content/*", "/subscribers", "/subscribers/*", "/support", "/support/*", "/tasks", "/tasks/*", "/theme", "/theme/*", "/visitors", "/visitors/*", "/weekly-newsletter", "/weekly-newsletter/*"],
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
   },

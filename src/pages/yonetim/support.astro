@@ -55,7 +55,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
             el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${t.no} · açıldı ${tarih(t.olusturma)}`),
             el('h2', { style: 'margin: 0; font-size: 20px; overflow-wrap: anywhere' }, t.konu),
             el('span', { style: 'font-size: 13px; color: var(--tx2); overflow-wrap: anywhere' }, [uye.ad, uye.firma, uye.eposta].filter(Boolean).join(' · ')),
-            t.musteri_id ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id), style: 'font-size: 13px' }, 'CRM kaydını aç') : el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Üye bir CRM müşterisine bağlı değil')),
+            t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'font-size: 13px' }, 'CRM kaydını aç') : el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Üye bir CRM müşterisine bağlı değil')),
           el('span', { class: 'cip ' + (CIP[t.durum] || 'yeni') }, s.durumlar[t.durum] || t.durum)),
         el('ol', { style: 'list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px' },
           ...s.mesajlar.map((m) => el('li', { class: 'ds-mesaj' + (m.yazan === 'ekip' ? ' ekip' : '') },

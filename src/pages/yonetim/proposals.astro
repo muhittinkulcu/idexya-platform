@@ -13,7 +13,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <h2 data-duz-baslik style="margin: 0; font-size: 20px; color: var(--head)">Yeni teklif</h2>
 <span data-duz-no style="font-size: 13px; color: var(--tx2)"></span>
 </div>
-<div data-musteri-yok hidden class="uyari bilgi">CRM’de henüz müşteri yok. Teklif hazırlamak için önce <a href="/yonetim/crm/">Müşteriler (CRM)</a> sayfasından müşteri ekleyin ya da bir talebi CRM’e alın.</div>
+<div data-musteri-yok hidden class="uyari bilgi">CRM’de henüz müşteri yok. Teklif hazırlamak için önce <a href="/crm">Müşteriler (CRM)</a> sayfasından müşteri ekleyin ya da bir talebi CRM’e alın.</div>
 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px">
 <label class="alan">Müşteri<select name="musteri_id" required></select></label>
 <label class="alan" style="grid-column: span 2">Teklif başlığı<input name="baslik" maxlength="160" required placeholder="Ör. Kurumsal web sitesi ve SEO paketi"></label>
@@ -88,7 +88,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('thead', {}, el('tr', {}, ...['No', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 3 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
       el('tbody', {}, ...gor.map((t) => el('tr', { style: t.id === seciliId ? 'background: var(--card2)' : '' },
         el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: '?sekme=' + sekme + '&id=' + encodeURIComponent(t.id), style: 'font-weight: 600', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
-        el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
+        el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.baslik),
         el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, tutar(t.toplam)),
         el('td', { style: hucre }, el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
@@ -126,7 +126,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   function gelirAlani(t, gelir) {
     if (gelir) {
       const odendi = gelir.durum === 'odendi';
-      return el('a', { class: 'dugme', href: '/yonetim/muhasebe/', title: 'Muhasebede aç' },
+      return el('a', { class: 'dugme', href: '/accounting', title: 'Muhasebede aç' },
         el('span', { class: 'cip ' + (odendi ? 'kazanildi' : 'teklif'), style: 'margin-right: 6px' }, odendi ? 'Tahsil edildi' : 'Tahsilat bekliyor'),
         odendi ? (gelir.odeme_tarihi ? gun(gelir.odeme_tarihi) : '') : gelir.vade ? 'vade ' + gun(gelir.vade) : 'vade yok');
     }
@@ -148,7 +148,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     catch (h) { seciliId = ''; adresYaz(); detay.hidden = true; genelHata(h.durum === 404 ? 'Bu teklif bulunamadı; silinmiş olabilir.' : 'Teklif yüklenemedi: ' + h.message); return; }
     const t = v.teklif, m = v.musteri;
     const dugme = (ad, ne, ana) => el('button', { type: 'button', class: 'dugme' + (ana ? ' ana' : ''), onclick: () => islem(t, ne) }, ad);
-    const yazdir = el('a', { class: 'dugme', href: '/yonetim/teklif-yazdir/?id=' + encodeURIComponent(t.id), target: '_blank', rel: 'noopener' }, 'Yazdır / PDF');
+    const yazdir = el('a', { class: 'dugme', href: '/proposal-print?id=' + encodeURIComponent(t.id), target: '_blank', rel: 'noopener' }, 'Yazdır / PDF');
     const eylemler = {
       taslak: [el('button', { type: 'button', class: 'dugme', onclick: () => duzenle(t) }, 'Düzenle'), yazdir, dugme('Gönderildi olarak işaretle', 'gonderildi', true), dugme('Kopyala', 'kopyala'), dugme('Sil', 'sil')],
       gonderildi: [dugme('Kabul edildi', 'kabul', true), dugme('Reddedildi', 'red'), yazdir, dugme('Kopyala', 'kopyala')],
@@ -164,7 +164,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('div', { style: 'display: flex; flex-direction: column; gap: 4px; min-width: 0' },
           el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap' }, el('strong', { style: 'font-size: 13px; color: var(--tx2)' }, t.no), el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
           el('h2', { style: 'margin: 0; font-size: 22px; color: var(--head); overflow-wrap: anywhere' }, t.baslik),
-          el('span', { style: 'font-size: 14px' }, 'Müşteri: ', m ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(m.id) }, musteriAdi(m)) : 'CRM’de bulunamadı')),
+          el('span', { style: 'font-size: 14px' }, 'Müşteri: ', m ? el('a', { href: '/customer?id=' + encodeURIComponent(m.id) }, musteriAdi(m)) : 'CRM’de bulunamadı')),
         el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { seciliId = ''; adresYaz(); detay.hidden = true; ciz(); } }, 'Kapat')),
       el('dl', { style: 'margin: 0; display: flex; gap: 6px 20px; flex-wrap: wrap; font-size: 13px' }, ...bilgi.map(([a, b]) => el('div', { style: 'display: flex; gap: 6px' }, el('dt', { style: 'color: var(--tx2)' }, a + ':'), el('dd', { style: 'margin: 0' }, b)))),
       el('div', { style: 'overflow-x: auto; border: 1px solid var(--line); border-radius: 14px' }, el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 13px' },

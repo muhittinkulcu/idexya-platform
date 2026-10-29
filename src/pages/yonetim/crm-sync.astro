@@ -46,7 +46,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (h.musteri_id) {
       alt = el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
         el('span', { class: 'cip kazanildi' }, 'Eşleşti'),
-        h.musteri_ad ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(h.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, h.musteri_ad) : el('span', { style: 'color: var(--err)' }, 'Müşteri kartı silinmiş'),
+        h.musteri_ad ? el('a', { href: '/customer?id=' + encodeURIComponent(h.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, h.musteri_ad) : el('span', { style: 'color: var(--err)' }, 'Müşteri kartı silinmiş'),
         el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${tarih(h.eslesme_zamani)} · ${h.eslestiren}`),
         h.eski ? el('span', { class: 'cip gorusme' }, 'Son 28 günde veri yok') : '',
         el('span', { style: 'flex: 1 1 0' }),
@@ -86,10 +86,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
         veri.kurulu
           ? 'İlk çekim yapılmamış ya da son 28 günde harcama yok. Veri her gün İstanbul saatiyle 10.00’da çekilir; hemen almak için '
           : 'IDOS bağlantısı (Cloudflare değişkenleri IDOS_BQ_ANAHTAR ve IDOS_BQ_GORUNUM) henüz girilmediği için IDOS’tan hiçbir reklam hesabı gelmiyor. Ayrıntılar ve bağlantı durumu için ',
-        el('a', { href: '/yonetim/' }, 'Genel bakış › Reklam performansı'),
+        el('a', { href: '/dashboard' }, 'Genel bakış › Reklam performansı'),
         veri.kurulu ? ' bölümündeki “Şimdi çek” düğmesini kullanın.' : ' bölümüne bakın. Bağlantı kurulunca hesaplar burada listelenir.'));
     }
-    if (!veri.musteriler.length && ozetVar) kutular.push(el('div', { class: 'uyari bilgi' }, 'CRM’de henüz müşteri yok; eşleştirmek için önce ', el('a', { href: '/yonetim/crm/' }, 'CRM’e müşteri ekleyin'), '.'));
+    if (!veri.musteriler.length && ozetVar) kutular.push(el('div', { class: 'uyari bilgi' }, 'CRM’de henüz müşteri yok; eşleştirmek için önce ', el('a', { href: '/crm' }, 'CRM’e müşteri ekleyin'), '.'));
     uyari.replaceChildren(...kutular);
     if (sekme === 'eslesmemis' && !veri.hesaplar.some((h) => !h.musteri_id) && veri.hesaplar.length) sekme = 'hepsi';
     ciz();

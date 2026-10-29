@@ -58,7 +58,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('td', {}, tarih(x.talep_zamani), el('div', { style: 'font-size: 12px; color: var(--tx2)' }, 'tıklama ' + tarih(x.tiklama_zamani))),
         el('td', { style: 'font-size: 13px' }, [x.gclid ? 'Google (gclid)' : x.gbraid || x.wbraid ? 'Google (iOS)' : null, x.fbclid ? 'Meta (fbclid)' : null].filter(Boolean).join(' · ') || '—',
           x.utm_source ? el('div', { style: 'color: var(--tx2)' }, [x.utm_source, x.utm_medium, x.utm_campaign].filter(Boolean).join(' / ')) : null),
-        el('td', {}, x.musteri_id ? el('a', { href: '/yonetim/musteri/?id=' + encodeURIComponent(x.musteri_id) }, x.firma || x.ad || 'Müşteri') : el('span', { style: 'color: var(--tx2)' }, 'CRM’e alınmadı')),
+        el('td', {}, x.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(x.musteri_id) }, x.firma || x.ad || 'Müşteri') : el('span', { style: 'color: var(--tx2)' }, 'CRM’e alınmadı')),
         el('td', {}, x.kazanildi ? el('span', { class: 'cip kazanildi' }, 'Kazanıldı') : el('span', { class: 'cip yeni' }, 'Henüz değil'), x.donusum_zamani ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, tarih(x.donusum_zamani)) : null,
           x.pencere_disi ? el('div', { style: 'font-size: 12px; color: var(--warn)' }, 'Google için 90 gün aşıldı') : null, (x.gbraid || x.wbraid) && !x.gclid ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, 'iOS kimliği: dosyaya girmez') : null),
         el('td', {}, tl(x.deger)),

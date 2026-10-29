@@ -3,9 +3,11 @@
 // gönderim başarısız olur ve hata ayarlar tablosuna (eposta_son_hata) yazılır, bildirimlerde görünür. Hiçbir hata asıl işlemi durdurmaz.
 // Toplu/pazarlama e-postası için kullanılmaz. Gönderen adres wrangler.jsonc'taki allowed_sender_addresses ile sınırlıdır.
 import { simdi } from './ortak.js';
+import { PANEL_ALAN, panelYoluMu } from './panel-yollar.js';
 
 export const GONDEREN = { email: 'bildirim@idexya.com', name: 'Idexya Panel' };
 const SITE = 'https://idexya.com';
+const kok = (yol) => (panelYoluMu(yol) ? `https://${PANEL_ALAN}` : SITE);
 const EPOSTA = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 async function ayar(db, k) { const r = await db.prepare('SELECT deger FROM ayarlar WHERE anahtar = ?').bind(k).first(); return r ? r.deger : null; }
@@ -17,11 +19,11 @@ const kacis = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;',
 
 // satirlar: [etiket, değer] dizisi; bag: { metin, yol } panel ya da site bağlantısı.
 function govde(baslik, satirlar, bag, alt) {
-  const text = [baslik, '', ...satirlar.map(([e, d]) => `${e}: ${d}`), '', bag ? `${bag.metin}: ${SITE}${bag.yol}` : '', '', alt || 'Bu e-posta Idexya panelinden otomatik gönderildi.'].join('\n');
+  const text = [baslik, '', ...satirlar.map(([e, d]) => `${e}: ${d}`), '', bag ? `${bag.metin}: ${kok(bag.yol)}${bag.yol}` : '', '', alt || 'Bu e-posta Idexya panelinden otomatik gönderildi.'].join('\n');
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1F2A3A;max-width:560px">
 <h2 style="font-size:18px;margin:0 0 12px">${kacis(baslik)}</h2>
 <table style="border-collapse:collapse">${satirlar.map(([e, d]) => `<tr><td style="padding:4px 12px 4px 0;color:#5B6B80;vertical-align:top">${kacis(e)}</td><td style="padding:4px 0;white-space:pre-wrap">${kacis(d)}</td></tr>`).join('')}</table>
-${bag ? `<p style="margin:18px 0"><a href="${SITE}${kacis(bag.yol)}" style="background:#B84406;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">${kacis(bag.metin)}</a></p>` : ''}
+${bag ? `<p style="margin:18px 0"><a href="${kok(bag.yol)}${kacis(bag.yol)}" style="background:#B84406;color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none">${kacis(bag.metin)}</a></p>` : ''}
 <p style="font-size:12px;color:#8A96A8">${kacis(alt || 'Bu e-posta Idexya panelinden otomatik gönderildi.')}</p></div>`;
   return { text, html };
 }

@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Ayarlar" aktif="ayar" yol="Sistem" aciklama="Firma bilgileri ve varsayılanlar. Teklif çıktısı gibi belgelerde bu bilgiler kullanılır. Erişim anahtarları ve gizli değerler burada değil, Cloudflare panelinde tutulur.">
 <form class="kart" data-form style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px"></form>
 <div style="display: flex; gap: 10px; align-items: center"><button type="button" class="dugme ana" data-kaydet>Kaydet</button><span data-durum style="color: var(--tx2); font-size: 14px"></span></div>
-<p style="margin: 0; font-size: 14px; color: var(--tx2)">Bağlantı durumları için <a href="/yonetim/entegrasyonlar/">Entegrasyonlar</a> sayfasına bakın.</p>
+<p style="margin: 0; font-size: 14px; color: var(--tx2)">Bağlantı durumları için <a href="/integrations">Entegrasyonlar</a> sayfasına bakın.</p>
 <script>
   import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
   const form = document.querySelector('[data-form]'), durum = document.querySelector('[data-durum]');
