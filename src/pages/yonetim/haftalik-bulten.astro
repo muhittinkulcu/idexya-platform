@@ -1,0 +1,223 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+// Haftalık Bülten editörü (worker/haftalik-bulten.js). Maddeler taslak girer; yalnız onaylananlar sayı yayınlandığında sitede görünür.
+---
+<Yonetim baslik="Haftalık Bülten" aktif="haftalik-bulten" yol="Web sitesi" aciklama="AI ve dijital pazarlama gelişmelerini haftalık sayılar halinde derleyin. Araştırma taslakları buraya düşer; maddeleri inceleyip onayladığınızda ve sayıyı yayınladığınızda /tr/bulten/ sayfasında görünür.">
+<div class="hb-y" data-kok>
+  <div class="hb-y-ust">
+    <div role="tablist" aria-label="Görünüm" class="hb-y-sekme" data-sekmeler></div>
+    <span class="hb-y-bosluk"></span>
+    <a class="dugme" href="/tr/bulten/" target="_blank" rel="noopener">Sitede aç ↗</a>
+    <button type="button" class="dugme birincil" data-yeni-sayi>+ Geçen haftanın sayısı</button>
+  </div>
+  <div data-gorunum></div>
+</div>
+<style is:global>
+  .hb-y{display:flex;flex-direction:column;gap:16px}
+  .hb-y-ust{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.hb-y-bosluk{flex:1}
+  .hb-y-sekme{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--track,var(--card2))}
+  .hb-y-sekme button{min-height:34px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+  .hb-y-sekme button[aria-selected=true]{background:var(--card);color:var(--head);box-shadow:0 1px 3px var(--shadow)}
+  .dugme.birincil{background:var(--fill);border-color:var(--fill);color:#fff}
+  .hb-y-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+  .hb-y-sayi{display:flex;flex-direction:column;gap:8px;padding:18px}
+  .hb-y-sayi small{color:var(--acc);font-weight:700}.hb-y-sayi b{font-size:17px;color:var(--head);line-height:1.3}
+  .hb-y-ilerle{height:6px;border-radius:999px;background:var(--track,var(--card2));overflow:hidden}.hb-y-ilerle i{display:block;height:100%;background:var(--ok)}
+  .hb-y-satir{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:13px;color:var(--tx2)}
+  .hb-y-eylem{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+  .hb-y-editor{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:16px;align-items:start}
+  .hb-y-yan{position:sticky;top:90px;display:flex;flex-direction:column;gap:12px;padding:16px}
+  .hb-y-yan h3{margin:0;font-size:14px;color:var(--head)}
+  .hb-y-sayac{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.hb-y-sayac div{padding:10px;border-radius:12px;background:var(--card2);text-align:center}.hb-y-sayac b{display:block;font-size:22px;color:var(--head)}.hb-y-sayac span{font-size:11.5px;color:var(--tx2)}
+  .hb-y-suzgec{display:flex;flex-wrap:wrap;gap:6px}
+  .hb-y-cip{min-height:30px;padding:0 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--tx2);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+  .hb-y-cip[aria-pressed=true]{background:var(--tint);border-color:var(--btnline);color:var(--tintx)}
+  .hb-y-grup{display:flex;flex-direction:column;gap:10px}
+  .hb-y-grup>h3{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:15px;color:var(--head)}
+  .hb-y-grup>h3 i{width:12px;height:12px;border-radius:50%;background:var(--r)}
+  .hb-y-madde{padding:16px;display:flex;flex-direction:column;gap:10px;border-left:4px solid var(--line)}
+  .hb-y-madde.onayli{border-left-color:var(--ok)}.hb-y-madde.cikarildi{opacity:.55}
+  .hb-y-madde h4{margin:0;font-size:16px;color:var(--head);line-height:1.35}
+  .hb-y-madde p{margin:0;font-size:14px;line-height:1.6;color:var(--tx)}
+  .hb-y-madde .anlam{padding:10px 12px;border-radius:10px;background:var(--tint)}
+  .hb-y-kaynak{display:flex;flex-wrap:wrap;gap:6px}.hb-y-kaynak a{font-size:12.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);overflow-wrap:anywhere}
+  .hb-y-not{padding:8px 10px;border-radius:10px;background:var(--warnb);color:var(--warn);font-size:12.5px}
+  .hb-y-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .hb-y-form .tam{grid-column:1/-1}
+  .hb-y-form textarea{min-height:96px;resize:vertical}
+  .hb-y-kaynak-satir{display:grid;grid-template-columns:minmax(0,.4fr) minmax(0,1fr) auto;gap:6px}
+  .hb-y-konu{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(0,1.6fr) 110px 90px auto;gap:8px;align-items:center;padding:10px 14px;border-top:1px solid var(--line)}
+  .hb-y-konu input,.hb-y-konu select{min-height:36px;padding:4px 8px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;width:100%;box-sizing:border-box}
+  .hb-y-konu input[type=color]{padding:2px;height:36px}
+  @media (max-width:1100px){.hb-y-editor{grid-template-columns:1fr}.hb-y-yan{position:static}.hb-y-form{grid-template-columns:1fr}.hb-y-konu{grid-template-columns:40px 1fr}}
+</style>
+<script>
+  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  const gor = document.querySelector('[data-gorunum]'), sekmeKutu = document.querySelector('[data-sekmeler]');
+  const ETKI = { yuksek: 'Yüksek etki', orta: 'Orta etki', dusuk: 'Düşük etki' };
+  const DURUM = { taslak: 'Taslak', onayli: 'Onaylı', cikarildi: 'Çıkarıldı' };
+  const GUVEN = { 'tek-kaynak': 'Yalnız ikincil kaynak', 'tarih-belirsiz': 'Tarih belirsiz' };
+  let veri = null, sekme = 'sayilar', acik = null, suzgec = 'hepsi', duzenlenen = null;
+  const konuAl = (id) => veri.konular.find((k) => k.id === id) || { ad: id, renk: '#888' };
+  const gunYaz = (g) => (g ? g.split('-').reverse().join('.') : '—');
+
+  async function yukle() {
+    try { veri = await api('haftalik-bulten'); genelHata(''); }
+    catch (h) { genelHata('Bülten verisi yüklenemedi: ' + h.message); return; }
+    if (acik) await sayiAc(acik.sayi.id, false); else ciz();
+  }
+  function sekmeCiz() {
+    sekmeKutu.replaceChildren(...[['sayilar', 'Sayılar'], ['konular', 'Konular']].map(([k, a]) => el('button', { type: 'button', role: 'tab', 'aria-selected': String(sekme === k && !acik), onclick: () => { sekme = k; acik = null; ciz(); } }, a)));
+  }
+  function ciz() {
+    sekmeCiz();
+    if (acik) return editorCiz();
+    if (sekme === 'konular') return konularCiz();
+    if (!veri.sayilar.length) { gor.replaceChildren(el('div', { class: 'kart bos' }, 'Henüz sayı yok. “+ Geçen haftanın sayısı” ile başlayın; haftalık araştırma taslakları da buraya düşer.')); return; }
+    gor.replaceChildren(el('div', { class: 'hb-y-izgara' }, ...veri.sayilar.map((s) => el('article', { class: 'kart hb-y-sayi' },
+      el('div', { class: 'hb-y-satir' }, el('small', {}, `Sayı #${s.no} · ${gunYaz(s.hafta_bas)} – ${gunYaz(s.hafta_bit)}`), el('span', { class: 'cip ' + (s.durum === 'yayinda' ? 'kazanildi' : 'gorusme') }, s.durum === 'yayinda' ? 'Yayında' : 'Taslak')),
+      el('b', {}, s.baslik),
+      el('div', { class: 'hb-y-ilerle', title: `${s.onayli}/${s.madde} onaylı` }, el('i', { style: `width:${s.madde ? Math.round(s.onayli / s.madde * 100) : 0}%` })),
+      el('div', { class: 'hb-y-satir' }, `${s.madde} madde · ${s.onayli} onaylı`, s.yayin_zamani ? ` · yayın ${tarih(s.yayin_zamani)}` : ''),
+      el('div', { class: 'hb-y-eylem' },
+        el('button', { type: 'button', class: 'dugme kucuk birincil', onclick: () => sayiAc(s.id) }, 'Aç ve düzenle'),
+        el('a', { class: 'dugme kucuk', href: `/tr/bulten/${s.slug}/?onizleme=1`, target: '_blank', rel: 'noopener' }, 'Önizle ↗'))))));
+  }
+
+  async function sayiAc(id, kaydir = true) {
+    try { const s = await api('haftalik-bulten/sayi/' + id); acik = s; genelHata(''); ciz(); if (kaydir) scrollTo({ top: 0 }); }
+    catch (h) { genelHata('Sayı açılamadı: ' + h.message); }
+  }
+
+  function editorCiz() {
+    const { sayi, maddeler } = acik;
+    const say = (d) => maddeler.filter((m) => m.durum === d).length;
+    const gorunen = maddeler.filter((m) => suzgec === 'hepsi' || m.durum === suzgec);
+    const baslik = el('input', { value: sayi.baslik, maxlength: '160' }), ozet = el('textarea', { maxlength: '600', rows: '3', placeholder: 'Bu haftanın 2–3 cümlelik özeti (sayfanın ve paylaşımların açıklaması olur)' }, sayi.ozet || '');
+    const kaydetSayi = el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => {
+      try { await api('haftalik-bulten/sayi/' + sayi.id, { baslik: baslik.value, ozet: ozet.value }); genelHata(''); await yukle(); } catch (h) { genelHata(h.message); }
+    } }, 'Başlık ve özeti kaydet');
+    const yayinda = sayi.durum === 'yayinda';
+    const yayin = el('button', { type: 'button', class: 'dugme ' + (yayinda ? '' : 'birincil'), onclick: async () => {
+      const ileti = yayinda ? 'Bu sayı sitede yayından kaldırılsın mı?' : `Sayı #${sayi.no} yayınlansın mı? Yalnız onaylı ${say('onayli')} madde sitede görünecek.`;
+      if (!confirm(ileti)) return;
+      try { await api(`haftalik-bulten/sayi/${sayi.id}/durum`, { durum: yayinda ? 'taslak' : 'yayinda' }); genelHata(''); await yukle(); } catch (h) { genelHata(h.message); }
+    } }, yayinda ? 'Yayından kaldır' : 'Sayıyı yayınla');
+    const topluOnay = say('taslak') ? el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => {
+      if (!confirm(`${say('taslak')} taslak madde onaylansın mı? Önce her maddeyi okuduğunuzdan emin olun.`)) return;
+      for (const m of maddeler.filter((x) => x.durum === 'taslak')) { try { await api('haftalik-bulten/madde/' + m.id, { durum: 'onayli' }); } catch (h) { genelHata(`“${m.baslik}”: ${h.message}`); break; } }
+      await yukle();
+    } }, 'Bütün taslakları onayla') : null;
+
+    const konuSira = veri.konular.map((k) => k.id);
+    const gruplar = [...new Set(gorunen.map((m) => m.konu))].sort((a, b) => konuSira.indexOf(a) - konuSira.indexOf(b));
+    const akis = el('div', { style: 'display:flex;flex-direction:column;gap:14px' },
+      duzenlenen === 'yeni' ? maddeFormu(null) : null,
+      ...(gruplar.length ? gruplar.map((kid) => { const k = konuAl(kid); return el('section', { class: 'hb-y-grup' }, el('h3', { style: `--r:${k.renk}` }, el('i'), k.ad, el('span', { style: 'font-weight:500;color:var(--tx2);font-size:13px' }, `${gorunen.filter((m) => m.konu === kid).length} madde`)),
+        ...gorunen.filter((m) => m.konu === kid).map((m) => duzenlenen === m.id ? maddeFormu(m) : maddeKart(m))); })
+        : [el('div', { class: 'kart bos' }, maddeler.length ? 'Bu süzgece uyan madde yok.' : 'Bu sayıda henüz madde yok. “+ Madde ekle” ile ekleyin.')]));
+
+    gor.replaceChildren(el('div', { class: 'hb-y-editor' },
+      el('div', { style: 'display:flex;flex-direction:column;gap:14px;min-width:0' },
+        el('div', { class: 'kart', style: 'padding:16px;display:flex;flex-direction:column;gap:10px' },
+          el('div', { class: 'hb-y-satir' }, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { acik = null; duzenlenen = null; ciz(); } }, '← Sayılar'), el('b', { style: 'color:var(--acc)' }, `Sayı #${sayi.no} · ${gunYaz(sayi.hafta_bas)} – ${gunYaz(sayi.hafta_bit)}`), el('span', { class: 'cip ' + (yayinda ? 'kazanildi' : 'gorusme') }, yayinda ? 'Yayında' : 'Taslak')),
+          el('label', { class: 'alan' }, 'Sayı başlığı', baslik), el('label', { class: 'alan' }, 'Özet', ozet), el('div', {}, kaydetSayi)),
+        el('div', { class: 'hb-y-ust' },
+          el('div', { class: 'hb-y-suzgec' }, ...[['hepsi', `Tümü ${maddeler.length}`], ['taslak', `Taslak ${say('taslak')}`], ['onayli', `Onaylı ${say('onayli')}`], ['cikarildi', `Çıkarılan ${say('cikarildi')}`]].map(([k, a]) => el('button', { type: 'button', class: 'hb-y-cip', 'aria-pressed': String(suzgec === k), onclick: () => { suzgec = k; ciz(); } }, a))),
+          el('span', { class: 'hb-y-bosluk' }), topluOnay,
+          el('button', { type: 'button', class: 'dugme kucuk birincil', onclick: () => { duzenlenen = 'yeni'; ciz(); } }, '+ Madde ekle')),
+        akis),
+      el('aside', { class: 'kart hb-y-yan' },
+        el('h3', {}, 'Yayın durumu'),
+        el('div', { class: 'hb-y-sayac' }, ...[['taslak', 'Taslak'], ['onayli', 'Onaylı'], ['cikarildi', 'Çıkarılan']].map(([k, a]) => el('div', {}, el('b', {}, say(k)), el('span', {}, a)))),
+        el('p', { style: 'margin:0;font-size:13px;color:var(--tx2);line-height:1.5' }, 'Sitede yalnız onaylı maddeler görünür. Taslak ve çıkarılan maddeler yayında gösterilmez.'),
+        el('a', { class: 'dugme', href: `/tr/bulten/${sayi.slug}/?onizleme=1`, target: '_blank', rel: 'noopener' }, 'Önizle ↗'),
+        yayinda ? el('a', { class: 'dugme', href: `/tr/bulten/${sayi.slug}/`, target: '_blank', rel: 'noopener' }, 'Sitede gör ↗') : null,
+        yayin)));
+  }
+
+  function maddeKart(m) {
+    const k = konuAl(m.konu); let kaynak = [];
+    try { kaynak = JSON.parse(m.kaynaklar || '[]'); } catch {}
+    const durumDegis = async (d) => { try { await api('haftalik-bulten/madde/' + m.id, { durum: d }); genelHata(''); await yukle(); } catch (h) { genelHata(h.message); } };
+    return el('article', { class: 'kart hb-y-madde ' + m.durum },
+      el('div', { class: 'hb-y-satir' }, el('span', { class: 'cip ' + (m.durum === 'onayli' ? 'kazanildi' : m.durum === 'cikarildi' ? 'kaybedildi' : 'gorusme') }, DURUM[m.durum]), gunYaz(m.tarih), ' · ', ETKI[m.etki] || '', GUVEN[m.guven] ? el('span', { class: 'cip kaybedildi' }, GUVEN[m.guven]) : null),
+      el('h4', {}, m.baslik),
+      el('p', {}, el('b', {}, 'Ne oldu? '), m.ne_oldu),
+      m.ne_anlama ? el('p', { class: 'anlam' }, el('b', {}, 'Ne anlama geliyor? '), m.ne_anlama) : null,
+      el('div', { class: 'hb-y-kaynak' }, ...kaynak.map((x) => el('a', { href: x.url, target: '_blank', rel: 'noopener' }, (x.ad || x.url) + ' ↗'))),
+      m.not_ ? el('div', { class: 'hb-y-not' }, 'Editör notu: ' + m.not_) : null,
+      el('div', { class: 'hb-y-eylem' },
+        m.durum !== 'onayli' ? el('button', { type: 'button', class: 'dugme kucuk birincil', onclick: () => durumDegis('onayli') }, '✓ Onayla') : el('button', { type: 'button', class: 'dugme kucuk', onclick: () => durumDegis('taslak') }, 'Onayı geri al'),
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { duzenlenen = m.id; ciz(); } }, 'Düzenle'),
+        m.durum !== 'cikarildi' ? el('button', { type: 'button', class: 'dugme kucuk', onclick: () => durumDegis('cikarildi') }, 'Bu sayıdan çıkar') : null,
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { if (!confirm('Madde kalıcı olarak silinsin mi?')) return; try { await api(`haftalik-bulten/madde/${m.id}/sil`, {}); await yukle(); } catch (h) { genelHata(h.message); } } }, 'Sil')));
+  }
+
+  function maddeFormu(m) {
+    let kaynak = []; try { kaynak = JSON.parse((m && m.kaynaklar) || '[]'); } catch {}
+    if (!kaynak.length) kaynak = [{ ad: '', url: '' }];
+    const f = {
+      konu: el('select', {}, ...veri.konular.filter((k) => k.aktif || (m && m.konu === k.id)).map((k) => el('option', { value: k.id, selected: m ? m.konu === k.id : false }, k.ad))),
+      tarih: el('input', { type: 'date', value: (m && m.tarih) || acik.sayi.hafta_bit, min: '2020-01-01' }),
+      etki: el('select', {}, ...Object.entries(ETKI).map(([v, a]) => el('option', { value: v, selected: (m ? m.etki : 'orta') === v }, a))),
+      baslik: el('input', { value: (m && m.baslik) || '', maxlength: '160', placeholder: 'Bilgi veren, kısa başlık' }),
+      ne_oldu: el('textarea', { maxlength: '1500', placeholder: 'Ne duyuruldu ya da değişti? Kimler için, nerede geçerli?' }, (m && m.ne_oldu) || ''),
+      ne_anlama: el('textarea', { maxlength: '1500', placeholder: 'Türkiye’deki işletme ve reklamverenler için pratik anlamı' }, (m && m.ne_anlama) || ''),
+      not: el('input', { value: (m && m.not_) || '', maxlength: '600', placeholder: 'Yalnız panelde görünür' })
+    };
+    const kaynakKutu = el('div', { style: 'display:flex;flex-direction:column;gap:6px' });
+    const kaynakCiz = () => kaynakKutu.replaceChildren(...kaynak.map((x, i) => el('div', { class: 'hb-y-kaynak-satir' },
+      el('input', { value: x.ad, placeholder: 'Kaynak adı (ör. OpenAI blog)', oninput: (e) => { x.ad = e.target.value; } }),
+      el('input', { value: x.url, type: 'url', placeholder: 'https://…', oninput: (e) => { x.url = e.target.value; } }),
+      el('button', { type: 'button', class: 'dugme kucuk', 'aria-label': 'Kaynağı kaldır', onclick: () => { kaynak.splice(i, 1); if (!kaynak.length) kaynak.push({ ad: '', url: '' }); kaynakCiz(); } }, 'Kaldır'))),
+      el('button', { type: 'button', class: 'dugme kucuk', style: 'align-self:flex-start', onclick: () => { kaynak.push({ ad: '', url: '' }); kaynakCiz(); } }, '+ Kaynak'));
+    kaynakCiz();
+    const kaydet = async () => {
+      const g = { konu: f.konu.value, tarih: f.tarih.value, etki: f.etki.value, baslik: f.baslik.value, ne_oldu: f.ne_oldu.value, ne_anlama: f.ne_anlama.value, not: f.not.value, kaynaklar: kaynak.filter((x) => x.url.trim()) };
+      try { if (m) await api('haftalik-bulten/madde/' + m.id, g); else await api(`haftalik-bulten/sayi/${acik.sayi.id}/madde`, g); duzenlenen = null; genelHata(''); await yukle(); }
+      catch (h) { genelHata(h.message); }
+    };
+    return el('div', { class: 'kart', style: 'padding:16px;display:flex;flex-direction:column;gap:12px;border:2px solid var(--btnline)' },
+      el('b', { style: 'color:var(--head)' }, m ? 'Maddeyi düzenle' : 'Yeni madde (taslak olarak eklenir)'),
+      el('div', { class: 'hb-y-form' },
+        el('label', { class: 'alan' }, 'Konu', f.konu), el('label', { class: 'alan' }, 'Gelişme tarihi', f.tarih), el('label', { class: 'alan' }, 'Etki', f.etki),
+        el('label', { class: 'alan tam' }, 'Başlık', f.baslik),
+        el('label', { class: 'alan tam' }, 'Ne oldu?', f.ne_oldu),
+        el('label', { class: 'alan tam' }, 'Ne anlama geliyor?', f.ne_anlama),
+        el('div', { class: 'alan tam' }, 'Kaynaklar (ilki birincil kaynak olmalı)', kaynakKutu),
+        el('label', { class: 'alan tam' }, 'Editör notu', f.not)),
+      el('div', { class: 'hb-y-eylem' }, el('button', { type: 'button', class: 'dugme birincil', onclick: kaydet }, 'Kaydet'), el('button', { type: 'button', class: 'dugme', onclick: () => { duzenlenen = null; ciz(); } }, 'Vazgeç')));
+  }
+
+  function konularCiz() {
+    const yeni = { id: '', kategori: veri.kategoriler[0]?.id || 'ai', ad: '', aciklama: '', renk: '#B84406', sira: 99, aktif: 1, yeni: true };
+    const satir = (k) => {
+      const f = { renk: el('input', { type: 'color', value: k.renk || '#B84406', 'aria-label': 'Renk' }), ad: el('input', { value: k.ad, placeholder: 'Ad (ör. Perplexity)', 'aria-label': 'Ad' }), aciklama: el('input', { value: k.aciklama || '', placeholder: 'Kısa açıklama', 'aria-label': 'Açıklama' }),
+        kategori: el('select', { 'aria-label': 'Kategori' }, ...veri.kategoriler.map((x) => el('option', { value: x.id, selected: x.id === k.kategori }, x.ad))),
+        aktif: el('select', { 'aria-label': 'Durum' }, el('option', { value: '1', selected: !!k.aktif }, 'Açık'), el('option', { value: '0', selected: !k.aktif }, 'Kapalı')),
+        id: el('input', { value: k.id, placeholder: 'kimlik (ör. perplexity)', 'aria-label': 'Kimlik', disabled: !k.yeni }) };
+      return el('div', { class: 'hb-y-konu' }, f.renk, k.yeni ? f.id : el('div', {}, el('b', {}, k.ad || '—'), el('div', { style: 'font-size:12px;color:var(--tx2)' }, k.id)), el('div', { style: 'display:flex;gap:6px' }, f.ad, f.aciklama), f.kategori, f.aktif,
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => {
+          try { await api('haftalik-bulten/konu', { id: k.yeni ? f.id.value : k.id, kategori: f.kategori.value, ad: f.ad.value, aciklama: f.aciklama.value, renk: f.renk.value, sira: k.sira, aktif: f.aktif.value === '1' }); genelHata(''); await yukle(); }
+          catch (h) { genelHata(h.message); }
+        } }, k.yeni ? 'Ekle' : 'Kaydet'));
+    };
+    gor.replaceChildren(...veri.kategoriler.map((kat) => el('section', { class: 'kart', style: 'overflow:hidden' },
+      el('div', { style: 'padding:14px 16px' }, el('b', { style: 'color:var(--head)' }, kat.ad), el('span', { style: 'margin-left:8px;color:var(--tx2);font-size:13px' }, kat.aciklama || '')),
+      ...veri.konular.filter((k) => k.kategori === kat.id).map(satir))),
+      el('section', { class: 'kart', style: 'overflow:hidden' }, el('div', { style: 'padding:14px 16px' }, el('b', { style: 'color:var(--head)' }, 'Yeni konu ekle')), satir(yeni)));
+  }
+
+  document.querySelector('[data-yeni-sayi]').addEventListener('click', async (o) => {
+    o.currentTarget.disabled = true;
+    try { const s = await api('haftalik-bulten/sayi', {}); await yukle(); await sayiAc(s.sayi.id); } catch (h) { genelHata(h.message); }
+    finally { o.currentTarget.disabled = false; }
+  });
+  yukle().then(() => {
+    const q = new URLSearchParams(location.search);
+    if (q.get('yeni') === '1') document.querySelector('[data-yeni-sayi]').click();
+    else if (q.get('sayi')) sayiAc(q.get('sayi'));
+  });
+</script>
+</Yonetim>

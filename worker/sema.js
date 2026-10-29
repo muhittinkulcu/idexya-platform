@@ -68,6 +68,15 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS reklam_hesap (
     platform TEXT NOT NULL, hesap TEXT NOT NULL, hesap_adi TEXT, marka TEXT, musteri_id TEXT, etiket TEXT, guncelleme TEXT NOT NULL, guncelleyen TEXT,
     PRIMARY KEY (platform, hesap))`,
+  // Haftalık Bülten (worker/haftalik-bulten.js): kategori › konu › haftalık sayı › madde. Kaynaklar JSON [{ad, url}].
+  `CREATE TABLE IF NOT EXISTS bulten_kategori (id TEXT PRIMARY KEY, ad TEXT NOT NULL, aciklama TEXT, sira INTEGER NOT NULL DEFAULT 0)`,
+  `CREATE TABLE IF NOT EXISTS bulten_konu (id TEXT PRIMARY KEY, kategori TEXT NOT NULL, ad TEXT NOT NULL, aciklama TEXT, renk TEXT, sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1)`,
+  `CREATE TABLE IF NOT EXISTS bulten_sayi (id TEXT PRIMARY KEY, slug TEXT NOT NULL UNIQUE, no INTEGER NOT NULL, baslik TEXT NOT NULL, ozet TEXT, hafta_bas TEXT NOT NULL, hafta_bit TEXT NOT NULL,
+    durum TEXT NOT NULL, yayin_zamani TEXT, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, guncelleyen TEXT)`,
+  `CREATE TABLE IF NOT EXISTS bulten_madde (id TEXT PRIMARY KEY, sayi_id TEXT NOT NULL, konu TEXT NOT NULL, tarih TEXT, baslik TEXT NOT NULL, ne_oldu TEXT NOT NULL, ne_anlama TEXT,
+    etki TEXT NOT NULL, kaynaklar TEXT NOT NULL, durum TEXT NOT NULL, sira INTEGER NOT NULL DEFAULT 0, guven TEXT, not_ TEXT, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS bulten_madde_sayi ON bulten_madde (sayi_id, sira)`,
+  `CREATE INDEX IF NOT EXISTS bulten_madde_konu ON bulten_madde (konu, durum)`,
   `CREATE TABLE IF NOT EXISTS reklam_cekim (
     id TEXT PRIMARY KEY, zaman TEXT NOT NULL, durum TEXT NOT NULL, satir INTEGER, baslangic TEXT, mesaj TEXT, tetikleyen TEXT NOT NULL)`,
   // Bülten ilgi listesi (worker/bulten.js): e-posta, ticari ileti onay kaydı ve abonelikten çıkma anahtarı.

@@ -10,4 +10,5 @@ export const IKON: Record<string, string> = {
   // Blog mega menüsü: yazılar ve ölçüm konusu.
   yazi: '<path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5M9 12h7M9 16h5"></path>',
   olcum: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>',
+  bulten: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><path d="M12 12l6-6"></path><circle cx="12" cy="12" r="1"></circle>',
 };
