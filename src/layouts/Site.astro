@@ -144,6 +144,7 @@ main p{max-width:76ch}
 .ust-menu{align-items:center}
 /* Hizmetler açılır menüsü: Hizmetler > ana kategori > alt hizmetler (masaüstü). Telefonda "Menü" çekmecesi kullanılır. */
 .ust-acilir{position:relative;display:flex;align-items:center;gap:2px}
+.ust-acilir.menu-duz .ust-acilir-ok,.ust-acilir.menu-duz .ust-panel{display:none!important}
 .ust-acilir-ok{width:24px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:inherit;cursor:pointer;padding:0;transition:transform .2s}
 .ust-acilir.acilmis .ust-acilir-ok{transform:rotate(180deg)}
 .ust-panel{position:absolute;top:calc(100% + 10px);left:-24px;width:min(720px,calc(100vw - 48px));display:none;flex-direction:column;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:0 28px 60px -20px var(--shadow);padding:10px;z-index:60}
@@ -679,6 +680,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 @media print{header,footer,#cerez,[data-tema-dugme],nav[aria-label="Dil seçimi"]{display:none!important}body{background:#fff;color:#000}a{color:#000}}
 @media (max-width:640px){main h1{font-size:clamp(32px,9vw,44px)!important}main h2{font-size:clamp(24px,7vw,34px)!important}}
 </style>
+<script is:inline>try{var u=new URLSearchParams(location.search).get('tema')==='onizleme',r=localStorage.getItem(u?'idx-tema-onizleme':'idx-tema'),t=r&&JSON.parse(r);t=t&&(t.tema||t);if(t){var c='';if(t.menu){if(t.menu.stil&&!sessionStorage.getItem('idx-menu')){document.documentElement.dataset.mk=t.menu.stil;document.documentElement.dataset.ma=t.menu.stil}(t.menu.ogeler||[]).forEach(function(o){if(o.gorunur===false)c+='[data-menu-k="'+o.k.replace(/[^a-z0-9-]/g,'')+'"]{display:none!important}'})}if(t.ust){if(t.ust.giris===false)c+='.ust-giris{display:none!important}';if(t.ust.arama===false)c+='[data-arama-ac]{display:none!important}';if(t.ust.temaDugme===false)c+='[data-tema-dugme]{display:none!important}'}if(c){var s=document.createElement('style');s.id='tema-erken';s.textContent=c;document.head.appendChild(s)}}}catch(e){}</script>
 <script is:inline>try{var q=new URLSearchParams(location.search).get('menu'),t=['standart','orta','mega'];if(q==='varsayilan')sessionStorage.removeItem('idx-menu');else if(t.indexOf(q)>-1)sessionStorage.setItem('idx-menu',q);var m=sessionStorage.getItem('idx-menu');if(t.indexOf(m)>-1){document.documentElement.dataset.mk=m;document.documentElement.dataset.ma=m}}catch(e){}</script>
 <script is:inline>try{if(localStorage.getItem('idx-tema')==='koyu'){document.documentElement.dataset.tema='koyu'}}catch(e){}</script>
 </head>
@@ -694,8 +696,8 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <span class="logo-cizgi" aria-hidden="true"></span><span class="logo-yazi"><span class="logo-ad">Idexya</span><span class="logo-alt">GOOD THINGS</span></span>
 </a>
 <nav aria-label="Ana menü" class="ust-menu">
-{MENU.filter((m) => m.ust).map((m) => m.k === 'hizmetler' ? (
-<div class="ust-acilir" data-acilir>
+{MENU.map((m) => m.k === 'hizmetler' ? (
+<div class="ust-acilir" data-acilir data-menu-k={m.k} hidden={!m.ust || undefined}>
 <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
 <button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="hizmet-menu" aria-label="Hizmet kategorilerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
 <div class="ust-panel" id="hizmet-menu" data-acilir-panel>
@@ -717,7 +719,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </div>
 ) : m.k === 'paketler' ? (
-<div class="ust-acilir" data-acilir>
+<div class="ust-acilir" data-acilir data-menu-k={m.k} hidden={!m.ust || undefined}>
 <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
 <button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="paket-menu" aria-label="Paket kategorilerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
 <div class="ust-panel ust-paket" id="paket-menu" data-acilir-panel>
@@ -774,7 +776,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </div>
 ) : m.k === 'blog' ? (
-<div class="ust-acilir" data-acilir>
+<div class="ust-acilir" data-acilir data-menu-k={m.k} hidden={!m.ust || undefined}>
 <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>
 <button type="button" class="ust-acilir-ok" data-acilir-dugme aria-expanded="false" aria-controls="blog-menu" aria-label="Blog içeriklerini aç"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></button>
 <div class="ust-panel ust-blog" id="blog-menu" data-acilir-panel>
@@ -825,7 +827,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div class="ust-panel-dip"><a href="/tr/haberler">Tüm yazılar <span aria-hidden="true">→</span></a><a href="/tr/bulten/" class="ust-dip-cta">Haftalık Bülten</a></div>
 </div>
 </div>
-) : <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
+) : <a href={m.href} data-menu-k={m.k} hidden={!m.ust || undefined} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
 </nav>
 <div class="ust-eylem">
 <button type="button" class="ikon-dugme arama-dugme" data-arama-ac aria-label="Sitede ara" aria-keyshortcuts="Control+K Meta+K"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span class="arama-yazi">Ara</span><kbd>⌘K</kbd></button>
@@ -877,11 +879,11 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 <div class="kap cm-govde">
 <nav aria-label="Site menüsü" class="cm-liste">
-{MENU.map((m, i) => <a href={m.href} data-onizle={m.k} aria-current={aktif === m.ad ? 'page' : undefined} style={`--s:${i}`}><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>)}
+{MENU.map((m, i) => <a href={m.href} data-onizle={m.k} data-menu-k={m.k} aria-current={aktif === m.ad ? 'page' : undefined} style={`--s:${i}`}><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ok"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>)}
 </nav>
 <nav class="cm-akordiyon" aria-label="Site menüsü (mobil)">
 {MENU.map((m) => (
-  <details class="cm-ak" name="cm-ak" open={aktif === m.ad}>
+  <details class="cm-ak" name="cm-ak" open={aktif === m.ad} data-menu-k={m.k}>
     <summary><span class="cm-ad">{m.ad}</span><span class="cm-alt">{m.alt}</span><span class="cm-ak-ok" aria-hidden="true"></span></summary>
     <div class="cm-ak-ic">
       <a href={m.href} class="cm-ak-ana">{m.ad} sayfasına gidin</a>
@@ -1050,14 +1052,14 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div style="display: flex; flex-wrap: wrap; gap: 40px">
 <div style="flex: 2 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
 <span style="font-weight: 700; font-size: 20px; color: var(--head)">Idexya | Good Things</span>
-<span style="color: var(--tx2); font-size: 15px; max-width: 360px">{menuVeri.tanitim}</span>
-<div style="display: flex; gap: 8px">
+<span style="color: var(--tx2); font-size: 15px; max-width: 360px" data-alt-tanitim>{menuVeri.tanitim}</span>
+<div style="display: flex; gap: 8px" data-alt-sosyal>
 {menuVeri.sosyal.map((x) => <a href={x.href} aria-label={x.ad} rel="noopener" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 10px; color: var(--head); background: var(--card)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={sosyalIkon(x.ad)}></svg></a>)}
 </div>
 </div>
-{menuVeri.alt.map((k) => <nav aria-label={k.baslik} style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; font-size: 15px"><span style="font-weight: 600; padding-bottom: 8px; color: var(--head)">{k.baslik}</span>{k.baglantilar.map((b) => <a href={b.href} style="color: var(--tx2); text-decoration: none; padding: 7px 0">{b.ad}</a>)}</nav>)}
+{menuVeri.alt.map((k) => <nav aria-label={k.baslik} data-alt-sutun style="flex: 1 1 160px; display: flex; flex-direction: column; gap: 2px; font-size: 15px"><span style="font-weight: 600; padding-bottom: 8px; color: var(--head)">{k.baslik}</span>{k.baglantilar.map((b) => <a href={b.href} style="color: var(--tx2); text-decoration: none; padding: 7px 0">{b.ad}</a>)}</nav>)}
 </div>
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 14px; color: var(--tx2)"><span>© 2026 Idexya | Good Things</span><span><a href="/" style="color: var(--tx2)">Türkçe</a> · <a href="/en/" style="color: var(--tx2)">English</a> · <button type="button" data-cerez-ac style="border: 0; background: none; padding: 0; color: var(--tx2); font: inherit; text-decoration: underline; cursor: pointer">Çerez tercihleri</button></span></div>
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-top: 22px; border-top: 1px solid var(--line); font-size: 14px; color: var(--tx2)"><span data-alt-telif>© 2026 Idexya | Good Things</span><span><a href="/" style="color: var(--tx2)">Türkçe</a> · <a href="/en/" style="color: var(--tx2)">English</a> · <button type="button" data-cerez-ac style="border: 0; background: none; padding: 0; color: var(--tx2); font: inherit; text-decoration: underline; cursor: pointer">Çerez tercihleri</button></span></div>
 </div>
 </footer>
 <div id="cerez" role="dialog" aria-label="Çerez tercihleri" class="gizli" style="position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 50; max-width: 720px; margin: 0 auto; background: var(--card); border: 1px solid var(--line); border-radius: 20px; box-shadow: 0 24px 60px var(--shadow); padding: 20px; display: flex; flex-direction: column; gap: 14px">
