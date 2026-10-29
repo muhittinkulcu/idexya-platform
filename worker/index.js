@@ -257,11 +257,17 @@ async function yonetimApi(istek, env, yol, kim) {
   return hata('Bulunamadı', 404);
 }
 
+const PANEL_ALAN = 'panel.idexya.com';
+
 export default {
   async fetch(istek, env, ctx) {
     const url = new URL(istek.url);
     const yol = url.pathname;
     try {
+      // Yönetim paneli girişi panel.idexya.com (Muhittin, 29 Eki 2026). Kök adres panele gider; ?tema=… (tema önizlemesi) sitenin kendisini açar.
+      if (url.hostname === PANEL_ALAN && yol === '/' && !url.searchParams.has('tema')) return Response.redirect(`${url.origin}/yonetim/`, 302);
+      // Eski adres: PANEL_YONLENDIR=evet olduğunda idexya.com/yonetim… panel.idexya.com'a taşınır (Access ayarı tamamlanınca açılır).
+      if (env.PANEL_YONLENDIR === 'evet' && url.hostname === 'idexya.com' && (yol === '/yonetim' || yol.startsWith('/yonetim/'))) return Response.redirect(`https://${PANEL_ALAN}${yol}${url.search}`, 301);
       if (yol === '/api/talep') {
         if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
         return await talepAl(istek, env);
