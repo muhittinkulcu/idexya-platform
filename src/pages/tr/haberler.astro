@@ -57,11 +57,14 @@ const konular = [...new Set(YAZILAR.map((y) => y.kategori))].map((k) => ({ ad: k
 <KatmanStil />
 <script>
   const dugmeler = [...document.querySelectorAll<HTMLButtonElement>('[data-konu]')];
-  dugmeler.forEach((d) => d.addEventListener('click', () => {
-    const k = d.dataset.konu || '';
+  const sec = (k: string) => {
     document.querySelectorAll<HTMLElement>('[data-yazi]').forEach((e) => { e.hidden = !!k && e.dataset.yazi !== k; });
     dugmeler.forEach((x) => x.hasAttribute('aria-pressed') && x.setAttribute('aria-pressed', String((x.dataset.konu || '') === k)));
-  }));
+  };
+  dugmeler.forEach((d) => d.addEventListener('click', () => sec(d.dataset.konu || '')));
+  // Menüden gelen ?konu=… süzgeci (yalnız var olan bir konuysa uygulanır)
+  const gelen = new URLSearchParams(location.search).get('konu') || '';
+  if (gelen && dugmeler.some((d) => d.dataset.konu === gelen)) sec(gelen);
 </script>
 <style>
   .bl-ust{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:56px;align-items:center}
