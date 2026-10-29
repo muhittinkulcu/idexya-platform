@@ -297,7 +297,7 @@ export default {
         const yanit = await env.ASSETS.fetch(istek);
         const y = new Response(yanit.body, yanit);
         Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => y.headers.set(k, v));
-        y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
         return y;
       }
       if (yol.startsWith('/api/')) return hata('Bulunamadı', 404);
