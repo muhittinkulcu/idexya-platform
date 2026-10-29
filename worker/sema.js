@@ -64,6 +64,10 @@ export const SEMA = [
     gun TEXT NOT NULL, platform TEXT NOT NULL, hesap TEXT NOT NULL, para TEXT NOT NULL, musteri_id TEXT, marka TEXT,
     harcama REAL NOT NULL DEFAULT 0, gosterim INTEGER, tiklama INTEGER, sonuclar TEXT,
     PRIMARY KEY (gun, platform, hesap, para))`,
+  // Reklam hesap adları: hesap_adi/marka IDOS görünümünden her çekimde güncellenir; etiket panelden elle verilir ve çekimde ezilmez.
+  `CREATE TABLE IF NOT EXISTS reklam_hesap (
+    platform TEXT NOT NULL, hesap TEXT NOT NULL, hesap_adi TEXT, marka TEXT, musteri_id TEXT, etiket TEXT, guncelleme TEXT NOT NULL, guncelleyen TEXT,
+    PRIMARY KEY (platform, hesap))`,
   `CREATE TABLE IF NOT EXISTS reklam_cekim (
     id TEXT PRIMARY KEY, zaman TEXT NOT NULL, durum TEXT NOT NULL, satir INTEGER, baslangic TEXT, mesaj TEXT, tetikleyen TEXT NOT NULL)`,
   // Bülten ilgi listesi (worker/bulten.js): e-posta, ticari ileti onay kaydı ve abonelikten çıkma anahtarı.

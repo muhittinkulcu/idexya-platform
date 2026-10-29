@@ -5,10 +5,11 @@
 import { importPKCS8, SignJWT } from 'jose';
 import { json, hata, simdi, kimlik, islemYaz } from './ortak.js';
 
-const GUN = 28;
+// 56 gün: panelde 28 günlük dönemi önceki 28 günle karşılaştırabilmek için.
+const GUN = 56;
 const UST_SINIR_BAYT = String(100 * 1024 * 1024); // Sorgu başına en fazla 100 MB işlenir; aşılırsa BigQuery sorguyu reddeder.
 const GEREKLI = ['metric_date', 'platform', 'account_id', 'currency', 'spend'];
-const BILINEN = new Set([...GEREKLI, 'client_id', 'brand_name', 'impressions', 'clicks']);
+const BILINEN = new Set([...GEREKLI, 'client_id', 'brand_name', 'account_name', 'impressions', 'clicks']);
 const GORUNUM_DESEN = /^[a-z][a-z0-9-]{4,61}[a-z0-9]\.[A-Za-z0-9_]{1,1024}\.[A-Za-z0-9_]{1,1024}$/;
 
 export const reklamKurulu = (env) => !!(env.IDOS_BQ_ANAHTAR && env.IDOS_BQ_GORUNUM);
@@ -71,8 +72,8 @@ export function ozetle(satirlar) {
   for (const x of satirlar) {
     if (!x.metric_date || !x.platform || !x.account_id || !x.currency) continue;
     const k = [x.metric_date, x.platform, x.account_id, x.currency].join('|');
-    const o = m.get(k) || { gun: x.metric_date.slice(0, 10), platform: String(x.platform).toLowerCase(), hesap: x.account_id, para: String(x.currency).toUpperCase(), musteri_id: null, marka: null, harcama: 0, gosterim: null, tiklama: null, sonuclar: {} };
-    o.musteri_id = o.musteri_id || x.client_id || null; o.marka = o.marka || x.brand_name || null;
+    const o = m.get(k) || { gun: x.metric_date.slice(0, 10), platform: String(x.platform).toLowerCase(), hesap: x.account_id, para: String(x.currency).toUpperCase(), musteri_id: null, marka: null, hesap_adi: null, harcama: 0, gosterim: null, tiklama: null, sonuclar: {} };
+    o.musteri_id = o.musteri_id || x.client_id || null; o.marka = o.marka || x.brand_name || null; o.hesap_adi = o.hesap_adi || x.account_name || null;
     o.harcama += Number(x.spend) || 0;
     if (x.impressions !== null && x.impressions !== undefined) o.gosterim = (o.gosterim || 0) + Number(x.impressions);
     if (x.clicks !== null && x.clicks !== undefined) o.tiklama = (o.tiklama || 0) + Number(x.clicks);
@@ -91,6 +92,12 @@ async function yaz(db, liste, tetikleyen, baslangic) {
         json_extract(value, '$.musteri_id'), json_extract(value, '$.marka'), json_extract(value, '$.harcama'), json_extract(value, '$.gosterim'),
         json_extract(value, '$.tiklama'), json(json_extract(value, '$.sonuclar')) FROM json_each(?)`).bind(JSON.stringify(liste.slice(i, i + 400))));
   }
+  // Hesap adları: görünümde ad/marka varsa güncellenir; boş gelirse eldeki değer korunur, elle verilen etiket hiç ezilmez.
+  const hesaplar = [...new Map(liste.map((o) => [o.platform + '|' + o.hesap, { platform: o.platform, hesap: o.hesap, hesap_adi: o.hesap_adi, marka: o.marka, musteri_id: o.musteri_id }])).values()];
+  if (hesaplar.length) sorgular.push(db.prepare(`INSERT INTO reklam_hesap (platform, hesap, hesap_adi, marka, musteri_id, guncelleme)
+      SELECT json_extract(value, '$.platform'), json_extract(value, '$.hesap'), json_extract(value, '$.hesap_adi'), json_extract(value, '$.marka'), json_extract(value, '$.musteri_id'), ? FROM json_each(?)
+      ON CONFLICT(platform, hesap) DO UPDATE SET hesap_adi = COALESCE(excluded.hesap_adi, reklam_hesap.hesap_adi), marka = COALESCE(excluded.marka, reklam_hesap.marka),
+        musteri_id = COALESCE(excluded.musteri_id, reklam_hesap.musteri_id), guncelleme = excluded.guncelleme`).bind(simdi(), JSON.stringify(hesaplar)));
   sorgular.push(db.prepare('INSERT INTO reklam_cekim (id, zaman, durum, satir, baslangic, mesaj, tetikleyen) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), simdi(), 'tamam', liste.length, baslangic, null, tetikleyen));
   await db.batch(sorgular);
 }
@@ -110,16 +117,48 @@ export async function reklamCek(env, tetikleyen) {
   }
 }
 
-export async function yonetimReklamApi(db, env, yontem, yol, kim) {
+export async function yonetimReklamApi(db, env, yontem, yol, kim, govde) {
   if (yol === 'reklam' && yontem === 'GET') {
     const kurulu = reklamKurulu(env);
-    const [son, sonTamam, gun, marka] = await db.batch([
+    // Hesap adı: panel etiketi > IDOS hesap adı > kimlik. Müşteri: CRM eşleşmesindeki firma (yalnız firma adı; kişi bilgisi gönderilmez) > IDOS marka adı.
+    const [son, sonTamam, gun, satir, hesap, ayar] = await db.batch([
       db.prepare('SELECT zaman, durum, satir, mesaj, tetikleyen FROM reklam_cekim ORDER BY zaman DESC LIMIT 1'),
       db.prepare("SELECT zaman, satir FROM reklam_cekim WHERE durum = 'tamam' ORDER BY zaman DESC LIMIT 1"),
       db.prepare('SELECT gun, platform, para, SUM(harcama) AS harcama, SUM(gosterim) AS gosterim, SUM(tiklama) AS tiklama, COUNT(*) AS hesap FROM reklam_ozet GROUP BY gun, platform, para ORDER BY gun'),
-      db.prepare('SELECT gun, COALESCE(marka, hesap) AS marka, musteri_id, platform, para, harcama, sonuclar FROM reklam_ozet')
+      db.prepare('SELECT gun, platform, hesap, para, harcama, gosterim, tiklama, sonuclar FROM reklam_ozet'),
+      db.prepare(`SELECT o.platform, o.hesap, h.etiket, h.hesap_adi, COALESCE(m.firma, h.marka) AS musteri, m.id AS crm_id
+        FROM (SELECT DISTINCT platform, hesap FROM reklam_ozet) o
+        LEFT JOIN reklam_hesap h ON h.platform = o.platform AND h.hesap = o.hesap
+        LEFT JOIN reklam_eslesme e ON e.platform = o.platform AND e.hesap = o.hesap
+        LEFT JOIN musteriler m ON m.id = e.musteri_id`),
+      db.prepare("SELECT deger FROM ayarlar WHERE anahtar = 'reklam_kurallar'")
     ]);
-    return json({ ok: true, kurulu, bugun: new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10), sonCekim: son.results[0] || null, sonBasarili: sonTamam.results[0] || null, gunluk: gun.results, satirlar: marka.results });
+    let kurallar = null;
+    try { kurallar = ayar.results[0] ? JSON.parse(ayar.results[0].deger) : null; } catch {}
+    return json({ ok: true, kurulu, gunSayisi: GUN, bugun: new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10), sonCekim: son.results[0] || null, sonBasarili: sonTamam.results[0] || null, gunluk: gun.results, satirlar: satir.results, hesaplar: hesap.results, kurallar });
+  }
+  // Hesaba panelde görünen ad (etiket) verme; boş metin etiketi kaldırır.
+  if (yol === 'reklam/hesap' && yontem === 'POST') {
+    const platform = String(govde?.platform || ''), hesap = String(govde?.hesap || '').slice(0, 64), etiket = String(govde?.etiket || '').trim().slice(0, 120) || null;
+    if (!['meta', 'google'].includes(platform) || !hesap) return hata('Geçersiz hesap', 400);
+    await db.prepare(`INSERT INTO reklam_hesap (platform, hesap, etiket, guncelleme, guncelleyen) VALUES (?, ?, ?, ?, ?)
+      ON CONFLICT(platform, hesap) DO UPDATE SET etiket = excluded.etiket, guncelleme = excluded.guncelleme, guncelleyen = excluded.guncelleyen`).bind(platform, hesap, etiket, simdi(), kim.eposta).run();
+    await islemYaz(db, kim.eposta, 'reklam_hesap_etiket', `${platform}:${hesap}`, etiket || 'etiket kaldırıldı');
+    return json({ ok: true });
+  }
+  // Koşullu biçimlendirme kuralları: bütün yöneticiler aynı kuralları görür.
+  if (yol === 'reklam/kurallar' && yontem === 'POST') {
+    const ALAN = ['harcama', 'degisim', 'gosterim', 'tiklama', 'ctr', 'cpc', 'cpm', 'sonuc'], KOSUL = ['gt', 'gte', 'lt', 'lte', 'arasi', 'sifir'], STIL = ['yesil', 'kirmizi', 'sari', 'mavi', 'gri', 'kalin'];
+    const sayiMi = (v) => (v === null || v === '' || v === undefined ? null : Number.isFinite(Number(v)) ? Number(v) : NaN);
+    const liste = (Array.isArray(govde?.kurallar) ? govde.kurallar : []).slice(0, 30).map((k) => ({
+      alan: k.alan, kosul: k.kosul, deger: sayiMi(k.deger), deger2: sayiMi(k.deger2), stil: k.stil, kapsam: k.kapsam === 'satir' ? 'satir' : 'hucre', aktif: k.aktif !== false
+    }));
+    if (liste.some((k) => !ALAN.includes(k.alan) || !KOSUL.includes(k.kosul) || !STIL.includes(k.stil) || Number.isNaN(k.deger) || Number.isNaN(k.deger2) || (k.kosul !== 'sifir' && k.deger === null) || (k.kosul === 'arasi' && k.deger2 === null))) return hata('Kurallardan biri eksik ya da geçersiz', 400);
+    const kayit = { kurallar: liste, cubuk: govde?.cubuk !== false, olcek: govde?.olcek === true };
+    await db.prepare(`INSERT INTO ayarlar (anahtar, deger, guncelleme, guncelleyen) VALUES ('reklam_kurallar', ?, ?, ?)
+      ON CONFLICT(anahtar) DO UPDATE SET deger = excluded.deger, guncelleme = excluded.guncelleme, guncelleyen = excluded.guncelleyen`).bind(JSON.stringify(kayit), simdi(), kim.eposta).run();
+    await islemYaz(db, kim.eposta, 'reklam_kurallar', null, `${liste.length} kural`);
+    return json({ ok: true, kurallar: kayit });
   }
   if (yol === 'reklam/cek' && yontem === 'POST') {
     if (!reklamKurulu(env)) return hata('IDOS bağlantı ayarları girilmemiş', 409);

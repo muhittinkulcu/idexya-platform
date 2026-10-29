@@ -2,6 +2,7 @@
 // Toplamlar yalnız TRY hesaplarından yapılır; başka para birimindeki hesaplar ayrı belirtilir, kura çevrilmez.
 import { api, el, tarih, once, genelHata } from './ortak.js';
 import { kpiKart, yiginCiz, gunler } from './grafik.js';
+import { reklamTablosu } from './reklam-tablo.js';
 
 const SONUC_ADI = { messaging_conversations: 'Mesaj görüşmesi', purchases: 'Satın alma', conversions: 'Google dönüşümü', leads: 'Potansiyel müşteri', calls: 'Arama' };
 const PLATFORM = { meta: { ad: 'Meta', renk: 'var(--s2)' }, google: { ad: 'Google Ads', renk: 'var(--s3)' } };
@@ -33,7 +34,7 @@ export function reklamBolumu(kok) {
     }
     cip(hataVar ? 'spam' : 'crm', hataVar ? 'Son çekim başarısız · eski veri' : 'Güncel');
     ciz(r, hataVar ? son : null);
-    not.textContent = `Kaynak: IDOS BigQuery (yalnız okuma) · son başarılı çekim ${tarih(basarili.zaman)} (${once(basarili.zaman)}) · ${sayi(basarili.satir)} satır · bugün hariç, son 28 gün · ilişkilendirme ayarı IDOS’ta tutulmadığı için bilinmiyor`;
+    not.textContent = `Kaynak: IDOS BigQuery (yalnız okuma) · son başarılı çekim ${tarih(basarili.zaman)} (${once(basarili.zaman)}) · ${sayi(basarili.satir)} satır · grafik son 28 gün, bugün hariç · ilişkilendirme ayarı IDOS’ta tutulmadığı için bilinmiyor`;
   }
 
   function ciz(r, sonHata) {
@@ -56,34 +57,14 @@ export function reklamBolumu(kok) {
     ];
     const uyari = [];
     if (sonHata) uyari.push(el('div', { class: 'uyari hata' }, el('b', {}, 'Son çekim başarısız: '), sonHata.mesaj, ' Aşağıdaki rakamlar önceki başarılı çekime ait.'));
-    if (digerPara.length) uyari.push(el('div', { class: 'uyari bilgi' }, `${digerPara.join(', ')} para birimindeki hesaplar toplamlara katılmadı (kura çevrilmez); marka tablosunda kendi para birimiyle görünür.`));
+    if (digerPara.length) uyari.push(el('div', { class: 'uyari bilgi' }, `${digerPara.join(', ')} para birimindeki hesaplar toplamlara katılmadı (kura çevrilmez); ayrıntı tablosunda kendi para birimiyle görünür.`));
 
     // Platforma göre günlük harcama
     const seriler = Object.entries(PLATFORM).map(([k, p]) => ({ ad: p.ad, renk: p.renk, degerler: Object.fromEntries(g28.map((gun) => [gun, topla(tr, 'harcama', [gun], k)])) }));
     const alan = el('div', { class: 'cubuk-alan', style: 'height: 180px' }), x = el('div', { class: 'x-eksen' });
     const lejant = el('div', { class: 'lejant' }, ...seriler.map((sr) => el('span', {}, el('i', { style: `background: ${sr.renk}` }), `${sr.ad} `, el('b', { style: 'color: var(--head)' }, tl(Object.values(sr.degerler).reduce((a, b) => a + b, 0))))), el('span', { style: 'color: var(--tx2)' }, '28 gün · TRY'));
 
-    // Marka tablosu: son 7 gün ve önceki 7 gün
-    const m = {};
-    r.satirlar.forEach((s) => {
-      const k = s.marka + '|' + s.para;
-      const o = (m[k] ||= { marka: s.marka, para: s.para, platform: new Set(), simdi: 0, once: 0, sonuc: {} });
-      if (simdi7.includes(s.gun)) { o.simdi += s.harcama; o.platform.add((PLATFORM[s.platform] || { ad: s.platform }).ad); if (s.sonuclar) for (const [a, v] of Object.entries(JSON.parse(s.sonuclar))) o.sonuc[a] = (o.sonuc[a] || 0) + v; }
-      if (once7.includes(s.gun)) o.once += s.harcama;
-    });
-    const para = (n, p) => (p === 'TRY' ? tl(n) : sayi(n, 2) + ' ' + p);
-    const satirlar = Object.values(m).filter((o) => o.simdi || o.once).sort((a, b) => (b.para === 'TRY') - (a.para === 'TRY') || b.simdi - a.simdi);
-    const tablo = el('div', { class: 'tablo-sar', style: 'max-height: 360px' }, el('table', {},
-      el('thead', {}, el('tr', {}, el('th', {}, 'Marka / hesap'), el('th', {}, 'Platform'), el('th', {}, 'Harcama · 7 gün'), el('th', {}, 'Önceki 7 gün'), el('th', {}, 'Değişim'), el('th', {}, 'Sonuçlar · 7 gün'))),
-      el('tbody', {}, ...satirlar.map((o) => {
-        const f = o.once ? Math.round((o.simdi - o.once) / o.once * 100) : null;
-        return el('tr', {}, el('td', {}, o.marka || '—'), el('td', {}, [...o.platform].join(', ') || '—'), el('td', {}, el('b', {}, para(o.simdi, o.para))), el('td', {}, para(o.once, o.para)),
-          el('td', {}, f === null ? (o.simdi ? 'yeni' : '—') : el('span', { style: 'font-weight: 700; color: var(--head)' }, (f > 0 ? '▲ %' : f < 0 ? '▼ %' : '= %') + Math.abs(f))),
-          el('td', {}, Object.entries(o.sonuc).filter(([, v]) => v).map(([a, v]) => `${sonucAdi(a)}: ${sayi(v, 1)}`).join(' · ') || '—'));
-      }))));
-    tablo.querySelector('table').classList.add('degisim-tablo');
-
-    govde.replaceChildren(...uyari, el('div', { class: 'kpi-sira' }, ...kartlar), lejant, el('div', {}, alan, x), el('h3', { style: 'margin: 6px 0 0; font-size: 13px; color: var(--tx2); font-weight: 600' }, 'Markalara göre'), tablo);
+    govde.replaceChildren(...uyari, el('div', { class: 'kpi-sira' }, ...kartlar), lejant, el('div', {}, alan, x), el('h3', { style: 'margin: 6px 0 0; font-size: 15px; color: var(--head); font-weight: 700' }, 'Hesap ayrıntıları'), reklamTablosu(r, yukle));
     yiginCiz(alan, x, g28, seriler, tl);
   }
 
