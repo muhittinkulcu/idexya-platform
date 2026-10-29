@@ -297,11 +297,16 @@ export async function yonetimHaftalikBultenApi(db, yontem, yol, govde, kim) {
       const liste = (Array.isArray(g.maddeler) ? g.maddeler : []).slice(0, 80).map((x, i) => maddeTemizle({ etki: 'orta', kaynaklar: [], ...x, durum: 'taslak', sira: (i + 1) * 10 }));
       const kotu = liste.map((k, i) => [i, maddeEksik(k)]).filter(([, e]) => e);
       if (!liste.length || kotu.length) return hata(liste.length ? `Madde ${kotu[0][0] + 1}: ${kotu[0][1]}` : 'Madde yok', 400);
+      // Aynı dosya iki kez yüklenirse aynı başlıklı maddeler yeniden eklenmez.
+      const var_ = new Set((await db.prepare('SELECT baslik FROM bulten_madde WHERE sayi_id = ?').bind(sayi.id).all()).results.map((x) => x.baslik));
+      const yeni = liste.filter((k) => !var_.has(k.baslik));
+      if (!yeni.length) return json({ ok: true, eklenen: 0, atlanan: liste.length });
+      liste.length = 0; liste.push(...yeni);
       const z = simdi();
       await db.batch(liste.map((k) => db.prepare(`INSERT INTO bulten_madde (id, sayi_id, konu, tarih, baslik, ne_oldu, ne_anlama, etki, kaynaklar, durum, sira, guven, not_, olusturma, guncelleme) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'taslak', ?, ?, ?, ?, ?)`)
         .bind(kimlik(), sayi.id, k.konu, k.tarih || null, k.baslik, k.ne_oldu, k.ne_anlama || null, k.etki, k.kaynaklar, k.sira, k.guven || null, k.not_ || null, z, z)));
       await islemYaz(db, kim.eposta, 'bulten_ice_aktar', sayi.slug, `${liste.length} taslak madde`);
-      return json({ ok: true, eklenen: liste.length });
+      return json({ ok: true, eklenen: liste.length, atlanan: var_.size ? undefined : 0 });
     }
   }
   m = alt.match(/^madde\/([\w-]{8,64})(\/sil)?$/);

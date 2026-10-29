@@ -124,7 +124,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
           el('label', { class: 'alan' }, 'Sayı başlığı', baslik), el('label', { class: 'alan' }, 'Özet', ozet), el('div', {}, kaydetSayi)),
         el('div', { class: 'hb-y-ust' },
           el('div', { class: 'hb-y-suzgec' }, ...[['hepsi', `Tümü ${maddeler.length}`], ['taslak', `Taslak ${say('taslak')}`], ['onayli', `Onaylı ${say('onayli')}`], ['cikarildi', `Çıkarılan ${say('cikarildi')}`]].map(([k, a]) => el('button', { type: 'button', class: 'hb-y-cip', 'aria-pressed': String(suzgec === k), onclick: () => { suzgec = k; ciz(); } }, a))),
-          el('span', { class: 'hb-y-bosluk' }), topluOnay,
+          el('span', { class: 'hb-y-bosluk' }), topluOnay, iceAktar(sayi),
           el('button', { type: 'button', class: 'dugme kucuk birincil', onclick: () => { duzenlenen = 'yeni'; ciz(); } }, '+ Madde ekle')),
         akis),
       el('aside', { class: 'kart hb-y-yan' },
@@ -134,6 +134,21 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('a', { class: 'dugme', href: `/tr/bulten/${sayi.slug}/?onizleme=1`, target: '_blank', rel: 'noopener' }, 'Önizle ↗'),
         yayinda ? el('a', { class: 'dugme', href: `/tr/bulten/${sayi.slug}/`, target: '_blank', rel: 'noopener' }, 'Sitede gör ↗') : null,
         yayin)));
+  }
+
+  // Araştırma oturumunun hazırladığı JSON dosyası ({ maddeler: [...] }) taslak olarak eklenir; hiçbiri kendiliğinden yayınlanmaz.
+  function iceAktar(sayi) {
+    const dosya = el('input', { type: 'file', accept: 'application/json,.json', hidden: true, onchange: async (e) => {
+      const f = e.target.files[0]; if (!f) return;
+      let g; try { g = JSON.parse(await f.text()); } catch { genelHata('Dosya geçerli bir JSON değil.'); return; }
+      const liste = Array.isArray(g) ? g : g.maddeler;
+      if (!Array.isArray(liste) || !liste.length) { genelHata('Dosyada “maddeler” listesi bulunamadı.'); return; }
+      if (!confirm(`${liste.length} madde bu sayıya TASLAK olarak eklensin mi? Yayınlanmadan önce her birini onaylamanız gerekir.`)) return;
+      try { const s = await api(`haftalik-bulten/sayi/${sayi.id}/ice-aktar`, { maddeler: liste }); genelHata(''); suzgec = 'taslak'; await yukle(); alert(s.eklenen ? `${s.eklenen} taslak madde eklendi.` : 'Bu dosyadaki maddeler zaten ekli; yeni madde eklenmedi.'); }
+      catch (h) { genelHata('İçe aktarılamadı: ' + h.message); }
+      finally { e.target.value = ''; }
+    } });
+    return el('span', {}, dosya, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => dosya.click() }, 'Taslak içe aktar (JSON)'));
   }
 
   function maddeKart(m) {
@@ -209,10 +224,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('section', { class: 'kart', style: 'overflow:hidden' }, el('div', { style: 'padding:14px 16px' }, el('b', { style: 'color:var(--head)' }, 'Yeni konu ekle')), satir(yeni)));
   }
 
-  document.querySelector('[data-yeni-sayi]').addEventListener('click', async (o) => {
-    o.currentTarget.disabled = true;
+  const yeniDugme = document.querySelector('[data-yeni-sayi]');
+  yeniDugme.addEventListener('click', async () => {
+    yeniDugme.disabled = true;
     try { const s = await api('haftalik-bulten/sayi', {}); await yukle(); await sayiAc(s.sayi.id); } catch (h) { genelHata(h.message); }
-    finally { o.currentTarget.disabled = false; }
+    finally { yeniDugme.disabled = false; }
   });
   yukle().then(() => {
     const q = new URLSearchParams(location.search);
