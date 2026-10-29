@@ -1,0 +1,19 @@
+---
+// Haftalık Bülten sayfalarının kabuğu. Sunucu (worker/haftalik-bulten.js) içeriği [data-bulten-alan] içine yerleştirir,
+// başlık ve açıklamayı değiştirir; yayındaki sayfalarda noindex kaldırılır. Bu adres doğrudan açılamaz.
+import Site from '../../layouts/Site.astro';
+import Bulten from '../../components/ana/Bulten.astro';
+import BultenStil from '../../components/BultenStil.astro';
+---
+<Site baslik="Haftalık Bülten" aciklama="AI ve dijital pazarlama gelişmeleri" aktif="Blog" aramayaKapali>
+<BultenStil />
+<div class="hb" data-bulten-alan></div>
+<section class="hb-abone-kap" id="abone" aria-label="Bülten aboneliği"><div class="hb-abone-ic"><Bulten /></div></section>
+<script>
+  document.addEventListener('click', async (o) => {
+    const d = (o.target as HTMLElement).closest<HTMLButtonElement>('[data-baglanti-kopyala]');
+    if (!d) return;
+    try { await navigator.clipboard.writeText(location.href.split('#')[0]); d.textContent = 'Kopyalandı'; setTimeout(() => { d.textContent = 'Bağlantıyı kopyala'; }, 2000); } catch {}
+  });
+</script>
+</Site>

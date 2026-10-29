@@ -33,6 +33,9 @@ const kademeCapa = (k) => 'k-' + k.ad.toLocaleLowerCase('tr-TR').replace(/[^a-z0
 const BLOG_KONU = { Reklam: { ikon: 'dijital-reklam', aciklama: 'Google ve Meta’da bütçe, teklif ve kreatif kararları' }, 'E-ticaret': { ikon: 'e-ticaret', aciklama: 'Mağaza, pazaryeri ve satış değeri' }, 'Ölçüm': { ikon: 'olcum', aciklama: 'GA4, Tag Manager ve dönüşüm ölçümü' }, SEO: { ikon: 'seo', aciklama: 'Arama ve yapay zekâ görünürlüğü' } };
 const BLOG_SEKME = [{ ad: 'Son yazılar', ikon: 'yazi', aciklama: 'Bütün konulardan en yeniler', yazilar: yazilar, href: '/tr/haberler' },
   ...[...new Set(yazilar.map((y) => y.kategori))].map((k) => ({ ad: k, ikon: BLOG_KONU[k]?.ikon || 'yazi', aciklama: BLOG_KONU[k]?.aciklama || `${k} üzerine yazılar`, yazilar: yazilar.filter((y) => y.kategori === k), href: `/tr/haberler?konu=${encodeURIComponent(k)}` }))];
+// Haftalık Bülten kategorileri (konu kimlikleri worker/haftalik-bulten.js ile aynı).
+const BULTEN_KONU = [{ ad: 'AI dünyası', gorsel: 'konsol', aciklama: 'Yapay zekâ modelleri, asistanlar ve geliştirici araçları.', konular: [['chatgpt', 'ChatGPT'], ['claude', 'Claude'], ['gemini', 'Gemini'], ['cursor', 'Cursor']] },
+  { ad: 'Dijital pazarlama', gorsel: 'analitik', aciklama: 'Reklam, ölçüm, arama ve e-ticaret platformları.', konular: [['google-ads', 'Google Ads'], ['meta-ads', 'Meta Ads'], ['ga4', 'GA4'], ['search-console', 'SEO'], ['tiktok', 'TikTok'], ['shopify', 'Shopify'], ['ikas', 'ikas']] }];
 const blogKonuSayi = Object.entries(yazilar.reduce((a, y) => ({ ...a, [y.kategori]: (a[y.kategori] || 0) + 1 }), {}));
 // Çekmece: yazı başına tahmini okuma süresi (dakikada ~200 kelime).
 const okumaDk = (y) => Math.max(1, Math.round(JSON.stringify(y.govde || '').split(/\s+/).length / 200));
@@ -798,8 +801,28 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 </div>
 </li>
 ))}
+<li data-kat class="ust-kat-sihirbaz">
+<a href="/tr/bulten/" class="ust-kat-bas"><span class="uk-ikon" set:html={ikon('bulten', 18)}></span><span class="uk-ad"><span>Haftalık Bülten</span><em>AI ve pazarlamada bu hafta ne değişti</em></span></a>
+<div class="ust-alt mk-sutunlu" style="--s:2">
+<strong>Haftalık Bülten</strong>
+<ul class="mk-kartlar">
+  {BULTEN_KONU.map((k) => (
+  <li class="mk-kart">
+    <a href="/tr/bulten/" class="mk-gorsel" tabindex="-1" aria-hidden="true"><img src={`/kapak/cizim/${k.gorsel}.webp`} alt="" width="640" height="480" loading="lazy" decoding="async" /></a>
+    <a href="/tr/bulten/" class="mk-baslik"><small>Kategori</small><b>{k.ad}</b></a>
+    <p>{k.aciklama}</p>
+    <ul class="mk-alt-liste">{k.konular.map(([id, ad]) => <li><a href={`/tr/bulten/konu/${id}/`}>{ad}</a></li>)}</ul>
+  </li>))}
 </ul>
-<div class="ust-panel-dip"><a href="/tr/haberler">Tüm yazılar <span aria-hidden="true">→</span></a><a href="/#bt-eposta" class="ust-dip-cta">Bültene abone olun</a></div>
+<div class="mk-ozet-kart">
+  <b>Her pazartesi, kaynaklı</b>
+  <p>Resmî duyuruları ve birincil kaynakları tarıyor, her gelişmenin işiniz için ne anlama geldiğini Türkçe özetliyoruz.</p>
+  <span class="mk-eylem"><a href="/tr/bulten/" class="ust-alt-tum">Bülteni okuyun →</a><a href="/tr/bulten/#abone" class="mk-ikincil">E-postayla alın</a></span>
+</div>
+</div>
+</li>
+</ul>
+<div class="ust-panel-dip"><a href="/tr/haberler">Tüm yazılar <span aria-hidden="true">→</span></a><a href="/tr/bulten/" class="ust-dip-cta">Haftalık Bülten</a></div>
 </div>
 </div>
 ) : <a href={m.href} aria-current={aktif === m.ad ? 'page' : undefined}>{m.ad}</a>)}
@@ -955,7 +978,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
   <div class="cm-blog-yan">
     <div class="cm-kutucuk"><b>Konular</b><span class="cm-etiketler">{blogKategoriler.map((k) => <a href="/tr/haberler">{k}</a>)}</span></div>
     <a href="/icerik/" class="cm-kutucuk cm-kutucuk-bag"><b>Üyelere özel</b><strong>İçerikler ve rehberler</strong><span>Ücretsiz üye olun; yalnız üyelere açılan yazılar, rehberler ve dosyalar.</span><span class="cm-yazi-oku">İçeriklere göz atın<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
-    <a href="/#bt-eposta" class="cm-kutucuk cm-kutucuk-bag"><b>Aylık bülten</b><strong>Ayda bir e-posta</strong><span>Reklam, e-ticaret ve ölçümde işe yarayan güncel bilgiler. İstediğiniz an ayrılabilirsiniz.</span><span class="cm-yazi-oku">Abone olun<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
+    <a href="/tr/bulten/" class="cm-kutucuk cm-kutucuk-bag"><b>Haftalık Bülten</b><strong>Her pazartesi</strong><span>AI ve dijital pazarlamada geçen hafta neler değişti; kaynaklı, Türkçe özetler.</span><span class="cm-yazi-oku">Bülteni okuyun<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></span></a>
   </div>
 </div>
 </section>

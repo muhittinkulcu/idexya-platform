@@ -9,7 +9,7 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/yonetim", "/yonetim/*", "/icerik/*", "/kabuk/*", "/uye/*"],
+    "run_worker_first": ["/api/*", "/yonetim", "/yonetim/*", "/icerik/*", "/kabuk/*", "/uye/*", "/tr/bulten", "/tr/bulten/*", "/sitemap-bulten.xml"],
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
   },
