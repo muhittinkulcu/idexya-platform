@@ -23,6 +23,7 @@
   // Yönetim paneli girişi: Cloudflare Access. Değerler Cloudflare panelinden "Variables" olarak girilir.
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
+  // Panelden eklenen değişkenler (ör. IDOS_BQ_GORUNUM) dağıtımda silinmesin diye; gizli değerler zaten etkilenmez.
   "keep_vars": true,
   "observability": { "enabled": true },
   // Her gün 07.00 UTC (İstanbul 10.00): saklama süresi dolan kişisel veri silinir (worker/saklama.js) ve IDOS reklam
