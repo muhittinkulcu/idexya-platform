@@ -121,7 +121,7 @@ export function kabuk() {
     });
     // Sık kullanılanlar
     const fav = $('[data-favoriler]');
-    fav.replaceChildren(...t.favori.map((k) => $(`[data-modul="${k}"]`)).filter(Boolean).map((m) => el(m.dataset.href ? 'a' : 'span', { class: 'mo' + (m.dataset.href ? '' : ' yakinda'), href: m.dataset.href || undefined }, el('span', { style: 'color: #F07A23' }, '★'), el('span', { class: 'etiket' }, m.dataset.ad))));
+    fav.replaceChildren(...t.favori.map((k) => $(`[data-modul="${k}"]`)).filter(Boolean).map((m) => el(m.dataset.href ? 'a' : 'span', { class: 'mo' + (m.dataset.href ? '' : ' yakinda'), href: m.dataset.href || undefined }, el('span', { style: 'color: var(--brand)' }, '★'), el('span', { class: 'etiket' }, m.dataset.ad))));
     $('[data-favori-blok]').hidden = !t.favori.length;
     // Çekmece kontrolleri
     $$('[data-t]').forEach((c) => { c.checked = !!t[c.dataset.t]; });
