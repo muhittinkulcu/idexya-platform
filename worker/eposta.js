@@ -65,7 +65,7 @@ export async function uyeyeBildir(env, to, baslik, satirlar, bag) {
 export async function yonetimEpostaApi(db, env, yontem, yol, kim) {
   if (yol !== 'eposta/deneme') return null;
   if (yontem !== 'POST') return hata('Yöntem desteklenmiyor', 405);
-  if (!env.EPOSTA) return hata('E-posta bağlantısı (EPOSTA) tanımlı değil', 409);
+  if (!env.EPOSTA || env.EPOSTA_ACIK !== 'evet') return hata('E-posta gönderimi kapalı (Email Sending kurulup EPOSTA_ACIK=evet yapılınca açılır)', 409);
   const to = await ayar(db, 'bildirim_eposta');
   if (!to) return hata('Önce Ayarlar’da bildirim e-postası adresini girip kaydedin', 409);
   const g = govde('Idexya panel: deneme e-postası', [['Gönderen', GONDEREN.email], ['İsteyen', kim.eposta], ['Zaman', new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })]], { metin: 'Paneli aç', yol: '/dashboard' });
