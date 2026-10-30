@@ -2,7 +2,7 @@
 // Gönderim yalnız ayarlarda bildirim adresi girildiyse yapılır; idexya.com alan adı Cloudflare Email Sending'e eklenmeden
 // gönderim başarısız olur ve hata ayarlar tablosuna (eposta_son_hata) yazılır, bildirimlerde görünür. Hiçbir hata asıl işlemi durdurmaz.
 // Toplu/pazarlama e-postası için kullanılmaz. Gönderen adres wrangler.jsonc'taki allowed_sender_addresses ile sınırlıdır.
-import { simdi } from './ortak.js';
+import { simdi, json, hata, islemYaz } from './ortak.js';
 import { PANEL_ALAN, panelYoluMu } from './panel-yollar.js';
 
 export const GONDEREN = { email: 'bildirim@idexya.com', name: 'Idexya Panel' };
@@ -59,4 +59,18 @@ export async function uyeyeBildir(env, to, baslik, satirlar, bag) {
     const g = govde(baslik, satirlar, bag, 'Bu e-postayı Idexya müşteri alanındaki hesabınızla ilgili bir gelişme olduğu için aldınız.');
     return await epostaGonder(env, { to, subject: baslik, ...g });
   } catch (e) { return { ok: false, hata: e && e.message }; }
+}
+
+// Panel › Ayarlar › "Deneme e-postası gönder": Email Sending kurulumunu gerçek bir talep beklemeden doğrular.
+export async function yonetimEpostaApi(db, env, yontem, yol, kim) {
+  if (yol !== 'eposta/deneme') return null;
+  if (yontem !== 'POST') return hata('Yöntem desteklenmiyor', 405);
+  if (!env.EPOSTA) return hata('E-posta bağlantısı (EPOSTA) tanımlı değil', 409);
+  const to = await ayar(db, 'bildirim_eposta');
+  if (!to) return hata('Önce Ayarlar’da bildirim e-postası adresini girip kaydedin', 409);
+  const g = govde('Idexya panel: deneme e-postası', [['Gönderen', GONDEREN.email], ['İsteyen', kim.eposta], ['Zaman', new Date().toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul' })]], { metin: 'Paneli aç', yol: '/dashboard' });
+  const r = await epostaGonder(env, { to, subject: 'Idexya panel: deneme e-postası', ...g });
+  await islemYaz(db, kim.eposta, 'eposta_deneme', to, r.ok ? 'gönderildi' : 'başarısız');
+  if (!r.ok) return hata('Gönderilemedi: ' + (r.hata || 'bilinmeyen hata') + ' · idexya.com, Cloudflare Email Sending’de doğrulanmış olmalı', 502);
+  return json({ ok: true, alici: to });
 }
