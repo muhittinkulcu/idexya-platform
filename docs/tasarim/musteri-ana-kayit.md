@@ -35,7 +35,7 @@ kullanılmaz. Silme yoktur; müşteri `arsiv` durumuna alınır.
 | Alan | IDOS'taki karşılığı (bugün) | Not |
 |---|---|---|
 | `musteri_id` | `client_id` | Kalıcı, değişmez |
-| `marka` | `brand_name` | Zorunlu. Ekranlarda görünen ad |
+| `marka` | `brand_name` | Zorunlu. Ekranlarda görünen ad. Paylaşımlarda (v2 görünüm, ortak API) yalnız marka adı gider; şahıs müşteride marka yoksa NULL (karar, 30 Eki) |
 | `unvan` | `legal_name` | Ticari unvan. Şahıs müşteride boş kalabilir |
 | `sektor` | `business_model` (yakın) | **Eksik.** Sabit listeden `sektor` alanı eklenmeli |
 | `durum` | `lifecycle_status`: aday, aktif, duraklatildi, ayrildi, arsiv | İstenen aktif/pasif/ayrıldı karşılığı: pasif = duraklatildi. `aday` ana kayıtta kullanılmaz (aday Panel'de kalır, §2) |
@@ -200,6 +200,7 @@ Kurallar:
 **İş bölümü ve sıra**
 | Sıra | Ürün | İş | Büyüklük |
 |---|---|---|---|
+| 0 | IDOS | **İlk adım:** `idexya_share.reklam_ozet_gunluk` v2: `account_name`, `client_id`, `brand_name` (Marketing'e iletildi). Karar: `brand_name` = marka adı; şahıs müşteride marka yoksa NULL. Panel'de kod değişikliği gerekmez | Küçük |
 | 1 | IDOS | `sektor`, `para_birimi`, `musteri_kisi`; ortak salt okuma API'si (3 GET) + servis jetonları + `client_scope` | Orta |
 | 2 | IDOS | `musteri-adayi` yazma ucu + onay kuyruğu ekranı | Orta |
 | 3 | Panel | `ana_kayit_id`, `ana_musteri` önbelleği, saatlik eşitleme, müşteri kartında salt okuma bloğu | Orta |
@@ -207,7 +208,7 @@ Kurallar:
 | 5 | Creative | Markalara `musteri_id`, marka bilgisini ana kayıttan okuma | Orta (doğrulanacak) |
 | 6 | Hepsi | Kuru deneme raporu → elle onay → uygulama → doğrulama | Orta |
 
-Kısa vadeli ara çözüm (bu belgeden bağımsız, Marketing'e iletildi): `idexya_share.reklam_ozet_gunluk` görünümüne
+Planın 0. adımı (Marketing'e iletildi; karar: `brand_name` marka adıdır, şahıs müşteride marka yoksa NULL): `idexya_share.reklam_ozet_gunluk` görünümüne
 `account_name`, `client_id`, `brand_name` eklenmesi. Bu, §3'teki `hesap-esleme` ucu gelene kadar Panel'in "Adsız hesap /
 Atanmamış" sorununu çözer. Ortak API gelince görünüm yine yalnız rakam taşıyacak hâle döndürülebilir.
 
