@@ -16,12 +16,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <h2 style="margin: 8px 0 0; font-size: 18px">Elle seçilen gönderiler <small style="font-weight: 400; color: var(--tx2); font-size: 14px">(otomatik akış yokken gösterilir)</small></h2>
 <form class="kart" data-form style="padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 16px; align-items: start">
 <div style="display: flex; flex-direction: column; gap: 12px">
-<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Gönderi bağlantısı<input name="baglanti" type="url" required placeholder="https://www.instagram.com/p/…" style="min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
-<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Kısa açıklama (isteğe bağlı)<input name="aciklama" maxlength="200" placeholder="Görselin ne anlattığı; ekran okuyucular için de kullanılır" style="min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Gönderi bağlantısı<input name="baglanti" type="url" required placeholder="https://www.instagram.com/p/…" style="min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Kısa açıklama (isteğe bağlı)<input name="aciklama" maxlength="200" placeholder="Görselin ne anlattığı; ekran okuyucular için de kullanılır" style="min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
 <label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Görsel<input name="dosya" type="file" accept="image/jpeg,image/png,image/webp" required></label>
 <div style="display: flex; gap: 8px; align-items: center"><button type="submit" class="dugme ana">Gönderiyi ekle</button><span data-durum style="font-size: 14px; color: var(--tx2)"></span></div>
 </div>
-<div data-onizleme style="aspect-ratio: 1; border-radius: 12px; border: 1px dashed var(--line); background: var(--card2) center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: var(--tx2); font-size: 13px; text-align: center; padding: 8px">Görsel önizlemesi</div>
+<div data-onizleme style="aspect-ratio: 1; border-radius: 12px; border: 1px dashed rgb(var(--line)); background: var(--card2) center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: var(--tx2); font-size: 13px; text-align: center; padding: 8px">Görsel önizlemesi</div>
 </form>
 <section class="kart" aria-label="Eklenen gönderiler" data-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px"></section>
 <script>
@@ -79,7 +79,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       let gorunurSira = 0;
       liste.replaceChildren(...(r.gonderiler.length ? r.gonderiler.map((g) => {
         const sitede = g.gorunur && gorunurSira++ < 8;
-        return el('article', { style: 'display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: var(--card)' },
+        return el('article', { style: 'display: flex; flex-direction: column; gap: 8px; border: 1px solid rgb(var(--line)); border-radius: 12px; padding: 10px; background: rgb(var(--card))' },
           el('div', { style: 'position: relative' },
             g.gorunur ? el('img', { src: `/api/instagram/${encodeURIComponent(g.id)}/gorsel`, alt: g.aciklama || 'Instagram gönderisi', style: 'width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; display: block' })
               : el('div', { style: 'aspect-ratio: 1; border-radius: 8px; background: var(--card2); display: flex; align-items: center; justify-content: center; color: var(--tx2); font-size: 13px' }, 'Gizli'),

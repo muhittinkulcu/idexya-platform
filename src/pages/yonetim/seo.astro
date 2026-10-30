@@ -26,9 +26,9 @@ import '../../scripts/yonetim/grafik.css';
     <div class="modul-bas"><h2 id="b-sayfa">Sayfalar</h2>
       <div style="display: flex; gap: 8px; flex-wrap: wrap">
         <label style="display: flex; align-items: center; gap: 6px; font-size: 13px">Sorun
-          <select data-suz style="min-height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--tx); font: inherit; max-width: 220px"></select></label>
+          <select data-suz style="min-height: 34px; border-radius: 10px; border: 1px solid rgb(var(--line)); background: rgb(var(--card)); color: var(--tx); font: inherit; max-width: 220px"></select></label>
         <label style="display: flex; align-items: center; gap: 6px; font-size: 13px">Sırala
-          <select data-sirala style="min-height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--tx); font: inherit">
+          <select data-sirala style="min-height: 34px; border-radius: 10px; border: 1px solid rgb(var(--line)); background: rgb(var(--card)); color: var(--tx); font: inherit">
             <option value="puan">Puan (düşükten)</option><option value="sorun">Sorun sayısı</option><option value="yol">Adres</option>
           </select></label>
       </div>
@@ -54,7 +54,7 @@ import '../../scripts/yonetim/grafik.css';
 
   function sorunKarti(k, n, bilgi, siteMi) {
     const secili = suz === k;
-    return el('details', { style: `border: 1px solid ${secili ? 'var(--btnline)' : 'var(--line)'}; border-radius: 14px; padding: 10px 14px; background: var(--card2)` },
+    return el('details', { style: `border: 1px solid ${secili ? 'var(--btnline)' : 'rgb(var(--line))'}; border-radius: 14px; padding: 10px 14px; background: var(--card2)` },
       el('summary', { style: 'cursor: pointer; display: flex; flex-wrap: wrap; gap: 8px; align-items: center' },
         el('span', { class: 'cip ' + AGIRLIK_CIP[bilgi.agirlik] }, AGIRLIK_AD[bilgi.agirlik]),
         el('b', { style: 'color: var(--head)' }, bilgi.ad),
@@ -94,7 +94,7 @@ import '../../scripts/yonetim/grafik.css';
 
     // robots.txt ve sitemap
     const st = son.sonuc.site;
-    const satir = (ad, iyi, metin) => el('div', { style: 'display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line)' }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? 'Tamam' : 'Sorun'), el('span', {}, el('b', {}, ad + ': '), metin));
+    const satir = (ad, iyi, metin) => el('div', { style: 'display: flex; gap: 10px; align-items: baseline; padding: 6px 0; border-top: 1px solid rgb(var(--line))' }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? 'Tamam' : 'Sorun'), el('span', {}, el('b', {}, ad + ': '), metin));
     $('[data-site]').replaceChildren(
       satir('robots.txt', st.robots.durum === 200 && !o.siteSorunlari.includes('robots_kapali'), st.robots.durum === 200 ? `açılıyor · kapalı yollar: ${(st.robots.engelli || []).join(', ') || 'yok'} · sitemap satırı: ${(st.robots.sitemaplar || []).join(', ') || 'yok'}` : `açılmıyor (durum ${st.robots.durum})`),
       satir('sitemap.xml', st.sitemap.durum === 200 && st.sitemap.gecerli && !st.sitemap.yabanci, st.sitemap.durum === 200 ? `${sayi(st.sitemap.adres)} adres · biçim ${st.sitemap.gecerli ? 'geçerli' : 'bozuk'} · başka alan adı ${st.sitemap.yabanci} · tekrar ${st.sitemap.tekrar}` : `açılmıyor (durum ${st.sitemap.durum})`),

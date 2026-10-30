@@ -4,20 +4,20 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Görevler ve takvim" aktif="gorev" yol="Satış ve müşteri" aciklama="Ekibin yapılacakları. Her görevin bir günü, isteğe bağlı saati, önceliği ve sorumlusu olur; istenirse bir müşteriye bağlanır. Günler İstanbul saatine göre hesaplanır.">
 <style is:global>
   .gv-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .gv-grup{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--card2);border:1px solid var(--line)}
+  .gv-grup{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--card2);border:1px solid rgb(var(--line))}
   .gv-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .gv-form .genis{grid-column:1/-1}
   .gv-bolum{padding:6px 0}
   .gv-bolum>h2{margin:0;padding:12px 16px 6px;font-size:15px;color:var(--head);display:flex;gap:8px;align-items:center}
-  .gv-satir{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-top:1px solid var(--line)}
+  .gv-satir{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-top:1px solid rgb(var(--line))}
   .gv-satir .govde{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
   .gv-satir .ust-bilgi{display:flex;gap:6px 10px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--tx2)}
   .gv-satir .eylem{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-  .gv-tik{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:var(--card);cursor:pointer;color:var(--ok);font-weight:800;padding:0;line-height:1}
+  .gv-tik{flex:0 0 auto;width:26px;height:26px;border-radius:8px;border:2px solid rgb(var(--line));background:rgb(var(--card));cursor:pointer;color:var(--ok);font-weight:800;padding:0;line-height:1}
   .gv-tik[aria-pressed="true"]{background:var(--okb);border-color:var(--ok)}
   .gv-takvim{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;padding:10px}
   .gv-takvim .bas{font-size:11px;font-weight:600;color:var(--tx2);text-align:center;padding:4px 0}
-  .gv-gun{min-height:96px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:6px;display:flex;flex-direction:column;gap:3px;text-align:left;font:inherit;color:var(--tx);cursor:pointer;overflow:hidden}
+  .gv-gun{min-height:96px;min-width:0;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));padding:6px;display:flex;flex-direction:column;gap:3px;text-align:left;font:inherit;color:var(--tx);cursor:pointer;overflow:hidden}
   .gv-gun.disi{background:var(--card2);color:var(--tx2)}
   .gv-gun.bugun{border-color:var(--brand);box-shadow:inset 0 0 0 1px var(--brand)}
   .gv-gun.secili{background:var(--tint)}

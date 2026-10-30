@@ -282,8 +282,22 @@ export function kabuk() {
     const yeni = document.documentElement.dataset.tema === 'koyu' ? 'acik' : 'koyu';
     document.documentElement.dataset.tema = yeni;
     document.getElementById('kabuk').className = 'kabuk ' + yeni;
+    document.documentElement.classList.toggle('dark', yeni === 'koyu');
     try { localStorage.setItem('idx-tema', yeni); } catch (e) {}
   });
+
+  // Görünüm: Cam (varsayılan) ya da Düz. Yalnız bu tarayıcıda görünüm tercihi olarak tutulur (idx-cam = duz → kapalı).
+  const camSecim = $('[data-cam-secim]');
+  const camIsaretle = () => $$('button', camSecim).forEach((b) => b.setAttribute('aria-pressed', String((b.dataset.v === 'cam') === document.documentElement.classList.contains('cam'))));
+  if (camSecim) {
+    camIsaretle();
+    $$('button', camSecim).forEach((b) => b.addEventListener('click', () => {
+      const cam = b.dataset.v === 'cam';
+      document.documentElement.classList.toggle('cam', cam);
+      try { if (cam) localStorage.removeItem('idx-cam'); else localStorage.setItem('idx-cam', 'duz'); } catch (e) {}
+      camIsaretle();
+    }));
+  }
 
   uygula();
 

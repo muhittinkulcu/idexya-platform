@@ -72,7 +72,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     );
     ['firma', 'ad', 'eposta', 'telefon', 'sektor', 'paket'].forEach((k) => (bilgi.elements[k].value = m[k] || ''));
     bilgi.elements.deger.value = m.deger ?? '';
-    gunluk.replaceChildren(...(veri.kayitlar.length ? veri.kayitlar.map((k) => el('li', { style: 'display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line)' },
+    gunluk.replaceChildren(...(veri.kayitlar.length ? veri.kayitlar.map((k) => el('li', { style: 'display: flex; gap: 12px; padding: 12px 0; border-top: 1px solid rgb(var(--line))' },
       el('span', { 'aria-hidden': 'true', style: `flex: none; width: 10px; height: 10px; margin-top: 6px; border-radius: 50%; background: ${TUR_RENK[k.tur] || '#5F574F'}` }),
       el('div', { style: 'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px' },
         el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap' }, el('strong', { style: 'color: var(--head)' }, k.baslik), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim)),
@@ -88,7 +88,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     document.querySelector('[data-teklif-yeni]').href = '/proposals?new=1&customer=' + encodeURIComponent(id);
     try {
       const r = await api('teklifler/musteri/' + encodeURIComponent(id));
-      kutu.replaceChildren(...(r.teklifler.length ? r.teklifler.map((t) => el('li', { style: 'display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line)' },
+      kutu.replaceChildren(...(r.teklifler.length ? r.teklifler.map((t) => el('li', { style: 'display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid rgb(var(--line))' },
         el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0' }, el('a', { href: '/proposals?id=' + encodeURIComponent(t.id), style: 'font-weight: 600' }, t.no), el('span', { style: 'overflow-wrap: anywhere' }, t.baslik)),
         el('span', { style: 'display: flex; gap: 8px; align-items: center' }, el('span', { style: 'white-space: nowrap; font-variant-numeric: tabular-nums' }, tl(t.toplam)), el('span', { class: 'cip ' + (TEKLIF_DURUM[t.durum] || ['', ''])[1] }, (TEKLIF_DURUM[t.durum] || [t.durum])[0]))))
         : [el('li', { class: 'bos', style: 'padding: 16px' }, 'Bu müşteriye henüz teklif hazırlanmadı. “Bu müşteriye teklif hazırla” ile başlayabilirsiniz.')]));
@@ -129,7 +129,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('a', { href: '/accounts?customer=' + encodeURIComponent(id), style: 'font-size: 13px' }, r.kayitlar.length ? 'Envanterde yönet' : '+ Hesap ekle'));
     const CIP = { aktif: 'kazanildi', bekliyor: 'teklif', kaldirildi: 'kaybedildi' };
     kutu.replaceChildren(...[bas, r.kayitlar.length
-      ? el('div', { style: 'display: flex; flex-wrap: wrap; gap: 8px' }, r.kayitlar.map((k) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px' },
+      ? el('div', { style: 'display: flex; flex-wrap: wrap; gap: 8px' }, r.kayitlar.map((k) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; font-size: 13px' },
           el('b', {}, r.platformlar[k.platform] || k.platform), el('span', { style: 'color: var(--tx2); font-family: ui-monospace, monospace' }, k.hesap_kimligi || k.hesap_adi || ''),
           el('span', { class: 'cip ' + (CIP[k.durum] || '') }, r.durumlar[k.durum] || k.durum))))
       : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu müşteri için henüz hesap kaydı yok. Google Ads, Meta, GA4, GTM gibi hesaplarını ve erişimlerinizi envantere ekleyin.')]);

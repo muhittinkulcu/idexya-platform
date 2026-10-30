@@ -3,8 +3,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Üyeler ve yetkiler" aktif="uyeler" yol="Üyelik" aciklama="Siteden gelen üyelik talepleri burada onaylanır. Her üyeye hangi bölümün hangi yetkiyle açılacağını tek tek seçersiniz; onaysız üye hiçbir bölüm görmez. Üyelik yönetim paneline ve IDOS'a erişim vermez.">
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
-<div role="tablist" aria-label="Üye durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); flex-wrap: wrap"></div>
-<label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Üye ara</span><input type="search" data-ara placeholder="Ad, e-posta veya firma ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
+<div role="tablist" aria-label="Üye durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line)); flex-wrap: wrap"></div>
+<label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Üye ara</span><input type="search" data-ara placeholder="Ad, e-posta veya firma ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
 </div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="Üye listesi" class="kart" data-liste style="flex: 2 1 340px; overflow: hidden"></section>
@@ -33,13 +33,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   function listeCiz() {
     sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
       const n = k === 'hepsi' ? tum.length : tum.filter((u) => u.durum === k).length, s = k === sekme;
-      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; listeCiz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; listeCiz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
     }));
     const q = ara.value.trim().toLocaleLowerCase('tr-TR');
     const gor = tum.filter((u) => (sekme === 'hepsi' || u.durum === sekme) && (!q || [u.ad, u.eposta, u.firma].some((x) => x && x.toLocaleLowerCase('tr-TR').includes(q))));
     liste.replaceChildren(...(gor.length ? gor.map((u) => el('button', {
       type: 'button', 'aria-pressed': String(u.id === secili), onclick: () => { secili = u.id; history.replaceState(null, '', '?id=' + encodeURIComponent(u.id)); listeCiz(); ayrintiYukle(); },
-      style: `width: 100%; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${u.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer`
+      style: `width: 100%; display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border: 0; border-top: 1px solid rgb(var(--line)); background: ${u.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer`
     }, el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('strong', { style: 'color: var(--head)' }, u.ad), el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(u.olusturma))),
       el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [u.eposta, u.firma].filter(Boolean).join(' · ')),
       el('span', { style: 'display: flex; gap: 6px; align-items: center' }, el('span', { class: 'cip ' + CIP[u.durum] }, katalog.durumlar[u.durum]), u.modul_sayisi ? el('span', { style: 'font-size: 12px; color: var(--tx2)' }, u.modul_sayisi + ' bölüm açık') : null)))
@@ -62,10 +62,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const atanan = Object.fromEntries(v.moduller.map((m) => [m.modul, m]));
     const secimler = {};
     const modulSatir = katalog.moduller.map((md) => {
-      const sec = el('select', { 'aria-label': md.ad + ' yetkisi', style: 'min-height: 36px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; max-width: 100%' },
+      const sec = el('select', { 'aria-label': md.ad + ' yetkisi', style: 'min-height: 36px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: rgb(var(--card)); color: var(--tx); font: inherit; max-width: 100%' },
         el('option', { value: '' }, 'Kapalı'), Object.entries(katalog.yetkiler).map(([k, ad]) => el('option', { value: k, selected: atanan[md.k] && atanan[md.k].yetki === k }, ad)));
       secimler[md.k] = sec;
-      return el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line)' },
+      return el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid rgb(var(--line))' },
         el('span', { style: 'display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px' }, el('strong', { style: 'color: var(--head)' }, md.ad, md.hazir ? '' : el('span', { style: 'margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--tx2)' }, 'Yakında')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, md.aciklama + (atanan[md.k] ? ` · ${tarih(atanan[md.k].verildi)} tarihinde açıldı` : ''))), sec);
     });
     const modulKaydet = el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
@@ -73,7 +73,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       o.currentTarget.disabled = true;
       try { const r = await api(`uyeler/${encodeURIComponent(u.id)}/moduller`, { moduller: istek }); await yenile(r.degisen.length ? 'Yetkiler kaydedildi.' : 'Değişiklik yok.'); } catch (h) { bildir('Kaydedilemedi: ' + h.message, 'hata'); o.currentTarget.disabled = false; }
     } }, 'Yetkileri kaydet');
-    const grupSec = gruplar.map((g) => el('label', { style: 'display: inline-flex; gap: 6px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px; cursor: pointer' }, el('input', { type: 'checkbox', value: g.id, checked: v.gruplar.includes(g.id) }), g.ad));
+    const grupSec = gruplar.map((g) => el('label', { style: 'display: inline-flex; gap: 6px; align-items: center; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: 999px; font-size: 13px; cursor: pointer' }, el('input', { type: 'checkbox', value: g.id, checked: v.gruplar.includes(g.id) }), g.ad));
     const grupKaydet = el('button', { type: 'button', class: 'dugme', onclick: async (o) => {
       const ids = grupSec.map((l) => l.querySelector('input')).filter((i) => i.checked).map((i) => i.value);
       try { await api(`uyeler/${encodeURIComponent(u.id)}/gruplar`, { gruplar: ids }); await grupYukle(); await yenile('Gruplar kaydedildi.'); } catch (h) { bildir('Kaydedilemedi: ' + h.message, 'hata'); }
@@ -83,7 +83,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       try {
         const r = await api(`uyeler/${encodeURIComponent(u.id)}/sifre-baglantisi`, {});
         const adres = location.origin + r.yol;
-        const kutu = el('input', { readonly: true, value: adres, 'aria-label': 'Şifre yenileme bağlantısı', style: 'flex: 1 1 260px; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit; font-size: 12px' });
+        const kutu = el('input', { readonly: true, value: adres, 'aria-label': 'Şifre yenileme bağlantısı', style: 'flex: 1 1 260px; min-height: 36px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit; font-size: 12px' });
         baglantiKutu.replaceChildren(kutu, el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { try { await navigator.clipboard.writeText(adres); bildir('Bağlantı kopyalandı. Yalnız üyeye, güvenli bir kanaldan gönderin.'); } catch (e) { kutu.select(); } } }, 'Kopyala'), el('span', { style: 'font-size: 12px; color: var(--tx2); flex: 1 1 100%' }, '24 saat ve bir kez geçerli. Bu sayfadan ayrılınca yeniden gösterilmez.'));
         baglantiKutu.hidden = false;
       } catch (h) { bildir('Oluşturulamadı: ' + h.message, 'hata'); }
@@ -94,19 +94,19 @@ import Yonetim from '../../layouts/Yonetim.astro';
     ayr.replaceChildren(
       el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap' }, el('strong', { style: 'font-size: 18px; color: var(--head)' }, u.ad), el('span', { class: 'cip ' + CIP[u.durum], style: 'align-self: flex-start' }, katalog.durumlar[u.durum])),
       el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px; font-size: 13px' }, bilgiler.map(([a, d]) => el('div', { style: 'padding: 10px 12px; border-radius: 10px; background: var(--card2); display: flex; flex-direction: column; min-width: 0' }, el('span', { style: 'font-size: 11px; color: var(--tx2)' }, a), el('span', { style: 'font-weight: 600; overflow-wrap: anywhere' }, d)))),
-      u.neden ? el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); white-space: pre-wrap; overflow-wrap: anywhere' }, el('span', { style: 'display: block; font-size: 11px; color: var(--tx2)' }, 'Üyelik nedeni'), u.neden) : '',
+      u.neden ? el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid rgb(var(--line)); white-space: pre-wrap; overflow-wrap: anywhere' }, el('span', { style: 'display: block; font-size: 11px; color: var(--tx2)' }, 'Üyelik nedeni'), u.neden) : '',
       dugmeler.length ? el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, dugmeler) : '',
       mesaj,
       el('div', { style: 'display: flex; flex-direction: column' }, baslik('Açık bölümler ve yetkiler'), u.durum !== 'onayli' ? el('span', { style: 'font-size: 12px; color: var(--warn); padding-top: 4px' }, 'Üye onaylanmadan seçilen bölümler ona görünmez.') : '', modulSatir, el('div', { style: 'padding-top: 10px' }, modulKaydet)),
       el('div', { style: 'display: flex; flex-direction: column; gap: 8px' }, baslik('Gruplar'), gruplar.length ? el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap' }, grupSec) : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Henüz grup yok. Aşağıdan ekleyebilirsiniz.'), gruplar.length ? el('div', {}, grupKaydet) : ''),
       el('div', { style: 'display: flex; flex-direction: column; gap: 8px' }, baslik('Güvenlik'), el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, sifreDugme, oturumDugme), baglantiKutu),
-      el('div', { style: 'display: flex; flex-direction: column' }, baslik('Geçmiş'), v.kayitlar.length ? v.kayitlar.map((k) => el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13px' }, el('span', {}, el('strong', {}, ISLEM[k.islem] || k.islem), k.detay && k.islem !== 'uye_kayit' ? ' · ' + k.detay : ''), el('span', { style: 'color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim))) : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Kayıt yok.'))
+      el('div', { style: 'display: flex; flex-direction: column' }, baslik('Geçmiş'), v.kayitlar.length ? v.kayitlar.map((k) => el('div', { style: 'display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid rgb(var(--line)); font-size: 13px' }, el('span', {}, el('strong', {}, ISLEM[k.islem] || k.islem), k.detay && k.islem !== 'uye_kayit' ? ' · ' + k.detay : ''), el('span', { style: 'color: var(--tx2)' }, tarih(k.zaman) + ' · ' + k.kim))) : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Kayıt yok.'))
     );
   }
 
   async function grupYukle() {
     gruplar = (await api('gruplar')).gruplar;
-    $('[data-gruplar]').replaceChildren(...(gruplar.length ? gruplar.map((g) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 6px 6px 12px; border: 1px solid var(--line); border-radius: 999px; font-size: 13px' },
+    $('[data-gruplar]').replaceChildren(...(gruplar.length ? gruplar.map((g) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 6px 6px 12px; border: 1px solid rgb(var(--line)); border-radius: 999px; font-size: 13px' },
       el('span', {}, el('strong', {}, g.ad), ` · ${g.uye_sayisi} üye`), el('button', { type: 'button', class: 'dugme kucuk', 'aria-label': g.ad + ' grubunu sil', onclick: async () => {
         if (!confirm(`“${g.ad}” grubu silinsin mi? Üyeler silinmez, yalnız bu gruptan çıkar.`)) return;
         try { await api(`gruplar/${encodeURIComponent(g.id)}/sil`, {}); await grupYukle(); ayrintiYukle(); } catch (h) { genelHata(h.message); }

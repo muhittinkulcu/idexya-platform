@@ -91,7 +91,7 @@ import '../../scripts/yonetim/grafik.css';
           el('td', { style: hucre }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? `${o.basliklar.kontrol} sayfada var` : eksik ? `${eksik} sayfada eksik` : yanlis ? 'farklı değer: ' + yanlis : 'denetlenemedi')));
       }))));
     const st = son.sonuc.site;
-    const satir = (ad, iyi, metin) => el('div', { style: 'display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line)' }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? 'Tamam' : 'Sorun'), el('span', { style: 'overflow-wrap: anywhere' }, el('b', {}, ad + ': '), metin));
+    const satir = (ad, iyi, metin) => el('div', { style: 'display: flex; gap: 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid rgb(var(--line))' }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? 'Tamam' : 'Sorun'), el('span', { style: 'overflow-wrap: anywhere' }, el('b', {}, ad + ': '), metin));
     $('[data-tarama]').replaceChildren(
       satir('robots.txt', st.robots.durum === 200 && !o.siteSorunlari.includes('robots_kapali'), st.robots.durum === 200 ? `açılıyor · ${(st.robots.engelli || []).length} kapalı yol · sitemap satırı ${(st.robots.sitemaplar || []).length ? 'var' : 'yok'}` : `açılmıyor (durum ${st.robots.durum})`),
       satir('sitemap.xml', st.sitemap.durum === 200 && st.sitemap.gecerli, st.sitemap.durum === 200 ? `${sayi(st.sitemap.adres)} adres · biçim ${st.sitemap.gecerli ? 'geçerli' : 'bozuk'}` : `açılmıyor (durum ${st.sitemap.durum})`),

@@ -87,5 +87,5 @@ export function puanTrendi(kutu, gecmis) {
   kutu.replaceChildren(s, etiket);
 }
 
-export const hucre = 'padding: 9px 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+export const hucre = 'padding: 9px 12px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
 export const bas = (b, ek = '') => el('th', { scope: 'col', style: 'padding: 9px 12px; text-align: left; font-size: 12px; color: var(--tx2); white-space: nowrap' + ek }, b);

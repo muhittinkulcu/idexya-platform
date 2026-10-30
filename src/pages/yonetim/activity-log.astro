@@ -3,8 +3,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="İşlem geçmişi" aktif="gecmis" yol="Sistem" aciklama="Panelde ve sitede yapılan kayıtlı işlemler: kim, neyi, ne zaman yaptı. Kayıtlar değiştirilemez ve silinemez.">
 <div class="kart" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
-<label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">Ara<input data-ara type="search" placeholder="İşlem, kişi veya ayrıntı" style="min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
-<label style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">İşlem türü<select data-tur style="min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"><option value="">Tümü</option></select></label>
+<label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">Ara<input data-ara type="search" placeholder="İşlem, kişi veya ayrıntı" style="min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<label style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">İşlem türü<select data-tur style="min-height: 40px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"><option value="">Tümü</option></select></label>
 <button type="button" class="dugme" data-csv style="align-self: flex-end">CSV indir</button>
 </div>
 <section class="kart" aria-label="İşlemler" data-liste style="overflow-x: auto"></section>
@@ -15,7 +15,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const ad = (k) => AD[k] || k.replace(/_/g, ' ');
   const liste = document.querySelector('[data-liste]'), ara = document.querySelector('[data-ara]'), tur = document.querySelector('[data-tur]');
   let tum = [];
-  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
   function suz() { const q = ara.value.trim().toLocaleLowerCase('tr-TR'); return tum.filter((k) => (!tur.value || k.islem === tur.value) && (!q || [k.kim, ad(k.islem), k.hedef, k.detay].join(' ').toLocaleLowerCase('tr-TR').includes(q))); }
   function ciz() {
     const g = suz();

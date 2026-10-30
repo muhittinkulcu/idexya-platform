@@ -7,24 +7,24 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <p data-aciklama style="margin: 0; color: var(--tx2)"></p>
 <section class="kart" data-duzenleyici style="padding: 16px; display: flex; flex-direction: column; gap: 12px" aria-live="polite"><div class="bos">Yükleniyor…</div></section>
 <div class="kart si-cubuk" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: sticky; bottom: 12px; z-index: 5; box-shadow: 0 10px 30px var(--shadow)">
-<input data-not maxlength="120" placeholder="Değişiklik notu (isteğe bağlı)" aria-label="Değişiklik notu" style="flex: 1 1 240px; min-height: 42px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit">
+<input data-not maxlength="120" placeholder="Değişiklik notu (isteğe bağlı)" aria-label="Değişiklik notu" style="flex: 1 1 240px; min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit">
 <button type="button" class="dugme ana" data-yayinla>Yayınla</button>
 <button type="button" class="dugme" data-indir>Yedek indir (JSON)</button>
 <span data-kayit-durum role="status" style="font-size: 14px; color: var(--tx2)"></span>
 </div>
 <div data-hatalar></div>
-<dialog data-medya-sec style="max-width: 760px; width: calc(100% - 32px); border: 1px solid var(--line); border-radius: 16px; padding: 0; background: var(--card); color: var(--tx)">
-<div style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line)"><b>Medya kütüphanesinden seç</b><button type="button" class="dugme kucuk" data-medya-kapat>Kapat</button></div>
+<dialog data-medya-sec style="max-width: 760px; width: calc(100% - 32px); border: 1px solid rgb(var(--line)); border-radius: 16px; padding: 0; background: rgb(var(--card)); color: var(--tx)">
+<div style="padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgb(var(--line))"><b>Medya kütüphanesinden seç</b><button type="button" class="dugme kucuk" data-medya-kapat>Kapat</button></div>
 <div data-medya-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 60vh; overflow: auto"></div>
 </dialog>
 <style is:global>
   .si-alan{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
-  .si-alan input,.si-alan textarea,.si-alan select{min-height:40px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;font-weight:400}
+  .si-alan input,.si-alan textarea,.si-alan select{min-height:40px;padding:8px 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;font-weight:400}
   .si-alan textarea{min-height:80px;resize:vertical;line-height:1.5}
   .si-alan small{font-weight:400;color:var(--tx2)}
   .si-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-  .si-liste{display:flex;flex-direction:column;gap:8px;padding-left:10px;border-left:2px solid var(--line)}
-  .si-oge{border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  .si-liste{display:flex;flex-direction:column;gap:8px;padding-left:10px;border-left:2px solid rgb(var(--line))}
+  .si-oge{border:1px solid rgb(var(--line));border-radius:12px;background:rgb(var(--card))}
   .si-oge>summary{cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 12px;font-weight:600;list-style:none}
   .si-oge>summary::-webkit-details-marker{display:none}
   .si-oge>summary::before{content:"▸";color:var(--tx2);transition:transform .15s}
@@ -34,7 +34,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .si-grup{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:var(--card2)}
   .si-grup>b{font-size:15px}
   .si-gorsel{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .si-gorsel img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .si-gorsel img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid rgb(var(--line))}
 </style>
 <script>
   import { api, el, tarih, genelHata, prm, adresMetni, capaTr } from '../../scripts/yonetim/ortak.js';
@@ -54,7 +54,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     medyaSecildi = geri; const l = q('[data-medya-liste]'); l.replaceChildren(el('div', { class: 'bos' }, 'Yükleniyor…')); medyaKutu.showModal();
     try {
       const r = await api('medya');
-      l.replaceChildren(...(r.medya.length ? r.medya.map((m) => el('button', { type: 'button', style: 'border: 1px solid var(--line); border-radius: 10px; padding: 6px; background: var(--card); cursor: pointer; display: flex; flex-direction: column; gap: 4px; font: inherit; font-size: 12px; color: inherit', onclick: () => { medyaSecildi(`/api/medya/${m.id}`); medyaKutu.close(); } },
+      l.replaceChildren(...(r.medya.length ? r.medya.map((m) => el('button', { type: 'button', style: 'border: 1px solid rgb(var(--line)); border-radius: 10px; padding: 6px; background: rgb(var(--card)); cursor: pointer; display: flex; flex-direction: column; gap: 4px; font: inherit; font-size: 12px; color: inherit', onclick: () => { medyaSecildi(`/api/medya/${m.id}`); medyaKutu.close(); } },
         el('img', { src: `/api/medya/${m.id}`, alt: '', style: 'width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px' }), m.ad)) : [el('div', { class: 'bos' }, 'Kütüphane boş. Önce Medya kütüphanesine görsel yükleyin.')]));
     } catch (h) { l.replaceChildren(el('div', { class: 'uyari hata' }, h.message)); }
   }

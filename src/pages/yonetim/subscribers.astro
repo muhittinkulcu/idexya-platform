@@ -13,11 +13,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const liste = document.querySelector('[data-liste]'), sekmeKutu = document.querySelector('[data-sekmeler]');
   const DURUM = { aktif: 'Listede', ayrildi: 'Ayrıldı' };
   let tum = [], sekme = 'aktif';
-  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
   function ciz() {
     sekmeKutu.replaceChildren(...['aktif', 'ayrildi', 'hepsi'].map((b) => {
       const s = b === sekme, n = b === 'hepsi' ? tum.length : tum.filter((x) => x.durum === b).length;
-      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = b; ciz(); } }, (DURUM[b] || 'Tümü') + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = b; ciz(); } }, (DURUM[b] || 'Tümü') + ' ', el('span', { style: 'opacity: .7' }, String(n)));
     }));
     const gor = tum.filter((x) => sekme === 'hepsi' || x.durum === sekme);
     if (!gor.length) { liste.replaceChildren(el('div', { class: 'bos' }, tum.length ? 'Bu sekmede kayıt yok.' : 'Henüz bülten kaydı yok.')); return; }

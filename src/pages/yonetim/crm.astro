@@ -3,8 +3,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="CRM" aktif="crm" yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
-<label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit"></label>
-<div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line)"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
+<label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
 <button type="button" class="dugme ana" data-yeni-ac>+ Yeni müşteri</button>
 </div>
 <form data-yeni-form hidden class="kart" style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end">
@@ -29,18 +29,18 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try { await api(`musteriler/${encodeURIComponent(m.id)}/asama`, { asama: yeni }); m.asama = yeni; m.guncelleme = new Date().toISOString(); ciz(); }
     catch (h) { sec.value = m.asama; sec.disabled = false; genelHata('Aşama değiştirilemedi: ' + h.message); }
   }
-  const asamaSec = (m) => el('select', { 'aria-label': baslik(m) + ' aşaması', style: 'min-height: 32px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 12px; max-width: 100%', onchange: (o) => asamaDegis(m, o.currentTarget.value, o.currentTarget) },
+  const asamaSec = (m) => el('select', { 'aria-label': baslik(m) + ' aşaması', style: 'min-height: 32px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 12px; max-width: 100%', onchange: (o) => asamaDegis(m, o.currentTarget.value, o.currentTarget) },
     ASAMALAR.map((a) => el('option', { value: a.k, selected: a.k === m.asama }, a.ad)));
 
   function ciz() {
-    document.querySelectorAll('[data-gorunum]').forEach((d) => { const s = d.dataset.gorunum === gorunum; d.setAttribute('aria-pressed', String(s)); d.style.cssText = s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent'; });
+    document.querySelectorAll('[data-gorunum]').forEach((d) => { const s = d.dataset.gorunum === gorunum; d.setAttribute('aria-pressed', String(s)); d.style.cssText = s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent'; });
     const q = ara.value.trim().toLocaleLowerCase('tr-TR');
     const gor = tum.filter((m) => !q || [m.firma, m.ad, m.eposta, m.telefon].some((x) => x && x.toLocaleLowerCase('tr-TR').includes(q)));
     if (!tum.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, 'CRM’de henüz müşteri yok. Talepler sayfasından bir talebi CRM’e alın veya “Yeni müşteri” ile elle ekleyin.')); return; }
     if (gorunum === 'liste') {
       alan.replaceChildren(el('div', { class: 'kart', style: 'overflow-x: auto' }, el('table', { style: 'width: 100%; min-width: 720px; border-collapse: collapse; font-size: 13px' },
         el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 10px 14px; font-weight: 600${i === 3 ? '; text-align: right' : ''}` }, b)))),
-        el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid var(--line)' },
+        el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid rgb(var(--line))' },
           el('td', { style: 'padding: 10px 14px' }, el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null),
           el('td', { style: 'padding: 10px 14px; color: var(--tx2)' }, [m.eposta, m.telefon].filter(Boolean).join(' · ') || '—'),
           el('td', { style: 'padding: 10px 14px' }, asamaSec(m)),
@@ -53,7 +53,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       ASAMALAR.map((a) => {
         const ms = gor.filter((m) => m.asama === a.k);
         const top = ms.reduce((s, m) => s + (m.deger || 0), 0);
-        return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid var(--line); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
+        return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid rgb(var(--line)); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
           el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px' }, el('strong', { style: 'color: var(--head)' }, a.ad + ' · ' + ms.length), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ms.some((m) => m.deger) ? para(top) : '')),
           ms.length ? ms.map((m) => el('article', { class: 'kart', style: 'padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-radius: 12px' },
             el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)),

@@ -140,7 +140,7 @@ export function isiCiz(satirlar, kutuEl, notEl) {
     for (let s = 0; s < 24; s++) {
       const n = m[hg + '-' + s] || 0;
       const ip = `${GUN_TAM[hg]} ${iki(s)}.00–${iki((s + 1) % 24)}.00\n${sayi(n)} talep`;
-      hucreler.push(el('i', n ? { 'data-n': n, 'data-ip': ip, style: `background: color-mix(in oklab, var(--brand) ${Math.round(25 + (n / en) * 75)}%, var(--card))` } : { 'data-ip': ip }));
+      hucreler.push(el('i', n ? { 'data-n': n, 'data-ip': ip, style: `background: color-mix(in oklab, var(--brand) ${Math.round(25 + (n / en) * 75)}%, rgb(var(--card)))` } : { 'data-ip': ip }));
     }
   });
   kutuEl.replaceChildren(...hucreler);

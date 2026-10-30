@@ -19,7 +19,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const ciz = () => {
       govde.replaceChildren(...g.musteriler.map((m) => {
         const secili = m.id === tut;
-        return el('div', { style: `display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; padding: 12px; border-radius: 14px; border: 1px solid ${secili ? 'var(--brand)' : 'var(--line)'}; background: ${secili ? 'var(--tint)' : 'transparent'}` },
+        return el('div', { style: `display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; padding: 12px; border-radius: 14px; border: 1px solid ${secili ? 'var(--brand)' : 'rgb(var(--line))'}; background: ${secili ? 'var(--tint)' : 'transparent'}` },
           el('label', { style: 'display: flex; gap: 8px; align-items: center; font-size: 13px; font-weight: 600; cursor: pointer; flex: none' },
             el('input', { type: 'radio', name: 'tut-' + sira, checked: secili, onchange: () => { tut = m.id; ciz(); } }), 'Bunu tut'),
           el('div', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1 1 220px' },

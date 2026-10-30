@@ -37,4 +37,4 @@ export function dosyaIndir(icerik, ad, tur) {
 
 // Sekme benzeri düğme grubu (bülten sayfasındaki görünüm)
 export const secmeDugme = (secili, etiket, tik, ek = {}) => el('button', { type: 'button', class: 'dugme kucuk', 'aria-pressed': String(secili),
-  style: secili ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: tik, ...ek }, etiket);
+  style: secili ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: tik, ...ek }, etiket);
