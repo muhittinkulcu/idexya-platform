@@ -29,6 +29,7 @@ import { yonetimDonusumApi, reklamTemizle, talepReklamSorgu } from './donusum.js
 import { ekibeBildir } from './eposta.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
 import { panelAlani, panelKoku, eskiYol, SAYFALAR } from './panel-yollar.js';
+import { eskiAramayiCevir } from '../src/data/panel-parametre.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -100,7 +101,7 @@ async function talepAl(istek, env) {
   const KAYNAK_ADI = { iletisim: 'İletişim formu', analiz: 'Ücretsiz analiz formu', paket: 'Paket teklif formu', sihirbaz: 'Paket sihirbazı', asistan: 'Yapay zekâ asistanı', form: 'Site formu' };
   await ekibeBildir(env, `Yeni talep: ${ad}${kirp(g.firma, 160) ? ' · ' + kirp(g.firma, 160) : ''}`, [['Kaynak', KAYNAK_ADI[kaynak] || kaynak], ['Ad', ad], ['Firma', kirp(g.firma, 160) || '—'],
     ['E-posta', eposta || '—'], ['Telefon', telefon || '—'], ['Konu', kirp(g.konu, 120) || '—'], ['Mesaj', kirp(g.mesaj, 1500) || '—'], ['Sayfa', kirp(g.sayfa, 200) || '—']],
-    { metin: 'Panelde aç', yol: '/leads?sekme=yeni' }, eposta || undefined);
+    { metin: 'Panelde aç', yol: '/leads?tab=new' }, eposta || undefined);
   return json({ ok: true });
 }
 
@@ -265,14 +266,16 @@ export default {
     try {
       // Yönetim paneli yalnız panel.idexya.com'da, İngilizce adreslerle açılır (worker/panel-yollar.js).
       const panel = panelAlani(url, env);
-      if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${panelKoku(url, env)}${eskiYol(yol)}${url.search}`, 301);
+      if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${panelKoku(url, env)}${eskiYol(yol)}${eskiAramayiCevir(url.search) || url.search}`, 301);
       let panelSayfa = null;
       if (panel) {
         // Kök adres panele gider; ?tema=… (tema düzenleyici önizlemesi) sitenin kendisini açar.
         if (yol === '/' && !url.searchParams.has('tema')) return Response.redirect(`${url.origin}/dashboard`, 302);
         const m = yol.match(/^\/([a-z-]+)(\/?)$/);
         if (m && SAYFALAR.has(m[1])) {
-          if (m[2]) return Response.redirect(`${url.origin}/${m[1]}${url.search}`, 301);
+          // Eski Türkçe seçenekler (?sekme=yeni) İngilizce adrese taşınır (?tab=new)
+          const arama = eskiAramayiCevir(url.search);
+          if (m[2] || arama) return Response.redirect(`${url.origin}/${m[1]}${arama || url.search}`, 301);
           panelSayfa = m[1];
         }
       }

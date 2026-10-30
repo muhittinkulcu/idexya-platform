@@ -1,4 +1,8 @@
 // Yönetim paneli ortak yardımcıları. Sunucudan gelen her metin textContent ile yazılır (HTML olarak yorumlanmaz).
+import { adresMetni, adrestenOku, capaTr } from '../../data/panel-parametre.js';
+export { adresMetni, capaTr };
+// Adres seçeneğini Türkçe adıyla okur (adres İngilizce: ?tab=new → prm('sekme') === 'yeni')
+export const prm = (ad) => adrestenOku(ad, location.search);
 export const ASAMALAR = [
   { k: 'yeni', ad: 'Yeni' }, { k: 'gorusme', ad: 'Görüşülüyor' }, { k: 'teklif', ad: 'Teklif gönderildi' },
   { k: 'goruldu', ad: 'Teklif görüldü' }, { k: 'kazanildi', ad: 'Kazanıldı' }, { k: 'kaybedildi', ad: 'Kaybedildi' }

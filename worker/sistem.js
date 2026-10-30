@@ -59,7 +59,7 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
       db.prepare('SELECT zaman, durum, mesaj FROM reklam_cekim ORDER BY zaman DESC LIMIT 1')
     ]);
     const t = talep.results[0], u = uye.results[0], y = yorum.results[0];
-    if (t.n) onay.push({ tur: 'talep', baslik: `${t.n} yeni talep yanıt bekliyor`, detay: t.gec ? `${t.gec} talep 24 saatten eski; 1 iş günü içinde dönüş sözü veriliyor.` : 'Hepsi son 24 saat içinde geldi.', zaman: t.en_eski, href: '/leads?sekme=yeni', onem: t.gec ? 'kritik' : 'normal' });
+    if (t.n) onay.push({ tur: 'talep', baslik: `${t.n} yeni talep yanıt bekliyor`, detay: t.gec ? `${t.gec} talep 24 saatten eski; 1 iş günü içinde dönüş sözü veriliyor.` : 'Hepsi son 24 saat içinde geldi.', zaman: t.en_eski, href: '/leads?tab=new', onem: t.gec ? 'kritik' : 'normal' });
     if (u.n) onay.push({ tur: 'uye', baslik: `${u.n} üyelik başvurusu onay bekliyor`, detay: 'Başvuruyu onaylayın ya da reddedin.', zaman: u.en_eski, href: '/members', onem: 'normal' });
     if (y.n) onay.push({ tur: 'yorum', baslik: `${y.n} yorum yayın onayı bekliyor`, detay: 'Yorumlar onaylanmadan sitede görünmez.', zaman: y.en_eski, href: '/articles', onem: 'normal' });
     // Diğer modüllerin tabloları varsa onlardan da bildirim üret (modüller ayrı ayrı kurulabilir).
@@ -69,7 +69,7 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     }
     if (await tabloVar(db, 'teklifler')) {
       const g = await db.prepare("SELECT COUNT(*) AS n FROM teklifler WHERE durum = 'gonderildi' AND gecerlilik IS NOT NULL AND gecerlilik < ?").bind(new Date().toISOString().slice(0, 10)).first();
-      if (g && g.n) onay.push({ tur: 'teklif', baslik: `${g.n} gönderilen teklifin geçerlilik süresi doldu`, detay: 'Müşteriyle görüşüp kabul ya da red olarak işaretleyin.', href: '/proposals?sekme=gonderildi', onem: 'normal' });
+      if (g && g.n) onay.push({ tur: 'teklif', baslik: `${g.n} gönderilen teklifin geçerlilik süresi doldu`, detay: 'Müşteriyle görüşüp kabul ya da red olarak işaretleyin.', href: '/proposals?tab=sent', onem: 'normal' });
     }
     if (await tabloVar(db, 'hesap_envanteri')) {
       const u = await envanterUyarilari(db);

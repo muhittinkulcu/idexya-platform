@@ -144,9 +144,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 
   <section class="kart modul" data-m="kure" aria-label="Bekleyen talepler">
-    <div class="modul-bas"><h2>Bekleyen talepler</h2><a href="/leads?sekme=yeni" class="bk-bag">Talepleri aç →</a></div>
+    <div class="modul-bas"><h2>Bekleyen talepler</h2><a href="/leads?tab=new" class="bk-bag">Talepleri aç →</a></div>
     <div class="bk">
-      <a class="bk-halka" href="/leads?sekme=yeni" aria-label="Yanıt bekleyen talepler">
+      <a class="bk-halka" href="/leads?tab=new" aria-label="Yanıt bekleyen talepler">
         <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="bk-iz"/><circle cx="60" cy="60" r="50" class="bk-dolu" data-bk-taze/><circle cx="60" cy="60" r="50" class="bk-gec" data-bk-gec/></svg>
         <span class="bk-ic"><b data-v="bekleyen">—</b><small>yanıt bekleyen</small></span>
       </a>
@@ -197,7 +197,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <section class="kart modul" data-m="hizli" aria-label="Hızlı işlemler">
     <div class="modul-bas"><h2>Hızlı işlemler</h2></div>
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px">
-      <a class="kpi" href="/leads?sekme=yeni"><span style="font-weight: 700; color: var(--head)">Talepleri ayıkla</span><span style="font-size: 12px; color: var(--tx2)">Yeni gelenleri CRM’e al veya spam’e ayır</span></a>
+      <a class="kpi" href="/leads?tab=new"><span style="font-weight: 700; color: var(--head)">Talepleri ayıkla</span><span style="font-size: 12px; color: var(--tx2)">Yeni gelenleri CRM’e al veya spam’e ayır</span></a>
       <a class="kpi" href="/articles"><span style="font-weight: 700; color: var(--head)">İçerik yayınla</span><span style="font-size: 12px; color: var(--tx2)">Yazı ve kaynak ekle, görünürlüğü seç</span></a>
       <a class="kpi" href="/members"><span style="font-weight: 700; color: var(--head)">Üyeleri onayla</span><span style="font-size: 12px; color: var(--tx2)">Başvuruları incele, bölüm aç</span></a>
       <a class="kpi" href="/assistant"><span style="font-weight: 700; color: var(--head)">Sohbetleri oku</span><span style="font-size: 12px; color: var(--tx2)">Asistanın ziyaretçilerle konuşmaları</span></a>
@@ -291,7 +291,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       us.hidden = false;
       us.replaceChildren(el('span', { class: 'simge', 'aria-hidden': 'true' }, '!'),
         el('span', { style: 'flex: 1; min-width: 200px' }, el('b', {}, `Uyarı: ${b24.n} talep 24 saattir yanıtlanmadı.`), ' En eskisi ', once(b24.en_eski), ' geldi.'),
-        el('a', { class: 'dugme kucuk', href: '/leads?sekme=yeni' }, 'Talepleri aç →'));
+        el('a', { class: 'dugme kucuk', href: '/leads?tab=new' }, 'Talepleri aç →'));
     }
 
     // Temel sayılar: son 7 gün ve önceki 7 gün; kıvılcım son 30 günün günlük toplamı
@@ -304,10 +304,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const kaz = gr.asamalar.find((a) => a.asama === 'kazanildi') || { n: 0, deger: 0 };
     const yuzde = (x) => (x === null ? '—' : '%' + Math.round(x * 100));
     $('[data-kpi]').replaceChildren(
-      kpiKart({ ad: 'Yeni talep · 7 gün', deger: topla(gunT, g14.slice(7)), onceki: topla(gunT, g14.slice(0, 7)), seri: g30.map((x) => gunT[x] || 0), href: '/leads?sekme=hepsi', alt: 'önceki 7 güne göre' }),
+      kpiKart({ ad: 'Yeni talep · 7 gün', deger: topla(gunT, g14.slice(7)), onceki: topla(gunT, g14.slice(0, 7)), seri: g30.map((x) => gunT[x] || 0), href: '/leads?tab=all', alt: 'önceki 7 güne göre' }),
       kpiKart({ ad: 'CRM’e alınan · 7 gün', deger: topla(gunM, g14.slice(7)), onceki: topla(gunM, g14.slice(0, 7)), seri: g30.map((x) => gunM[x] || 0), href: '/crm', alt: 'önceki 7 güne göre' }),
-      kpiKart({ ad: 'Talepten müşteriye · 30 gün', metin: yuzde(oran('simdi')), oncekiMetin: 'Önceki 30 gün: ' + yuzde(oran('once')), aciklama: 'CRM’e alınan ÷ spam olmayan talep', href: '/leads?sekme=crm' }),
-      kpiKart({ ad: 'Yanıt bekleyen', metin: String(bekleyen), aciklama: b24.n ? `${b24.n} tanesi 24 saati geçti` : 'Ayıklanmayı bekliyor', href: '/leads?sekme=yeni' }),
+      kpiKart({ ad: 'Talepten müşteriye · 30 gün', metin: yuzde(oran('simdi')), oncekiMetin: 'Önceki 30 gün: ' + yuzde(oran('once')), aciklama: 'CRM’e alınan ÷ spam olmayan talep', href: '/leads?tab=crm' }),
+      kpiKart({ ad: 'Yanıt bekleyen', metin: String(bekleyen), aciklama: b24.n ? `${b24.n} tanesi 24 saati geçti` : 'Ayıklanmayı bekliyor', href: '/leads?tab=new' }),
       kpiKart({ ad: 'Açık fırsat değeri', metin: o.musteri.n ? para(o.musteri.hat || 0) : '—', aciklama: `${acik} açık fırsat · tahmini aylık`, href: '/crm' }),
       kpiKart({ ad: 'Kazanılan', metin: kaz.n ? para(kaz.deger) : '—', aciklama: `${kaz.n} müşteri · tüm zamanlar`, href: '/crm' })
     );

@@ -60,7 +60,7 @@ import BannerStil from '../../components/BannerStil.astro';
 </div>
 
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, prm } from '../../scripts/yonetim/ortak.js';
   import { bannerOlustur, KAPAKLAR, TEMA, zamanUygun } from '../../scripts/banner.js';
   const $ = (s, k = document) => k.querySelector(s);
   const $$ = (s, k = document) => [...k.querySelectorAll(s)];
@@ -374,7 +374,7 @@ import BannerStil from '../../components/BannerStil.astro';
   $('[data-yeni]').addEventListener('click', () => { secimCiz(); goster('sec'); });
   $('[data-ara]').addEventListener('input', listeCiz);
   $('[data-durum-suz]').addEventListener('change', listeCiz);
-  yukle().then(() => { if (new URLSearchParams(location.search).get('yeni') === '1') { secimCiz(); goster('sec'); } });
+  yukle().then(() => { if (prm('yeni') === '1') { secimCiz(); goster('sec'); } });
 </script>
 
 <style is:global>

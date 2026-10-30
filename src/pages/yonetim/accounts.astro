@@ -44,7 +44,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </form>
 <div data-liste style="display: flex; flex-direction: column; gap: 14px"></div>
 <script>
-  import { api, el, tarih as zaman, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih as zaman, genelHata, prm } from '../../scripts/yonetim/ortak.js';
   import { bugunIst, gun, kucuk } from '../../scripts/yonetim/kayit.js';
   const $ = (s) => document.querySelector(s);
   const liste = $('[data-liste]'), form = $('[data-form]'), fdurum = $('[data-form-durum]');
@@ -135,7 +135,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       secenek(pSuz, v.platformlar, 'Tüm platformlar'); secenek(dSuz, v.durumlar, 'Tüm durumlar');
       const mus = Object.fromEntries(v.musteriler.map((m) => [m.id, musAd(m)]));
       secenek(form.musteri_id, mus, 'Müşteri seçin'); secenek(mSuz, mus, 'Tüm müşteriler');
-      const p = new URLSearchParams(location.search).get('musteri'); if (p && mus[p] && !mSuz.dataset.ilk) { mSuz.value = p; mSuz.dataset.ilk = '1'; }
+      const p = prm('musteri'); if (p && mus[p] && !mSuz.dataset.ilk) { mSuz.value = p; mSuz.dataset.ilk = '1'; }
       ciz();
     } catch (h) { genelHata('Envanter yüklenemedi: ' + h.message); }
   }

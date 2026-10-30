@@ -42,7 +42,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <section class="kart" aria-label="Teklif listesi" data-liste style="overflow-x: auto"></section>
 
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, prm, adresMetni } from '../../scripts/yonetim/ortak.js';
   const $ = (s) => document.querySelector(s);
   const liste = $('[data-liste]'), sekmeKutu = $('[data-sekmeler]'), detay = $('[data-detay]'), form = $('[data-duzenleyici]');
   const kalemKutu = $('[data-kalemler]'), toplamKutu = $('[data-toplamlar]'), duzDurum = $('[data-duz-durum]');
@@ -62,15 +62,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
   const yerelGun = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-  const prm = new URLSearchParams(location.search);
-  let sekme = SEKMELER.some((s) => s[0] === prm.get('sekme')) ? prm.get('sekme') : 'taslak';
-  let tum = [], musteriler = null, seciliId = prm.get('id') || '', duzenlenen = null;
+  let sekme = SEKMELER.some((s) => s[0] === prm('sekme')) ? prm('sekme') : 'taslak';
+  let tum = [], musteriler = null, seciliId = prm('id') || '', duzenlenen = null;
 
   function adresYaz() {
-    const p = new URLSearchParams();
-    p.set('sekme', sekme);
-    if (seciliId) p.set('id', seciliId);
-    history.replaceState(null, '', location.pathname + '?' + p.toString());
+    history.replaceState(null, '', location.pathname + adresMetni({ sekme, id: seciliId }));
   }
 
   // --- Liste ---
@@ -87,7 +83,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     liste.replaceChildren(el('table', { style: 'width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px' },
       el('thead', {}, el('tr', {}, ...['No', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 3 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
       el('tbody', {}, ...gor.map((t) => el('tr', { style: t.id === seciliId ? 'background: var(--card2)' : '' },
-        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: '?sekme=' + sekme + '&id=' + encodeURIComponent(t.id), style: 'font-weight: 600', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
+        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: adresMetni({ sekme, id: t.id }), style: 'font-weight: 600', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
         el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.baslik),
         el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, tutar(t.toplam)),
@@ -236,7 +232,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   async function duzenle(t) {
     duzenlenen = t || null; duzDurum.textContent = '';
-    try { await musteriSecenekleri(t ? t.musteri_id : prm.get('musteri') || ''); }
+    try { await musteriSecenekleri(t ? t.musteri_id : prm('musteri') || ''); }
     catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); return; }
     $('[data-duz-baslik]').textContent = t ? 'Taslağı düzenle' : 'Yeni teklif';
     $('[data-duz-no]').textContent = t ? t.no : 'Numara kaydedince verilir';
@@ -285,8 +281,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   (async () => {
     await yukle();
-    if (seciliId) { const t = tum.find((x) => x.id === seciliId); if (t && prm.get('sekme') === null) { sekme = t.durum; adresYaz(); ciz(); } await ac(seciliId); }
-    else if (prm.get('yeni') === '1') duzenle(null);
+    if (seciliId) { const t = tum.find((x) => x.id === seciliId); if (t && prm('sekme') === null) { sekme = t.durum; adresYaz(); ciz(); } await ac(seciliId); }
+    else if (prm('yeni') === '1') duzenle(null);
   })();
 </script>
 </Yonetim>

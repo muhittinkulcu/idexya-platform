@@ -37,12 +37,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .si-gorsel img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
 </style>
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, prm, adresMetni, capaTr } from '../../scripts/yonetim/ortak.js';
   import { DOSYALAR, dogrula, ekDenetim } from '../../data/icerik-sema.js';
   import { yaziEditoru } from '../../scripts/yonetim/editor.js';
   const q = (s) => document.querySelector(s);
-  const parametre = new URLSearchParams(location.search);
-  let ad = DOSYALAR[parametre.get('dosya')] ? parametre.get('dosya') : 'hizmetler';
+  let ad = DOSYALAR[prm('dosya')] ? prm('dosya') : 'hizmetler';
   let veri = null, sha = null, yayinAcik = false, degisti = false;
   const isaretle = () => { degisti = true; q('[data-kayit-durum]').textContent = 'Kaydedilmemiş değişiklik var.'; };
   addEventListener('beforeunload', (o) => { if (degisti) { o.preventDefault(); o.returnValue = ''; } });
@@ -137,7 +136,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   async function ac(yeni) {
     if (degisti && !confirm('Kaydedilmemiş değişiklikler kaybolacak. Devam edilsin mi?')) return;
     ad = yeni; degisti = false; q('[data-kayit-durum]').textContent = ''; q('[data-hatalar]').replaceChildren();
-    history.replaceState(null, '', `?dosya=${ad}${location.hash}`);
+    history.replaceState(null, '', adresMetni({ dosya: ad }) + location.hash);
     q('[data-dosyalar]').replaceChildren(...Object.entries(DOSYALAR).map(([k, d]) => el('button', { type: 'button', class: 'dugme kucuk', 'aria-pressed': String(k === ad), style: k === ad ? 'background: var(--tint); color: var(--tintx); border-color: transparent' : 'border-color: transparent; background: transparent', onclick: () => ac(k) }, d.ad)));
     q('[data-aciklama]').textContent = DOSYALAR[ad].aciklama;
     const ed = q('[data-duzenleyici]'); ed.replaceChildren(el('div', { class: 'bos' }, 'Yükleniyor…'));
@@ -146,7 +145,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       veri = r.veri; sha = r.sha; yayinAcik = r.yayinAcik;
       q('[data-yayinla]').disabled = !yayinAcik;
       ed.replaceChildren(alan(DOSYALAR[ad].sema, veri, (v) => { veri = v; }, () => veri));
-      if (location.hash) { const h = ed.querySelector(`[data-alan="${location.hash.slice(1)}"]`); if (h) { h.scrollIntoView({ block: 'start' }); h.querySelector('details')?.setAttribute('open', ''); } }
+      if (location.hash) { const h = ed.querySelector(`[data-alan="${capaTr(location.hash.slice(1))}"]`); if (h) { h.scrollIntoView({ block: 'start' }); h.querySelector('details')?.setAttribute('open', ''); } }
     } catch (h) { ed.replaceChildren(el('div', { class: 'uyari hata' }, 'İçerik yüklenemedi: ' + h.message)); }
   }
   q('[data-indir]').addEventListener('click', () => {

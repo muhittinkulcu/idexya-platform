@@ -12,11 +12,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </section>
 </div>
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, prm } from '../../scripts/yonetim/ortak.js';
   const liste = document.querySelector('[data-liste]'), sekmeKutu = document.querySelector('[data-sekmeler]'), detay = document.querySelector('[data-detay]');
   const SEKME = { acik: 'Yanıt bekleyen', yanitlandi: 'Yanıtlanan', kapali: 'Kapanan', hepsi: 'Tümü' };
   const CIP = { acik: 'yeni', yanitlandi: 'kazanildi', kapali: 'kaybedildi' };
-  let tum = [], durumlar = {}, sekme = new URLSearchParams(location.search).get('sekme') || 'acik', secili = new URLSearchParams(location.search).get('t');
+  let tum = [], durumlar = {}, sekme = prm('sekme') || 'acik', secili = prm('t');
   if (!SEKME[sekme]) sekme = 'acik';
 
   function ciz() {
@@ -33,7 +33,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   async function ac(id) {
     secili = id; ciz();
-    const u = new URL(location.href); u.searchParams.set('t', id); history.replaceState(null, '', u);
+    const u = new URL(location.href); u.searchParams.set('ticket', id); history.replaceState(null, '', u);
     try {
       const s = await api('destek/' + encodeURIComponent(id)); genelHata('');
       const t = s.talep, uye = s.uye || {};
