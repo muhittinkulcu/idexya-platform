@@ -38,19 +38,19 @@ const I = {
 const MENU = [
   { grup: 'ÖZET', ad: 'Özet', ogeler: [
     { k: 'genel', ad: 'Genel bakış', href: '/dashboard', sabit: true },
-    { k: 'bildirim', ad: 'Bildirimler', href: '/notifications', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/notifications#onay' }, { ad: 'Sistem uyarıları', href: '/notifications#uyari' }] }
+    { k: 'bildirim', ad: 'Bildirimler', href: '/notifications', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/notifications#approvals' }, { ad: 'Sistem uyarıları', href: '/notifications#alerts' }] }
   ] },
   // Satış: talep gelir → müşteri olur → teklif verilir → işler planlanır
   { grup: 'SATIŞ', ad: 'Satış', ogeler: [
     { k: 'talepler', ad: 'Talepler', href: '/leads', i: 'talep', sayac: 'talep', altlar: [
-      { ad: 'Yeni', href: '/leads?sekme=yeni' }, { ad: 'CRM’e alınan', href: '/leads?sekme=crm' },
-      { ad: 'Spam', href: '/leads?sekme=spam' }, { ad: 'Tümü', href: '/leads?sekme=hepsi' }] },
+      { ad: 'Yeni', href: '/leads?tab=new' }, { ad: 'CRM’e alınan', href: '/leads?tab=crm' },
+      { ad: 'Spam', href: '/leads?tab=spam' }, { ad: 'Tümü', href: '/leads?tab=all' }] },
     { k: 'crm', ad: 'Müşteriler (CRM)', href: '/crm', i: 'crm', altlar: [
       { ad: 'Satış panosu', href: '/crm' }, { ad: 'IDOS eşitleme', href: '/crm-sync' }, { ad: 'Çakışmalar', href: '/crm-conflicts' }] },
     { k: 'hesaplar', ad: 'Hesap envanteri', href: '/accounts', i: 'anahtar' },
     { k: 'teklif', ad: 'Teklifler', href: '/proposals', i: 'teklif', altlar: [
-      { ad: 'Taslaklar', href: '/proposals?sekme=taslak' }, { ad: 'Gönderilenler', href: '/proposals?sekme=gonderildi' },
-      { ad: 'Kabul edilenler', href: '/proposals?sekme=kabul' }] },
+      { ad: 'Taslaklar', href: '/proposals?tab=draft' }, { ad: 'Gönderilenler', href: '/proposals?tab=sent' },
+      { ad: 'Kabul edilenler', href: '/proposals?tab=accepted' }] },
     { k: 'gorev', ad: 'Görevler ve takvim', href: '/tasks', i: 'gorev' }
   ] },
   // Pazarlama ve iletişim: ziyaretçiyle ve abonelerle temas
@@ -62,10 +62,10 @@ const MENU = [
   // Web sitesi: sitede görünen her şey
   { grup: 'WEB SİTESİ', ad: 'Web sitesi', ogeler: [
     { k: 'site', ad: 'Site içeriği', href: '/site-content', i: 'icerik', altlar: [
-      { ad: 'Hizmetler', href: '/site-content?dosya=hizmetler' }, { ad: 'Paketler', href: '/site-content?dosya=paketler' },
-      { ad: 'Ürünler', href: '/site-content?dosya=urunler#urunler' }, { ad: 'Kategoriler', href: '/site-content?dosya=urunler#kategoriler' },
-      { ad: 'Referanslar', href: '/site-content?dosya=referanslar' }, { ad: 'Blog yazıları', href: '/site-content?dosya=yazilar' }, { ad: 'Menüler', href: '/site-content?dosya=site-menu' },
-      { ad: 'Sık sorulan sorular', href: '/site-content?dosya=sss' }, { ad: 'Yasal sayfalar', href: '/site-content?dosya=yasal' }] },
+      { ad: 'Hizmetler', href: '/site-content?file=services' }, { ad: 'Paketler', href: '/site-content?file=packages' },
+      { ad: 'Ürünler', href: '/site-content?file=products#products' }, { ad: 'Kategoriler', href: '/site-content?file=products#categories' },
+      { ad: 'Referanslar', href: '/site-content?file=references' }, { ad: 'Blog yazıları', href: '/site-content?file=posts' }, { ad: 'Menüler', href: '/site-content?file=site-menu' },
+      { ad: 'Sık sorulan sorular', href: '/site-content?file=faq' }, { ad: 'Yasal sayfalar', href: '/site-content?file=legal' }] },
     { k: 'icerikler', ad: 'Yazılar ve kaynaklar', href: '/articles', i: 'belge', sayac: 'yorum' },
     { k: 'tema', ad: 'Tema düzenleyici', href: '/theme', i: 'tema' },
     { k: 'haftalik-bulten', ad: 'Haftalık Bülten', href: '/weekly-newsletter', i: 'radar' },
@@ -83,7 +83,7 @@ const MENU = [
   // Üyelik: kimin neye erişebildiği
   { grup: 'ÜYELİK VE ERİŞİM', ad: 'Üyelik ve erişim', ogeler: [
     { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/members', i: 'uye', sayac: 'uye' },
-    { k: 'portal', ad: 'Müşteri alanı', href: '/client-portal', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/client-portal?sekme=erisim' }, { ad: 'Davetler', href: '/client-portal?sekme=davet' }] },
+    { k: 'portal', ad: 'Müşteri alanı', href: '/client-portal', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/client-portal?tab=access' }, { ad: 'Davetler', href: '/client-portal?tab=invites' }] },
     { k: 'destek', ad: 'Destek talepleri', href: '/support', i: 'destek', sayac: 'destek' }
   ] },
   { grup: 'FİNANS', ad: 'Finans', ogeler: [
@@ -355,17 +355,17 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
           <summary class="dugme ana">+ Yeni oluştur</summary>
           <div class="yeni-liste" role="menu" aria-label="Ne oluşturmak istiyorsunuz?">
             <b>Web sitesi</b>
-            <a role="menuitem" href="/site-content?dosya=yazilar&yeni=1"><strong>Blog yazısı</strong><span>Sitedeki blogda yayınlanır</span></a>
-            <a role="menuitem" href="/articles?yeni=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
-            <a role="menuitem" href="/site-content?dosya=paketler&yeni=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
-            <a role="menuitem" href="/site-content?dosya=hizmetler"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
-            <a role="menuitem" href="/weekly-newsletter?yeni=1"><strong>Haftalık Bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
-            <a role="menuitem" href="/banners?yeni=1"><strong>Banner, duyuru ya da açılır pencere</strong><span>Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu</span></a>
-            <a role="menuitem" href="/site-content?dosya=sss&yeni=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
+            <a role="menuitem" href="/site-content?file=posts&new=1"><strong>Blog yazısı</strong><span>Sitedeki blogda yayınlanır</span></a>
+            <a role="menuitem" href="/articles?new=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
+            <a role="menuitem" href="/site-content?file=packages&new=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
+            <a role="menuitem" href="/site-content?file=services"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
+            <a role="menuitem" href="/weekly-newsletter?new=1"><strong>Haftalık Bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
+            <a role="menuitem" href="/banners?new=1"><strong>Banner, duyuru ya da açılır pencere</strong><span>Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu</span></a>
+            <a role="menuitem" href="/site-content?file=faq&new=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
             <b>Satış ve iş</b>
-            <a role="menuitem" href="/crm?yeni=1"><strong>Müşteri</strong><span>CRM’e elle müşteri kaydı</span></a>
-            <a role="menuitem" href="/proposals?yeni=1"><strong>Teklif</strong><span>Kalemli, KDV’li teklif hazırlayın</span></a>
-            <a role="menuitem" href="/tasks?yeni=1"><strong>Görev</strong><span>Takvime görev ve hatırlatma</span></a>
+            <a role="menuitem" href="/crm?new=1"><strong>Müşteri</strong><span>CRM’e elle müşteri kaydı</span></a>
+            <a role="menuitem" href="/proposals?new=1"><strong>Teklif</strong><span>Kalemli, KDV’li teklif hazırlayın</span></a>
+            <a role="menuitem" href="/tasks?new=1"><strong>Görev</strong><span>Takvime görev ve hatırlatma</span></a>
           </div>
         </details>
         <a class="dugme ikincil" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
@@ -451,9 +451,9 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
       document.addEventListener('click', (o) => { if (m.open && !m.contains(o.target as Node)) m.open = false; });
       m.addEventListener('keydown', (o) => { if (o.key === 'Escape') { m.open = false; m.querySelector('summary')!.focus(); } });
       // Bazı sayfalar adres çubuğunu yeniden yazdığı için "yeni" isteği oturumda da tutulur
-      m.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => a.addEventListener('click', () => { try { if (a.search.includes('yeni=1')) sessionStorage.setItem('idx-yeni', a.pathname); } catch (e) {} }));
+      m.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => a.addEventListener('click', () => { try { if (a.search.includes('new=1')) sessionStorage.setItem('idx-yeni', a.pathname); } catch (e) {} }));
     }
-    let yeniIstek = new URLSearchParams(location.search).get('yeni') === '1';
+    let yeniIstek = new URLSearchParams(location.search).get('new') === '1';
     try { if (sessionStorage.getItem('idx-yeni') === location.pathname) { yeniIstek = true; } sessionStorage.removeItem('idx-yeni'); } catch (e) {}
     if (yeniIstek && !location.pathname.startsWith('/proposals')) {
       let deneme = 0;

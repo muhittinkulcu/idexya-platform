@@ -31,11 +31,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </section>
 </div>
 <section class="kart" aria-label="Teklifler" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><h2 style="margin: 0; font-size: 16px; color: var(--head)">Teklifler</h2><a class="dugme kucuk" data-teklif-yeni href="/proposals?yeni=1">+ Bu müşteriye teklif hazırla</a></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><h2 style="margin: 0; font-size: 16px; color: var(--head)">Teklifler</h2><a class="dugme kucuk" data-teklif-yeni href="/proposals?new=1">+ Bu müşteriye teklif hazırla</a></div>
 <ul data-teklifler style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ul>
 </section>
 <script>
-  import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata, prm } from '../../scripts/yonetim/ortak.js';
   const id = new URLSearchParams(location.search).get('id') || '';
   const ust = document.querySelector('[data-ust]'), bilgi = document.querySelector('[data-bilgi]'), gunluk = document.querySelector('[data-gunluk]');
   const TUR = [['not', 'Not'], ['gorusme', 'Görüşme'], ['eposta', 'E-posta'], ['gorev', 'Görev']];
@@ -61,7 +61,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       }
     }, a.ad)));
     const iletisim = [m.ad && m.firma ? m.ad : null, m.eposta, m.telefon, m.kaynak ? 'Kaynak: ' + (KAYNAK[m.kaynak] || (m.kaynak === 'elle' ? 'Elle eklendi' : m.kaynak)) : null, 'Değer: ' + para(m.deger)].filter(Boolean).join(' · ');
-    const yeniMi = new URLSearchParams(location.search).get('mevcut') === '1';
+    const yeniMi = prm('mevcut') === '1';
     ust.replaceChildren(
       yeniMi ? el('div', { class: 'uyari bilgi', role: 'status' }, 'Bu e-posta veya telefonla kayıtlı bir müşteri zaten vardı; yeni kart açılmadı, mevcut kart açıldı.') : '',
       el('div', { class: 'kart', style: 'padding: 16px; display: flex; flex-direction: column; gap: 10px' },
@@ -85,7 +85,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const tl = (n) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n) || 0) + ' TL';
   async function teklifleriYukle() {
     const kutu = document.querySelector('[data-teklifler]');
-    document.querySelector('[data-teklif-yeni]').href = '/proposals?yeni=1&musteri=' + encodeURIComponent(id);
+    document.querySelector('[data-teklif-yeni]').href = '/proposals?new=1&customer=' + encodeURIComponent(id);
     try {
       const r = await api('teklifler/musteri/' + encodeURIComponent(id));
       kutu.replaceChildren(...(r.teklifler.length ? r.teklifler.map((t) => el('li', { style: 'display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line)' },
@@ -126,7 +126,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try { r = await api('envanter/musteri/' + encodeURIComponent(id)); } catch (h) { kutu.hidden = true; return; }
     const bas = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
       el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, `Hesaplar ve erişimler (${r.kayitlar.length})`),
-      el('a', { href: '/accounts?musteri=' + encodeURIComponent(id), style: 'font-size: 13px' }, r.kayitlar.length ? 'Envanterde yönet' : '+ Hesap ekle'));
+      el('a', { href: '/accounts?customer=' + encodeURIComponent(id), style: 'font-size: 13px' }, r.kayitlar.length ? 'Envanterde yönet' : '+ Hesap ekle'));
     const CIP = { aktif: 'kazanildi', bekliyor: 'teklif', kaldirildi: 'kaybedildi' };
     kutu.replaceChildren(...[bas, r.kayitlar.length
       ? el('div', { style: 'display: flex; flex-wrap: wrap; gap: 8px' }, r.kayitlar.map((k) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid var(--line); border-radius: 10px; font-size: 13px' },

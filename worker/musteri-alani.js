@@ -69,7 +69,7 @@ export async function uyeMusteriApi(istek, env, yol) {
       if (y.ok) {
         const d = await db.prepare('SELECT no, baslik, toplam FROM teklifler WHERE id = ?').bind(t.id).first();
         await ekibeBildir(env, `Teklif ${m[2] === 'kabul' ? 'kabul edildi' : 'reddedildi'}: ${d.no}`, [['Teklif', `${d.no} · ${d.baslik}`], ['Toplam (KDV dâhil)', new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(d.toplam) + ' TL'], ['Karar veren', `${u.ad} (${u.eposta})`]],
-          { metin: 'Teklifi aç', yol: `/proposals?sekme=${m[2]}&id=${encodeURIComponent(t.id)}` });
+          { metin: 'Teklifi aç', yol: `/proposals?tab=${m[2] === 'kabul' ? 'accepted' : 'rejected'}&id=${encodeURIComponent(t.id)}` });
       }
       return y;
     }
@@ -100,7 +100,7 @@ export async function uyeMusteriApi(istek, env, yol) {
         db.prepare("INSERT INTO destek_mesajlari (id, talep_id, yazan, yazan_id, ad, metin, zaman) VALUES (?, ?, 'uye', ?, ?, ?, ?)").bind(kimlik(), id, u.id, u.ad, metin, z)
       ]);
       await islemYaz(db, 'üye: ' + u.eposta, 'destek_acildi', id, `${no} · ${konu}`);
-      await ekibeBildir(env, `Yeni destek talebi: ${konu}`, [['Talep', no], ['Üye', `${u.ad} (${u.eposta})`], ['Mesaj', metin.slice(0, 1500)]], { metin: 'Talebi aç', yol: `/support?t=${encodeURIComponent(id)}` }, u.eposta);
+      await ekibeBildir(env, `Yeni destek talebi: ${konu}`, [['Talep', no], ['Üye', `${u.ad} (${u.eposta})`], ['Mesaj', metin.slice(0, 1500)]], { metin: 'Talebi aç', yol: `/support?ticket=${encodeURIComponent(id)}` }, u.eposta);
       return json({ ok: true, id, no });
     }
     const m = yol.match(/^destek\/([\w-]+)(?:\/(mesaj|kapat))?$/);
@@ -121,7 +121,7 @@ export async function uyeMusteriApi(istek, env, yol) {
         db.prepare("INSERT INTO destek_mesajlari (id, talep_id, yazan, yazan_id, ad, metin, zaman) VALUES (?, ?, 'uye', ?, ?, ?, ?)").bind(kimlik(), talep.id, u.id, u.ad, metin, z),
         db.prepare("UPDATE destek_talepleri SET durum = 'acik', son_yazan = 'uye', guncelleme = ? WHERE id = ?").bind(z, talep.id)
       ]);
-      await ekibeBildir(env, `Destek talebine yeni mesaj: ${talep.konu}`, [['Talep', talep.no], ['Üye', `${u.ad} (${u.eposta})`], ['Mesaj', metin.slice(0, 1500)]], { metin: 'Talebi aç', yol: `/support?t=${encodeURIComponent(talep.id)}` }, u.eposta);
+      await ekibeBildir(env, `Destek talebine yeni mesaj: ${talep.konu}`, [['Talep', talep.no], ['Üye', `${u.ad} (${u.eposta})`], ['Mesaj', metin.slice(0, 1500)]], { metin: 'Talebi aç', yol: `/support?ticket=${encodeURIComponent(talep.id)}` }, u.eposta);
       return json({ ok: true });
     }
     if (m[2] === 'kapat' && yontem === 'POST') {

@@ -235,8 +235,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
   });
   yukle().then(() => {
     const q = new URLSearchParams(location.search);
-    if (q.get('yeni') === '1') document.querySelector('[data-yeni-sayi]').click();
-    else if (q.get('sayi')) sayiAc(q.get('sayi'));
+    if (q.get('new') === '1') document.querySelector('[data-yeni-sayi]').click();
+    else if (q.get('issue')) sayiAc(q.get('issue'));
   });
 </script>
 </Yonetim>

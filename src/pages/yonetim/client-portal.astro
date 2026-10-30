@@ -6,11 +6,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div data-mesaj></div>
 <div data-alan style="display: flex; flex-direction: column; gap: 14px"></div>
 <script>
-  import { api, el, tarih, once, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, once, genelHata, prm, adresMetni } from '../../scripts/yonetim/ortak.js';
   const $ = (s) => document.querySelector(s);
   const alan = $('[data-alan]'), sekmeKutu = $('[data-sekmeler]'), mesaj = $('[data-mesaj]');
   const SEKME = [['erisim', 'Erişimler'], ['davet', 'Davetler']];
-  let sekme = new URLSearchParams(location.search).get('sekme') === 'davet' ? 'davet' : 'erisim';
+  let sekme = prm('sekme') === 'davet' ? 'davet' : 'erisim';
   const bildir = (metin, tur = 'ok') => mesaj.replaceChildren(metin ? el('div', { class: 'uyari ' + tur, role: 'status' }, metin) : '');
   const secStil = 'min-height: 36px; min-width: 0; max-width: 100%; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px';
   const musteriSecenek = (liste, secili, bosMetin) => [el('option', { value: '' }, bosMetin), ...liste.map((m) => el('option', { value: m.id, selected: m.id === secili }, m.alt ? `${m.ad} · ${m.alt}` : m.ad))];
@@ -18,10 +18,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
   function sekmeCiz() {
     sekmeKutu.replaceChildren(...SEKME.map(([k, ad]) => {
       const s = k === sekme;
-      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { if (sekme === k) return; sekme = k; history.replaceState(null, '', '?sekme=' + k); bildir(''); yukle(); } }, ad);
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { if (sekme === k) return; sekme = k; history.replaceState(null, '', adresMetni({ sekme: k })); bildir(''); yukle(); } }, ad);
     }));
     // Menüdeki alt sayfa işareti sekmeyle birlikte değişir.
-    document.querySelectorAll('[data-alt-link]').forEach((a) => { if (a.getAttribute('href').startsWith('/client-portal')) { if (a.getAttribute('href') === '/client-portal?sekme=' + sekme) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); } });
+    document.querySelectorAll('[data-alt-link]').forEach((a) => { if (a.getAttribute('href').startsWith('/client-portal')) { if (a.getAttribute('href') === '/client-portal' + adresMetni({ sekme })) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); } });
   }
 
   // --- Erişimler ---
@@ -30,7 +30,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const katalog = Object.fromEntries(v.katalog.map((m) => [m.k, m]));
     const musAd = Object.fromEntries(v.musteriler.map((m) => [m.id, m.ad]));
     if (!v.uyeler.length) {
-      alan.replaceChildren(el('div', { class: 'kart bos' }, 'Onaylı üye yok. Üyelik talepleri ', el('a', { href: '/members' }, 'Üyeler ve yetkiler'), ' sayfasında onaylanır; müşterinizi davetle üye yapmak için ', el('a', { href: '/client-portal?sekme=davet' }, 'Davetler'), ' sekmesini kullanın.'));
+      alan.replaceChildren(el('div', { class: 'kart bos' }, 'Onaylı üye yok. Üyelik talepleri ', el('a', { href: '/members' }, 'Üyeler ve yetkiler'), ' sayfasında onaylanır; müşterinizi davetle üye yapmak için ', el('a', { href: '/client-portal?tab=invites' }, 'Davetler'), ' sekmesini kullanın.'));
       return;
     }
     const bagli = v.uyeler.filter((u) => u.musteri_id).length;
@@ -79,7 +79,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('span', { style: 'display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px' }, el('strong', { style: 'color: var(--head); font-size: 14px' }, md.ad, md.hazir ? '' : el('span', { style: 'margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--tx2)' }, 'Yakında')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, md.aciklama)), s);
     });
     const eposta = el('input', { type: 'email', name: 'eposta', required: true, autocomplete: 'off', maxlength: '160' });
-    const musteri = el('select', { name: 'musteri_id' }, musteriSecenek(musteriler, new URLSearchParams(location.search).get('musteri'), 'Müşteriye bağlama (isteğe bağlı)'));
+    const musteri = el('select', { name: 'musteri_id' }, musteriSecenek(musteriler, prm('musteri'), 'Müşteriye bağlama (isteğe bağlı)'));
     const sonuc = el('div', { hidden: true });
     const form = el('form', { class: 'kart', 'aria-label': 'Yeni davet', style: 'padding: 16px; display: flex; flex-direction: column; gap: 12px', onsubmit: async (o) => {
       o.preventDefault();
