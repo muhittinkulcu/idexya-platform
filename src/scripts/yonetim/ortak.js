@@ -91,9 +91,34 @@ export function kabuk() {
   const tr = $('[data-tarih]');
   if (tr) tr.textContent = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', weekday: 'long' }).format(new Date()) + ' ·';
 
-  // Aktif alt sayfayı işaretle
-  const burasi = location.pathname + location.search;
-  $$('[data-alt-link]').forEach((a) => { if (a.getAttribute('href') === burasi) a.setAttribute('aria-current', 'page'); });
+  // Aktif alt sayfayı işaretle ve sayfa yoluna alt sekmeyi ekle. Sekmeler adresi history.replaceState ile değiştirir;
+  // bu yüzden adres değişince ikisi yeniden hesaplanır.
+  const yolKutu = $('[data-yol]');
+  function konumGuncelle() {
+    const burasi = location.pathname + location.search, hashli = burasi + location.hash;
+    let secili = null;
+    $$('[data-alt-link]').forEach((a) => {
+      const h = a.getAttribute('href'), es = h === hashli || h === burasi;
+      if (es && !secili) { secili = a; a.setAttribute('aria-current', 'page'); } else a.removeAttribute('aria-current');
+    });
+    if (!yolKutu) return;
+    $$('[data-yol-alt]', yolKutu).forEach((e) => e.remove());
+    const son = $('[data-yol-son]', yolKutu), baslik = $('[data-baslik]', son), modulHref = yolKutu.dataset.modulHref;
+    const modulLi = $('[data-yol-modul]', yolKutu);
+    if (modulLi) modulLi.remove();
+    // Alt sekme yalnız bu sayfanın modülüne aitse ve modül adı başlıkla aynıysa eklenir (ör. Satış › Talepler › Yeni)
+    if (secili && modulHref && secili.getAttribute('href') !== modulHref && secili.pathname === location.pathname && baslik.textContent.trim() === yolKutu.dataset.modulAd) {
+      son.hidden = true;
+      son.before(el('li', { 'data-yol-modul': '' }, el('a', { href: modulHref, class: 'yol-modul' }, yolKutu.dataset.modulAd)));
+      son.after(el('li', { 'data-yol-alt': '' }, el('span', { class: 'yol-alt', 'aria-current': 'page' }, secili.dataset.ad || secili.textContent.trim())));
+    } else son.hidden = false;
+  }
+  konumGuncelle();
+  for (const ad of ['replaceState', 'pushState']) {
+    const asil = history[ad].bind(history);
+    history[ad] = (...a) => { const r = asil(...a); try { konumGuncelle(); } catch (e) {} return r; };
+  }
+  addEventListener('popstate', konumGuncelle); addEventListener('hashchange', konumGuncelle);
 
   function uygula() {
     yan.classList.toggle('dar', t.yanMod === 'dar');
