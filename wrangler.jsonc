@@ -19,9 +19,9 @@
   "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform" }],
   // E-posta bildirimleri (worker/eposta.js): Cloudflare Email Service. Gönderim için idexya.com, Cloudflare panelinde Email Sending'e eklenmelidir.
   "send_email": [{ "name": "EPOSTA", "allowed_sender_addresses": ["bildirim@idexya.com"] }],
-  // Günlük veritabanı yedeği (worker/yedek.js) için R2 bağlantısı. Otomatik oluşturma ilk denemede yayını durdurdu (26 Eki 2026);
-  // R2 Cloudflare panelinde etkinleştirilip "idexya-yedek" deposu açılınca aşağıdaki satır açılır:
-  // "r2_buckets": [{ "binding": "YEDEK", "bucket_name": "idexya-yedek" }],
+  // Günlük veritabanı yedeği (worker/yedek.js): her gün 07.00 UTC zamanlayıcısıyla yedek/<gün>.json.gz yazılır, 30 gün saklanır.
+  // "idexya-yedek" deposu Cloudflare panelinde (R2) ÖNCEDEN oluşturulmalıdır; depo yoksa canlı yayın başarısız olur.
+  "r2_buckets": [{ "binding": "YEDEK", "bucket_name": "idexya-yedek" }],
   // Yönetim paneli girişi: Cloudflare Access. Değerler Cloudflare panelinden "Variables" olarak girilir.
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
