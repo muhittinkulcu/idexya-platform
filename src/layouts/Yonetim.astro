@@ -239,6 +239,9 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 .kabuk .icerik-kilit,.kabuk .icerik-yorum-form,.kabuk .icerik-kart{background:rgb(var(--card));border-color:rgb(var(--line))}
 .kabuk .icerik-dugme.ikincil,.kabuk .icerik-yorum-form input:not([type=checkbox]),.kabuk .icerik-yorum-form textarea{border-color:rgb(var(--line))}
 .kabuk .icerik-yorumlar{border-top-color:rgb(var(--line))}
+/* Logo işareti: Idexya X'i tek kaynaktan (public/favicon.svg, sitedeki logoyla aynı yol); renk --brand ile maske üzerinden verilir. */
+.logo-x{display:block;flex:none;width:28px;height:28px;background:var(--brand);-webkit-mask:url(/favicon.svg) center/contain no-repeat;mask:url(/favicon.svg) center/contain no-repeat}
+@media (forced-colors:active){.logo-x{background:CanvasText}}
 /* Özelleştir çekmecesi */
 .perde{position:fixed;inset:0;background:rgba(10,14,20,.35);z-index:40}
 .cekmece{font-family:'Geist',system-ui,sans-serif;color:var(--tx);position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);z-index:41;background:rgb(var(--card));border-left:1px solid rgb(var(--line));box-shadow:-30px 0 60px -30px var(--shadow);display:flex;flex-direction:column}
@@ -282,7 +285,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 <aside class="yan sabit" id="yan" aria-label="Yan menü" data-cam="yuzey">
   <div class="logo">
     <a href="/dashboard" class="logo-baglanti" aria-label="Idexya | Website Yönetim · Genel bakış" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E9E5A" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>
+      <span class="logo-x" aria-hidden="true"></span>
       <b class="etiket urun-adi"><span class="urun-marka">Idexya</span><small class="urun-alt">Website Yönetim</small></b>
     </a>
     <span class="logo-arac masa">
