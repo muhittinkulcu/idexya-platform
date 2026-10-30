@@ -9,7 +9,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
   const durum = document.querySelector('[data-durum]'), liste = document.querySelector('[data-liste]');
   const kb = (n) => (n >= 1048576 ? (n / 1048576).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + ' MB' : Math.max(1, Math.round(n / 1024)).toLocaleString('tr-TR') + ' KB');
-  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left';
   async function yukle() {
     let r;
     try { r = await api('yedek'); genelHata(''); } catch (h) { genelHata('Yedek bilgisi alınamadı: ' + h.message); return; }

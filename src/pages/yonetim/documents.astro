@@ -4,12 +4,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Belgeler" aktif="belge" yol="Finans ve bağlantılar" aciklama="Sözleşme, teklif, fatura ve raporların listesi. Her belge türü, tarihi ve isteğe bağlı müşterisiyle kaydedilir; bağlantıya tıklayınca dosya bulunduğu yerde açılır.">
 <style is:global>
   .bl-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .bl-arac input,.bl-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .bl-arac input,.bl-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
   .bl-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .bl-form .genis{grid-column:1/-1}
   .bl-tablo{width:100%;min-width:880px;border-collapse:collapse;font-size:14px}
   .bl-tablo th{padding:10px 14px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
-  .bl-tablo td{padding:10px 14px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+  .bl-tablo td{padding:10px 14px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
 </style>
 <div class="uyari bilgi">Dosyalar bu panelde saklanmaz. Belge bulunduğu yerde (ör. Google Drive, OneDrive) kalır; burada yalnızca adı, türü, tarihi ve <b>https://</b> bağlantısı tutulur. Bağlantıyı silmek dosyayı silmez. Drive’da paylaşımı “bağlantıya sahip herkes” yerine yalnız ekibinize açık tutmanız önerilir. “Müşteri alanında paylaş” işaretlenen belge, o müşteriye bağlı üyelere görünür; bu durumda dosyayı Drive’da müşterinin e-postasıyla paylaşın.</div>
 <div class="bl-arac">

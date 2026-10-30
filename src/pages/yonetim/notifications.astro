@@ -14,7 +14,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   import { api, el, once, genelHata } from '../../scripts/yonetim/ortak.js';
   const RENK = { kritik: 'kaybedildi', uyari: 'teklif', normal: 'gorusme', bilgi: 'yeni' };
   const ETIKET = { kritik: 'Acil', uyari: 'Uyarı', normal: 'Bekliyor', bilgi: 'Bilgi' };
-  const ciz = (kutu, liste, bos) => kutu.replaceChildren(...(liste.length ? liste.map((b) => el('a', { href: b.href, style: 'display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; color: inherit; margin-bottom: 8px' },
+  const ciz = (kutu, liste, bos) => kutu.replaceChildren(...(liste.length ? liste.map((b) => el('a', { href: b.href, style: 'display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid rgb(var(--line)); border-radius: 12px; text-decoration: none; color: inherit; margin-bottom: 8px' },
     el('span', { class: 'cip ' + (RENK[b.onem] || ''), style: 'flex: none' }, ETIKET[b.onem] || 'Bilgi'),
     el('span', { style: 'flex: 1; display: flex; flex-direction: column; gap: 4px' }, el('b', {}, b.baslik), el('span', { style: 'color: var(--tx2); font-size: 14px' }, b.detay || '')),
     b.zaman ? el('small', { style: 'color: var(--tx2); white-space: nowrap' }, once(b.zaman)) : null)) : [el('div', { class: 'bos' }, bos)]));

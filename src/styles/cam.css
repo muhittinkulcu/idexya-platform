@@ -1,0 +1,75 @@
+/* Idexya cam teması -- ORTAK TANIM (Marketing, Creative, Panel). Kural ve kullanım: docs/tasarim/cam-temasi.md.
+   Çatıdan bağımsızdır: yalnız CSS değişkeni ve üç sınıf. Başka projeye bu dosya olduğu gibi kopyalanır; değişiklik önce
+   burada yapılır, sonra kopyalara taşınır (sürüm aşağıda).
+   Sürüm: 1 (30 Eki 2026).
+
+   Açma: <html class="cam"> (koyu tema için ayrıca .dark). Kapalıyken hiçbir kural etki etmez.
+   Yüzeyler:
+     [data-cam="yuzey"]  menü, üst çubuk, alt menü: belirgin cam (arkası bulanık görünür)
+     .cam-yogun / .kart  içerik kartı ve tablo: yoğun cam (okunurluk önce)
+   Erişilebilirlik: saydamlığı azalt / yüksek karşıtlık tercihinde ve backdrop-filter desteklenmiyorsa yüzeyler opak olur. */
+
+.cam {
+  --cam-zemin: 239 233 225;
+  --cam-leke-1: 30 158 90;   --cam-leke-1-a: .30;   /* Panel yeşili (Marketing kopyasında mavi) */
+  --cam-leke-2: 240 122 35;  --cam-leke-2-a: .26;   /* Idexya turuncusu */
+  --cam-leke-3: 13 148 136;  --cam-leke-3-a: .18;   /* AI yeşili */
+  --cam-yuzey: 255 255 255;  --cam-yuzey-a: .64;    /* menü ve üst çubuk (üçüncül yazı karşıtlığı için .64 altına inilmez) */
+  --cam-yogun-a: .84;                               /* kart ve tablo */
+  --cam-kenar: 255 255 255;  --cam-kenar-a: .70;
+  --cam-golge: 15 23 42;     --cam-golge-a: .10;
+  --cam-bulaniklik: 22px;
+  --cam-doygunluk: 1.4;
+}
+.cam.dark {
+  --cam-zemin: 11 14 20;
+  --cam-leke-1-a: .40; --cam-leke-2-a: .24; --cam-leke-3-a: .22;
+  --cam-yuzey: 30 36 48;     --cam-yuzey-a: .55;
+  --cam-yogun-a: .88;
+  --cam-kenar: 255 255 255;  --cam-kenar-a: .10;
+  --cam-golge: 0 0 0;        --cam-golge-a: .35;
+}
+
+/* Zemin: düz renk + üç yumuşak leke. Sabit (kaydırmada kıpırdamaz); yazı her zaman cam yüzeyin üstündedir. */
+.cam body {
+  background-color: rgb(var(--cam-zemin));
+  background-image:
+    radial-gradient(48vw 42vw at 8% 4%, rgb(var(--cam-leke-1) / var(--cam-leke-1-a)), transparent 70%),
+    radial-gradient(42vw 38vw at 96% 18%, rgb(var(--cam-leke-2) / var(--cam-leke-2-a)), transparent 70%),
+    radial-gradient(46vw 40vw at 60% 104%, rgb(var(--cam-leke-3) / var(--cam-leke-3-a)), transparent 70%);
+  background-attachment: fixed;
+}
+
+.cam [data-cam="yuzey"] {
+  background-color: rgb(var(--cam-yuzey) / var(--cam-yuzey-a));
+  -webkit-backdrop-filter: blur(var(--cam-bulaniklik)) saturate(var(--cam-doygunluk));
+  backdrop-filter: blur(var(--cam-bulaniklik)) saturate(var(--cam-doygunluk));
+  border-color: rgb(var(--cam-kenar) / var(--cam-kenar-a));
+}
+
+.cam .cam-yogun, .cam .kart {
+  background-color: rgb(var(--card) / var(--cam-yogun-a));
+  -webkit-backdrop-filter: blur(var(--cam-bulaniklik)) saturate(var(--cam-doygunluk));
+  backdrop-filter: blur(var(--cam-bulaniklik)) saturate(var(--cam-doygunluk));
+  border-color: rgb(var(--cam-kenar) / var(--cam-kenar-a));
+  box-shadow: inset 0 0 0 1px rgb(var(--cam-kenar) / calc(var(--cam-kenar-a) * .5)),
+              0 10px 30px -12px rgb(var(--cam-golge) / var(--cam-golge-a));
+}
+
+/* Okunurluk güvenceleri: cam yalnız süs; tercih ya da destek yoksa opak yüzeye düşer. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .cam { --cam-yuzey-a: .96; --cam-yogun-a: 1; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .cam { --cam-yuzey-a: 1; --cam-yogun-a: 1; --cam-bulaniklik: 0px; }
+  .cam [data-cam="yuzey"] { background-color: rgb(var(--panel)); }
+}
+@media (prefers-contrast: more) {
+  .cam { --cam-yuzey-a: 1; --cam-yogun-a: 1; --cam-bulaniklik: 0px; --cam-kenar-a: 1; }
+  .cam [data-cam="yuzey"] { background-color: rgb(var(--panel)); border-color: rgb(var(--line)); }
+  .cam .cam-yogun, .cam .kart { border-color: rgb(var(--line)); }
+}
+@media print {
+  .cam body { background: rgb(var(--card)); }
+  .cam [data-cam="yuzey"], .cam .cam-yogun, .cam .kart { backdrop-filter: none; -webkit-backdrop-filter: none; background-color: rgb(var(--card)); }
+}

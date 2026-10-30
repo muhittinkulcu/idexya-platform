@@ -19,7 +19,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .bk-halka{position:relative;width:168px;height:168px;flex:0 0 auto;margin:0 auto;display:block;text-decoration:none;color:inherit;border-radius:50%}
   .bk-halka svg{width:100%;height:100%;transform:rotate(-90deg)}
   .bk-halka circle{fill:none;stroke-width:10;stroke-linecap:round;transition:stroke-dasharray .6s ease,stroke-dashoffset .6s ease}
-  .bk-iz{stroke:var(--track,var(--line))}
+  .bk-iz{stroke:var(--track,rgb(var(--line)))}
   .bk-dolu{stroke:var(--brand);stroke-dasharray:0 400}
   .bk-gec{stroke:#E0A100;stroke-dasharray:0 400}
   .bk-temiz .bk-dolu{stroke:var(--ok)}
@@ -35,7 +35,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .bk-sayilar div:first-child{grid-column:1 / -1;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:10px}
   .bk-sayilar div:first-child dt{flex-basis:100%}
   .bk-sayilar div:first-child dd{font-size:26px}
-  .bk-sayilar div{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:12px;border:1px solid var(--line);min-width:0}
+  .bk-sayilar div{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:12px;border:1px solid rgb(var(--line));min-width:0}
   .bk-sayilar dt{font-size:12px;color:var(--tx2)}
   .bk-sayilar dd{margin:0;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:700;color:var(--head);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .bk-sayilar small{font-size:11px;color:var(--tx2)}
@@ -44,29 +44,29 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hn-satir{display:grid;grid-template-columns:minmax(110px,150px) minmax(0,1fr) 64px;align-items:center;gap:14px}
   .hn-ad{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--tx)}
   .hn-ad i{width:10px;height:10px;border-radius:3px;flex:none;background:var(--brand);opacity:var(--o)}
-  .hn-iz{height:10px;border-radius:999px;background:var(--track,var(--line));overflow:hidden}
+  .hn-iz{height:10px;border-radius:999px;background:var(--track,rgb(var(--line)));overflow:hidden}
   .hn-iz span{display:block;height:100%;border-radius:999px;background:var(--brand);opacity:var(--o);transition:width .6s ease}
   .hn-kaz .hn-ad i,.hn-kaz .hn-iz span{background:var(--ok);opacity:1}
   .hn-kay .hn-ad i,.hn-kay .hn-iz span{background:var(--tx2);opacity:.55}
-  .hn-kaz{margin-top:6px;padding-top:12px;border-top:1px dashed var(--line)}
+  .hn-kaz{margin-top:6px;padding-top:12px;border-top:1px dashed rgb(var(--line))}
   .hn-sayi{display:flex;align-items:baseline;justify-content:flex-end;gap:6px}
   .hn-sayi b{font-size:16px;color:var(--head)}.hn-sayi small{font-size:11px;color:var(--tx2)}
   .hn-bos{font-size:13px;color:var(--tx2);padding-top:4px}
   @media (prefers-reduced-motion:reduce){.bk-halka circle,.hn-iz span{transition:none}}
   .modul-arac{display:flex;gap:6px}
-  .modul-arac button{min-width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--head);cursor:pointer;font:inherit;font-size:12px}
-  .kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
+  .modul-arac button{min-width:36px;height:36px;border-radius:10px;border:1px solid rgb(var(--line));background:rgb(var(--card));color:var(--head);cursor:pointer;font:inherit;font-size:12px}
+  .kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid rgb(var(--line));padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
   .kpi:hover{border-color:var(--btnline);color:inherit}
   .kpi b{font-family:'Bricolage Grotesque',sans-serif;font-size:28px;font-weight:800;letter-spacing:-.03em;color:var(--head);line-height:1.15}
   .kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
   .degisim{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
   .degisim .ok-u,.degisim-tablo .ok-u{color:var(--ok);font-weight:700}.degisim .ok-a,.degisim-tablo .ok-a{color:var(--err);font-weight:700}
   .kivilcim{display:block;width:100%;height:34px;margin-top:4px}
-  .uyari-serit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:var(--warnb);color:var(--tx);border:1px solid var(--line)}
+  .uyari-serit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:var(--warnb);color:var(--tx);border:1px solid rgb(var(--line))}
   .uyari-serit .simge{width:26px;height:26px;border-radius:8px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:var(--warn);color:#FFFFFF;font-weight:800}
   .segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg)}
   .segment-kucuk button{height:30px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
-  .segment-kucuk button[aria-pressed=true]{background:var(--card);color:var(--head);box-shadow:0 1px 3px var(--shadow)}
+  .segment-kucuk button[aria-pressed=true]{background:rgb(var(--card));color:var(--head);box-shadow:0 1px 3px var(--shadow)}
   .lejant{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--tx)}
   .lejant span{display:inline-flex;align-items:center;gap:6px}
   .lejant i{width:10px;height:10px;border-radius:3px;display:inline-block}
@@ -95,13 +95,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .yatay-iz{height:12px;border-radius:0 4px 4px 0;background:var(--track);overflow:hidden}
   .yatay-iz div{height:100%;border-radius:0 4px 4px 0}
   .yatay-sat b{color:var(--head);font-variant-numeric:tabular-nums}
-  .tablo-sar{overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid var(--line);border-radius:14px}
+  .tablo-sar{overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid rgb(var(--line));border-radius:14px}
   .tablo-sar table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
-  .tablo-sar th,.tablo-sar td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+  .tablo-sar th,.tablo-sar td{padding:7px 10px;text-align:right;border-bottom:1px solid rgb(var(--line));white-space:nowrap}
   .tablo-sar th:first-child,.tablo-sar td:first-child{text-align:left}
   .tablo-sar thead th{position:sticky;top:0;background:var(--card2);color:var(--tx2);font-weight:600}
   .ipucu{position:fixed;z-index:50;pointer-events:none;background:var(--head);color:var(--bg);padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.45;white-space:pre-line;box-shadow:0 10px 30px -12px var(--shadow);max-width:240px}
-  .bekleyen-kutu{flex:1;min-height:120px;border:2px dashed var(--line);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;color:var(--tx2)}
+  .bekleyen-kutu{flex:1;min-height:120px;border:2px dashed rgb(var(--line));border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;color:var(--tx2)}
   @media (max-width:900px){.pano{grid-template-columns:minmax(0,1fr)}.pano>.modul,.pano>.modul.tam{grid-column:auto}}
   @media (max-width:600px){.isi{grid-template-columns:30px repeat(24,minmax(0,1fr));gap:1px}.cubuk-alan,.x-eksen{margin-left:28px}}
 </style>
@@ -205,7 +205,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 </div>
 
-<div data-gizliler hidden style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 16px; border-radius: 18px; border: 1px dashed var(--line)"></div>
+<div data-gizliler hidden style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 16px; border-radius: 18px; border: 1px dashed rgb(var(--line))"></div>
 <div class="ipucu" data-ipucu hidden></div>
 
 <script>
@@ -339,7 +339,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
     const har = $('[data-hareket]');
     if (!o.sonKayitlar.length) har.append(el('div', { class: 'bos' }, 'Henüz hareket yok. Siteden gelen ilk talep CRM’e alındığında burada görünür.'));
-    o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/customer?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid var(--line); text-decoration: none; color: inherit' },
+    o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/customer?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid rgb(var(--line)); text-decoration: none; color: inherit' },
       el('span', { style: 'width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; background: ' + (k.tur === 'talep' ? '#F07A23' : k.tur === 'sistem' ? 'var(--ok)' : 'var(--info)') }),
       el('span', { style: 'flex: 1; display: flex; flex-direction: column; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, k.firma || k.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, k.baslik + ' · ' + k.kim)),
       el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(k.zaman)))));

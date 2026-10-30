@@ -6,7 +6,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <section class="kart" aria-label="Çekim geçmişi" data-liste style="overflow-x: auto"></section>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
-  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
   async function yukle() {
     try {
       const r = await api('entegrasyonlar');

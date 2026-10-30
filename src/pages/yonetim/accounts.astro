@@ -4,14 +4,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Hesap envanteri" aktif="hesaplar" yol="Satış" aciklama="Her müşterinin reklam, ölçüm ve satış hesapları; bu hesaplara kimin, hangi düzeyde ve ne zamandan beri eriştiği. Aynı hesap kimliği iki müşteriye yazılamaz.">
 <style is:global>
   .hs-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .hs-arac input,.hs-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .hs-arac input,.hs-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
   .hs-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .hs-form .genis{grid-column:1/-1}
   .hs-grup{display:flex;flex-direction:column}
-  .hs-grup-bas{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .hs-grup-bas{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgb(var(--line));flex-wrap:wrap}
   .hs-tablo{width:100%;min-width:860px;border-collapse:collapse;font-size:14px}
   .hs-tablo th{padding:8px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
-  .hs-tablo td{padding:10px 16px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+  .hs-tablo td{padding:10px 16px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
   .hs-kimlik{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
   .hs-uyari{display:flex;flex-direction:column;gap:6px}
   .hs-uyari li{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--card2)}

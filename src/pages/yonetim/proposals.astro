@@ -28,7 +28,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <label class="alan" style="flex: 2 1 280px">Notlar (teklifte görünür)<textarea name="notlar" rows="4" maxlength="4000" placeholder="Ödeme koşulları, teslim süresi, kapsam dışı işler…" style="resize: vertical"></textarea></label>
-<dl data-toplamlar style="flex: 1 1 240px; margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid var(--line); font-variant-numeric: tabular-nums"></dl>
+<dl data-toplamlar style="flex: 1 1 240px; margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid rgb(var(--line)); font-variant-numeric: tabular-nums"></dl>
 </div>
 <p style="margin: 0; font-size: 12px; color: var(--tx2)">Ekrandaki toplamlar önizlemedir; kaydederken tutarlar sunucuda kuruşa yuvarlanarak yeniden hesaplanır.</p>
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
@@ -59,7 +59,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const sayiYaz = (n) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(Number(n) || 0);
   const gun = (s) => (s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.split('-').reverse().join('.') : '—');
   const musteriAdi = (m) => (m ? m.firma || m.ad || m.eposta || 'Adsız müşteri' : '—');
-  const hucre = 'padding: 10px 14px; border-top: 1px solid var(--line); text-align: left; vertical-align: top';
+  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
   const yerelGun = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   let sekme = SEKMELER.some((s) => s[0] === prm('sekme')) ? prm('sekme') : 'taslak';
@@ -73,7 +73,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   function ciz() {
     sekmeKutu.replaceChildren(...SEKMELER.map(([k, ad]) => {
       const s = k === sekme, n = k === 'hepsi' ? tum.length : tum.filter((x) => x.durum === k).length;
-      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; adresYaz(); ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; adresYaz(); ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
     }));
     const gor = tum.filter((x) => sekme === 'hepsi' || x.durum === sekme);
     if (!gor.length) {
@@ -127,7 +127,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         odendi ? (gelir.odeme_tarihi ? gun(gelir.odeme_tarihi) : '') : gelir.vade ? 'vade ' + gun(gelir.vade) : 'vade yok');
     }
     const ileri = new Date(Date.now() + 3 * 3600000 + 30 * 86400000).toISOString().slice(0, 10);
-    const vade = el('input', { type: 'date', value: ileri, 'aria-label': 'Vade tarihi', style: 'min-height: 38px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit' });
+    const vade = el('input', { type: 'date', value: ileri, 'aria-label': 'Vade tarihi', style: 'min-height: 38px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit' });
     return el('span', { style: 'display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap' }, vade,
       el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
         if (!confirm(`${t.no} için muhasebeye ${tutar(t.toplam)} tutarında, ${vade.value ? 'vadesi ' + gun(vade.value) : 'vadesiz'} bekleyen gelir kaydı eklensin mi?`)) return;
@@ -153,7 +153,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const bilgi = [['Oluşturma', tarih(t.olusturma)], ['Geçerlilik', gun(t.gecerlilik)], t.gonderim_zamani ? ['Gönderildi', tarih(t.gonderim_zamani)] : null,
       t.karar_zamani ? [t.durum === 'kabul' ? 'Kabul' : 'Ret', tarih(t.karar_zamani)] : null, ['Hazırlayan', t.olusturan]].filter(Boolean);
     const th = (b, sag) => el('th', { scope: 'col', style: `padding: 8px 10px; font-size: 12px; color: var(--tx2); text-align: ${sag ? 'right' : 'left'}` }, b);
-    const td = (c, sag) => el('td', { style: `padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: top; ${sag ? 'text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' : 'overflow-wrap: anywhere'}` }, c);
+    const td = (c, sag) => el('td', { style: `padding: 8px 10px; border-top: 1px solid rgb(var(--line)); vertical-align: top; ${sag ? 'text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' : 'overflow-wrap: anywhere'}` }, c);
     detay.replaceChildren(
       mesaj ? el('div', { class: 'uyari ok', role: 'status' }, mesaj) : '',
       el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: flex-start' },
@@ -163,7 +163,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
           el('span', { style: 'font-size: 14px' }, 'Müşteri: ', m ? el('a', { href: '/customer?id=' + encodeURIComponent(m.id) }, musteriAdi(m)) : 'CRM’de bulunamadı')),
         el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { seciliId = ''; adresYaz(); detay.hidden = true; ciz(); } }, 'Kapat')),
       el('dl', { style: 'margin: 0; display: flex; gap: 6px 20px; flex-wrap: wrap; font-size: 13px' }, ...bilgi.map(([a, b]) => el('div', { style: 'display: flex; gap: 6px' }, el('dt', { style: 'color: var(--tx2)' }, a + ':'), el('dd', { style: 'margin: 0' }, b)))),
-      el('div', { style: 'overflow-x: auto; border: 1px solid var(--line); border-radius: 14px' }, el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 13px' },
+      el('div', { style: 'overflow-x: auto; border: 1px solid rgb(var(--line)); border-radius: 14px' }, el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 13px' },
         el('thead', {}, el('tr', {}, th('Kalem'), th('Adet', true), th('Birim fiyat', true), th('Tutar', true))),
         el('tbody', {}, ...t.kalemler.map((k) => el('tr', {}, td([el('strong', {}, k.ad), k.aciklama ? el('div', { style: 'font-size: 13px; color: var(--tx2); white-space: pre-wrap' }, k.aciklama) : '']), td(sayiYaz(k.adet), true), td(tutar(k.birim_fiyat), true), td(tutar(k.tutar), true)))))),
       el('div', { style: 'display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start' },
@@ -177,7 +177,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   function toplamListesi(t, ek) {
     const sat = (a, b, guclu) => [el('dt', { style: guclu ? 'font-weight: 700; color: var(--head)' : 'color: var(--tx2)' }, a), el('dd', { style: 'margin: 0; text-align: right; white-space: nowrap' + (guclu ? '; font-weight: 700; color: var(--head)' : '') }, b)];
-    const d = el('dl', { style: 'margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid var(--line); font-variant-numeric: tabular-nums' + (ek ? '; flex: ' + ek.flex : '') },
+    const d = el('dl', { style: 'margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid rgb(var(--line)); font-variant-numeric: tabular-nums' + (ek ? '; flex: ' + ek.flex : '') },
       ...sat('Ara toplam', tutar(t.ara_toplam)), ...(Number(t.indirim) > 0 ? sat('İndirim', '−' + tutar(t.indirim)) : []),
       ...sat(`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)), ...sat('Genel toplam', tutar(t.toplam), true));
     return d;
@@ -195,7 +195,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   function kalemSatiri(k = {}) {
     const g = (ad, tip, deger, ek) => el('input', { name: ad, type: tip, value: deger ?? '', ...ek });
-    const li = el('li', { style: 'border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 10px' },
+    const li = el('li', { style: 'border: 1px solid rgb(var(--line)); border-radius: 14px; padding: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 10px' },
       el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end' },
         el('label', { class: 'alan', style: 'flex: 3 1 220px; min-width: 0' }, 'Hizmet / ürün', g('ad', 'text', k.ad, { maxlength: '200', required: true, placeholder: 'Ör. Aylık sosyal medya yönetimi' })),
         el('label', { class: 'alan', style: 'flex: 1 1 90px; min-width: 0' }, 'Adet', g('adet', 'number', k.adet ?? 1, { min: '0.01', step: '0.01', inputmode: 'decimal' })),

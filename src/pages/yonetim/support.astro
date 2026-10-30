@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Destek talepleri" aktif="destek" yol="Üyelik ve erişim" aciklama="Müşteri alanındaki üyelerin açtığı talepler. Uygulama e-posta göndermez; yanıtınız üyenin “Destek talepleri” sayfasında görünür.">
 <div class="ds-izgara">
 <section class="kart" aria-label="Talepler" style="display: flex; flex-direction: column; min-width: 0">
-<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 10px; border-bottom: 1px solid var(--line); flex-wrap: wrap"></div>
+<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 10px; border-bottom: 1px solid rgb(var(--line)); flex-wrap: wrap"></div>
 <div data-liste style="display: flex; flex-direction: column"></div>
 </section>
 <section class="kart" data-detay aria-live="polite" style="padding: 20px; display: flex; flex-direction: column; gap: 14px; min-width: 0">
@@ -37,7 +37,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try {
       const s = await api('destek/' + encodeURIComponent(id)); genelHata('');
       const t = s.talep, uye = s.uye || {};
-      const metin = el('textarea', { rows: '5', maxlength: '4000', required: true, placeholder: 'Yanıtınız üyeye görünür.', style: 'width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit; resize: vertical' });
+      const metin = el('textarea', { rows: '5', maxlength: '4000', required: true, placeholder: 'Yanıtınız üyeye görünür.', style: 'width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit; resize: vertical' });
       const gonder = async (kapat, d) => {
         if (!metin.value.trim()) { metin.focus(); return; }
         d.disabled = true;
@@ -79,10 +79,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <style is:global>
 .ds-izgara{display:grid;grid-template-columns:minmax(280px,380px) minmax(0,1fr);gap:16px;align-items:start}
 @media (max-width:900px){.ds-izgara{grid-template-columns:1fr}}
-.ds-satir{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--tx);font:inherit;cursor:pointer}
+.ds-satir{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid rgb(var(--line));background:transparent;color:var(--tx);font:inherit;cursor:pointer}
 .ds-satir:hover{background:var(--card2)}
 .ds-satir.secili{background:var(--tint)}
-.ds-mesaj{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card2);max-width:92%}
+.ds-mesaj{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid rgb(var(--line));background:var(--card2);max-width:92%}
 .ds-mesaj.ekip{align-self:flex-end;background:var(--tint);border-color:transparent}
 </style>
 </Yonetim>

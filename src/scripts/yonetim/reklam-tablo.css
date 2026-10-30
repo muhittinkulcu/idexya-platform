@@ -1,29 +1,29 @@
 /* Reklam performansı ayrıntı tablosu (src/scripts/yonetim/reklam-tablo.js) */
 .rt{display:flex;flex-direction:column;gap:10px;min-width:0}
-.rt-sekmeler{display:flex;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.rt-sekmeler{display:flex;gap:4px;border-bottom:1px solid rgb(var(--line));overflow-x:auto}
 .rt-sekmeler button{position:relative;height:40px;padding:0 14px;border:0;background:transparent;color:var(--tx2);font:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap}
 .rt-sekmeler button[aria-selected=true]{color:var(--head)}
 .rt-sekmeler button[aria-selected=true]::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--brand)}
 .rt-arac{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.rt-ara{flex:1 1 220px;max-width:340px;min-height:36px;padding:6px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px}
+.rt-ara{flex:1 1 220px;max-width:340px;min-height:36px;padding:6px 12px;border:1px solid rgb(var(--line));border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px}
 .rt-bosluk{flex:1 1 auto}
-.rt-sar{overflow:auto;max-height:520px;border:1px solid var(--line);border-radius:14px}
+.rt-sar{overflow:auto;max-height:520px;border:1px solid rgb(var(--line));border-radius:14px}
 .rt-tablo{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;font-variant-numeric:tabular-nums}
-.rt-tablo th,.rt-tablo td{padding:8px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+.rt-tablo th,.rt-tablo td{padding:8px 10px;text-align:right;border-bottom:1px solid rgb(var(--line));white-space:nowrap;vertical-align:middle}
 .rt-tablo .sol{text-align:left}
 .rt-tablo thead th{position:sticky;top:0;z-index:2;background:var(--card2);padding:0}
 .rt-tablo thead th button{width:100%;padding:9px 10px;border:0;background:transparent;color:var(--tx2);font:inherit;font-size:12px;font-weight:700;text-align:inherit;cursor:pointer;white-space:nowrap}
 .rt-tablo thead th[aria-sort] button{color:var(--head)}
-.rt-tablo tbody tr:hover td{background-color:color-mix(in srgb,var(--card2) 70%,var(--card))}
-.rt-tablo tfoot td{position:sticky;bottom:0;background:var(--card2);font-weight:700;color:var(--head);border-bottom:0;border-top:1px solid var(--line)}
-.rt-tablo td:first-child,.rt-tablo th:first-child{position:sticky;left:0;z-index:1;background:var(--card)}
+.rt-tablo tbody tr:hover td{background-color:color-mix(in srgb,var(--card2) 70%,rgb(var(--card)))}
+.rt-tablo tfoot td{position:sticky;bottom:0;background:var(--card2);font-weight:700;color:var(--head);border-bottom:0;border-top:1px solid rgb(var(--line))}
+.rt-tablo td:first-child,.rt-tablo th:first-child{position:sticky;left:0;z-index:1;background:rgb(var(--card))}
 .rt-tablo thead th:first-child{z-index:3;background:var(--card2)}.rt-tablo tfoot td:first-child{z-index:3;background:var(--card2)}
 .rt-hesap{display:flex;flex-direction:column;gap:2px;min-width:180px}
 .rt-hesap-ad{font-weight:600;color:var(--head)}
 .rt-kimlik{display:inline-flex;align-items:center;gap:4px;color:var(--tx2);font-size:12px}
 .rt-kimlik code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
 .rt-mini{min-height:24px;padding:0 6px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--tx2);font:inherit;font-size:12px;cursor:pointer}
-.rt-mini:hover{border-color:var(--line);color:var(--head);background:var(--card2)}
+.rt-mini:hover{border-color:rgb(var(--line));color:var(--head);background:var(--card2)}
 .rt-ad-giris{min-height:32px;padding:4px 8px;border:1px solid var(--brand);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;width:100%}
 .rt-bag{padding:0;border:0;background:transparent;color:var(--acc);font:inherit;font-weight:600;cursor:pointer;text-align:left}
 .rt-bag:hover{text-decoration:underline}
@@ -39,16 +39,16 @@
 .kb-kalin{font-weight:800!important;color:var(--head)!important}
 tr.kb-yesil td,tr.kb-kirmizi td,tr.kb-sari td,tr.kb-mavi td{background-color:inherit!important;color:inherit!important}
 tr.kb-yesil td{background-color:var(--okb)!important}tr.kb-kirmizi td{background-color:var(--errb)!important}tr.kb-sari td{background-color:var(--warnb)!important}tr.kb-mavi td{background-color:var(--infob)!important}
-.rt-panel{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--card2)}
+.rt-panel{display:flex;flex-direction:column;gap:12px;padding:14px;border:1px solid rgb(var(--line));border-radius:14px;background:var(--card2)}
 .rt-panel-ust,.rt-hazir,.rt-panel-alt{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
 .rt-anahtar{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--head);cursor:pointer}
 .rt-kurallar{display:flex;flex-direction:column;gap:6px}
-.rt-kural{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);font-size:13px}
+.rt-kural{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:8px 10px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));font-size:13px}
 .rt-kural.kapali{opacity:.55}
-.rt-kural select,.rt-kural .rt-sayi{min-height:32px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px}
+.rt-kural select,.rt-kural .rt-sayi{min-height:32px;padding:4px 8px;border:1px solid rgb(var(--line));border-radius:8px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px}
 .rt-kural .rt-sayi{width:96px}
 .rt-stiller{display:inline-flex;gap:4px}
-.rt-stil{width:30px;height:28px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--tx);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.rt-stil{width:30px;height:28px;border:1px solid rgb(var(--line));border-radius:7px;background:rgb(var(--card));color:var(--tx);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
 .rt-stil[aria-pressed=true]{outline:2px solid var(--brand);outline-offset:1px}
 .rt-cip{min-height:30px;padding:0 10px;border:1px dashed var(--btnline);border-radius:999px;background:transparent;color:var(--acc);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
 .rt-cip:hover{background:var(--tint)}

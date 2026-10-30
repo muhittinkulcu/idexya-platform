@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Medya kütüphanesi" aktif="medya" yol="İçerik" aciklama="İçeriklerde kullanacağınız görseller. Görseller yüklenmeden önce tarayıcıda küçültülür (en fazla 1280 piksel) ve sitenin kendi adresinden sunulur. Adresi kopyalayıp içerik metnine ekleyebilirsiniz.">
 <div class="kart" style="padding: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
 <label class="dugme ana" style="cursor: pointer">Görsel yükle<input type="file" accept="image/jpeg,image/png,image/webp" multiple data-dosya style="position: absolute; width: 1px; height: 1px; opacity: 0"></label>
-<input type="search" data-ara placeholder="Ada göre ara" aria-label="Görsel ara" style="flex: 1 1 200px; min-height: 40px; padding: 0 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--card); color: var(--tx); font: inherit">
+<input type="search" data-ara placeholder="Ada göre ara" aria-label="Görsel ara" style="flex: 1 1 200px; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit">
 <span data-durum role="status" style="font-size: 14px; color: var(--tx2)"></span>
 </div>
 <section class="kart" aria-label="Görseller" data-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px"></section>
@@ -38,8 +38,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const g = tum.filter((m) => !q || (m.ad + ' ' + (m.alt || '')).toLocaleLowerCase('tr-TR').includes(q));
     liste.replaceChildren(...(g.length ? g.map((m) => {
       const adres = `${location.origin}/api/medya/${m.id}`;
-      const alt = el('input', { value: m.alt || '', maxlength: 200, placeholder: 'Alternatif metin', 'aria-label': 'Alternatif metin', style: 'min-height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--tx); font: inherit; font-size: 13px' });
-      return el('article', { style: 'display: flex; flex-direction: column; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 10px' },
+      const alt = el('input', { value: m.alt || '', maxlength: 200, placeholder: 'Alternatif metin', 'aria-label': 'Alternatif metin', style: 'min-height: 34px; padding: 0 8px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 13px' });
+      return el('article', { style: 'display: flex; flex-direction: column; gap: 6px; border: 1px solid rgb(var(--line)); border-radius: 12px; padding: 10px' },
         el('img', { src: `/api/medya/${m.id}`, alt: m.alt || '', loading: 'lazy', style: 'width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 8px; background: var(--card2)' }),
         el('b', { style: 'font-size: 14px; overflow-wrap: anywhere' }, m.ad),
         el('small', { style: 'color: var(--tx2)' }, `${m.genislik}×${m.yukseklik} · ${Math.round(m.boyut / 1024)} KB · ${tarih(m.olusturma, false)}`),

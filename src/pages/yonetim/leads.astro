@@ -2,7 +2,7 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Talepler" aktif="talepler" aciklama="Siteden gelen her talep önce burada ayıklanır. Gerçek talep tek tıkla CRM'e geçer; aynı e-posta veya telefonla kayıtlı müşteri varsa yeni kart açılmaz, mevcut karta eklenir.">
-<div role="tablist" aria-label="Talep durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid var(--line); align-self: flex-start; flex-wrap: wrap"></div>
+<div role="tablist" aria-label="Talep durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line)); align-self: flex-start; flex-wrap: wrap"></div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="Talep listesi" class="kart" data-liste style="flex: 2 1 380px; overflow: hidden"></section>
 <section aria-label="Talep ayrıntısı" class="kart" data-ayrinti style="flex: 3 1 460px; padding: 18px; display: flex; flex-direction: column; gap: 14px"></section>
@@ -17,14 +17,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
     sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
       const n = k === 'hepsi' ? tum.length : tum.filter((t) => t.durum === k).length;
       const s = k === sekme;
-      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: var(--card); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; try { history.replaceState(null, '', adresMetni({ sekme: k })); } catch (e) {} secili = null; sabit = null; mesaj = null; ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; try { history.replaceState(null, '', adresMetni({ sekme: k })); } catch (e) {} secili = null; sabit = null; mesaj = null; ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
     }));
     const gor = tum.filter((t) => sekme === 'hepsi' || t.durum === sekme);
     // İşlem yapılan talep, sekmeden çıksa da sonucu görülsün diye ayrıntıda kalır.
     if (!(sabit && secili === sabit) && (!secili || !gor.some((t) => t.id === secili))) secili = gor[0] ? gor[0].id : null;
     liste.replaceChildren(...(gor.length ? gor.map((t) => el('button', {
       type: 'button', 'aria-pressed': String(t.id === secili), onclick: () => { secili = t.id; sabit = null; mesaj = null; ciz(); },
-      style: `width: 100%; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${t.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer`
+      style: `width: 100%; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border: 0; border-top: 1px solid rgb(var(--line)); background: ${t.id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer`
     }, el('span', { style: 'flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px' },
       el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('strong', { style: 'color: var(--head)' }, t.ad || '—'), el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(t.olusturma))),
       el('span', { style: 'font-size: 12px; color: var(--tx2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap' }, [KAYNAK[t.kaynak] || t.kaynak, t.firma, t.konu].filter(Boolean).join(' · ')),
@@ -67,7 +67,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('span', { class: 'cip ' + t.durum, style: 'align-self: flex-start' }, TALEP_DURUM[t.durum] || t.durum)),
       el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; font-size: 13px' },
         alanlar.map(([ad, d]) => el('div', { style: 'padding: 10px 12px; border-radius: 10px; background: var(--card2); display: flex; flex-direction: column; min-width: 0' }, el('span', { style: 'font-size: 11px; color: var(--tx2)' }, ad), el('span', { style: 'font-weight: 600; overflow-wrap: anywhere' }, d)))),
-      el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere' }, t.mesaj || ek.not || 'Mesaj yazılmamış.'),
+      el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid rgb(var(--line)); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere' }, t.mesaj || ek.not || 'Mesaj yazılmamış.'),
       el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, dugmeler),
       durumYaz
     );

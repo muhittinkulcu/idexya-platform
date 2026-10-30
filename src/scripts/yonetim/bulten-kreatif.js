@@ -108,7 +108,7 @@ const STIL = `
 .kr-anlam{padding:30px 34px;border-radius:28px;background:#FDE9DB;color:#002559}.kr-anlam b{color:#A9420A}.kr-anlam p{color:#002559!important}
 .kr-url{margin:0;font-size:46px;font-weight:700;color:#FFB58A;word-break:break-all}
 .kr-kutu{padding:34px;border-radius:28px;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.16)}.kr-kutu b{font-size:36px}.kr-kutu p{margin:10px 0 0;font-size:30px;line-height:1.45;color:#C6D2E3}
-.ks .segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--track,var(--card2))}.ks .segment-kucuk button{height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.ks .segment-kucuk button[aria-pressed=true]{background:var(--card);color:var(--head);box-shadow:0 1px 3px var(--shadow)}
+.ks .segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--track,var(--card2))}.ks .segment-kucuk button{height:32px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:600;cursor:pointer}.ks .segment-kucuk button[aria-pressed=true]{background:rgb(var(--card));color:var(--head);box-shadow:0 1px 3px var(--shadow)}
 .ks{display:flex;flex-direction:column;gap:16px}
 .ks-arac{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .ks-izgara{display:flex;flex-wrap:wrap;gap:14px}
@@ -117,7 +117,7 @@ const STIL = `
 .ks-onizleme>.kr{position:absolute;left:0;top:0;transform-origin:0 0}
 .ks-secim{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto;padding:4px}
 .ks-secim label{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:500}
-.ks-metin{width:100%;min-height:180px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;box-sizing:border-box}
+.ks-metin{width:100%;min-height:180px;padding:10px 12px;border:1px solid rgb(var(--line));border-radius:12px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;box-sizing:border-box}
 `;
 
 function slaytlar(sayi, secili, konuAl, tur, tum) {

@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Muhasebe" aktif="muhasebe" yol="Finans ve bağlantılar" aciklama="Basit gelir-gider defteri: kesilen ve gelen faturaları, tahsilat ve ödemeleri ay ay izleyin. Tutarlar KDV dâhil girilir.">
 <style is:global>
   .mh-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .mh-arac input,.mh-arac select{min-height:40px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .mh-arac input,.mh-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
   .mh-ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px}
   .mh-ozet .kart{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-radius:16px}
   .mh-ozet .mh-ad{font-size:12px;font-weight:600;color:var(--tx2)}
@@ -14,7 +14,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .mh-form .genis{grid-column:1/-1}
   .mh-tablo{width:100%;min-width:920px;border-collapse:collapse;font-size:14px}
   .mh-tablo th{padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
-  .mh-tablo td{padding:10px 12px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+  .mh-tablo td{padding:10px 12px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
   .mh-tablo .sayi{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 </style>
 <div class="uyari bilgi">Bu defter resmî muhasebe kaydı değildir; e-fatura, beyanname ya da yasal defter yerine geçmez. Ay sonunda “CSV indir” ile dosyayı alıp mali müşavirinize verin. KDV tutarları bilgi amaçlıdır.</div>

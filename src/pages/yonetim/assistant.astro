@@ -13,7 +13,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   let tum = [], secili = new URLSearchParams(location.search).get('id');
   function listeCiz() {
     liste.replaceChildren(...(tum.length ? tum.map((s) => el('button', { type: 'button', 'aria-pressed': String(s.sohbet_id === secili), onclick: () => ac(s.sohbet_id),
-      style: `width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border: 0; border-top: 1px solid var(--line); background: ${s.sohbet_id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer` },
+      style: `width: 100%; display: flex; flex-direction: column; gap: 3px; padding: 12px 14px; border: 0; border-top: 1px solid rgb(var(--line)); background: ${s.sohbet_id === secili ? 'var(--tint)' : 'transparent'}; color: inherit; font: inherit; text-align: left; cursor: pointer` },
       el('span', { style: 'display: flex; justify-content: space-between; gap: 8px' }, el('strong', { style: 'color: var(--head); overflow: hidden; text-overflow: ellipsis; white-space: nowrap' }, s.ilk || '—'), el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(s.son))),
       el('span', { style: 'display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--tx2)' }, `${s.mesaj} mesaj`, s.sayfa ? ' · ' + s.sayfa : '', s.kart ? el('span', { class: 'cip kazanildi' }, 'Talep kartı açıldı') : null)))
       : [el('div', { class: 'bos' }, 'Henüz asistan sohbeti yok.')]));
