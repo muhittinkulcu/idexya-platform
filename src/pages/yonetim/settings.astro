@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Ayarlar" aktif="ayar" yol="Sistem" aciklama="Firma bilgileri ve varsayılanlar. Teklif çıktısı gibi belgelerde bu bilgiler kullanılır. Erişim anahtarları ve gizli değerler burada değil, Cloudflare panelinde tutulur.">
 <form class="kart" data-form style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px"></form>
 <div style="display: flex; gap: 10px; align-items: center"><button type="button" class="dugme ana" data-kaydet>Kaydet</button><span data-durum style="color: var(--tx2); font-size: 14px"></span></div>
-<section class="kart" style="padding: 18px 20px; display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center">
+<section class="kart" data-eposta-bolum hidden style="padding: 18px 20px; flex-wrap: wrap; gap: 10px 14px; align-items: center">
   <div style="flex: 1 1 280px"><strong style="display: block">E-posta bildirimleri</strong><span style="font-size: 14px; color: var(--tx2)">Kaydedilmiş bildirim adresine deneme e-postası gönderir. Alan adı Cloudflare Email Sending’de doğrulanmadıysa hatayı burada görürsünüz.</span></div>
   <button type="button" class="dugme" data-eposta-dene>Deneme e-postası gönder</button><span data-eposta-durum role="status" style="flex-basis: 100%; font-size: 14px; color: var(--tx2)"></span>
 </section>
@@ -16,6 +16,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
   (async () => {
     try {
       const r = await api('ayarlar');
+      // Deneme e-postası bölümü yalnız e-posta gönderimi açıkken görünür
+      const eb = document.querySelector('[data-eposta-bolum]'); if (r.epostaDeneme) { eb.hidden = false; eb.style.display = 'flex'; }
       form.replaceChildren(...r.alanlar.map((a) => el('label', { style: `display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 14px${a.sinir > 300 ? '; grid-column: 1 / -1' : ''}` }, a.ad,
         a.sinir > 300 ? el('textarea', { name: a.k, maxlength: a.sinir, rows: 3, style: stil }, r.degerler[a.k] || '') : el('input', { name: a.k, maxlength: a.sinir, value: r.degerler[a.k] || '', style: stil }))));
     } catch (h) { genelHata('Ayarlar yüklenemedi: ' + h.message); }

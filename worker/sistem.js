@@ -114,7 +114,8 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
   }
 
   // --- Ayarlar ---
-  if (yol === 'ayarlar' && yontem === 'GET') return json({ ok: true, alanlar: AYARLAR.map(({ k, ad, sinir }) => ({ k, ad, sinir })), degerler: await ayarlariOku(db) });
+  // epostaDeneme: "Deneme e-postası" düğmesi yalnız e-posta gönderimi açıkken (EPOSTA_ACIK=evet, Email Sending kurulunca) görünür.
+  if (yol === 'ayarlar' && yontem === 'GET') return json({ ok: true, epostaDeneme: !!env.EPOSTA && env.EPOSTA_ACIK === 'evet', alanlar: AYARLAR.map(({ k, ad, sinir }) => ({ k, ad, sinir })), degerler: await ayarlariOku(db) });
   if (yol === 'ayarlar' && yontem === 'POST') {
     const z = simdi(), sorgular = [], degisen = [];
     for (const a of AYARLAR) {
