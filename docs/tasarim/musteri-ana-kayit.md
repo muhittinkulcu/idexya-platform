@@ -1,4 +1,4 @@
-# Müşteri ana kaydı — tasarım belgesi (taslak, onay bekliyor)
+# Müşteri ana kaydı — tasarım belgesi (onaylandı, 30 Eki 2026)
 
 Karar (Muhittin, 30 Eki 2026): tüm müşteri bilgisi **tek ana kayıtta** tutulur. Panel (panel.idexya.com), Creative ve
 Marketing (IDOS) müşteri bilgisini oradan okur. Bu belge yalnız tasarımdır; kod yoktur. Onaydan sonra iş ürünlere bölünür.
@@ -58,7 +58,7 @@ kullanılmaz. Silme yoktur; müşteri `arsiv` durumuna alınır.
 **İletişim kişileri (`musteri_kisi`), KVKK gereği en az veri:**
 `kisi_id, musteri_id, ad, rol (karar verici / pazarlama / muhasebe / teknik), eposta, telefon, tercih_kanal, iletisim_izni (evet/hayır + tarih), aktif`.
 - T.C. kimlik, doğum tarihi, adres gibi alanlar **tutulmaz**.
-- Ayrılan kişi silinmez ama `aktif = hayır` olur; saklama süresi dolunca anonimleştirilir (süre Muhittin'den).
+- Ayrılan kişi silinmez ama `aktif = hayır` olur. Müşteri ayrıldıktan sonra 2 yıl (ayarlanabilir) dolunca kişi kaydı anonimleştirilir (karar 4).
 - Kişi verisi yalnız ana kayıtta durur. Diğer ürünlere **gönderilmez** (§3, §5).
 
 ---
@@ -129,7 +129,7 @@ Bugünkü durum: Panel CRM canlıda **0 müşteri**. IDOS'ta müşteriler var. C
 |---|---|---|---|---|---|
 | Kimlik, marka, unvan, sektör, durum | Yazar | Okur (kendi müşterileri yazar) | Okur | Okur | Yalnız kendi markası |
 | Sorumlu | Yazar | Okur | Okur | — | — |
-| Reklam ve ölçüm hesapları (Meta, Google, GA4, SC, GTM, Merchant) | Yazar | Yazar (kendi müşterileri) | Okur | — | — |
+| Reklam ve ölçüm hesapları (Meta, Google, GA4, SC, GTM, Merchant) | Yazar | Okur (karar 3) | Okur | — | — |
 | Sosyal hesaplar, web sitesi | Yazar | Yazar | Okur | Okur | Yalnız kendi |
 | Ana sonuç, para birimi, hedefler | Yazar | Yazar | Okur | — | — |
 | İletişim kişileri | Yazar | Okur (kendi müşterileri) | **Yok** | **Yok** | Yalnız kendi kaydı |
@@ -212,9 +212,9 @@ Planın 0. adımı (Marketing'e iletildi; karar: `brand_name` marka adıdır, ş
 `account_name`, `client_id`, `brand_name` eklenmesi. Bu, §3'teki `hesap-esleme` ucu gelene kadar Panel'in "Adsız hesap /
 Atanmamış" sorununu çözer. Ortak API gelince görünüm yine yalnız rakam taşıyacak hâle döndürülebilir.
 
-## Muhittin'in karar vermesi gerekenler
-1. Ana kayıt IDOS'ta mı (öneri), yoksa başka bir yerde mi?
-2. "Pasif" = IDOS'taki `duraklatildi` kabul mü?
-3. Ekip üyeleri kendi müşterilerinin hesap alanlarını yazabilsin mi, yoksa yalnız siz mi?
-4. İletişim kişisi verisinin saklama süresi (ayrılan müşteri için).
-5. "Müşteri yap" onayı her zaman sizden mi geçsin?
+## Kararlar (Muhittin, 30 Eki 2026)
+1. **Ana kayıt IDOS'ta.**
+2. **Pasif = `duraklatildi`.**
+3. **Hesap alanlarını (Meta, Google Ads, GA4, Search Console, GTM, Merchant) şimdilik yalnız yönetici (Muhittin) yazar; ekip okur.** §5'teki tabloda ekip satırı buna göre okunmalıdır: "Yazar (kendi müşterileri)" hesap alanları için geçerli değildir.
+4. **İletişim kişisi saklama süresi:** müşteri ayrıldıktan sonra **2 yıl**, ardından anonimleştirme. Süre ayarlanabilir olmalı (`MUSTERI_KISI_SAKLAMA_GUN`, varsayılan 730). Hukuki teyit Muhittin'de.
+5. **"Müşteri yap" onayı her zaman Muhittin'den geçer.** Onay kuyruğunu yalnız yönetici rolü onaylar ya da reddeder.
