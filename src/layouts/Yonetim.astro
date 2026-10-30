@@ -123,6 +123,11 @@ import '../styles/cam.css';
 <link rel="icon" href="/favicon-panel-64.png" type="image/png" sizes="64x64">
 <link rel="icon" href="/favicon-panel-512.png" type="image/png" sizes="512x512">
 <link rel="apple-touch-icon" href="/favicon-panel-180.png" sizes="180x180">
+<!-- Telefona uygulama olarak kurulum (PWA, 30 Eki 2026). Cloudflare Access arkasında olduğu için bildirim dosyası çerezle istenir. -->
+<link rel="manifest" href="/panel.webmanifest" crossorigin="use-credentials">
+<meta name="theme-color" content="#1E9E5A">
+<meta name="apple-mobile-web-app-title" content="Website">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&display=swap">
@@ -298,6 +303,16 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 .yeni-liste a{display:flex;flex-direction:column;gap:1px;padding:8px 10px;border-radius:10px;text-decoration:none;color:var(--tx)}
 .yeni-liste a:hover,.yeni-liste a:focus-visible{background:var(--card2,var(--bg))}
 .yeni-liste strong{font-size:14px;color:var(--head)}.yeni-liste span{font-size:12.5px;color:var(--tx2)}
+/* Ürünler menüsü (30 Eki 2026): Idexya ürünleri arasında geçiş; X işareti favicon.svg'den, renk ürüne göre. */
+.urun-liste{width:300px}
+.urun-liste a,.urun-liste .urun-yakinda{flex-direction:row;align-items:center;gap:12px;padding:9px 10px;border-radius:10px}
+.urun-liste .urun-yakinda{display:flex;opacity:.55;cursor:not-allowed}
+.urun-liste a[aria-current=page]{background:var(--tint)}
+.urun-x{flex:none;width:24px;height:24px;background:var(--urun-renk);-webkit-mask:url(/favicon.svg) center/contain no-repeat;mask:url(/favicon.svg) center/contain no-repeat}
+.urun-ad{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.urun-isaret{color:var(--acc);font-weight:800;font-size:15px}
+@media (max-width:860px){.urun-liste{position:fixed;left:12px;right:12px;top:64px;width:auto}}
+@media (forced-colors:active){.urun-x{background:CanvasText}}
 </style>
 <script is:inline>(function(){var t='acik',c=true;try{t=localStorage.getItem('idx-tema')==='koyu'?'koyu':'acik';c=localStorage.getItem('idx-cam')!=='duz'}catch(e){}var h=document.documentElement;h.dataset.tema=t;h.classList.toggle('cam',c);h.classList.toggle('dark',t==='koyu')})()</script>
 </head>
@@ -408,6 +423,17 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
         </details>
         <a class="dugme ikincil" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
       </span>
+      <details class="yeni-menu urun-menu" data-acilir-menu>
+        <summary class="ikon" aria-label="Ürünler" title="Ürünler"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="5" r="2"></circle><circle cx="12" cy="5" r="2"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="19" cy="12" r="2"></circle><circle cx="5" cy="19" r="2"></circle><circle cx="12" cy="19" r="2"></circle><circle cx="19" cy="19" r="2"></circle></svg></summary>
+        <div class="yeni-liste urun-liste" role="menu" aria-label="Idexya ürünleri">
+          <b>Idexya ürünleri</b>
+          <a role="menuitem" href="/dashboard" aria-current="page"><span class="urun-x" style="--urun-renk: #1E9E5A" aria-hidden="true"></span><span class="urun-ad"><strong>Website Yönetim</strong><span>Bu panel · panel.idexya.com</span></span><span class="urun-isaret" aria-label="Bulunduğunuz ürün">✓</span></a>
+          <a role="menuitem" href="https://creative.idexya.com/" rel="noopener"><span class="urun-x" style="--urun-renk: #DC2626" aria-hidden="true"></span><span class="urun-ad"><strong>Creative</strong><span>creative.idexya.com</span></span></a>
+          <a role="menuitem" href="https://marketing.idexya.com/" rel="noopener"><span class="urun-x" style="--urun-renk: #2563EB" aria-hidden="true"></span><span class="urun-ad"><strong>Marketing</strong><span>marketing.idexya.com</span></span></a>
+          <span role="menuitem" aria-disabled="true" class="urun-yakinda"><span class="urun-x" style="--urun-renk: #8B98A5" aria-hidden="true"></span><span class="urun-ad"><strong>AI Agency</strong><span>Yakında</span></span></span>
+          <span role="menuitem" aria-disabled="true" class="urun-yakinda"><span class="urun-x" style="--urun-renk: #8B98A5" aria-hidden="true"></span><span class="urun-ad"><strong>Marketplace</strong><span>Yakında</span></span></span>
+        </div>
+      </details>
       <button type="button" class="ikon" data-tema-dugme aria-label="Temayı değiştir"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button>
       <button type="button" class="dugme" data-ozellestir aria-haspopup="dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg><span class="masa">Özelleştir</span></button>
       <button type="button" class="ikon masa" data-ust-sabitle aria-pressed="true" aria-label="Üst menüyü sabitle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M9 3h6l-1 6 4 4H6l4-4z"></path></svg></button>
@@ -491,12 +517,19 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 <script>
   // "+ Yeni oluştur" menüsü: dışarı tıklayınca ya da Esc ile kapanır. ?yeni=1 ile açılan sayfada o sayfanın "yeni" düğmesine basılır.
   {
+    // Açılır menüler (Yeni oluştur, Ürünler): dışarı tıklama ve Esc kapatır.
+    document.querySelectorAll<HTMLDetailsElement>('[data-yeni-menu], [data-acilir-menu]').forEach((d) => {
+      document.addEventListener('click', (o) => { if (d.open && !d.contains(o.target as Node)) d.open = false; });
+      d.addEventListener('keydown', (o) => { if (o.key === 'Escape' && d.open) { d.open = false; d.querySelector('summary')!.focus(); } });
+    });
     const m = document.querySelector<HTMLDetailsElement>('[data-yeni-menu]');
     if (m) {
-      document.addEventListener('click', (o) => { if (m.open && !m.contains(o.target as Node)) m.open = false; });
-      m.addEventListener('keydown', (o) => { if (o.key === 'Escape') { m.open = false; m.querySelector('summary')!.focus(); } });
       // Bazı sayfalar adres çubuğunu yeniden yazdığı için "yeni" isteği oturumda da tutulur
       m.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => a.addEventListener('click', () => { try { if (a.search.includes('new=1')) sessionStorage.setItem('idx-yeni', a.pathname); } catch (e) {} }));
+    }
+    // PWA: service worker yalnız panel alan adında kaydedilir (idexya.com sitesine karışmaz). Kabuk varlıklarını saklar, veriyi saklamaz.
+    if ('serviceWorker' in navigator && /^panel\.(idexya\.com|localhost)$/.test(location.hostname)) {
+      addEventListener('load', () => { navigator.serviceWorker.register('/panel-sw.js', { scope: '/' }).catch(() => {}); });
     }
     let yeniIstek = new URLSearchParams(location.search).get('new') === '1';
     try { if (sessionStorage.getItem('idx-yeni') === location.pathname) { yeniIstek = true; } sessionStorage.removeItem('idx-yeni'); } catch (e) {}
