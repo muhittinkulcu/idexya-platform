@@ -319,6 +319,13 @@ export function kabuk() {
     const k = $('[data-kim]'); if (k && o.kim) k.textContent = o.kim;
     const av = $('[data-kim-avatar]'); if (av && o.kim) av.title = o.kim;
     const ke = $('[data-kim-eposta]'); if (ke && o.kim) ke.textContent = o.kim;
+    // Yan menüdeki IDOS kartı: reklam verisi bağlantısının gerçek durumu (worker/reklam.js günlük çekim)
+    const idosDurum = $('[data-idos-durum]'), idosDetay = $('[data-idos-detay]'), r = o.reklam;
+    if (idosDurum && idosDetay && r) {
+      if (!r.kurulu) { idosDurum.textContent = 'Bağlı değil'; idosDetay.textContent = 'Reklam verisi için Entegrasyonlar’daki IDOS ayarları gerekli.'; }
+      else if (!r.son) { idosDurum.textContent = 'Bağlı'; idosDetay.textContent = 'Henüz veri çekilmedi. Çekim her sabah kendiliğinden yapılır.'; }
+      else { idosDurum.textContent = r.son.durum === 'tamam' ? '● Bağlı' : '● Son çekim başarısız'; idosDurum.style.color = r.son.durum === 'tamam' ? '#4CC38A' : '#FF8A7E'; idosDetay.textContent = 'Son reklam verisi çekimi: ' + tarih(r.son.zaman); }
+    }
   }).catch((h) => {
     sayacGuncelle(null);
     if (h.durum === 401) genelHata('Oturumunuz kapanmış. Sayfayı yenileyip yeniden giriş yapın.');

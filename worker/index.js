@@ -123,16 +123,17 @@ async function yonetimApi(istek, env, yol, kim) {
   }
 
   if (yol === 'ozet' && yontem === 'GET') {
-    const [t, m, a, k, u, yo, de] = await db.batch([
+    const [t, m, a, k, u, yo, de, rc] = await db.batch([
       db.prepare("SELECT durum, COUNT(*) AS n FROM talepler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler"),
       db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler GROUP BY asama"),
       db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12"),
       db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n FROM yorumlar WHERE durum = 'bekliyor'"),
-      db.prepare("SELECT COUNT(*) AS n FROM destek_talepleri WHERE durum = 'acik'")
+      db.prepare("SELECT COUNT(*) AS n FROM destek_talepleri WHERE durum = 'acik'"),
+      db.prepare('SELECT zaman, durum FROM reklam_cekim ORDER BY zaman DESC LIMIT 1')
     ]);
-    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n, bekleyenDestek: de.results[0].n });
+    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n, bekleyenDestek: de.results[0].n, reklam: { kurulu: reklamKurulu(env), son: rc.results[0] || null } });
   }
   if (yol === 'grafik' && yontem === 'GET') {
     // Genel bakış grafikleri; yalnız okuma. Gün ve saatler İstanbul saatine göre (UTC+3, Türkiye yaz saati uygulamıyor). Spam sayılmaz.
