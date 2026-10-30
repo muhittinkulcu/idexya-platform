@@ -93,9 +93,10 @@ async function yaz(db, liste, tetikleyen, baslangic) {
         json_extract(value, '$.tiklama'), json(json_extract(value, '$.sonuclar')) FROM json_each(?)`).bind(JSON.stringify(liste.slice(i, i + 400))));
   }
   // Hesap adları: görünümde ad/marka varsa güncellenir; boş gelirse eldeki değer korunur, elle verilen etiket hiç ezilmez.
+  // "WHERE true" gerekli: INSERT … SELECT … FROM ile ON CONFLICT birlikteyken SQLite ON'u JOIN koşulu sanır (30 Eki çekim hatası).
   const hesaplar = [...new Map(liste.map((o) => [o.platform + '|' + o.hesap, { platform: o.platform, hesap: o.hesap, hesap_adi: o.hesap_adi, marka: o.marka, musteri_id: o.musteri_id }])).values()];
   if (hesaplar.length) sorgular.push(db.prepare(`INSERT INTO reklam_hesap (platform, hesap, hesap_adi, marka, musteri_id, guncelleme)
-      SELECT json_extract(value, '$.platform'), json_extract(value, '$.hesap'), json_extract(value, '$.hesap_adi'), json_extract(value, '$.marka'), json_extract(value, '$.musteri_id'), ? FROM json_each(?)
+      SELECT json_extract(value, '$.platform'), json_extract(value, '$.hesap'), json_extract(value, '$.hesap_adi'), json_extract(value, '$.marka'), json_extract(value, '$.musteri_id'), ? FROM json_each(?) WHERE true
       ON CONFLICT(platform, hesap) DO UPDATE SET hesap_adi = COALESCE(excluded.hesap_adi, reklam_hesap.hesap_adi), marka = COALESCE(excluded.marka, reklam_hesap.marka),
         musteri_id = COALESCE(excluded.musteri_id, reklam_hesap.musteri_id), guncelleme = excluded.guncelleme`).bind(simdi(), JSON.stringify(hesaplar)));
   sorgular.push(db.prepare('INSERT INTO reklam_cekim (id, zaman, durum, satir, baslangic, mesaj, tetikleyen) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), simdi(), 'tamam', liste.length, baslangic, null, tetikleyen));
