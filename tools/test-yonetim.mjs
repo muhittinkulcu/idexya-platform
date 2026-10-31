@@ -11,7 +11,9 @@ const kontrol = (ad, kosul) => { console.log((kosul ? 'GEÇTİ ' : 'KALDI ') + a
 for (const [yol, ad, ek] of [['/tr/iletisim', 'İletişim Deneme', {}], ['/', 'Analiz Deneme', { site: 'https://ornek.com' }], ['/tr/paketler', 'Paket Deneme', {}]]) {
   await s.goto(B + yol);
   const c = await s.$('[data-cerez="red"]'); if (c && await c.isVisible()) await c.click();
-  const f = 'form[data-talep]';
+  // Sayfada gizli talep formları da var (çekmece menüsü, hızlı talep penceresi): görünür olan işaretlenir.
+  await s.$$eval('form[data-talep]', (fs) => { const g = fs.find((x) => x.getClientRects().length && x.querySelector('button[type=submit]').getBoundingClientRect().width > 0); if (g) g.dataset.testForm = '1'; });
+  const f = 'form[data-test-form]';
   await s.click(f + ' button[type=submit]');
   kontrol(yol + ' boş form uyarı verir', (await s.textContent(f + ' [data-form-durum]')).includes('adınızı'));
   await s.fill(f + ' [name=ad]', ad);
