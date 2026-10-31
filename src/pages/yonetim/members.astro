@@ -11,7 +11,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <section aria-label="Üye ayrıntısı" class="kart" data-ayrinti style="flex: 3 1 480px; padding: 18px; display: flex; flex-direction: column; gap: 16px"></section>
 </div>
 <section class="kart" aria-label="Üye grupları" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 16px; color: var(--head)">Üye grupları</h2>
+<div data-kart-bas><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="İçerikleri yalnız belirli üyelere açmak için kullanılan üye gruplarıdır.">Üye grupları: içerik paylaşımı</h2><small class="kart-alt">Tüm üyeler · güncel durum</small></div>
 <span style="font-size: 13px; color: var(--tx2)">Gruplar, içerikleri "yalnız bu gruptakiler görsün" diye paylaşmak için kullanılır (ör. "Eğitim katılımcıları").</span>
 <div data-gruplar style="display: flex; gap: 8px; flex-wrap: wrap"></div>
 <form data-grup-form style="display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end">

@@ -179,6 +179,22 @@ a.ucan-bas:hover{background:var(--card2);color:var(--head)}
 .tema-grup button:hover{background:var(--card2);color:var(--head)}
 .tema-grup button[aria-pressed=true]{background:var(--tint);color:var(--tintx)}
 .tema-grup button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+/* A kuralı: tablo sayfalama (src/scripts/yonetim/tablo-sayfa.js). Yazdırırken bütün satırlar çıkar. */
+tr[data-sayfa-gizli]{display:none}
+.tablo-sayfa{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:10px 2px 0;font-size:13px;color:var(--tx2)}
+.tablo-sayfa label{display:inline-flex;align-items:center;gap:8px}
+.tablo-sayfa select{padding:4px 8px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--head);font:inherit}
+.tablo-sayfa .ts-sag{display:inline-flex;align-items:center;gap:6px}
+.tablo-sayfa .ts-aralik{font-variant-numeric:tabular-nums;margin-right:4px}
+@media print{tr[data-sayfa-gizli]{display:table-row!important}.tablo-sayfa{display:none!important}}
+/* B kuralı: kart başlığı + kapsam/dönem satırı + "i" açıklaması (src/scripts/yonetim/kart-bilgi.js). */
+.kart-baslik{display:inline-flex;align-items:center;gap:8px}
+.kart-alt{display:block;margin:2px 0 0;font-size:12px;color:var(--tx2)}
+.kart-i{flex:0 0 auto;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgb(var(--line));border-radius:50%;background:rgb(var(--card));color:var(--tx2);font:600 12px/1 Georgia,serif;font-style:italic;cursor:pointer;padding:0}
+.kart-i:hover,.kart-i[aria-expanded=true]{color:var(--tintx);background:var(--tint);border-color:var(--btnline)}
+.kart-i:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.kart-i-metin{margin:6px 0 0;padding:8px 10px;border-radius:10px;background:var(--card2);font-size:13px;color:var(--tx);max-width:760px}
+@media print{.kart-i,.kart-i-metin{display:none!important}}
 .mg{display:flex;flex-direction:column;gap:1px}
 .mg>.grup-ad{padding:0 12px 6px;font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--tx2)}
 .ara-satir{display:flex;gap:6px;align-items:center}.ara-satir .ara-kutu{flex:1;min-width:0}
@@ -551,7 +567,11 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 </script>
 <script>
   import { kabuk } from '../scripts/yonetim/ortak.js';
+  import { tabloSayfalama } from '../scripts/yonetim/tablo-sayfa.js';
+  import { kartBilgi } from '../scripts/yonetim/kart-bilgi.js';
   kabuk();
+  tabloSayfalama();
+  kartBilgi();
 </script>
 </body>
 </html>

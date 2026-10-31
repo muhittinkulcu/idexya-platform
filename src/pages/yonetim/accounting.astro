@@ -168,7 +168,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const g = veri.gecikenler;
     gecKutu.hidden = !g.length;
     if (!g.length) return;
-    gecKutu.replaceChildren(el('h2', { style: 'margin: 0; padding: 14px 14px 4px; font-size: 15px; color: var(--err)' }, `Vadesi geçen kayıtlar (tüm aylar) · ${g.length}`),
+    gecKutu.replaceChildren(el('div', { 'data-kart-bas': '', style: 'padding: 14px 14px 4px' }, el('h2', { style: 'margin: 0; font-size: 15px; color: var(--err)', 'data-kart-bilgi': 'Vadesi bugünden önce olduğu hâlde ödendi ya da tahsil edildi olarak işaretlenmemiş kayıtlardır.' }, `Vadesi geçen kayıtlar: ${g.length} kayıt`), el('small', { class: 'kart-alt' }, 'Gelir-gider defteri · tüm aylar · ödenmemiş olanlar')),
       el('table', { class: 'mh-tablo' }, el('tbody', {}, g.map((k) => el('tr', { 'data-geciken-kayit': k.id },
         el('td', { style: 'white-space: nowrap' }, gun(k.tarih)), turHucre(k), aciklamaHucre(k), tutarHucre(k), durumHucre(k), el('td', {}, eylemler(k)))))));
   }

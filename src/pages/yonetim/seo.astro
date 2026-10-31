@@ -11,19 +11,19 @@ import '../../scripts/yonetim/grafik.css';
 <div class="kpi-sira" data-kpi></div>
 <div class="pano">
   <section class="kart modul" aria-labelledby="b-trend">
-    <div class="modul-bas"><h2 id="b-trend">Puanın seyri</h2><small>son 20 denetim</small></div>
+    <div class="modul-bas"><div><h2 id="b-trend" data-kart-bilgi="Her site denetiminde hesaplanan puanın zaman içindeki değişimidir.">SEO puanının seyri: site geneli</h2><small class="kart-alt">idexya.com · son 20 denetim</small></div></div>
     <div data-trend></div>
   </section>
   <section class="kart modul" aria-labelledby="b-site">
-    <div class="modul-bas"><h2 id="b-site">robots.txt ve sitemap</h2></div>
+    <div class="modul-bas"><div><h2 id="b-site" data-kart-bilgi="Arama motorlarının siteyi nasıl tarayacağını belirleyen iki dosyanın son denetimdeki durumudur.">robots.txt ve sitemap: tarama kuralları</h2><small class="kart-alt">idexya.com · son denetim</small></div></div>
     <div data-site></div>
   </section>
   <section class="kart modul tam" aria-labelledby="b-sorun">
-    <div class="modul-bas"><h2 id="b-sorun">Bulunan sorunlar</h2><small>tıklayınca sayfa tablosu o soruna göre süzülür</small></div>
+    <div class="modul-bas"><div><h2 id="b-sorun" data-kart-bilgi="Son denetimde bulunan SEO sorunlarının türe ve önem derecesine göre listesidir.">Bulunan sorunlar: türe göre</h2><small class="kart-alt">idexya.com · son denetim · tıklayınca sayfa tablosu süzülür</small></div></div>
     <div data-sorunlar style="display: flex; flex-direction: column; gap: 8px"></div>
   </section>
   <section class="kart modul tam" aria-labelledby="b-sayfa">
-    <div class="modul-bas"><h2 id="b-sayfa">Sayfalar</h2>
+    <div class="modul-bas"><div><h2 id="b-sayfa" data-kart-bilgi="Denetlenen her sayfanın başlık, açıklama ve sorun bilgisidir.">Sayfalar: denetim sonucu</h2><small class="kart-alt">idexya.com · son denetim</small></div>
       <div style="display: flex; gap: 8px; flex-wrap: wrap">
         <label style="display: flex; align-items: center; gap: 6px; font-size: 13px">Sorun
           <select data-suz style="min-height: 34px; border-radius: 10px; border: 1px solid rgb(var(--line)); background: rgb(var(--card)); color: var(--tx); font: inherit; max-width: 220px"></select></label>
@@ -36,7 +36,7 @@ import '../../scripts/yonetim/grafik.css';
     <div data-sayfalar style="overflow-x: auto"></div>
   </section>
   <section class="kart modul tam" aria-labelledby="b-geo">
-    <div class="modul-bas"><h2 id="b-geo">GEO: yapay zekâ aramalarına hazırlık</h2></div>
+    <div class="modul-bas"><div><h2 id="b-geo" data-kart-bilgi="Sayfaların yapay zekâ arama motorlarında kaynak gösterilmeye ne kadar hazır olduğunu ölçer.">GEO: yapay zekâ aramalarına hazırlık</h2><small class="kart-alt">idexya.com · son denetim</small></div></div>
     <p style="margin: 0; color: var(--tx2); font-size: 14px; max-width: 860px">ChatGPT, Gemini, Perplexity ve Google'ın yapay zekâ özetleri bir sayfayı kaynak gösterirken soruya doğrudan cevap veren bölümleri ve schema.org yapılandırılmış verisini kullanır. Sık sorulan sorular için <b>FAQPage</b>, hizmet sayfaları için <b>Service</b>, kurum bilgisi için <b>Organization</b> verisi ve "Nedir?", "Nasıl?" gibi soru biçimli ara başlıklar bu sayfaların alıntılanma şansını artırır.</p>
     <div class="kpi-sira" data-geo-kpi></div>
     <div data-geo style="overflow-x: auto"></div>
