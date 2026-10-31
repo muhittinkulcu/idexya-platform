@@ -301,15 +301,42 @@ export function kabuk() {
     }));
   }
 
-  // Tema
-  const td = $('[data-tema-dugme]');
-  if (td) td.addEventListener('click', () => {
-    const yeni = document.documentElement.dataset.tema === 'koyu' ? 'acik' : 'koyu';
-    document.documentElement.dataset.tema = yeni;
-    document.getElementById('kabuk').className = 'kabuk ' + yeni;
-    document.documentElement.classList.toggle('dark', yeni === 'koyu');
-    try { localStorage.setItem('idx-tema', yeni); } catch (e) {}
-  });
+  // Tema: Açık · Koyu · Sistem (cihaz ayarını izler, varsayılan) · Saate göre (07.00–19.00 açık, dışında koyu; cihaz saati).
+  // Seçim bu tarayıcıda idx-tema-secim anahtarında tutulur; ilk boyama Yonetim.astro'daki satır içi betikle yapılır.
+  const TEMA_SECIMLER = ['acik', 'koyu', 'sistem', 'saat'];
+  const sistemKoyu = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  let temaSaati = null;
+  const temaSecimi = () => { const s = document.documentElement.dataset.temaSecim; return TEMA_SECIMLER.includes(s) ? s : 'sistem'; };
+  function temaUygula(secim) {
+    const saat = new Date().getHours();
+    const koyu = secim === 'koyu' || (secim === 'sistem' && !!(sistemKoyu && sistemKoyu.matches)) || (secim === 'saat' && (saat < 7 || saat >= 19));
+    const h = document.documentElement, tema = koyu ? 'koyu' : 'acik';
+    h.dataset.temaSecim = secim;
+    if (h.dataset.tema !== tema) {
+      h.dataset.tema = tema;
+      h.classList.toggle('dark', koyu);
+      const kabuk = document.getElementById('kabuk'); if (kabuk) kabuk.className = 'kabuk ' + tema;
+    }
+    document.querySelectorAll('[data-tema-sec]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.temaSec === secim)));
+    // Saate göre: sayfa açıkken bir sonraki 07.00 ya da 19.00 geçişinde kendiliğinden değişir.
+    clearTimeout(temaSaati); temaSaati = null;
+    if (secim === 'saat') {
+      const n = new Date(), sonraki = new Date(n);
+      sonraki.setHours(saat < 7 ? 7 : saat < 19 ? 19 : 31, 0, 5, 0);
+      temaSaati = setTimeout(() => temaUygula(temaSecimi()), Math.max(1000, sonraki - n));
+    }
+  }
+  document.querySelectorAll('[data-tema-sec]').forEach((b) => b.addEventListener('click', () => {
+    const secim = b.dataset.temaSec;
+    try { localStorage.setItem('idx-tema-secim', secim); } catch (e) {}
+    temaUygula(secim);
+  }));
+  if (sistemKoyu && sistemKoyu.addEventListener) sistemKoyu.addEventListener('change', () => { if (temaSecimi() === 'sistem') temaUygula('sistem'); });
+  // Uyku ya da arka plan sekmesinde zamanlayıcı gecikebilir: sekmeye dönünce yeniden hesaplanır.
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) temaUygula(temaSecimi()); });
+  // Başka sekmede seçim değişirse bu sekme de izler.
+  window.addEventListener('storage', (o) => { if (o.key === 'idx-tema-secim' && TEMA_SECIMLER.includes(o.newValue)) temaUygula(o.newValue); });
+  temaUygula(temaSecimi());
 
   // Görünüm: Cam (varsayılan) ya da Düz. Yalnız bu tarayıcıda görünüm tercihi olarak tutulur (idx-cam = duz → kapalı).
   const camSecim = $('[data-cam-secim]');
