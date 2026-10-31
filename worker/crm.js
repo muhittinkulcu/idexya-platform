@@ -44,8 +44,8 @@ const epostaNormal = (e) => String(e || '').trim().toLowerCase();
 const musteriAdi = (m) => m.firma || m.ad || m.eposta || m.telefon || 'Adsız müşteri';
 
 // --- Birleştirme: musteri_id sütunu olan tablolar çalışma anında bulunur (başka modüllerin tabloları olsa da olmasa da çalışır).
-// reklam_ozet.musteri_id ve ana_musteri.musteri_id IDOS'un kendi müşteri numarasıdır, IDP kimliği değildir: taşınmaz.
-const TASINMAZ = new Set(['musteriler', 'reklam_ozet', 'ana_musteri']);
+// reklam_ozet, ana_musteri ve ana_hesap_esleme tablolarındaki musteri_id IDOS'un kendi müşteri numarasıdır, IDP kimliği değildir: taşınmaz.
+const TASINMAZ = new Set(['musteriler', 'reklam_ozet', 'ana_musteri', 'ana_hesap_esleme']);
 async function musteriTablolari(db) {
   const r = await db.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'").all();
   return r.results.filter((t) => !TASINMAZ.has(t.name) && /^[A-Za-z_][A-Za-z0-9_]*$/.test(t.name) && /[\s(,]musteri_id\s/i.test(t.sql || '')).map((t) => t.name);
