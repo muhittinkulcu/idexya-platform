@@ -16,6 +16,7 @@ import { medyaApi, yonetimSistemApi } from './sistem.js';
 import { yonetimYayinApi } from './yayin.js';
 import { yonetimTeklifApi } from './teklif.js';
 import { yonetimCrmApi } from './crm.js';
+import { yonetimAnaKayitApi, anaKayitEsitle, anaKayitKurulu } from './ana-kayit.js';
 import { yonetimPortalApi } from './portal.js';
 import { denetimCalistir, yonetimDenetimApi } from './denetim.js';
 import { olcumAl, yonetimOlcumApi } from './olcum.js';
@@ -254,7 +255,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
     || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim)) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
@@ -327,16 +328,22 @@ export default {
       return hata('Beklenmeyen bir hata oluştu', 500);
     }
   },
-  // Günlük zamanlayıcı (wrangler.jsonc triggers): saklama süresi dolan kişisel veriyi siler; IDOS reklam özetini
-  // çeker (IDOS ayarı yoksa bu adım atlanır); pazartesileri site denetimini çalıştırır (worker/denetim.js).
+  // Saatlik zamanlayıcı (wrangler.jsonc triggers, her saat başı UTC):
+  // · her saat: müşteri ana kaydı (IDOS) önbelleğinde yalnız değişenler eşitlenir (worker/ana-kayit.js; ayar yoksa atlanır);
+  // · 07.00 UTC'de günlük işler: ana kaydın tam eşitlemesi, saklama süresi dolan kişisel verinin silinmesi, IDOS reklam
+  //   özeti, Instagram akışı, site sağlığı, yedek; pazartesileri site denetimi (worker/denetim.js).
   async scheduled(olay, env, ctx) {
     await semaKur(env.DB);
+    const an = new Date(olay.scheduledTime || Date.now());
+    const gunluk = an.getUTCHours() === 7;
+    if (anaKayitKurulu(env)) ctx.waitUntil(anaKayitEsitle(env, 'Zamanlayıcı', { tam: gunluk }));
+    if (!gunluk) return;
     ctx.waitUntil(saklamaUygula(env.DB).catch((e) => console.error('saklama', e && e.message)));
     if (reklamKurulu(env)) ctx.waitUntil(reklamCek(env, 'Zamanlayıcı'));
     if (akisKurulu(env)) ctx.waitUntil(akisCek(env, 'Zamanlayıcı'));
     ctx.waitUntil(siteSaglikCron(env).catch((e) => console.error('site sağlık', e && e.message)));
     if (yedekKurulu(env)) ctx.waitUntil(yedekAl(env, 'Zamanlayıcı').catch((e) => console.error('yedek', e && e.message)));
-    // Haftalık site denetimi: pazartesi (UTC; zamanlayıcı 07.00 UTC'de çalışır).
-    if (new Date(olay.scheduledTime || Date.now()).getUTCDay() === 1) ctx.waitUntil(denetimCalistir(env, 'idexya.com', 'Zamanlayıcı').catch((e) => console.error('denetim', e && e.message)));
+    // Haftalık site denetimi: pazartesi (UTC).
+    if (an.getUTCDay() === 1) ctx.waitUntil(denetimCalistir(env, 'idexya.com', 'Zamanlayıcı').catch((e) => console.error('denetim', e && e.message)));
   }
 };

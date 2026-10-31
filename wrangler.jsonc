@@ -28,9 +28,10 @@
   // Panelden eklenen değişkenler (ör. IDOS_BQ_GORUNUM) dağıtımda silinmesin diye; gizli değerler zaten etkilenmez.
   "keep_vars": true,
   "observability": { "enabled": true },
-  // Her gün 07.00 UTC (İstanbul 10.00): saklama süresi dolan kişisel veri silinir (worker/saklama.js) ve IDOS reklam
-  // özeti çekilir (worker/reklam.js; IDOS_BQ_* ayarları yoksa atlanır).
-  "triggers": { "crons": ["0 7 * * *"] },
+  // Her saat başı (UTC): müşteri ana kaydı önbelleği eşitlenir (worker/ana-kayit.js; IDOS_ORTAK_* yoksa atlanır).
+  // Günlük işler yalnız 07.00 UTC'de (İstanbul 10.00) çalışır: saklama süresi dolan kişisel veri silinir (worker/saklama.js),
+  // IDOS reklam özeti çekilir (worker/reklam.js; IDOS_BQ_* ayarları yoksa atlanır), yedek alınır (worker/index.js scheduled).
+  "triggers": { "crons": ["0 * * * *"] },
   // Dal önizlemeleri (wrangler preview) için gerekli. Boş bırakıldı: D1 ve değişkenler önizlemeye aktarılmaz,
   // böylece önizleme canlı veritabanına erişemez; yönetim paneli de önizlemede kapalı kalır.
   "previews": {}

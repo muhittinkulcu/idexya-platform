@@ -173,5 +173,17 @@ export const SEMA = [
   // Reklam dönüşümü (worker/donusum.js): pazarlama çerezi izniyle gelen tıklama kimlikleri ve platforma yüklenen dönüşümler.
   `CREATE TABLE IF NOT EXISTS talep_reklam (
     talep_id TEXT PRIMARY KEY, gclid TEXT, gbraid TEXT, wbraid TEXT, fbclid TEXT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, utm_term TEXT, utm_content TEXT, tiklama_zamani TEXT NOT NULL)`,
-  `CREATE TABLE IF NOT EXISTS donusum_aktarim (talep_id TEXT NOT NULL, platform TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (talep_id, platform))`
+  `CREATE TABLE IF NOT EXISTS donusum_aktarim (talep_id TEXT NOT NULL, platform TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (talep_id, platform))`,
+  // Müşteri ana kaydı önbelleği (worker/ana-kayit.js): IDOS ortak API'sinin beyaz liste alanları. Kalıcı kopya değildir.
+  `CREATE TABLE IF NOT EXISTS ana_musteri (
+    musteri_id TEXT PRIMARY KEY, marka TEXT, durum TEXT, veri TEXT NOT NULL, guncelleme TEXT, cekim TEXT NOT NULL, parti TEXT NOT NULL)`
+];
+
+// Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.
+export const EK_SUTUNLAR = [
+  // Müşteri ana kaydı (IDOS) bağı: CRM kartı → IDOS musteri_id (tasarım docs/tasarim/musteri-ana-kayit.md §2)
+  ['musteriler', 'ana_kayit_id', 'TEXT']
+];
+export const EK_DIZINLER = [
+  `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`
 ];

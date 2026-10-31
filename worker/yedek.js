@@ -5,7 +5,7 @@
 // Instagram'dan yeniden çekilebilen tablolar ve ayarlar içindeki erişim anahtarları. Geri yükleme panelden yapılmaz (geri dönüşü zor işlem).
 import { json, hata, simdi, islemYaz } from './ortak.js';
 
-const HARIC = new Set(['oturumlar', 'giris_denemeleri', 'sifre_yenileme', 'instagram_akis', 'reklam_ozet', 'd1_migrations']);
+const HARIC = new Set(['oturumlar', 'giris_denemeleri', 'sifre_yenileme', 'instagram_akis', 'reklam_ozet', 'ana_musteri', 'd1_migrations']);
 const GIZLI_AYAR = new Set(['instagram_token']);
 const SAKLAMA_GUN = 30;
 const SAYFA = 500;

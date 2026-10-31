@@ -1,5 +1,5 @@
 // Sunucu tarafı ortak yardımcılar.
-import { SEMA } from './sema.js';
+import { SEMA, EK_SUTUNLAR, EK_DIZINLER } from './sema.js';
 
 export const GUVENLIK_BASLIKLARI = {
   'X-Content-Type-Options': 'nosniff',
@@ -19,6 +19,15 @@ let semaHazir = false;
 export async function semaKur(db) {
   if (semaHazir) return;
   await db.batch(SEMA.map((s) => db.prepare(s)));
+  for (const [tablo, sutun, tur] of EK_SUTUNLAR) {
+    const r = await db.prepare(`PRAGMA table_info(${tablo})`).all();
+    if (!r.results.some((x) => x.name === sutun)) {
+      // Aynı anda iki istek eklemeye çalışırsa ikincisi "duplicate column" alır; bu zararsızdır.
+      try { await db.prepare(`ALTER TABLE ${tablo} ADD COLUMN ${sutun} ${tur}`).run(); }
+      catch (e) { if (!/duplicate column/i.test(String(e && e.message))) throw e; }
+    }
+  }
+  await db.batch(EK_DIZINLER.map((s) => db.prepare(s)));
   semaHazir = true;
 }
 

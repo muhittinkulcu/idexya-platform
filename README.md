@@ -47,6 +47,15 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
     Diğer sayısal sütunlar sonuç türü sayılır (ör. `messaging_conversations`). Toplamlar yalnız TRY hesaplardan yapılır.
   - Test: `node tools/sahte/bigquery.mjs 8998` + `wrangler dev --test-scheduled` (`IDOS_BQ_API`, `IDOS_BQ_TOKEN_URL` sahte sunucuya),
     zamanlayıcı: `/cdn-cgi/handler/scheduled`
+- **Müşteri ana kaydı (IDOS) önbelleği** (`worker/ana-kayit.js`, tasarım `docs/tasarim/musteri-ana-kayit.md` §3): CRM kartı
+  `musteriler.ana_kayit_id` ile IDOS müşterisine bağlanır; müşteri kartında üstte salt okuma "Ana kayıt" bloğu görünür.
+  Her saat başı yalnız değişenler, 07.00 UTC'de tam liste çekilir (`ana_musteri` tablosu, yedeğe girmez). Kart açılınca tek
+  müşteri istenir, 10 dakika önbellekte kalır; IDOS'a ulaşılamazsa son önbellek "eski" uyarısıyla gösterilir. Ayarlar:
+  - Gizli: `IDOS_ORTAK_JETON` — IDOS'taki `ORTAK_JETON_PANEL` ile aynı değer (değer hiçbir dosyaya yazılmaz)
+  - `IDOS_ORTAK_URL` — IDOS adresi (https); `IDOS_MUSTERI_ADRESI` (isteğe bağlı) — "Ana kayıtta düzenle" bağlantısı, `{id}` yer tutucusuyla
+  - Ayar yoksa eşitleme atlanır, blok gizlenir. Elle eşitleme: `POST /api/yonetim/ana-kayit/esitle` (`{"tam": true}` ile tam liste)
+  - Test: `node tools/sahte/idos-ortak.mjs 8799 <deneme-jetonu>` + `wrangler dev --var IDOS_ORTAK_URL:http://127.0.0.1:8799 --var IDOS_ORTAK_JETON:<deneme-jetonu>`,
+    sonra `node tools/test-ana-kayit.mjs <panel adresi> http://127.0.0.1:8799 <ekran klasörü> <persist klasörü>`
 - Asistan testi: `node tools/sahte/anthropic.mjs 8999` (sahte API) + `wrangler dev --var ANTHROPIC_API_KEY:sahte --var ASISTAN_API_URL:http://127.0.0.1:8999/`,
   sonra `node tools/test-asistan.mjs <anahtarsız-adres> <sahte-anahtarlı-adres>`
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
