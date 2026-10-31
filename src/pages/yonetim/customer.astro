@@ -3,6 +3,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Müşteri kartı" aktif="crm" yol="Müşteri ilişkileri › CRM">
 <div data-ust style="display: flex; flex-direction: column; gap: 12px"></div>
+<section class="kart" aria-label="Ana kayıt (IDOS)" data-ana-kayit hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <section class="kart" aria-label="Hesaplar ve erişimler" data-hesaplar style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <section class="kart" aria-label="Reklam özeti (IDOS)" data-reklam hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
@@ -135,7 +136,53 @@ import Yonetim from '../../layouts/Yonetim.astro';
       : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu müşteri için henüz hesap kaydı yok. Google Ads, Meta, GA4, GTM gibi hesaplarını ve erişimlerinizi envantere ekleyin.')]);
   }
 
+  // Müşteri ana kaydı (IDOS): salt okuma. Müşteri bilgisi IDOS'ta düzenlenir; burada düzenleme düğmesi yoktur.
+  // IDOS bağlantısı kurulu değilse ve kart bağlı değilse blok görünmez. Bilinmeyen değer "—" yazılır.
+  const ANA_DURUM = { aktif: 'Aktif', pasif: 'Pasif', ayrildi: 'Ayrıldı', arsiv: 'Arşiv' };
+  const ANA_CIP = { aktif: 'kazanildi', pasif: 'teklif', ayrildi: 'kaybedildi', arsiv: '' };
+  const tire = (v) => (v === null || v === undefined || v === '' ? '—' : v);
+  async function anaKayitYukle() {
+    const kutu = document.querySelector('[data-ana-kayit]');
+    let r;
+    try { r = await api(`musteriler/${encodeURIComponent(id)}/ana-kayit`); } catch (h) { kutu.hidden = true; return; }
+    if (!r.bagli && !r.kurulu) { kutu.hidden = true; return; }
+    kutu.hidden = false;
+    const k = r.kayit;
+    const baslik = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
+      el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' },
+        el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Ana kayıt (IDOS): müşteri bilgileri'),
+        el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Salt okuma · müşteri bilgisi yalnız IDOS\'ta değiştirilir')),
+      r.duzenle ? el('a', { href: r.duzenle, target: '_blank', rel: 'noopener noreferrer', class: 'dugme kucuk' }, 'Ana kayıtta düzenle ↗') : '');
+    const satirlar = [baslik];
+    if (!r.bagli) {
+      satirlar.push(el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu kart ana kayda bağlı değil. Müşteri bilgileri IDOS\'tan okunmuyor.'));
+    } else if (r.yok) {
+      satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Bağlı ana kayıt IDOS\'ta bulunamadı. Müşteri silinmiş ya da paylaşımdan çıkarılmış olabilir. IDOS\'ta kontrol edin.'));
+    } else if (!k) {
+      satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Ana kayıt okunamadı' + (r.hata ? ': ' + r.hata : '') + '. Önbellekte bu müşteri için kayıt yok.'));
+    } else {
+      const h = k.hesaplar || {};
+      const say = (l) => (Array.isArray(l) ? l.filter((x) => x.tur !== 'arsiv').length : 0);
+      const var_ = (v) => (v ? 'bağlı' : '—');
+      satirlar.push(
+        el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
+          el('strong', { style: 'font-size: 15px; color: var(--head); overflow-wrap: anywhere' }, tire(k.marka)),
+          k.durum ? el('span', { class: 'cip ' + (ANA_CIP[k.durum] || '') }, ANA_DURUM[k.durum] || k.durum) : el('span', { class: 'cip' }, 'Durum: —'),
+          el('span', { style: 'font-size: 13px; color: var(--tx2); overflow-wrap: anywhere' }, 'Sorumlu: ' + tire(k.sorumlu))),
+        el('span', { style: 'font-size: 13px; overflow-wrap: anywhere' }, [
+          'Unvan: ' + tire(k.unvan), 'Sektör: ' + tire(k.sektor), 'Ana sonuç: ' + tire(k.ana_sonuc)].join(' · ')),
+        k.web_sitesi ? el('span', { style: 'font-size: 13px; overflow-wrap: anywhere' }, 'Web sitesi: ', el('a', { href: k.web_sitesi, target: '_blank', rel: 'noopener noreferrer' }, k.web_sitesi)) : el('span', { style: 'font-size: 13px' }, 'Web sitesi: —'),
+        el('span', { style: 'font-size: 13px; overflow-wrap: anywhere' }, [
+          'Meta reklam hesabı: ' + say(h.meta_ads), 'Google Ads hesabı: ' + say(h.google_ads), 'GA4: ' + var_(h.ga4),
+          'Search Console: ' + var_(h.search_console), 'GTM: ' + var_(h.gtm_web), 'Merchant Center: ' + var_(h.merchant)].join(' · ')));
+      if (r.eski) satirlar.push(el('div', { class: 'uyari', role: 'status' }, 'IDOS\'a şu an ulaşılamadı' + (r.hata ? ' (' + r.hata + ')' : '') + '; son önbellek gösteriliyor. Bilgiler güncel olmayabilir.'));
+    }
+    satirlar.push(el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Son eşitleme: ' + (r.son_esitleme ? tarih(r.son_esitleme) : '—') + (k && r.cekim ? ' · bu kayıt alındı: ' + tarih(r.cekim) : '')));
+    kutu.replaceChildren(...satirlar);
+  }
+
   async function yukle() {
+    anaKayitYukle();
     teklifleriYukle();
     reklamYukle();
     hesaplarYukle();

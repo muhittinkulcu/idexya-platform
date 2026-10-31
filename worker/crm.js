@@ -44,13 +44,13 @@ const epostaNormal = (e) => String(e || '').trim().toLowerCase();
 const musteriAdi = (m) => m.firma || m.ad || m.eposta || m.telefon || 'Adsız müşteri';
 
 // --- Birleştirme: musteri_id sütunu olan tablolar çalışma anında bulunur (başka modüllerin tabloları olsa da olmasa da çalışır).
-// reklam_ozet.musteri_id IDOS'un kendi müşteri numarasıdır, IDP kimliği değildir: taşınmaz.
-const TASINMAZ = new Set(['musteriler', 'reklam_ozet']);
+// reklam_ozet.musteri_id ve ana_musteri.musteri_id IDOS'un kendi müşteri numarasıdır, IDP kimliği değildir: taşınmaz.
+const TASINMAZ = new Set(['musteriler', 'reklam_ozet', 'ana_musteri']);
 async function musteriTablolari(db) {
   const r = await db.prepare("SELECT name, sql FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE '_cf_%'").all();
   return r.results.filter((t) => !TASINMAZ.has(t.name) && /^[A-Za-z_][A-Za-z0-9_]*$/.test(t.name) && /[\s(,]musteri_id\s/i.test(t.sql || '')).map((t) => t.name);
 }
-const DOLDURULAN = { firma: 'Firma', ad: 'Yetkili kişi', eposta: 'E-posta', telefon: 'Telefon', sektor: 'Sektör', kaynak: 'Kaynak', deger: 'Tahmini değer', paket: 'Paket', sorumlu: 'Sorumlu' };
+const DOLDURULAN = { firma: 'Firma', ad: 'Yetkili kişi', eposta: 'E-posta', telefon: 'Telefon', sektor: 'Sektör', kaynak: 'Kaynak', deger: 'Tahmini değer', paket: 'Paket', sorumlu: 'Sorumlu', ana_kayit_id: 'Ana kayıt bağı' };
 const bosMu = (v) => v === null || v === undefined || v === '';
 const ciftAnahtar = (a, b) => (a < b ? [a, b] : [b, a]);
 
@@ -189,6 +189,9 @@ export async function yonetimCrmApi(db, env, yontem, yol, govde, kim) {
     const kartlar = (await db.prepare(`SELECT * FROM musteriler WHERE id IN (${[tutId, ...kaynaklar].map(() => '?').join(',')})`).bind(tutId, ...kaynaklar).all()).results;
     const tut = kartlar.find((x) => x.id === tutId);
     if (!tut || kartlar.length !== kaynaklar.length + 1) return hata('Kartlardan biri bulunamadı; sayfayı yenileyin', 404);
+    // İki farklı ana kayda bağlı kartlar birleştirilmez: hangisinin doğru olduğu IDOS'ta çözülmeli.
+    const anaKayitlar = new Set(kartlar.map((x) => x.ana_kayit_id).filter(Boolean));
+    if (anaKayitlar.size > 1) return hata('Bu kartlar ana kayıtta farklı müşterilere bağlı; birleştirilemez', 409);
     const tablolar = await musteriTablolari(db);
     const ph = kaynaklar.map(() => '?').join(',');
     // Taşınacak satır sayıları (günlük notu için)
