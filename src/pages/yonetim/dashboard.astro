@@ -118,13 +118,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
 <div class="pano" data-pano>
   <section class="kart modul" data-m="kpi" aria-label="Temel sayılar">
-    <div class="modul-bas"><h2>Temel sayılar</h2><small>Gerçek veriler · spam sayılmaz</small></div>
+    <div class="modul-bas"><div><h2 data-kart-bilgi="Sitedeki formlardan gelen talepler ile CRM'deki fırsatların özet sayılarıdır; spam olarak ayrılan talepler sayılmaz.">Temel sayılar: talepler ve satış</h2><small class="kart-alt">idexya.com ve CRM · her kutunun dönemi kutuda yazılı · spam sayılmaz</small></div></div>
     <div class="kpi-sira" data-kpi></div>
   </section>
 
   <section class="kart modul" data-m="trend" aria-label="Talep grafiği">
     <div class="modul-bas">
-      <h2>Gelen talepler</h2>
+      <div><h2 data-kart-bilgi="Seçili dönemde siteden gelen taleplerin günlere ve kaynağa göre dağılımıdır; kesikli çizgi önceki eşit dönemdir.">Gelen talepler: kaynağa göre</h2><small class="kart-alt">idexya.com formları ve asistan · seçili dönem · İstanbul saati</small></div>
       <span style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
         <span class="segment-kucuk" role="group" aria-label="Dönem" data-donem>
           <button type="button" data-g="7">7 gün</button><button type="button" data-g="30">30 gün</button><button type="button" data-g="90">90 gün</button>
@@ -144,7 +144,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 
   <section class="kart modul" data-m="kure" aria-label="Bekleyen talepler">
-    <div class="modul-bas"><h2>Bekleyen talepler</h2><a href="/leads?tab=new" class="bk-bag">Talepleri aç →</a></div>
+    <div class="modul-bas"><div><h2 data-kart-bilgi="Henüz CRM'e alınmamış ya da spam olarak ayrılmamış, yanıt bekleyen taleplerdir.">Bekleyen talepler: yanıt bekleyenler</h2><small class="kart-alt">idexya.com · şu an açık olanlar</small></div><a href="/leads?tab=new" class="bk-bag">Talepleri aç →</a></div>
     <div class="bk">
       <a class="bk-halka" href="/leads?tab=new" aria-label="Yanıt bekleyen talepler">
         <svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="50" class="bk-iz"/><circle cx="60" cy="60" r="50" class="bk-dolu" data-bk-taze/><circle cx="60" cy="60" r="50" class="bk-gec" data-bk-gec/></svg>
@@ -162,32 +162,32 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 
   <section class="kart modul" data-m="huni" aria-label="Satış hunisi">
-    <div class="modul-bas"><h2>Satış hunisi</h2><a href="/crm" style="font-size: 13px; font-weight: 600">CRM panosu →</a></div>
+    <div class="modul-bas"><div><h2 data-kart-bilgi="CRM'deki kartların aşamalara göre dağılımıdır; her kart yalnız bulunduğu aşamada sayılır.">Satış hunisi: CRM aşamaları</h2><small class="kart-alt">Tüm CRM kartları · tüm zamanlar</small></div><a href="/crm" style="font-size: 13px; font-weight: 600">CRM panosu →</a></div>
     <ol class="hn" data-huni></ol>
     <div data-huni-alt style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px"></div>
   </section>
 
   <section class="kart modul" data-m="isi" aria-label="Talepler hangi saatte geliyor">
-    <div class="modul-bas"><h2>Talepler hangi saatte geliyor</h2><small>Son 90 gün · İstanbul saati</small></div>
+    <div class="modul-bas"><div><h2 data-kart-bilgi="Taleplerin haftanın günü ve günün saatine göre dağılımıdır; koyu kare daha çok talep demektir.">Talep saatleri: gün ve saate göre</h2><small class="kart-alt">idexya.com talepleri · son 90 gün · İstanbul saati</small></div></div>
     <div class="isi" data-isi role="img"></div>
     <span style="font-size: 13px; color: var(--tx2)" data-isi-not></span>
   </section>
 
   <section class="kart modul" data-m="kaynak" aria-label="Talepler nereden geliyor">
-    <div class="modul-bas"><h2>Talepler nereden geliyor</h2><small>Son 30 gün</small></div>
+    <div class="modul-bas"><div><h2 data-kart-bilgi="Taleplerin hangi formdan ve hangi sayfadan geldiğini gösterir.">Talep kaynakları: form ve sayfa</h2><small class="kart-alt">idexya.com talepleri · son 30 gün</small></div></div>
     <div class="yatay" data-kaynaklar></div>
     <h3 style="margin: 6px 0 0; font-size: 13px; color: var(--tx2); font-weight: 600">Talep getiren sayfalar</h3>
     <div class="yatay" data-sayfalar></div>
   </section>
 
   <section class="kart modul" data-m="hareket" aria-label="Son hareketler">
-    <div class="modul-bas"><h2>Son hareketler</h2></div>
+    <div class="modul-bas"><div><h2 data-kart-bilgi="CRM kartlarına düşen son notlar, aşama değişiklikleri ve sistem kayıtlarıdır.">Son hareketler: CRM günlüğü</h2><small class="kart-alt">Tüm CRM kartları · son 12 kayıt</small></div></div>
     <div data-hareket style="display: flex; flex-direction: column"></div>
   </section>
 
   <section class="kart modul" data-m="reklam" aria-label="Reklam performansı">
     <div class="modul-bas">
-      <h2>Reklam performansı</h2>
+      <div><h2 data-kart-bilgi="IDOS'tan günde bir kez çekilen reklam harcaması ve sonuçlarıdır; farklı para birimleri toplanmaz.">Reklam performansı: Meta ve Google Ads</h2><small class="kart-alt">Tüm müşterilerin IDOS reklam hesapları · son 28 gün, bugün hariç</small></div>
       <span style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><span class="cip gorusme" data-reklam-durum>Yükleniyor…</span><button type="button" class="dugme kucuk" data-reklam-cek hidden>Şimdi çek</button></span>
     </div>
     <div data-reklam-govde style="display: flex; flex-direction: column; gap: 14px"></div>

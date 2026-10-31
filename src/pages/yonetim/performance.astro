@@ -4,7 +4,7 @@ import '../../scripts/yonetim/grafik.css';
 ---
 <Yonetim baslik="Hız ve güvenlik" aktif="hiz" yol="Site" aciklama="Gerçek ziyaretçilerin tarayıcısında ölçülen sayfa hızı (Core Web Vitals) ve site denetiminin sayfa ağırlığı, güvenlik başlıkları, robots.txt ve sitemap kontrolleri.">
 <section class="kart modul" aria-labelledby="b-gercek" style="padding: 22px; display: flex; flex-direction: column; gap: 14px">
-  <div class="modul-bas"><h2 id="b-gercek">Gerçek kullanıcı hızı</h2>
+  <div class="modul-bas"><div><h2 id="b-gercek" data-kart-bilgi="Ziyaretçilerin kendi cihazında ölçülen yüklenme, tepki ve kayma değerleridir.">Gerçek kullanıcı hızı: Core Web Vitals</h2><small class="kart-alt">idexya.com ziyaretçileri · seçili dönem · 75. yüzdelik</small></div>
     <div class="segment-kucuk" role="group" aria-label="Dönem" data-donem><button type="button" data-g="7">Son 7 gün</button><button type="button" data-g="28">Son 28 gün</button></div>
   </div>
   <p style="margin: 0; color: var(--tx2); font-size: 14px; max-width: 900px">Değerler ziyaretçilerin kendi cihazında, sayfadan ayrılırken ölçülür ve Google'ın yöntemiyle <b>75. yüzdelik</b> olarak gösterilir: ziyaretlerin %75'i bu değerden iyi ya da eşittir. Eşikler Google Core Web Vitals'a göre: <b>LCP</b> (en büyük içeriğin görünme süresi) iyi ≤ 2,5 sn, kötü &gt; 4 sn; <b>INP</b> (tıklamaya tepki süresi, yaklaşık) iyi ≤ 200 ms, kötü &gt; 500 ms; <b>CLS</b> (sayfa kayması) iyi ≤ 0,1, kötü &gt; 0,25. Do Not Track açık ziyaretçiler ölçülmez; sayfa başına günde en çok 500 örnek tutulur.</p>
@@ -19,16 +19,16 @@ import '../../scripts/yonetim/grafik.css';
 <div class="uyari bilgi" data-sinir>Denetim bilgisi yükleniyor…</div>
 <div class="pano">
   <section class="kart modul" aria-labelledby="b-guv">
-    <div class="modul-bas"><h2 id="b-guv">Güvenlik başlıkları</h2></div>
+    <div class="modul-bas"><div><h2 id="b-guv" data-kart-bilgi="Denetlenen sayfaların yanıtında tarayıcıyı koruyan başlıkların olup olmadığını gösterir.">Güvenlik başlıkları: sayfa yanıtları</h2><small class="kart-alt">idexya.com · son denetim</small></div></div>
     <p style="margin: 0; color: var(--tx2); font-size: 13px">Başlıklar, denetlenen her sayfanın Cloudflare dosya sunucusundan gelen yanıtında kontrol edilir; yani public/_headers kuralları uygulanmış hâli. Cloudflare panelinde alan adı düzeyinde eklenen başlıklar (ör. HSTS) bu yanıtta görünmediği için burada denetlenmez.</p>
     <div data-guvenlik style="overflow-x: auto"></div>
   </section>
   <section class="kart modul" aria-labelledby="b-tarama">
-    <div class="modul-bas"><h2 id="b-tarama">robots.txt ve sitemap</h2></div>
+    <div class="modul-bas"><div><h2 id="b-tarama" data-kart-bilgi="Arama motorlarının siteyi nasıl tarayacağını belirleyen iki dosyanın son denetimdeki durumudur.">robots.txt ve sitemap: tarama kuralları</h2><small class="kart-alt">idexya.com · son denetim</small></div></div>
     <div data-tarama></div>
   </section>
   <section class="kart modul tam" aria-labelledby="b-agirlik">
-    <div class="modul-bas"><h2 id="b-agirlik">Sayfa ağırlığı</h2><small>HTML boyutu sıkıştırılmadan ölçülür; görseller ve dosyalar dâhil değildir</small></div>
+    <div class="modul-bas"><div><h2 id="b-agirlik" data-kart-bilgi="Ağır sayfalar yavaş açılır; bu tablo her sayfanın HTML boyutunu gösterir.">Sayfa ağırlığı: HTML boyutu</h2><small class="kart-alt">idexya.com · son denetim · sıkıştırılmamış HTML, görseller hariç</small></div></div>
     <div data-agirlik style="overflow-x: auto"></div>
   </section>
 </div>

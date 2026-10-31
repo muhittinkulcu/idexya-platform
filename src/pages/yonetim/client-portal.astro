@@ -111,7 +111,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const listeKutu = el('section', { class: 'kart', 'aria-label': 'Davetler', style: 'overflow: hidden' });
     async function listeCiz() {
       const l = sonuc.hidden ? v : await api('portal/davetler');
-      listeKutu.replaceChildren(el('h2', { style: 'margin: 0; padding: 14px 16px; font-size: 16px; color: var(--head)' }, 'Davetler'),
+      listeKutu.replaceChildren(el('div', { 'data-kart-bas': '', style: 'padding: 14px 16px' }, el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)', 'data-kart-bilgi': 'Müşterilerinize gönderilmek üzere oluşturulan üyelik davetleri ve kullanılıp kullanılmadıklarıdır.' }, 'Davetler: müşteri alanı üyelikleri'), el('small', { class: 'kart-alt' }, 'Tüm müşteriler · tüm davetler')),
         ...(l.davetler.length ? l.davetler.map((d) => el('div', { style: 'display: flex; flex-direction: column; gap: 6px; padding: 12px 16px; border-top: 1px solid rgb(var(--line))' },
           el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center' },
             el('strong', { style: 'color: var(--head); overflow-wrap: anywhere' }, d.eposta),

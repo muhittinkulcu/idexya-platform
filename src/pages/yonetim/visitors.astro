@@ -11,20 +11,20 @@ import '../../scripts/yonetim/grafik.css';
 <div class="kpi-sira" data-kpi></div>
 <div class="pano">
   <section class="kart modul tam" aria-labelledby="b-gunluk" id="gunluk">
-    <div class="modul-bas"><h2 id="b-gunluk">Günlük sayfa görüntüleme</h2><div class="lejant" data-lejant></div></div>
+    <div class="modul-bas"><div><h2 id="b-gunluk" data-kart-bilgi="Her gün kaç sayfa açıldığını gösterir; aynı kişinin açtığı her sayfa ayrı sayılır.">Günlük sayfa görüntüleme: tüm site</h2><small class="kart-alt">idexya.com · seçili dönem · çerezsiz yaklaşık sayım</small></div><div class="lejant" data-lejant></div></div>
     <div class="cubuk-alan" data-alan></div>
     <div class="x-eksen" data-x></div>
   </section>
   <section class="kart modul" aria-labelledby="b-sayfa">
-    <div class="modul-bas"><h2 id="b-sayfa">En çok görüntülenen sayfalar</h2><small>ilk 20</small></div>
+    <div class="modul-bas"><div><h2 id="b-sayfa" data-kart-bilgi="Seçili dönemde en çok açılan 20 sayfadır.">En çok görüntülenen sayfalar: ilk 20</h2><small class="kart-alt">idexya.com · seçili dönem</small></div></div>
     <div class="yatay" data-sayfalar></div>
   </section>
   <section class="kart modul" aria-labelledby="b-kaynak">
-    <div class="modul-bas"><h2 id="b-kaynak">Nereden geldiler</h2><small>yalnız yönlendiren sitenin alan adı</small></div>
+    <div class="modul-bas"><div><h2 id="b-kaynak" data-kart-bilgi="Ziyaretçiyi siteye gönderen sitenin alan adıdır; yönlendiren yoksa doğrudan, site içinden geçişler site içi gezinme olarak görünür.">Ziyaret kaynakları: yönlendiren siteler</h2><small class="kart-alt">idexya.com · seçili dönem · yalnız alan adı</small></div></div>
     <div class="yatay" data-kaynaklar></div>
   </section>
   <section class="kart modul" aria-labelledby="b-cihaz">
-    <div class="modul-bas"><h2 id="b-cihaz">Cihaz</h2><small>ekran genişliğine göre</small></div>
+    <div class="modul-bas"><div><h2 id="b-cihaz" data-kart-bilgi="Sayfa görüntülemelerinin mobil, tablet ve masaüstü dağılımıdır.">Cihaz türü: ekran genişliğine göre</h2><small class="kart-alt">idexya.com · seçili dönem</small></div></div>
     <div class="yatay" data-cihazlar></div>
     <p style="margin: 0; font-size: 12px; color: var(--tx2)">Mobil: 768 pikselden dar · Tablet: 768–1099 piksel · Masaüstü: 1100 piksel ve üstü.</p>
   </section>

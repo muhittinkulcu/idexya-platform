@@ -8,7 +8,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <section class="kart" aria-label="Reklam özeti (IDOS)" data-reklam hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section class="kart" aria-label="Müşteri bilgileri" style="flex: 1 1 320px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 16px; color: var(--head)">Bilgiler</h2>
+<div data-kart-bas><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Bu kart Panel'deki satış kaydıdır; ana kayıttaki müşteri bilgisi yukarıdaki IDOS kutusundadır.">Kart bilgileri: Panel CRM</h2><small class="kart-alt"><span data-baslik></span> · elle girilen satış bilgileri</small></div>
 <form data-bilgi style="display: flex; flex-direction: column; gap: 10px">
 <label class="alan">Firma<input name="firma"></label>
 <label class="alan">Yetkili kişi<input name="ad"></label>
@@ -22,7 +22,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </form>
 </section>
 <section class="kart" aria-label="Günlük" style="flex: 2 1 460px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<h2 style="margin: 0; font-size: 16px; color: var(--head)">Günlük</h2>
+<div data-kart-bas><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Bu karta eklenen notlar, görüşmeler ve sistemin yazdığı kayıtlardır.">Günlük: notlar ve hareketler</h2><small class="kart-alt"><span data-baslik></span> · yeniden eskiye, en çok 300 kayıt</small></div>
 <form data-not style="display: flex; flex-direction: column; gap: 8px">
 <div role="group" aria-label="Kayıt türü" data-tur style="display: flex; gap: 6px; flex-wrap: wrap"></div>
 <label class="alan"><span style="position: absolute; left: -10000px">Kayıt metni</span><textarea name="metin" rows="3" placeholder="Görüşme özeti, alınan karar, sonraki adım…" style="resize: vertical"></textarea></label>
@@ -32,7 +32,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </section>
 </div>
 <section class="kart" aria-label="Teklifler" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><h2 style="margin: 0; font-size: 16px; color: var(--head)">Teklifler</h2><a class="dugme kucuk" data-teklif-yeni href="/proposals?new=1">+ Bu müşteriye teklif hazırla</a></div>
+<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Bu müşteri için hazırlanan tekliflerin numarası, tutarı ve durumudur.">Teklifler: bu müşteriye hazırlananlar</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler</small></div><a class="dugme kucuk" data-teklif-yeni href="/proposals?new=1">+ Bu müşteriye teklif hazırla</a></div>
 <ul data-teklifler style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ul>
 </section>
 <script>
@@ -108,8 +108,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (!r.hesaplar.length) { kutu.hidden = true; return; }
     kutu.hidden = false;
     kutu.replaceChildren(
-      el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
-        el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Reklam özeti (IDOS)'),
+      el('div', { 'data-kart-bas': '', style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
+        el('div', {}, el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)', 'data-kart-bilgi': 'IDOS eşitleme sayfasında bu müşteriye eşleştirilen reklam hesaplarının harcama ve sonuçlarıdır.' }, 'Reklam özeti: eşleşen hesaplar'),
+          el('small', { class: 'kart-alt' }, `Bu müşteri · son ${r.gun} gün, bugün hariç · para birimleri ayrı`)),
         el('a', { href: '/crm-sync', style: 'font-size: 13px' }, 'Eşleşmeleri yönet')),
       r.ozet.length
         ? el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px' }, r.ozet.map((o) => el('div', { style: 'padding: 10px 12px; border-radius: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 2px; min-width: 0' },
@@ -125,8 +126,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const kutu = document.querySelector('[data-hesaplar]');
     let r;
     try { r = await api('envanter/musteri/' + encodeURIComponent(id)); } catch (h) { kutu.hidden = true; return; }
-    const bas = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
-      el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, `Hesaplar ve erişimler (${r.kayitlar.length})`),
+    const bas = el('div', { 'data-kart-bas': '', style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
+      el('div', {}, el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)', 'data-kart-bilgi': 'Bu müşterinin reklam ve ölçüm hesapları ile ajansın bu hesaplardaki erişim durumudur.' }, `Hesaplar ve erişimler: ${r.kayitlar.length} kayıt`),
+        el('small', { class: 'kart-alt' }, 'Bu müşteri · hesap envanteri, güncel durum')),
       el('a', { href: '/accounts?customer=' + encodeURIComponent(id), style: 'font-size: 13px' }, r.kayitlar.length ? 'Envanterde yönet' : '+ Hesap ekle'));
     const CIP = { aktif: 'kazanildi', bekliyor: 'teklif', kaldirildi: 'kaybedildi' };
     kutu.replaceChildren(...[bas, r.kayitlar.length
@@ -150,8 +152,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const k = r.kayit;
     const baslik = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
       el('span', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 0' },
-        el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Ana kayıt (IDOS): müşteri bilgileri'),
-        el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Salt okuma · müşteri bilgisi yalnız IDOS\'ta değiştirilir')),
+        el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)', 'data-kart-bilgi': 'IDOS\'taki müşteri ana kaydından okunan bilgilerdir; burada değiştirilemez, değişiklik IDOS\'ta yapılır.' }, 'Ana kayıt (IDOS): müşteri bilgileri'),
+        el('small', { class: 'kart-alt' }, 'Bu müşteri · salt okuma · son eşitleme aşağıda')),
       r.duzenle ? el('a', { href: r.duzenle, target: '_blank', rel: 'noopener noreferrer', class: 'dugme kucuk' }, 'Ana kayıtta düzenle ↗') : '');
     const satirlar = [baslik];
     if (!r.bagli) {
