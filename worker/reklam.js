@@ -121,17 +121,24 @@ export async function reklamCek(env, tetikleyen) {
 export async function yonetimReklamApi(db, env, yontem, yol, kim, govde) {
   if (yol === 'reklam' && yontem === 'GET') {
     const kurulu = reklamKurulu(env);
-    // Hesap adı: panel etiketi > IDOS hesap adı > kimlik. Müşteri: CRM eşleşmesindeki firma (yalnız firma adı; kişi bilgisi gönderilmez) > IDOS marka adı.
+    // Hesap adı: panel etiketi > IDOS hesap adı > kimlik.
+    // Müşteri: ana kayıt (IDOS hesap-esleme → ana_musteri marka adı; bağlı CRM kartı) > CRM elle eşleşmesindeki firma > görünümdeki marka adı.
+    // Kişi bilgisi gönderilmez.
     const [son, sonTamam, gun, satir, hesap, ayar] = await db.batch([
       db.prepare('SELECT zaman, durum, satir, mesaj, tetikleyen FROM reklam_cekim ORDER BY zaman DESC LIMIT 1'),
       db.prepare("SELECT zaman, satir FROM reklam_cekim WHERE durum = 'tamam' ORDER BY zaman DESC LIMIT 1"),
       db.prepare('SELECT gun, platform, para, SUM(harcama) AS harcama, SUM(gosterim) AS gosterim, SUM(tiklama) AS tiklama, COUNT(*) AS hesap FROM reklam_ozet GROUP BY gun, platform, para ORDER BY gun'),
       db.prepare('SELECT gun, platform, hesap, para, harcama, gosterim, tiklama, sonuclar FROM reklam_ozet'),
-      db.prepare(`SELECT o.platform, o.hesap, h.etiket, h.hesap_adi, COALESCE(m.firma, h.marka) AS musteri, m.id AS crm_id
+      db.prepare(`SELECT o.platform, o.hesap, h.etiket, h.hesap_adi,
+          COALESCE(am.marka, m.firma, h.marka) AS musteri,
+          COALESCE((SELECT k.id FROM musteriler k WHERE k.ana_kayit_id = ae.musteri_id ORDER BY k.olusturma LIMIT 1), m.id) AS crm_id,
+          ae.musteri_id AS ana_kayit_id, ae.tur AS ana_tur
         FROM (SELECT DISTINCT platform, hesap FROM reklam_ozet) o
         LEFT JOIN reklam_hesap h ON h.platform = o.platform AND h.hesap = o.hesap
         LEFT JOIN reklam_eslesme e ON e.platform = o.platform AND e.hesap = o.hesap
-        LEFT JOIN musteriler m ON m.id = e.musteri_id`),
+        LEFT JOIN musteriler m ON m.id = e.musteri_id
+        LEFT JOIN ana_hesap_esleme ae ON ae.platform = o.platform AND ae.hesap = o.hesap
+        LEFT JOIN ana_musteri am ON am.musteri_id = ae.musteri_id`),
       db.prepare("SELECT deger FROM ayarlar WHERE anahtar = 'reklam_kurallar'")
     ]);
     let kurallar = null;

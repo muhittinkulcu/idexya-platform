@@ -17,7 +17,10 @@ const SOSYAL = ['instagram', 'facebook', 'tiktok', 'linkedin', 'youtube', 'googl
 const HESAP_LISTE = ['meta_ads', 'google_ads'];
 const HESAP_TEK = ['meta_isletme', 'ga4', 'search_console', 'gtm_web', 'gtm_sunucu', 'merchant'];
 const HESAP_TUR = new Set(['ana', 'ek', 'arsiv']);
-const A = { zaman: 'ana_kayit.son_zaman', esitleme: 'ana_kayit.son_esitleme', tam: 'ana_kayit.son_tam', hata: 'ana_kayit.son_hata' };
+const A = { zaman: 'ana_kayit.son_zaman', esitleme: 'ana_kayit.son_esitleme', tam: 'ana_kayit.son_tam', hata: 'ana_kayit.son_hata', belirsiz: 'ana_kayit.belirsiz_hesap' };
+// IDOS platform adı → Panel reklam_ozet platform adı. Hesap kimliği IDOS'la aynı biçime getirilir (Meta: act_ öneksiz, Google: tiresiz).
+const PLATFORM = { meta_ads: 'meta', google_ads: 'google' };
+export const hesapNormal = (platform, h) => { const v = String(h || '').trim(); return platform === 'meta' ? v.replace(/^act_/i, '') : v.replace(/[-\s]/g, ''); };
 
 export const anaKayitKurulu = (env) => !!(env.IDOS_ORTAK_URL && env.IDOS_ORTAK_JETON);
 
@@ -72,6 +75,13 @@ export function temizle(k) {
   };
 }
 
+function eslesmeTemizle(x) {
+  const platform = PLATFORM[x && x.platform];
+  const hesap = platform ? hesapNormal(platform, yazi(x.hesap, 64)) : '';
+  if (!platform || !/^[\w.-]{1,64}$/.test(hesap) || !KIMLIK.test(String(x.musteri_id || ''))) return null;
+  return { platform, hesap, musteri_id: String(x.musteri_id), tur: HESAP_TUR.has(x.tur) ? x.tur : 'ana' };
+}
+
 const ekle = (db, k, cekim, parti) => db.prepare(`INSERT INTO ana_musteri (musteri_id, marka, durum, veri, guncelleme, cekim, parti) VALUES (?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(musteri_id) DO UPDATE SET marka = excluded.marka, durum = excluded.durum, veri = excluded.veri, guncelleme = excluded.guncelleme, cekim = excluded.cekim${parti === null ? '' : ', parti = excluded.parti'}`)
   .bind(k.musteri_id, k.marka, k.durum, JSON.stringify(k), k.guncelleme, cekim, parti === null ? 'tek' : parti);
@@ -108,12 +118,27 @@ export async function anaKayitEsitle(env, tetikleyen, { tam = false } = {}) {
       // Boş tam liste, dolu önbelleği silmez: IDOS tarafındaki geçici bir sorun bütün bağları "bulunamadı"ya düşürmesin.
       if (n && n.n > 0) throw new Error('IDOS boş müşteri listesi döndü; önbellek korundu');
     }
+    // Reklam hesabı → ana kayıt (4. adım): liste her seferinde bütün olarak gelir ve tek işlemde değiştirilir.
+    const es = await idosIstek(env, '/api/ortak/hesap-esleme');
+    if (!es.veri || !Array.isArray(es.veri.eslesme)) throw new Error('IDOS hesap eşleme yanıtı beklenen biçimde değil');
+    const eslesme = [...new Map(es.veri.eslesme.map(eslesmeTemizle).filter(Boolean).map((x) => [x.platform + '|' + x.hesap, x])).values()];
+    if (!eslesme.length) {
+      const n = await db.prepare('SELECT COUNT(*) AS n FROM ana_hesap_esleme').first();
+      if (n && n.n > 0) throw new Error('IDOS boş hesap eşleme listesi döndü; önbellek korundu');
+    }
     const sorgular = kayitlar.map((k) => ekle(db, k, z, parti ?? 'artim'));
     for (const id of silinen) sorgular.push(db.prepare('DELETE FROM ana_musteri WHERE musteri_id = ?').bind(id));
     if (tamMi) sorgular.push(db.prepare('DELETE FROM ana_musteri WHERE parti IS NOT ?').bind(parti));
     await parcali(db, sorgular);
-    await ayarYaz(db, { [A.zaman]: veri.zaman, [A.esitleme]: z, [A.hata]: '', ...(tamMi ? { [A.tam]: z } : {}) }, tetikleyen);
-    return { ok: true, tam: tamMi, gelen: kayitlar.length, silinen: silinen.length };
+    const esSorgu = [db.prepare('DELETE FROM ana_hesap_esleme')];
+    for (let i = 0; i < eslesme.length; i += 400) {
+      esSorgu.push(db.prepare(`INSERT INTO ana_hesap_esleme (platform, hesap, musteri_id, tur, cekim)
+        SELECT json_extract(value, '$.platform'), json_extract(value, '$.hesap'), json_extract(value, '$.musteri_id'), json_extract(value, '$.tur'), ? FROM json_each(?)`).bind(z, JSON.stringify(eslesme.slice(i, i + 400))));
+    }
+    await db.batch(esSorgu);
+    await ayarYaz(db, { [A.zaman]: veri.zaman, [A.esitleme]: z, [A.hata]: '', [A.belirsiz]: String(Number(es.veri.belirsiz_hesap_sayisi) || 0), ...(tamMi ? { [A.tam]: z } : {}) }, tetikleyen);
+    const aday = await adaylariKontrolEt(env, tetikleyen).catch((e) => { console.error('aday kontrol', e && e.message); return null; });
+    return { ok: true, tam: tamMi, gelen: kayitlar.length, silinen: silinen.length, hesap: eslesme.length, aday };
   } catch (e) {
     const mesaj = (e && e.name === 'TimeoutError') ? 'IDOS zaman aşımına uğradı' : String((e && e.message) || e).slice(0, 300);
     console.error('ana kayıt eşitleme', mesaj);
@@ -148,6 +173,99 @@ export async function anaMusteriGetir(env, musteriId) {
   }
 }
 
+// --- "Müşteri yap" (4. adım): kazanılan fırsat IDOS onay kuyruğuna aday olarak gider; kaydı yalnız Muhittin onaylar.
+// Kişi bilgisi yalnız kullanıcı "kişinin izni var" derse gönderilir (KVKK, en az veri). Onaylanınca kart ana kayda bağlanır.
+const TELEFON = /^[0-9 +()-]{6,40}$/;
+const EPOSTA = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const ADAY_TAZE_MS = 2 * 60 * 1000;
+
+export function adayGovdesi(m, kisiIzin, webSitesi) {
+  const marka = yazi(m.firma, 200) || yazi(m.ad, 200);
+  if (!marka) return null;
+  const g = { kaynak_kimlik: m.id, marka };
+  if (yazi(m.sektor, 100)) g.sektor = yazi(m.sektor, 100);
+  if (EPOSTA.test(m.sorumlu || '') && String(m.sorumlu).length <= 200) g.sorumlu = m.sorumlu;
+  if (webSitesi) g.web_sitesi = webSitesi;
+  if (kisiIzin) {
+    g.kisi_izin = true;
+    if (yazi(m.ad, 120) && m.firma) g.kisi_ad = yazi(m.ad, 120);
+    if (EPOSTA.test(m.eposta || '') && String(m.eposta).length <= 200) g.kisi_eposta = m.eposta;
+    if (TELEFON.test(m.telefon || '')) g.kisi_telefon = m.telefon;
+  }
+  return g;
+}
+
+const ADAY_DURUM = new Set(['bekliyor', 'onaylandi', 'reddedildi']);
+// IDOS'tan gelen aday durumunu yazar; onaylandıysa kartı ana kayda bağlar (kart başka bir kayda bağlıysa dokunmaz).
+async function adayDurumYaz(db, musteriId, v, kim) {
+  if (!v || !ADAY_DURUM.has(v.durum)) throw new Error('IDOS aday yanıtı beklenen biçimde değil');
+  const z = simdi(), anaId = v.durum === 'onaylandi' && KIMLIK.test(String(v.musteri_id || '')) ? String(v.musteri_id) : null;
+  const once = await db.prepare('SELECT durum FROM ana_kayit_aday WHERE musteri_id = ?').bind(musteriId).first();
+  const q = [db.prepare('UPDATE ana_kayit_aday SET durum = ?, ana_kayit_id = ?, red_gerekcesi = ?, son_kontrol = ? WHERE musteri_id = ?')
+    .bind(v.durum, anaId, v.durum === 'reddedildi' ? yazi(v.red_gerekcesi, 300) : null, z, musteriId)];
+  if (once && once.durum !== v.durum) {
+    if (anaId) {
+      q.push(db.prepare('UPDATE musteriler SET ana_kayit_id = ?, guncelleme = ? WHERE id = ? AND ana_kayit_id IS NULL').bind(anaId, z, musteriId));
+      q.push(db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) SELECT ?, id, ?, ?, ?, ?, ? FROM musteriler WHERE id = ?').bind(crypto.randomUUID(), z, 'sistem', 'Ana kayda alındı', 'IDOS ana kayıt: ' + anaId, kim, musteriId));
+    } else if (v.durum === 'reddedildi') {
+      q.push(db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) SELECT ?, id, ?, ?, ?, ?, ? FROM musteriler WHERE id = ?').bind(crypto.randomUUID(), z, 'sistem', 'Ana kayda alınmadı', yazi(v.red_gerekcesi, 300) || 'Gerekçe yazılmadı', kim, musteriId));
+    }
+  }
+  await db.batch(q);
+}
+
+async function adayKontrol(env, satir, kim) {
+  const r = await idosIstek(env, '/api/ortak/musteri-adayi/' + encodeURIComponent(satir.aday_id));
+  if (r.yok) throw new Error('Aday IDOS\'ta bulunamadı');
+  await adayDurumYaz(env.DB, satir.musteri_id, r.veri, kim);
+}
+
+// Saatlik eşitlemede bekleyen adaylar (en çok 50) yoklanır.
+export async function adaylariKontrolEt(env, kim) {
+  const r = await env.DB.prepare("SELECT musteri_id, aday_id FROM ana_kayit_aday WHERE durum = 'bekliyor' ORDER BY COALESCE(son_kontrol, gonderim) LIMIT 50").all();
+  let hata = 0;
+  for (const s of r.results) { try { await adayKontrol(env, s, kim); } catch (e) { hata++; console.error('aday', e && e.message); } }
+  return { yoklanan: r.results.length, hata };
+}
+
+async function musteriYap(db, env, musteriId, govde, kim) {
+  if (!anaKayitKurulu(env)) return hata('IDOS bağlantısı kurulu değil (IDOS_ORTAK_URL ve IDOS_ORTAK_JETON)', 409);
+  const m = await db.prepare('SELECT id, firma, ad, eposta, telefon, sektor, sorumlu, asama, ana_kayit_id FROM musteriler WHERE id = ?').bind(musteriId).first();
+  if (!m) return hata('Müşteri bulunamadı', 404);
+  if (m.ana_kayit_id) return hata('Bu kart zaten ana kayda bağlı', 409);
+  if (m.asama !== 'kazanildi') return hata('"Müşteri yap" yalnız kazanılan fırsatta kullanılabilir', 409);
+  const var_ = await db.prepare('SELECT durum FROM ana_kayit_aday WHERE musteri_id = ?').bind(musteriId).first();
+  if (var_ && var_.durum === 'bekliyor') return hata('Bu kart için onay bekleyen bir istek zaten var', 409);
+  const site = await db.prepare('SELECT adres FROM site_saglik_hedef WHERE musteri_id = ? AND aktif = 1 ORDER BY olusturma LIMIT 1').bind(musteriId).first();
+  const g = adayGovdesi(m, govde && govde.kisi_izin === true, site ? adres(site.adres) : null);
+  if (!g) return hata('Kartta firma ya da ad yok; önce kart bilgilerini doldurun', 422);
+  let r;
+  try {
+    r = await fetch(taban(env) + '/api/ortak/musteri-adayi', {
+      method: 'POST', body: JSON.stringify(g), signal: AbortSignal.timeout(ZAMAN_ASIMI_MS),
+      headers: { Authorization: 'Bearer ' + String(env.IDOS_ORTAK_JETON).trim(), 'Content-Type': 'application/json', Accept: 'application/json' }
+    });
+  } catch (e) { return hata('IDOS\'a ulaşılamadı; istek gönderilmedi. Biraz sonra yeniden deneyin.', 502); }
+  if (r.status === 429) return hata('IDOS onay kuyruğu dolu; önce bekleyen istekler karara bağlanmalı', 429);
+  if (r.status === 422) return hata('IDOS kart bilgilerini kabul etmedi (biçim hatası); firma, sektör ve iletişim alanlarını kontrol edin', 422);
+  if (!r.ok) return hata('IDOS isteği kabul etmedi (' + r.status + '); istek gönderilmedi', 502);
+  let v;
+  try { v = JSON.parse((await r.text()).slice(0, 100000)); } catch { return hata('IDOS yanıtı okunamadı', 502); }
+  if (!v || typeof v.aday_id !== 'string' || !KIMLIK.test(v.aday_id)) return hata('IDOS yanıtı beklenen biçimde değil', 502);
+  const z = simdi();
+  await db.batch([
+    db.prepare(`INSERT INTO ana_kayit_aday (musteri_id, aday_id, durum, gonderim, gonderen, kisi_gonderildi) VALUES (?, ?, 'bekliyor', ?, ?, ?)
+      ON CONFLICT(musteri_id) DO UPDATE SET aday_id = excluded.aday_id, durum = 'bekliyor', ana_kayit_id = NULL, red_gerekcesi = NULL, son_kontrol = NULL, gonderim = excluded.gonderim, gonderen = excluded.gonderen, kisi_gonderildi = excluded.kisi_gonderildi`)
+      .bind(musteriId, v.aday_id, z, kim.eposta, g.kisi_izin ? 1 : 0),
+    db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(crypto.randomUUID(), musteriId, z, 'sistem', 'Ana kayda onaya gönderildi',
+      g.kisi_izin ? 'İletişim kişisi izinle gönderildi.' : 'İletişim kişisi gönderilmedi.', kim.eposta)
+  ]);
+  // Aynı kart daha önce gönderildiyse IDOS var olan adayın durumunu döner (ör. zaten onaylanmış).
+  if (v.durum && v.durum !== 'bekliyor') await adayDurumYaz(db, musteriId, v, kim.eposta);
+  await islemYaz(db, kim.eposta, 'musteri_yap', musteriId, `aday ${v.aday_id}${g.kisi_izin ? ' · kişi izinli' : ''}`);
+  return json({ ok: true, aday_id: v.aday_id, durum: v.durum || 'bekliyor' });
+}
+
 function duzenleAdresi(env, musteriId) {
   const kalip = String(env.IDOS_MUSTERI_ADRESI || '').trim();
   if (!kalip.includes('{id}')) return null;
@@ -158,22 +276,34 @@ function duzenleAdresi(env, musteriId) {
 export async function yonetimAnaKayitApi(db, env, yontem, yol, kim, govde) {
   let m = yol.match(/^musteriler\/([\w-]+)\/ana-kayit$/);
   if (m && yontem === 'GET') {
-    const mus = await db.prepare('SELECT id, ana_kayit_id FROM musteriler WHERE id = ?').bind(m[1]).first();
+    let mus = await db.prepare('SELECT id, ana_kayit_id, asama FROM musteriler WHERE id = ?').bind(m[1]).first();
     if (!mus) return hata('Müşteri bulunamadı', 404);
+    let aday = await db.prepare('SELECT aday_id, durum, red_gerekcesi, gonderim, gonderen, son_kontrol FROM ana_kayit_aday WHERE musteri_id = ?').bind(m[1]).first();
+    // Bekleyen aday kart açılınca da yoklanır (en çok 2 dakikada bir).
+    if (aday && aday.durum === 'bekliyor' && anaKayitKurulu(env) && Date.now() - Date.parse(aday.son_kontrol || aday.gonderim) > ADAY_TAZE_MS) {
+      try {
+        await adayKontrol(env, { musteri_id: m[1], aday_id: aday.aday_id }, kim.eposta);
+        mus = await db.prepare('SELECT id, ana_kayit_id, asama FROM musteriler WHERE id = ?').bind(m[1]).first();
+        aday = await db.prepare('SELECT aday_id, durum, red_gerekcesi, gonderim, gonderen, son_kontrol FROM ana_kayit_aday WHERE musteri_id = ?').bind(m[1]).first();
+      } catch (e) { console.error('aday', e && e.message); }
+    }
     const ayar = await ayarlar(db);
-    const ortak = { kurulu: anaKayitKurulu(env), son_esitleme: ayar[A.esitleme] || null };
+    const ortak = { kurulu: anaKayitKurulu(env), son_esitleme: ayar[A.esitleme] || null, asama: mus.asama, aday: aday || null };
     if (!mus.ana_kayit_id) return json({ ok: true, bagli: false, ...ortak });
     const r = await anaMusteriGetir(env, mus.ana_kayit_id);
     return json({ ok: true, bagli: true, ana_kayit_id: mus.ana_kayit_id, ...ortak, ...r, duzenle: duzenleAdresi(env, mus.ana_kayit_id) });
   }
+  m = yol.match(/^musteriler\/([\w-]+)\/musteri-yap$/);
+  if (m && yontem === 'POST') return musteriYap(db, env, m[1], govde, kim);
   if (yol === 'ana-kayit/durum' && yontem === 'GET') {
     const [ayar, n, b] = await Promise.all([ayarlar(db), db.prepare('SELECT COUNT(*) AS n FROM ana_musteri').first(), db.prepare('SELECT COUNT(*) AS n FROM musteriler WHERE ana_kayit_id IS NOT NULL').first()]);
-    return json({ ok: true, kurulu: anaKayitKurulu(env), onbellek: n.n, bagli_kart: b.n, son_esitleme: ayar[A.esitleme] || null, son_tam: ayar[A.tam] || null, son_hata: ayar[A.hata] || null });
+    const [hs, ab] = await Promise.all([db.prepare('SELECT COUNT(*) AS n FROM ana_hesap_esleme').first(), db.prepare("SELECT COUNT(*) AS n FROM ana_kayit_aday WHERE durum = 'bekliyor'").first()]);
+    return json({ ok: true, kurulu: anaKayitKurulu(env), onbellek: n.n, bagli_kart: b.n, hesap_esleme: hs.n, belirsiz_hesap: ayar[A.belirsiz] === undefined ? null : Number(ayar[A.belirsiz]), bekleyen_aday: ab.n, son_esitleme: ayar[A.esitleme] || null, son_tam: ayar[A.tam] || null, son_hata: ayar[A.hata] || null });
   }
   if (yol === 'ana-kayit/esitle' && yontem === 'POST') {
     if (!anaKayitKurulu(env)) return hata('IDOS bağlantısı kurulu değil (IDOS_ORTAK_URL ve IDOS_ORTAK_JETON)', 409);
     const r = await anaKayitEsitle(env, kim.eposta, { tam: govde && govde.tam === true });
-    await islemYaz(db, kim.eposta, 'ana_kayit_esitle', null, r.ok ? `${r.tam ? 'tam' : 'artım'} · ${r.gelen} kayıt · ${r.silinen} silinen` : 'hata: ' + r.hata);
+    await islemYaz(db, kim.eposta, 'ana_kayit_esitle', null, r.ok ? `${r.tam ? 'tam' : 'artım'} · ${r.gelen} kayıt · ${r.silinen} silinen · ${r.hesap} hesap` : 'hata: ' + r.hata);
     return r.ok ? json(r) : hata('Eşitleme yapılamadı: ' + r.hata, 502);
   }
   return null;

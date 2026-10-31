@@ -176,7 +176,13 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS donusum_aktarim (talep_id TEXT NOT NULL, platform TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (talep_id, platform))`,
   // Müşteri ana kaydı önbelleği (worker/ana-kayit.js): IDOS ortak API'sinin beyaz liste alanları. Kalıcı kopya değildir.
   `CREATE TABLE IF NOT EXISTS ana_musteri (
-    musteri_id TEXT PRIMARY KEY, marka TEXT, durum TEXT, veri TEXT NOT NULL, guncelleme TEXT, cekim TEXT NOT NULL, parti TEXT NOT NULL)`
+    musteri_id TEXT PRIMARY KEY, marka TEXT, durum TEXT, veri TEXT NOT NULL, guncelleme TEXT, cekim TEXT NOT NULL, parti TEXT NOT NULL)`,
+  // Reklam hesabı → ana kayıt (IDOS hesap-esleme ucu; belirsiz hesaplar gelmez). Saatlik eşitlemede bütün olarak yenilenir.
+  `CREATE TABLE IF NOT EXISTS ana_hesap_esleme (platform TEXT NOT NULL, hesap TEXT NOT NULL, musteri_id TEXT NOT NULL, tur TEXT NOT NULL, cekim TEXT NOT NULL, PRIMARY KEY (platform, hesap))`,
+  // "Müşteri yap" istekleri: kart başına son aday. Kişi verisi burada tutulmaz; yalnız gönderilip gönderilmediği.
+  `CREATE TABLE IF NOT EXISTS ana_kayit_aday (
+    musteri_id TEXT PRIMARY KEY, aday_id TEXT NOT NULL, durum TEXT NOT NULL, ana_kayit_id TEXT, red_gerekcesi TEXT,
+    gonderim TEXT NOT NULL, gonderen TEXT NOT NULL, son_kontrol TEXT, kisi_gonderildi INTEGER NOT NULL DEFAULT 0)`
 ];
 
 // Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.

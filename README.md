@@ -54,6 +54,11 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
   - Gizli: `IDOS_ORTAK_JETON` — IDOS'taki `ORTAK_JETON_PANEL` ile aynı değer (değer hiçbir dosyaya yazılmaz)
   - `IDOS_ORTAK_URL` — IDOS adresi (https); `IDOS_MUSTERI_ADRESI` (isteğe bağlı) — "Ana kayıtta düzenle" bağlantısı, `{id}` yer tutucusuyla
   - Ayar yoksa eşitleme atlanır, blok gizlenir. Elle eşitleme: `POST /api/yonetim/ana-kayit/esitle` (`{"tam": true}` ile tam liste)
+  - **Hesap eşleme:** her eşitlemede IDOS `hesap-esleme` listesi `ana_hesap_esleme` tablosuna bütün olarak yazılır (belirsiz
+    hesaplar gelmez). Reklam tablosunda müşteri adı önce ana kayıttan, sonra CRM elle eşleşmesinden, sonra görünümdeki markadan okunur.
+  - **Müşteri yap:** "Kazanıldı" aşamasındaki bağsız kartta düğme çıkar; kart IDOS onay kuyruğuna aday olarak gider (marka, sektör,
+    sorumlu, varsa site adresi). İletişim kişisi yalnız "kişinin izni var" kutusu işaretlenirse gönderilir. Aday durumu saatlik
+    eşitlemede ve kart açılınca (2 dakikada bir) yoklanır; onaylanınca kart ana kayda bağlanır, reddedilirse gerekçe görünür.
   - Test: `node tools/sahte/idos-ortak.mjs 8799 <deneme-jetonu>` + `wrangler dev --var IDOS_ORTAK_URL:http://127.0.0.1:8799 --var IDOS_ORTAK_JETON:<deneme-jetonu>`,
     sonra `node tools/test-ana-kayit.mjs <panel adresi> http://127.0.0.1:8799 <ekran klasörü> <persist klasörü>`
 - Asistan testi: `node tools/sahte/anthropic.mjs 8999` (sahte API) + `wrangler dev --var ANTHROPIC_API_KEY:sahte --var ASISTAN_API_URL:http://127.0.0.1:8999/`,

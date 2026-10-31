@@ -155,7 +155,26 @@ import Yonetim from '../../layouts/Yonetim.astro';
       r.duzenle ? el('a', { href: r.duzenle, target: '_blank', rel: 'noopener noreferrer', class: 'dugme kucuk' }, 'Ana kayıtta düzenle ↗') : '');
     const satirlar = [baslik];
     if (!r.bagli) {
+      const a = r.aday;
       satirlar.push(el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu kart ana kayda bağlı değil. Müşteri bilgileri IDOS\'tan okunmuyor.'));
+      if (a && a.durum === 'bekliyor') {
+        satirlar.push(el('div', { class: 'uyari bilgi', role: 'status' }, `Ana kayıt onayı bekleniyor. ${tarih(a.gonderim)} tarihinde ${a.gonderen} gönderdi; kararı IDOS'ta yönetici verir.`));
+      } else if (r.asama !== 'kazanildi') {
+        satirlar.push(el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Fırsat "Kazanıldı" aşamasına gelince "Müşteri yap" ile ana kayda onaya gönderilebilir.'));
+      } else if (r.kurulu) {
+        if (a && a.durum === 'reddedildi') satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Ana kayda alınmadı: ' + (a.red_gerekcesi || 'gerekçe yazılmadı') + '. Kartı düzeltip yeniden gönderebilirsiniz.'));
+        const izin = el('input', { type: 'checkbox', 'data-kisi-izin': '' });
+        const durum = el('span', { role: 'status', style: 'font-size: 13px; color: var(--err)' });
+        const dugme = el('button', { type: 'button', class: 'dugme ana kucuk', 'data-musteri-yap': '', onclick: async () => {
+          dugme.disabled = true; durum.textContent = '';
+          try { await api(`musteriler/${encodeURIComponent(id)}/musteri-yap`, { kisi_izin: izin.checked }); yukle(); }
+          catch (h) { durum.textContent = 'Gönderilemedi: ' + h.message; dugme.disabled = false; }
+        } }, a && a.durum === 'reddedildi' ? 'Yeniden onaya gönder' : 'Müşteri yap');
+        satirlar.push(el('div', { style: 'display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--card2)' },
+          el('span', { style: 'font-size: 13px' }, 'Kart, IDOS\'taki onay kuyruğuna gider. Marka, sektör ve sorumlu gönderilir. Müşteri kaydı yalnız yönetici onaylarsa açılır.'),
+          el('label', { style: 'display: flex; gap: 8px; align-items: flex-start; font-size: 13px' }, izin, el('span', {}, 'İletişim kişisinin adı, e-postası ve telefonu da gönderilsin. Kişinin bu bilgilerin paylaşılmasına izni var (KVKK).')),
+          el('div', { style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' }, dugme, durum)));
+      }
     } else if (r.yok) {
       satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Bağlı ana kayıt IDOS\'ta bulunamadı. Müşteri silinmiş ya da paylaşımdan çıkarılmış olabilir. IDOS\'ta kontrol edin.'));
     } else if (!k) {
