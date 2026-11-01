@@ -65,6 +65,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const yeniMi = prm('mevcut') === '1';
     ust.replaceChildren(
       yeniMi ? el('div', { class: 'uyari bilgi', role: 'status' }, 'Bu e-posta veya telefonla kayıtlı bir müşteri zaten vardı; yeni kart açılmadı, mevcut kart açıldı.') : '',
+      m.arsiv ? el('div', { class: 'uyari', role: 'status', style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' },
+        el('span', {}, `Bu kart ${tarih(m.arsiv)} tarihinde arşivlendi; CRM listesinde ve sayılarda görünmez. Kayıt silinmedi.`),
+        el('button', { type: 'button', class: 'dugme kucuk', onclick: async (o) => { o.currentTarget.disabled = true; try { await api('musteriler/toplu', { ids: [id], islem: 'arsivden_cikar' }); yukle(); } catch (h) { genelHata('Arşivden çıkarılamadı: ' + h.message); } } }, 'Arşivden çıkar')) : '',
       el('div', { class: 'kart', style: 'padding: 16px; display: flex; flex-direction: column; gap: 10px' },
         el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center' },
           el('span', { style: 'color: var(--tx2); font-size: 13px; overflow-wrap: anywhere' }, iletisim),

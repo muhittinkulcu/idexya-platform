@@ -217,6 +217,9 @@ export async function yonetimCrmApi(db, env, yontem, yol, govde, kim) {
       db.prepare(`UPDATE musteriler SET ${set} WHERE id = ?`).bind(...Object.values(yeni), enEski, z, tutId),
       db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), tutId, z, 'sistem', 'Mükerrer kart birleştirildi', detay, kim.eposta),
       db.prepare(`DELETE FROM cakisma_ayri WHERE a IN (${ph}) OR b IN (${ph})`).bind(...kaynaklar, ...kaynaklar),
+      // Etiketler tutulan karta taşınır (aynı etiket zaten varsa tekrarı atılır).
+      db.prepare(`INSERT OR IGNORE INTO etiketler (tur, hedef, etiket, zaman, kim) SELECT tur, ?, etiket, zaman, kim FROM etiketler WHERE tur = 'musteri' AND hedef IN (${ph})`).bind(tutId, ...kaynaklar),
+      db.prepare(`DELETE FROM etiketler WHERE tur = 'musteri' AND hedef IN (${ph})`).bind(...kaynaklar),
       db.prepare(`DELETE FROM musteriler WHERE id IN (${ph})`).bind(...kaynaklar)
     ];
     try { await db.batch(q); }

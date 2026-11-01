@@ -1,8 +1,10 @@
 // Genel bakış · Reklam performansı ayrıntı tablosu: sekmeler (hesap, marka, platform, gün), dönem, arama ve platform süzgeci,
-// sıralama, hesaba panel adı verme, CSV ve koşullu biçimlendirme. Kurallar sunucuda tutulur (ayarlar.reklam_kurallar), herkes aynısını görür.
+// sıralama, hesaba panel adı verme, CSV, toplu seçim (CSV ve Hesaplar sekmesinde etiket) ve koşullu biçimlendirme.
+// Toplu seçimde durum değiştirme ve arşiv yoktur: bu tablo reklam hesabına yazmaz, yalnız okur. Kurallar sunucuda tutulur (ayarlar.reklam_kurallar), herkes aynısını görür.
 import './reklam-tablo.css';
 import { api, el, genelHata } from './ortak.js';
 import { gunler } from './grafik.js';
+import { topluSecim, topluTemizle, csvHucre } from './toplu-secim.js';
 
 const PLATFORM = { meta: 'Meta', google: 'Google Ads' };
 const SONUC_ADI = { messaging_conversations: 'Mesaj', purchases: 'Satın alma', conversions: 'Dönüşüm', leads: 'Potansiyel müşteri', calls: 'Arama' };
@@ -40,6 +42,9 @@ export function reklamTablosu(r, yenile) {
   if (!SEKME.some((s) => s.k === durum.sekme)) durum.sekme = 'hesap';
   if (![7, 14, 28].includes(durum.donem)) durum.donem = 7;
 
+  // Hesap etiketleri (toplu seçim): tur reklam_hesap, kimlik "platform:hesap".
+  let etiketler = {}, tumEtiket = [];
+  const etiketYukle = () => api('etiketler?tur=reklam_hesap').then((e) => { etiketler = e.etiketler; tumEtiket = e.tumu; }).catch(() => {});
   const kok = el('div', { class: 'rt' });
   const sekmeler = el('div', { class: 'rt-sekmeler', role: 'tablist', 'aria-label': 'Tablo görünümü' });
   const donemSec = el('div', { class: 'segment-kucuk', role: 'group', 'aria-label': 'Dönem' });
@@ -147,7 +152,8 @@ export function reklamTablosu(r, yenile) {
   function hesapHucre(o) {
     const kutu = el('div', { class: 'rt-hesap' });
     const goster = () => kutu.replaceChildren(
-      el('span', { class: 'rt-hesap-ad' }, o.ad || el('span', { class: 'rt-soluk' }, 'Adsız hesap')),
+      el('span', { class: 'rt-hesap-ad' }, o.ad || el('span', { class: 'rt-soluk' }, 'Adsız hesap'),
+        ...(etiketler[o.platform + ':' + o.hesap] || []).map((e) => el('span', { class: 'cip', style: 'font-size: 11px; margin-left: 6px' }, e))),
       el('span', { class: 'rt-kimlik' }, el('code', {}, o.hesap),
         el('button', { type: 'button', class: 'rt-mini', title: 'Kimliği kopyala', 'aria-label': 'Hesap kimliğini kopyala', onclick: () => navigator.clipboard?.writeText(o.hesap) }, '⧉'),
         el('button', { type: 'button', class: 'rt-mini', title: 'Panelde görünen adı değiştir', 'aria-label': 'Hesap adını düzenle', onclick: duzenle }, '✎')));
@@ -187,6 +193,7 @@ export function reklamTablosu(r, yenile) {
     panel.hidden = !durum.panel;
     if (durum.panel) panelCiz();
 
+    if (!tumu.length) topluTemizle('reklam');
     if (!tumu.length) { sar.replaceChildren(el('div', { class: 'bekleyen-kutu' }, durum.ara || durum.platform !== 'tum' ? 'Süzgece uyan hesap yok.' : 'Bu dönemde harcama yok.')); alt.textContent = ''; return; }
     const ornek = sutunlar(tumu[0]);
     const anahtar = durum.sirala || (durum.sekme === 'gun' ? 'gun' : 'harcama');
@@ -208,7 +215,7 @@ export function reklamTablosu(r, yenile) {
     const baslik = el('tr', {}, ...ornek.map((c) => el('th', { class: c.sol ? 'sol' : undefined, 'aria-sort': c.k === anahtar ? (yon === -1 ? 'descending' : 'ascending') : undefined, scope: 'col' },
       el('button', { type: 'button', onclick: () => { if (durum.sirala === c.k) durum.yon *= -1; else { durum.sirala = c.k; durum.yon = c.sol ? 1 : -1; } ciz(); } }, c.ad, c.k === anahtar ? (yon === -1 ? ' ↓' : ' ↑') : ''))));
     const govde = sirali.map(({ o, c }) => {
-      const tr = el('tr', {});
+      const tr = el('tr', { 'data-id': durum.sekme === 'hesap' ? o.platform + ':' + o.hesap : o.anahtar, 'data-ad': o.ad || o.musteri || o.hesap || o.gun || o.platform || '' });
       for (const kural of kurallar) if (kural.kapsam === 'satir' && uyar(kural, degerAl(o, kural.alan))) tr.classList.add('kb-' + kural.stil);
       for (const h of c) {
         const td = el('td', { class: h.sol ? 'sol' : undefined }, h.v);
@@ -239,6 +246,8 @@ export function reklamTablosu(r, yenile) {
     }
     const tablo = el('table', { class: 'rt-tablo' }, el('thead', {}, baslik), el('tbody', {}, ...govde), toplam ? el('tfoot', {}, toplam) : null);
     sar.replaceChildren(tablo);
+    topluSecim(tablo, { anahtar: 'reklam', ad: `reklam-${durum.sekme}-${durum.donem}gun`, etiketTur: durum.sekme === 'hesap' ? 'reklam_hesap' : null,
+      etiketler: tumEtiket, yenile: async () => { await etiketYukle(); ciz(); } });
     const digerPara = [...new Set(tumu.filter((o) => o.para !== 'TRY').map((o) => o.para))];
     const adsiz = durum.sekme === 'hesap' && tumu.some((o) => !o.ad);
     alt.replaceChildren(...[
@@ -284,11 +293,13 @@ export function reklamTablosu(r, yenile) {
   kbDugme.addEventListener('click', () => { durum.panel = !durum.panel; ciz(); });
   csv.addEventListener('click', () => {
     const tablo = sar.querySelector('table'); if (!tablo) return;
-    const hucre = (t) => '"' + t.replace(/[⧉✎]/g, '').replace(/\s+/g, ' ').trim().replace(/"/g, '""') + '"';
-    const satir = [...tablo.querySelectorAll('tr')].map((tr) => [...tr.children].map((c) => hucre(c.textContent.replace(/ [↓↑]$/, ''))).join(';'));
+    // Onay kutusu sütunu atlanır; hücreler formül enjeksiyonuna karşı korunur (toplu-secim.js csvHucre).
+    const hucre = (t) => csvHucre(t.replace(/[⧉✎]/g, '').replace(/\s+/g, ' ').trim());
+    const satir = [...tablo.querySelectorAll('tr')].map((tr) => [...tr.children].filter((c) => !c.hasAttribute('data-toplu-hucre')).map((c) => hucre(c.textContent.replace(/ [↓↑]$/, ''))).join(';'));
     const a = el('a', { href: URL.createObjectURL(new Blob(['﻿' + satir.join('\r\n')], { type: 'text/csv;charset=utf-8' })), download: `reklam-${durum.sekme}-${durum.donem}gun-${dun}.csv` });
     a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   });
   ciz();
+  etiketYukle().then(() => { if (Object.keys(etiketler).length) ciz(); });
   return kok;
 }

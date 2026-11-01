@@ -17,9 +17,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <button type="submit" class="dugme ana" style="min-height: 42px">Siteyi ekle</button>
   <span role="status" data-form-durum style="grid-column: 1 / -1; font-size: 14px; color: var(--err)"></span>
 </form>
+<div style="display: flex; justify-content: flex-end"><button type="button" class="dugme kucuk" data-arsiv aria-pressed="false">Arşivi göster</button></div>
 <div data-liste style="display: flex; flex-direction: column; gap: 12px"></div>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
+  let arsivMod = false, etiketler = {}, tumEtiket = [], sonVeri = null;
+  const arsivDugme = document.querySelector('[data-arsiv]');
   const liste = document.querySelector('[data-liste]'), form = document.querySelector('[data-form]'), fdurum = document.querySelector('[data-form-durum]');
   const DURUM = { iyi: ['İyi', 'kazanildi'], uyari: ['Uyarı', 'teklif'], kritik: ['Kritik', 'kaybedildi'] };
   // gtmIci: sayfada GTM varsa GA4/piksel kaynakta görünmeyebilir; bu durumda "yok" yerine nötr "GTM içinde olabilir" yazılır.
@@ -31,31 +35,38 @@ import Yonetim from '../../layouts/Yonetim.astro';
   });
   const sure = (ms) => (ms < 1000 ? `${ms} ms` : `${(ms / 1000).toLocaleString('tr-TR', { maximumFractionDigits: 1 })} sn`);
   async function islem(h, ne, d) {
-    if (ne === 'sil' && !confirm(`${h.adres} listeden ve kontrol geçmişinden kaldırılsın mı?`)) return;
+    // Silme yoktur: "Arşivle" siteyi ve kontrol geçmişini saklar, günlük kontrolü durdurur.
+    if (ne === 'arsivle' && !confirm(`${h.adres} arşivlensin mi?\nGünlük kontrol durur; site ve kontrol geçmişi silinmez, “Arşivi göster” ile geri alınabilir.`)) return;
     d.disabled = true; const eski = d.textContent; if (ne === 'kontrol') d.textContent = 'Kontrol ediliyor…';
     try { await api(`site-saglik/${encodeURIComponent(h.id)}/${ne}`, {}); genelHata(''); await yukle(); }
     catch (x) { genelHata(x.message); d.disabled = false; d.textContent = eski; }
   }
   function ciz(v) {
+    sonVeri = v;
+    arsivDugme.setAttribute('aria-pressed', String(arsivMod));
+    arsivDugme.textContent = arsivMod ? 'Arşivden çık' : `Arşivi göster (${v.arsivde || 0})`;
+    if (!v.hedefler.length && arsivMod) { liste.replaceChildren(el('div', { class: 'kart bos' }, 'Arşivde site yok.')); return; }
     if (!v.hedefler.length) { liste.replaceChildren(el('div', { class: 'kart bos' }, 'Henüz site eklenmedi. Yukarıdan müşteri seçip sitesinin adresini ekleyin; ilk kontrolü “Şimdi kontrol et” ile hemen yapabilirsiniz.')); return; }
     liste.replaceChildren(...v.hedefler.map((h) => {
       const s = h.son, d = DURUM[h.son_durum] || ['Kontrol edilmedi', 'yeni'];
       const gun = h.alan_bitis ? Math.floor((Date.parse(h.alan_bitis) - Date.now()) / 86400000) : null;
-      return el('section', { class: 'kart ss-kart', 'aria-label': h.adres, style: h.aktif ? '' : 'opacity: .65' },
+      const musteriAd = h.musteri_firma || h.musteri_ad || 'Müşteri';
+      return el('section', { class: 'kart ss-kart', 'aria-label': h.adres, style: h.aktif ? '' : 'opacity: .65', 'data-id': h.id, 'data-ad': new URL(h.adres).hostname },
         el('div', { class: 'ss-bas' },
           el('div', { style: 'display: flex; flex-direction: column; gap: 4px; min-width: 0' },
-            el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap' },
+            el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap', 'data-toplu-yer': '' },
               el('a', { href: h.adres, target: '_blank', rel: 'noopener noreferrer', style: 'font-weight: 700; font-size: 16px; overflow-wrap: anywhere' }, new URL(h.adres).hostname + ' ↗'),
-              el('span', { class: 'cip ' + d[1] }, d[0]), h.aktif ? null : el('span', { class: 'cip' }, 'Durduruldu')),
-            el('span', { style: 'font-size: 13px; color: var(--tx2)' }, [
-              h.musteri_firma || h.musteri_ad || 'Müşteri',
+              el('span', { class: 'cip ' + d[1] }, d[0]), h.arsiv ? el('span', { class: 'cip' }, 'Arşivde') : h.aktif ? null : el('span', { class: 'cip' }, 'Durduruldu'),
+              ...(etiketler[h.id] || []).map((e) => el('span', { class: 'cip', style: 'font-size: 11px' }, e))),
+            // Müşteri adı müşteri kartına gider; diğer değerlerin ayrıntı sayfası yok, düz metin kalır.
+            el('span', { style: 'font-size: 13px; color: var(--tx2)' }, h.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(h.musteri_id) }, musteriAd) : musteriAd, ' · ', [
               s ? `son kontrol ${tarih(s.zaman)}` : 'henüz kontrol edilmedi',
               s && s.http ? `HTTP ${s.http} · ${sure(s.sure)}` : null,
               h.alan_bitis ? `alan adı bitişi ${h.alan_bitis.split('-').reverse().join('.')}${gun !== null ? ` (${gun} gün)` : ''}` : null].filter(Boolean).join(' · '))),
           el('span', { style: 'display: flex; gap: 6px; flex-wrap: wrap' },
             el('button', { type: 'button', class: 'dugme ana kucuk', onclick: (o) => islem(h, 'kontrol', o.currentTarget) }, 'Şimdi kontrol et'),
-            el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(h, h.aktif ? 'durdur' : 'baslat', o.currentTarget) }, h.aktif ? 'Durdur' : 'Başlat'),
-            el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(h, 'sil', o.currentTarget) }, 'Kaldır'))),
+            h.arsiv ? null : el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(h, h.aktif ? 'durdur' : 'baslat', o.currentTarget) }, h.aktif ? 'Durdur' : 'Başlat'),
+            h.arsiv ? null : el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => islem(h, 'arsivle', o.currentTarget) }, 'Arşivle'))),
         s && s.sorunlar.length ? el('ul', { class: 'ss-liste' }, ...s.sorunlar.map((x) => el('li', { style: `color: ${x.onem === 'kritik' ? 'var(--err)' : 'var(--warn)'}` }, x.metin))) : s ? el('span', { style: 'font-size: 14px; color: var(--ok)' }, 'Sorun bulunmadı.') : null,
         s && s.notlar.length ? el('ul', { class: 'ss-liste', style: 'color: var(--tx2)' }, ...s.notlar.map((x) => el('li', {}, x))) : null,
         el('div', { style: 'display: flex; gap: 6px; flex-wrap: wrap' },
@@ -68,14 +79,32 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try { await api('site-saglik', { musteri_id: form.musteri_id.value, adres: form.adres.value.trim() }); form.adres.value = ''; await yukle(); }
     catch (h) { fdurum.textContent = h.message; } finally { d.disabled = false; }
   });
+  // Seçili sitelerin CSV'si: ekrandaki bilgilerle aynı (kimlik bilgisi ve sır yok).
+  const DURUM_AD = { iyi: 'İyi', uyari: 'Uyarı', kritik: 'Kritik' };
+  const siteCsv = (ids) => ({
+    bas: ['Site', 'Müşteri', 'Sağlık durumu', 'Günlük kontrol', 'Son kontrol', 'HTTP', 'Alan adı bitişi', 'Etiketler'],
+    satirlar: sonVeri.hedefler.filter((h) => ids.includes(h.id)).map((h) => [h.adres, h.musteri_firma || h.musteri_ad || '', DURUM_AD[h.son_durum] || 'Kontrol edilmedi',
+      h.arsiv ? 'Arşivde' : h.aktif ? 'Açık' : 'Durduruldu', h.son ? tarih(h.son.zaman) : '', h.son && h.son.http ? h.son.http : '', h.alan_bitis || '', (etiketler[h.id] || []).join(', ')])
+  });
   async function yukle() {
     try {
-      const v = await api('site-saglik'); genelHata('');
+      const [v, e] = await Promise.all([api('site-saglik' + (arsivMod ? '?arsiv=1' : '')), api('etiketler?tur=site')]); genelHata('');
+      etiketler = e.etiketler; tumEtiket = e.tumu;
       const s = form.musteri_id, d = s.value;
       s.replaceChildren(el('option', { value: '' }, 'Müşteri seçin'), ...v.musteriler.map((m) => el('option', { value: m.id }, m.firma || m.ad || 'Adsız müşteri'))); s.value = d;
       ciz(v);
+      if (!v.hedefler.length) topluTemizle('siteler');
+      else topluSecim(liste, {
+        anahtar: 'siteler', ad: 'musteri-siteleri', etiketTur: 'site', etiketler: tumEtiket, arsivGorunum: arsivMod, csv: siteCsv,
+        durumlar: arsivMod ? null : [{ deger: 'baslat', ad: 'Günlük kontrol açık' }, { deger: 'durdur', ad: 'Durduruldu' }],
+        durumYaz: (ids, islem) => api('site-saglik/toplu', { ids, islem }),
+        arsivle: (ids) => api('site-saglik/toplu', { ids, islem: 'arsivle' }),
+        arsivdenCikar: (ids) => api('site-saglik/toplu', { ids, islem: 'arsivden_cikar' }),
+        yenile: yukle
+      });
     } catch (h) { genelHata('Siteler yüklenemedi: ' + h.message); }
   }
+  arsivDugme.addEventListener('click', () => { arsivMod = !arsivMod; yukle(); });
   yukle();
 </script>
 </Yonetim>
