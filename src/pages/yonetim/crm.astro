@@ -5,6 +5,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
 <label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
 <div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
+<button type="button" class="dugme kucuk" data-arsiv aria-pressed="false">Arşivi göster</button>
 <button type="button" class="dugme ana" data-yeni-ac>+ Yeni müşteri</button>
 </div>
 <form data-yeni-form hidden class="kart" style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end">
@@ -18,8 +19,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div data-alan></div>
 <script>
   import { api, el, ASAMALAR, asamaAdi, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
   const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
-  let tum = [], gorunum = 'pano';
+  let tum = [], gorunum = 'pano', arsivMod = false, etiketler = {}, tumEtiket = [], arsivde = 0;
+  const arsivDugme = document.querySelector('[data-arsiv]');
   try { gorunum = localStorage.getItem('idx-crm-gorunum') || 'pano'; } catch (e) {}
   const bag = (m) => '/customer?id=' + encodeURIComponent(m.id);
   const baslik = (m) => m.firma || m.ad || m.eposta || '—';
@@ -36,17 +39,32 @@ import Yonetim from '../../layouts/Yonetim.astro';
     document.querySelectorAll('[data-gorunum]').forEach((d) => { const s = d.dataset.gorunum === gorunum; d.setAttribute('aria-pressed', String(s)); d.style.cssText = s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent'; });
     const q = ara.value.trim().toLocaleLowerCase('tr-TR');
     const gor = tum.filter((m) => !q || [m.firma, m.ad, m.eposta, m.telefon].some((x) => x && x.toLocaleLowerCase('tr-TR').includes(q)));
-    if (!tum.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, 'CRM’de henüz müşteri yok. Talepler sayfasından bir talebi CRM’e alın veya “Yeni müşteri” ile elle ekleyin.')); return; }
-    if (gorunum === 'liste') {
+    arsivDugme.setAttribute('aria-pressed', String(arsivMod));
+    arsivDugme.textContent = arsivMod ? 'Arşivden çık' : `Arşivi göster (${arsivde})`;
+    topluTemizle('crm');
+    if (!tum.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, arsivMod ? 'Arşivde müşteri yok.' : 'CRM’de henüz müşteri yok. Talepler sayfasından bir talebi CRM’e alın veya “Yeni müşteri” ile elle ekleyin.')); return; }
+    // Arşiv yalnız liste görünümünde gösterilir; toplu seçim de liste tablosundadır.
+    if (gorunum === 'liste' || arsivMod) {
+      const cip = (e) => el('span', { class: 'cip', style: 'font-size: 11px' }, e);
       alan.replaceChildren(el('div', { class: 'kart', style: 'overflow-x: auto' }, el('table', { style: 'width: 100%; min-width: 720px; border-collapse: collapse; font-size: 13px' },
         el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 10px 14px; font-weight: 600${i === 3 ? '; text-align: right' : ''}` }, b)))),
-        el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid rgb(var(--line))' },
-          el('td', { style: 'padding: 10px 14px' }, el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null),
+        el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid rgb(var(--line))', 'data-id': m.id, 'data-ad': baslik(m) },
+          el('td', { style: 'padding: 10px 14px' }, el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null,
+            (etiketler[m.id] || []).length ? el('div', { style: 'display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px' }, etiketler[m.id].map(cip)) : null),
           el('td', { style: 'padding: 10px 14px; color: var(--tx2)' }, [m.eposta, m.telefon].filter(Boolean).join(' · ') || '—'),
           el('td', { style: 'padding: 10px 14px' }, asamaSec(m)),
-          el('td', { style: 'padding: 10px 14px; text-align: right; white-space: nowrap' }, para(m.deger)),
-          el('td', { style: 'padding: 10px 14px; color: var(--tx2); white-space: nowrap' }, once(m.guncelleme))))))));
+          // Değer ve son hareket kartın kendisine (bilgiler ve günlük) gider; değer yoksa düz "—".
+          el('td', { style: 'padding: 10px 14px; text-align: right; white-space: nowrap' }, m.deger ? el('a', { href: bag(m), title: 'Kart bilgilerini aç' }, para(m.deger)) : para(m.deger)),
+          el('td', { style: 'padding: 10px 14px; color: var(--tx2); white-space: nowrap' }, el('a', { href: bag(m), title: 'Kart günlüğünü aç', style: 'color: inherit' }, once(m.guncelleme)))))))));
       if (!gor.length) alan.append(el('div', { class: 'bos' }, 'Aramayla eşleşen müşteri yok.'));
+      topluSecim(alan.querySelector('table'), {
+        anahtar: 'crm', ad: 'musteriler', etiketTur: 'musteri', etiketler: tumEtiket, arsivGorunum: arsivMod,
+        durumlar: ASAMALAR.map((a) => ({ deger: a.k, ad: a.ad })),
+        durumYaz: (ids, asama) => api('musteriler/toplu', { ids, islem: 'asama', asama }),
+        arsivle: (ids) => api('musteriler/toplu', { ids, islem: 'arsivle' }),
+        arsivdenCikar: (ids) => api('musteriler/toplu', { ids, islem: 'arsivden_cikar' }),
+        yenile: yukle
+      });
       return;
     }
     alan.replaceChildren(el('div', { style: 'display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 6px' },
@@ -73,9 +91,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try { const s = await api('musteriler', v); location.href = '/customer?id=' + encodeURIComponent(s.musteri_id) + (s.mevcut ? '&existing=1' : ''); }
     catch (h) { fdurum.hidden = false; fdurum.textContent = h.message; }
   });
-  (async () => {
-    try { tum = (await api('musteriler')).musteriler; ciz(); }
-    catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
-  })();
+  async function yukle() {
+    try {
+      const [v, e] = await Promise.all([api('musteriler' + (arsivMod ? '?arsiv=1' : '')), api('etiketler?tur=musteri')]);
+      tum = v.musteriler; arsivde = v.arsivde || 0; etiketler = e.etiketler; tumEtiket = e.tumu; ciz();
+    } catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
+  }
+  arsivDugme.addEventListener('click', () => { arsivMod = !arsivMod; yukle(); });
+  yukle();
 </script>
 </Yonetim>

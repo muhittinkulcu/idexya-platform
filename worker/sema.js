@@ -182,14 +182,20 @@ export const SEMA = [
   // "Müşteri yap" istekleri: kart başına son aday. Kişi verisi burada tutulmaz; yalnız gönderilip gönderilmediği.
   `CREATE TABLE IF NOT EXISTS ana_kayit_aday (
     musteri_id TEXT PRIMARY KEY, aday_id TEXT NOT NULL, durum TEXT NOT NULL, ana_kayit_id TEXT, red_gerekcesi TEXT,
-    gonderim TEXT NOT NULL, gonderen TEXT NOT NULL, son_kontrol TEXT, kisi_gonderildi INTEGER NOT NULL DEFAULT 0)`
+    gonderim TEXT NOT NULL, gonderen TEXT NOT NULL, son_kontrol TEXT, kisi_gonderildi INTEGER NOT NULL DEFAULT 0)`,
+  // Toplu seçim etiketleri (worker/etiket.js): tur = musteri | site | reklam_hesap; hedef = kaydın kimliği.
+  `CREATE TABLE IF NOT EXISTS etiketler (tur TEXT NOT NULL, hedef TEXT NOT NULL, etiket TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (tur, hedef, etiket))`
 ];
 
 // Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.
 export const EK_SUTUNLAR = [
   // Müşteri ana kaydı (IDOS) bağı: CRM kartı → IDOS musteri_id (tasarım docs/tasarim/musteri-ana-kayit.md §2)
-  ['musteriler', 'ana_kayit_id', 'TEXT']
+  ['musteriler', 'ana_kayit_id', 'TEXT'],
+  // Silme yerine arşiv (toplu seçim kuralı): arşivlenme zamanı; boşsa kayıt etkin. Arşivlenen kayıt listelerde gizlenir, silinmez.
+  ['musteriler', 'arsiv', 'TEXT'],
+  ['site_saglik_hedef', 'arsiv', 'TEXT']
 ];
 export const EK_DIZINLER = [
-  `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`
+  `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,
+  `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`
 ];

@@ -107,25 +107,27 @@ export async function siteSaglikUyarilari(db) {
   return r.results;
 }
 
-export async function yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim) {
+export async function yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, url) {
   if (!(yol === 'site-saglik' || yol.startsWith('site-saglik/'))) return null;
   if (yol === 'site-saglik' && yontem === 'GET') {
-    const [h, s, m] = await db.batch([
-      db.prepare(`SELECT h.*, m.firma AS musteri_firma, m.ad AS musteri_ad FROM site_saglik_hedef h LEFT JOIN musteriler m ON m.id = h.musteri_id ORDER BY COALESCE(m.firma, m.ad), h.adres`),
+    const arsiv = url && url.searchParams.get('arsiv') === '1';
+    const [h, s, m, n] = await db.batch([
+      db.prepare(`SELECT h.*, m.firma AS musteri_firma, m.ad AS musteri_ad FROM site_saglik_hedef h LEFT JOIN musteriler m ON m.id = h.musteri_id WHERE h.arsiv IS ${arsiv ? 'NOT ' : ''}NULL ORDER BY COALESCE(m.firma, m.ad), h.adres`),
       db.prepare(`SELECT s.* FROM site_saglik_sonuc s JOIN (SELECT hedef_id, MAX(zaman) AS z FROM site_saglik_sonuc GROUP BY hedef_id) x ON x.hedef_id = s.hedef_id AND x.z = s.zaman`),
-      db.prepare('SELECT id, firma, ad FROM musteriler ORDER BY COALESCE(firma, ad, eposta)')
+      db.prepare('SELECT id, firma, ad FROM musteriler WHERE arsiv IS NULL ORDER BY COALESCE(firma, ad, eposta)'),
+      db.prepare('SELECT COUNT(*) AS n FROM site_saglik_hedef WHERE arsiv IS NOT NULL')
     ]);
     const son = new Map(s.results.map((x) => [x.hedef_id, { ...x, bulunan: JSON.parse(x.bulunan || '{}'), sorunlar: JSON.parse(x.sorunlar || '[]'), notlar: JSON.parse(x.notlar || '[]') }]));
     const hedefler = [];
     for (const x of h.results) hedefler.push({ ...x, son: son.get(x.id) || null, beklenen: await beklenenler(db, x.musteri_id) });
-    return json({ ok: true, hedefler, musteriler: m.results, sinir: EN_COK_SITE });
+    return json({ ok: true, hedefler, musteriler: m.results, sinir: EN_COK_SITE, arsivde: n.results[0].n });
   }
   if (yol === 'site-saglik' && yontem === 'POST') {
     const adres = gecerliSite(kirp(govde.adres, 500));
     if (!adres) return hata('Adres https://ornek.com biçiminde bir alan adı olmalı (IP adresi ve yerel adresler kabul edilmez)', 422);
     const mid = kirp(govde.musteri_id, 64);
     if (!mid || !(await db.prepare('SELECT id FROM musteriler WHERE id = ?').bind(mid).first())) return hata('Müşteri seçin', 422);
-    if (await db.prepare('SELECT id FROM site_saglik_hedef WHERE adres = ?').bind(adres).first()) return hata('Bu adres zaten listede', 409);
+    if (await db.prepare('SELECT id FROM site_saglik_hedef WHERE adres = ?').bind(adres).first()) return hata('Bu adres zaten listede (arşivde olabilir; "Arşivi göster" ile bakın)', 409);
     const n = await db.prepare('SELECT COUNT(*) AS n FROM site_saglik_hedef WHERE aktif = 1').first();
     if (n.n >= EN_COK_SITE) return hata(`Günlük kontrol en çok ${EN_COK_SITE} siteyle sınırlı; önce bir siteyi kaldırın ya da durdurun`, 409);
     const id = kimlik();
@@ -133,7 +135,23 @@ export async function yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim) {
     await islemYaz(db, kim.eposta, 'site_saglik_eklendi', id, adres);
     return json({ ok: true, id });
   }
-  const m = yol.match(/^site-saglik\/([\w-]+)\/(kontrol|durdur|baslat|sil)$/);
+  // Toplu işlem (toplu seçim kuralı): durdur, başlat, arşivle, arşivden çıkar. Silme yoktur; arşivlenen site kontrol edilmez.
+  if (yol === 'site-saglik/toplu' && yontem === 'POST') {
+    const ids = Array.isArray(govde.ids) ? [...new Set(govde.ids.filter((x) => typeof x === 'string' && /^[\w-]{1,64}$/.test(x)))] : [];
+    if (!ids.length || ids.length > 500) return hata('1 ile 500 arasında site seçin', 422);
+    const liste = JSON.stringify(ids), islem = govde.islem;
+    if (islem === 'baslat') {
+      const n = await db.prepare('SELECT COUNT(*) AS n FROM site_saglik_hedef WHERE aktif = 1 OR id IN (SELECT value FROM json_each(?)) AND arsiv IS NULL').bind(liste).first();
+      if (n.n > EN_COK_SITE) return hata(`Günlük kontrol en çok ${EN_COK_SITE} siteyle sınırlı; daha az site seçin`, 409);
+    }
+    const sql = { durdur: 'aktif = 0 WHERE arsiv IS NULL AND', baslat: 'aktif = 1 WHERE arsiv IS NULL AND', arsivle: 'aktif = 0, arsiv = ? WHERE arsiv IS NULL AND', arsivden_cikar: 'arsiv = NULL WHERE arsiv IS NOT NULL AND' }[islem];
+    if (!sql) return hata('Geçersiz işlem', 422);
+    const r = await db.prepare(`UPDATE site_saglik_hedef SET ${sql} id IN (SELECT value FROM json_each(?))`).bind(...(islem === 'arsivle' ? [simdi()] : []), liste).run();
+    const n = r.meta ? r.meta.changes : null;
+    await islemYaz(db, kim.eposta, 'site_saglik_toplu_' + islem, null, `${n} site`);
+    return json({ ok: true, degisen: n });
+  }
+  const m = yol.match(/^site-saglik\/([\w-]+)\/(kontrol|durdur|baslat|arsivle)$/);
   if (m && yontem === 'POST') {
     const h = await db.prepare('SELECT * FROM site_saglik_hedef WHERE id = ?').bind(m[1]).first();
     if (!h) return hata('Site bulunamadı', 404);
@@ -141,11 +159,13 @@ export async function yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim) {
       if (h.son_kontrol && Date.parse(h.son_kontrol) > Date.now() - 60000) return hata('Bu site az önce kontrol edildi; bir dakika sonra tekrar deneyin', 429);
       return json({ ok: true, ...(await siteKontrol(env, h, !h.rdap_zaman)) });
     }
-    if (m[2] === 'sil') {
-      await db.batch([db.prepare('DELETE FROM site_saglik_sonuc WHERE hedef_id = ?').bind(h.id), db.prepare('DELETE FROM site_saglik_hedef WHERE id = ?').bind(h.id)]);
-      await islemYaz(db, kim.eposta, 'site_saglik_silindi', h.id, h.adres);
+    // Silme yerine arşiv: site ve kontrol geçmişi saklanır, günlük kontrol durur.
+    if (m[2] === 'arsivle') {
+      await db.prepare('UPDATE site_saglik_hedef SET aktif = 0, arsiv = ? WHERE id = ?').bind(simdi(), h.id).run();
+      await islemYaz(db, kim.eposta, 'site_saglik_arsivlendi', h.id, h.adres);
       return json({ ok: true });
     }
+    if (h.arsiv) return hata('Site arşivde; önce arşivden çıkarın', 409);
     await db.prepare('UPDATE site_saglik_hedef SET aktif = ? WHERE id = ?').bind(m[2] === 'baslat' ? 1 : 0, h.id).run();
     return json({ ok: true });
   }

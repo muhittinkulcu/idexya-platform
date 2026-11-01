@@ -17,6 +17,7 @@ import { yonetimYayinApi } from './yayin.js';
 import { yonetimTeklifApi } from './teklif.js';
 import { yonetimCrmApi } from './crm.js';
 import { yonetimAnaKayitApi, anaKayitEsitle, anaKayitKurulu } from './ana-kayit.js';
+import { yonetimEtiketApi } from './etiket.js';
 import { yonetimPortalApi } from './portal.js';
 import { denetimCalistir, yonetimDenetimApi } from './denetim.js';
 import { olcumAl, yonetimOlcumApi } from './olcum.js';
@@ -126,8 +127,8 @@ async function yonetimApi(istek, env, yol, kim) {
   if (yol === 'ozet' && yontem === 'GET') {
     const [t, m, a, k, u, yo, de, rc] = await db.batch([
       db.prepare("SELECT durum, COUNT(*) AS n FROM talepler GROUP BY durum"),
-      db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler"),
-      db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler GROUP BY asama"),
+      db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler WHERE arsiv IS NULL"),
+      db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler WHERE arsiv IS NULL GROUP BY asama"),
       db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12"),
       db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n FROM yorumlar WHERE durum = 'bekliyor'"),
@@ -145,7 +146,7 @@ async function yonetimApi(istek, env, yol, kim) {
       db.prepare("SELECT COALESCE(NULLIF(sayfa, ''), '(bilinmiyor)') AS sayfa, COUNT(*) AS n FROM talepler WHERE durum != 'spam' AND olusturma >= ? GROUP BY 1 ORDER BY n DESC LIMIT 8").bind(once(30)),
       db.prepare("SELECT CASE WHEN olusturma >= ? THEN 'simdi' ELSE 'once' END AS donem, durum, COUNT(*) AS n FROM talepler WHERE olusturma >= ? GROUP BY donem, durum").bind(once(30), once(60)),
       db.prepare("SELECT date(olusturma, '+3 hours') AS gun, COUNT(*) AS n FROM musteriler WHERE olusturma >= ? GROUP BY gun").bind(once(61)),
-      db.prepare("SELECT asama, COUNT(*) AS n, COALESCE(SUM(deger), 0) AS deger FROM musteriler GROUP BY asama"),
+      db.prepare("SELECT asama, COUNT(*) AS n, COALESCE(SUM(deger), 0) AS deger FROM musteriler WHERE arsiv IS NULL GROUP BY asama"),
       db.prepare("SELECT COUNT(*) AS n, MIN(olusturma) AS en_eski FROM talepler WHERE durum = 'yeni' AND olusturma < ?").bind(once(1))
     ]);
     return json({ ok: true, bugun: new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10), gunluk: gun.results, isi: isi.results, sayfalar: sayfa.results,
@@ -182,14 +183,44 @@ async function yonetimApi(istek, env, yol, kim) {
     const detay = [t.konu, t.mesaj, ek.paket ? 'Paket: ' + ek.paket : '', ek.site ? 'Site: ' + ek.site : ''].filter(Boolean).join(' · ');
     sorgular.push(db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mid, t.olusturma, 'talep', 'Talep geldi · ' + t.kaynak, detay, 'Web sitesi'));
     sorgular.push(db.prepare("UPDATE talepler SET durum = 'crm', musteri_id = ? WHERE id = ?").bind(mid, t.id));
-    sorgular.push(db.prepare('UPDATE musteriler SET guncelleme = ? WHERE id = ?').bind(z, mid));
+    // Arşivdeki karta yeni talep gelirse kart arşivden çıkar (gözden kaçmasın) ve günlüğe yazılır.
+    if (mus) sorgular.push(db.prepare("INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) SELECT ?, id, ?, 'sistem', 'Yeni talep geldiği için arşivden çıkarıldı', NULL, ? FROM musteriler WHERE id = ? AND arsiv IS NOT NULL").bind(kimlik(), z, kim.eposta, mid));
+    sorgular.push(db.prepare('UPDATE musteriler SET guncelleme = ?, arsiv = NULL WHERE id = ?').bind(z, mid));
     await db.batch(sorgular);
     await islemYaz(db, kim.eposta, 'talep_crm', t.id, mid);
     return json({ ok: true, musteri_id: mid, mevcut: !!mus });
   }
   if (yol === 'musteriler' && yontem === 'GET') {
-    const r = await db.prepare('SELECT id, firma, ad, eposta, telefon, asama, deger, paket, kaynak, guncelleme FROM musteriler ORDER BY guncelleme DESC LIMIT 500').all();
-    return json({ ok: true, musteriler: r.results });
+    const arsiv = new URL(istek.url).searchParams.get('arsiv') === '1';
+    const [r, n] = await db.batch([
+      db.prepare(`SELECT id, firma, ad, eposta, telefon, asama, deger, paket, kaynak, guncelleme, arsiv FROM musteriler WHERE arsiv IS ${arsiv ? 'NOT ' : ''}NULL ORDER BY guncelleme DESC LIMIT 500`),
+      db.prepare('SELECT COUNT(*) AS n FROM musteriler WHERE arsiv IS NOT NULL')
+    ]);
+    return json({ ok: true, musteriler: r.results, arsivde: n.results[0].n });
+  }
+  // Toplu işlem (toplu seçim kuralı): aşama değiştir, arşivle, arşivden çıkar. Silme yoktur; her kart günlüğüne işlenir.
+  if (yol === 'musteriler/toplu' && yontem === 'POST') {
+    const ids = Array.isArray(govde.ids) ? [...new Set(govde.ids.filter((x) => typeof x === 'string' && /^[\w-]{1,64}$/.test(x)))] : [];
+    if (!ids.length || ids.length > 500) return hata('1 ile 500 arasında kart seçin', 422);
+    const islem = govde.islem, z = simdi();
+    let set, baslik, detay = null;
+    if (islem === 'asama') {
+      if (!ASAMALAR.includes(govde.asama)) return hata('Geçersiz aşama', 422);
+      set = ['asama = ?', [govde.asama]]; baslik = 'Aşama değişti (toplu)'; detay = ASAMA_ADI[govde.asama];
+    } else if (islem === 'arsivle') { set = ['arsiv = ?', [z]]; baslik = 'Arşivlendi (toplu)'; }
+    else if (islem === 'arsivden_cikar') { set = ['arsiv = NULL', []]; baslik = 'Arşivden çıkarıldı (toplu)'; }
+    else return hata('Geçersiz işlem', 422);
+    const liste = JSON.stringify(ids);
+    // Yalnız gerçekten değişecek kartlar günlüğe yazılır.
+    const kosul = islem === 'asama' ? 'asama != ?' : islem === 'arsivle' ? 'arsiv IS NULL' : 'arsiv IS NOT NULL';
+    const kp = islem === 'asama' ? [govde.asama] : [];
+    const sonuc = await db.batch([
+      db.prepare(`INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) SELECT lower(hex(randomblob(16))), id, ?, 'sistem', ?, ?, ? FROM musteriler WHERE id IN (SELECT value FROM json_each(?)) AND ${kosul}`).bind(z, baslik, detay, kim.eposta, liste, ...kp),
+      db.prepare(`UPDATE musteriler SET ${set[0]}, guncelleme = ? WHERE id IN (SELECT value FROM json_each(?)) AND ${kosul}`).bind(...set[1], z, liste, ...kp)
+    ]);
+    const n = sonuc[1].meta ? sonuc[1].meta.changes : null;
+    await islemYaz(db, kim.eposta, 'musteri_toplu_' + islem, null, `${n} kart${detay ? ' · ' + detay : ''}`);
+    return json({ ok: true, degisen: n });
   }
   if (yol === 'musteriler' && yontem === 'POST') {
     const ad = kirp(govde.ad, 120), firma = kirp(govde.firma, 160), eposta = kirp(govde.eposta, 160).toLowerCase(), telefon = kirp(govde.telefon, 40);
@@ -255,8 +286,8 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim)) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
