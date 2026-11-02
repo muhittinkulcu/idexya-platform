@@ -150,7 +150,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const kutu = document.querySelector('[data-ana-kayit]');
     let r;
     try { r = await api(`musteriler/${encodeURIComponent(id)}/ana-kayit`); } catch (h) { kutu.hidden = true; return; }
-    if (!r.bagli && !r.kurulu) { kutu.hidden = true; return; }
+    // IDOS bağlantısı yokken blok yalnız kazanılan fırsatta, "Müşteri yap"ın neden görünmediğini söylemek için çıkar.
+    if (!r.bagli && !r.kurulu) {
+      if (r.asama !== 'kazanildi') { kutu.hidden = true; return; }
+      kutu.hidden = false;
+      kutu.replaceChildren(el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Ana kayıt (IDOS): bağlı değil'),
+        el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu fırsat kazanıldı. IDOS müşteri ana kaydı bağlantısı kurulunca “Müşteri yap” ile müşteriyi buradan ana kayda gönderebilirsiniz. ', el('a', { href: '/integrations' }, 'Entegrasyonlar')));
+      return;
+    }
     kutu.hidden = false;
     const k = r.kayit;
     const baslik = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
@@ -234,6 +241,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
     catch (h) { d.textContent = 'Eklenemedi: ' + h.message; }
   });
   turCiz();
-  if (!id) genelHata('Müşteri seçilmedi. CRM listesinden bir müşteri açın.'); else yukle();
+  if (!id) {
+    genelHata('Müşteri seçilmedi. CRM listesinden bir müşteri açın.');
+    // Boş form ve kartlar gösterilmez; yalnız CRM'e dönüş bağlantısı kalır.
+    const kap = ust.parentElement;
+    // Sayfa başlığı ve genel hata kutusu kalır; müşteri bölümleri gizlenir.
+    [...kap.children].forEach((x) => { if (!x.matches('[data-genel-hata], script') && !x.querySelector('h1') && x.matches('section, div, form')) x.hidden = true; });
+    kap.append(el('a', { class: 'dugme ana', href: '/crm', style: 'align-self: flex-start' }, 'CRM listesine git'));
+  } else yukle();
 </script>
 </Yonetim>
