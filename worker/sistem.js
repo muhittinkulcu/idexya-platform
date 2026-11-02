@@ -6,6 +6,7 @@ import { siteSaglikUyarilari } from './site-saglik.js';
 import { json, hata, simdi, kimlik, kirp, islemYaz, EPOSTA_DESEN } from './ortak.js';
 import { reklamKurulu } from './reklam.js';
 import { akisKurulu } from './instagram.js';
+import { anaKayitKurulu } from './ana-kayit.js';
 
 // Ayarlar: yalnız bu anahtarlar kaydedilebilir (teklif çıktısı ve iletişim bilgisi gibi yerlerde kullanılır).
 export const AYARLAR = [
@@ -94,6 +95,10 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     // Sistem uyarıları
     if (!env.TURNSTILE_SECRET) uyari.push({ baslik: 'Robot doğrulaması (Turnstile) kapalı', detay: 'Formlar yalnız hız sınırıyla korunuyor. Cloudflare Turnstile anahtarlarını tanımlayın.', href: '/integrations', onem: 'uyari' });
     if (!env.IP_TUZ) uyari.push({ baslik: 'IP_TUZ gizli değeri tanımlı değil', detay: 'IP adresleri varsayılan tuzla özetleniyor. Cloudflare’de rastgele bir IP_TUZ gizli değeri girin.', href: '/integrations', onem: 'uyari' });
+    if (anaKayitKurulu(env)) {
+      const ah = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'ana_kayit.son_hata'").first();
+      if (ah && ah.deger) uyari.push({ baslik: 'IDOS müşteri ana kaydı eşitlenemedi', detay: ah.deger + ' — müşteri kartları son alınan bilgiyi gösteriyor.', zaman: ah.guncelleme, href: '/integrations', onem: 'uyari' });
+    }
     if (!reklamKurulu(env)) uyari.push({ baslik: 'IDOS reklam verisi bağlı değil', detay: 'Genel bakıştaki reklam grafikleri boş kalır. IDOS_BQ_GORUNUM ve IDOS_BQ_ANAHTAR tanımlanmalı.', href: '/integrations', onem: 'bilgi' });
     if (akisKurulu(env)) {
       const ih = await db.prepare("SELECT deger, guncelleme FROM ayarlar WHERE anahtar = 'instagram_son_hata'").first();
@@ -139,10 +144,17 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     const yoneticiSayisi = (env.YONETICILER || '').split(',').map((x) => x.trim()).filter(Boolean).length;
     const cekimler = await db.prepare('SELECT zaman, durum, satir, baslangic, mesaj, tetikleyen FROM reklam_cekim ORDER BY zaman DESC LIMIT 30').all();
     const asistanAy = await db.prepare("SELECT COUNT(*) AS n FROM asistan_mesajlari WHERE rol = 'asistan' AND zaman >= ?").bind(new Date().toISOString().slice(0, 7) + '-01').first();
+    const ak = Object.fromEntries((await db.prepare("SELECT anahtar, deger FROM ayarlar WHERE anahtar IN ('ana_kayit.son_esitleme', 'ana_kayit.son_hata')").all()).results.map((x) => [x.anahtar, x.deger]));
+    const anaKurulu = anaKayitKurulu(env);
     return json({ ok: true, cekimler: cekimler.results, liste: [
       { k: 'access', ad: 'Cloudflare Access (panel girişi)', durum: var_(env.TEAM_DOMAIN) && var_(env.POLICY_AUD) && yoneticiSayisi ? 'bagli' : 'eksik', detay: `${yoneticiSayisi} yönetici e-postası tanımlı`, ayar: 'TEAM_DOMAIN, POLICY_AUD, YONETICILER' },
       { k: 'd1', ad: 'Veritabanı (Cloudflare D1)', durum: 'bagli', detay: 'Talepler, CRM, üyeler ve içerikler burada saklanır.' },
       { k: 'turnstile', ad: 'Robot doğrulaması (Cloudflare Turnstile)', durum: var_(env.TURNSTILE_SECRET) ? 'bagli' : 'eksik', detay: 'Formları ve üyelik sayfalarını robotlara karşı korur.', ayar: 'TURNSTILE_SECRET (gizli) ve derleme değişkeni PUBLIC_TURNSTILE_SITE_KEY' },
+      // Müşteri ana kaydı (IDOS ortak API): bağlı değilken panel çalışır; müşteri kartındaki ana kayıt bloğu ve "Müşteri yap" kapalı kalır.
+      { k: 'ana_kayit', ad: 'IDOS müşteri ana kaydı', durum: anaKurulu ? 'bagli' : 'eksik',
+        detay: !anaKurulu ? 'Bağlı değil. Müşteri kartındaki ana kayıt bilgisi ve “Müşteri yap” bağlantı kurulunca açılır; panelin geri kalanı bundan etkilenmez.'
+          : ak['ana_kayit.son_hata'] ? 'Son eşitleme hatası: ' + ak['ana_kayit.son_hata'] : ak['ana_kayit.son_esitleme'] ? 'Saatlik eşitleme çalışıyor. Son eşitleme: ' + ak['ana_kayit.son_esitleme'].slice(0, 16).replace('T', ' ') + ' (UTC)' : 'Bağlandı; ilk eşitleme bir sonraki saat başında yapılır.',
+        ayar: 'IDOS_ORTAK_URL, IDOS_ORTAK_JETON (gizli), IDOS_MUSTERI_ADRESI (isteğe bağlı)' },
       { k: 'idos', ad: 'IDOS reklam verisi (BigQuery)', durum: reklamKurulu(env) ? 'bagli' : 'eksik', detay: reklamKurulu(env) ? `Konum: ${env.IDOS_BQ_KONUM || 'europe-west1'}` : 'Genel bakıştaki reklam özetleri için gerekli.', ayar: 'IDOS_BQ_GORUNUM, IDOS_BQ_ANAHTAR (gizli)' },
       { k: 'asistan', ad: 'Yapay zekâ asistanı (Claude)', durum: var_(env.ANTHROPIC_API_KEY) ? 'bagli' : 'eksik', detay: `Bu ay ${asistanAy ? asistanAy.n : 0} yanıt · aylık sınır ${Number(env.ASISTAN_AYLIK_SINIR || 3000)}`, ayar: 'ANTHROPIC_API_KEY (gizli), ASISTAN_AYLIK_SINIR' },
       { k: 'yedek', ad: 'Veritabanı yedeği (R2)', durum: env.YEDEK ? 'bagli' : 'eksik', detay: 'Panel verisi her gün sıkıştırılmış JSON olarak R2 deposuna yazılır; son 30 gün saklanır.', ayar: 'YEDEK (R2 deposu bağlantısı, wrangler.json)' },
