@@ -2,12 +2,13 @@
 // Açılma koşulları:
 //   CATI_ONIZLEME=evet  elle (yerel: CATI_ONIZLEME=evet npm run build)
 //   Workers Builds'te main dışındaki dal (dal önizlemesi; önizlemede D1 ve değişken yoktur, wrangler.jsonc "previews")
-// CATI_ONIZLEME=kapali her durumda kapatır. main derlemesi, bu değişken elle verilmedikçe kapalıdır.
+// CATI_ONIZLEME=kapali her durumda kapatır. main derlemesi HER DURUMDA kapalıdır; canlıya geçişte bu bayrak kaldırılır.
 import { fileURLToPath } from 'node:url';
 import { appendFile } from 'node:fs/promises';
 import { ONIZLEME_YOLLARI } from './yollar.mjs';
 
 export function catiAcikMi(ortam = process.env) {
+  if (ortam.WORKERS_CI_BRANCH === 'main') return false;
   if (ortam.CATI_ONIZLEME === 'kapali') return false;
   if (ortam.CATI_ONIZLEME === 'evet') return true;
   const dal = ortam.WORKERS_CI_BRANCH;

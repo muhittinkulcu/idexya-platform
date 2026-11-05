@@ -7,6 +7,8 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { ONIZLEME_YOLLARI } from '../src/cati/yollar.mjs';
 const { chromium } = createRequire(process.env.PW_KOK ? `${process.env.PW_KOK}/` : import.meta.url)('playwright');
 const B = process.argv[2] || 'http://127.0.0.1:8795', SS = process.argv[3] || '';
+// Test kayıt yazar: canlı ya da önizleme adresine yönelmesin.
+if (!['127.0.0.1', 'localhost'].includes(new URL(B).hostname)) { console.error('Bu denetim yalnız yerel adreste çalışır.'); process.exit(2); }
 if (SS) mkdirSync(SS, { recursive: true });
 const hedef = existsSync('/opt/pw-browsers/chromium') ? { executablePath: '/opt/pw-browsers/chromium' } : {};
 const t = await chromium.launch(hedef);
