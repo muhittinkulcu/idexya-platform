@@ -1,0 +1,8 @@
+---
+// Teknoloji yönünde dönen altıgenler. Ortadaki öğe yuvaya verilir.
+const { mo = false } = Astro.props;
+---
+<div class="geo" aria-hidden="true" data-surekli>
+  <svg viewBox="0 0 500 500"><defs><linearGradient id="tg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#F5342E"></stop><stop offset="1" stop-color="#F07A23"></stop></linearGradient></defs><polygon class="h h1" points="250,20 449,135 449,365 250,480 51,365 51,135"></polygon><polygon class="h h2" points="250,70 406,160 406,340 250,430 94,340 94,160"></polygon><polygon class="h h3" points="250,120 363,185 363,315 250,380 137,315 137,185"></polygon><path class="h h2" d="M250 20V120M449 135 363 185M449 365 363 315M250 480V380M51 365 137 315M51 135 137 185"></path></svg>
+  <div class:list={['orta', { mo }]}><slot /></div>
+</div>

@@ -20,6 +20,15 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
 - Anahtarlar ve şifreler repoya yazılmaz.
 - Metinler TDK yazım kurallarına uyar; paragraflar iki yana yaslıdır.
 
+## Çatı site önizlemesi (bayrak arkasında)
+
+Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` altında gelişir. Bayrak kapalıyken bu dosyalar derlemeye girmez.
+
+- Bayrak: `CATI_ONIZLEME=evet` ya da Workers Builds'te `main` dışındaki dal (`src/cati/bayrak.mjs`). `CATI_ONIZLEME=kapali` her durumda kapatır.
+- Yerel: `CATI_ONIZLEME=evet npm run build && npx wrangler dev --port 8795 --local --persist-to <geçici klasör>`, adres `/cati-onizleme/`.
+- Denetim: `PW_KOK=<playwright klasörü> node tools/test-cati.mjs http://127.0.0.1:8795 <ekran klasörü>`.
+- Canlı değişmedi kanıtı: main'de ve dalda bayraksız `npm run build`, sonra `node tools/cati-kanit.mjs <main dist> dist`.
+
 ## Yönetim paneli (`/yonetim`)
 
 - Sunucu kodu `worker/index.js`; veritabanı Cloudflare D1 (`DB`), şema `worker/sema.js` ilk istekte kendiliğinden kurulur.

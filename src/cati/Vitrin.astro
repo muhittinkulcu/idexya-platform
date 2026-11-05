@@ -1,0 +1,48 @@
+---
+// Ortak parçaların önizlemesi: kahraman, şerit, ilkeler, süreç rayı, çağrı bandı. İçerik onaylı görsel kaynaktan.
+import Cati from '../layouts/Cati.astro';
+import EsYukselti from '../components/cati/EsYukselti.astro';
+import Geo from '../components/cati/Geo.astro';
+import Serit from '../components/cati/Serit.astro';
+import Isaret from '../components/cati/Isaret.astro';
+import { ILKELER } from './icerik.mjs';
+const { yon } = Astro.props;
+const ALT = 'Idexya; reklamı, içeriği, web sitesini, e-ticareti, görünürlüğü, otomasyonu ve prodüksiyonu tek ekipte bir araya getirir. İhtiyacınız olan hizmetle başlarsınız.';
+const Cta = '<div class="cta-sira"><a class="btn" href="/tr/iletisim/#form">Teklif iste</a><a class="btn ikinci" href="/hizmetler/">Hizmetleri inceleyin</a></div>';
+const SUREC = [['İhtiyacı konuşuruz', 'Hedefinizi ve mevcut durumunuzu birlikte netleştiririz.'], ['Planı sunarız', 'Kapsamı ve sonraki adımı yazılı olarak iletiriz.'], ['Onayınızla başlarız', 'Önemli kararlar size gerekçesiyle sunulur.'], ['Sonucu ölçeriz', 'Satış, form ve mesaj gibi sonuçları ayrı ayrı raporlarız.']];
+---
+<Cati baslik={yon === 't' ? 'Çatı önizleme: Teknoloji' : 'Çatı önizleme: Gece Hattı'} yon={yon}>
+  {yon === 'c' ? (
+    <section class="kc" id="kc" data-surekli data-imlec>
+      <EsYukselti />
+      <div class="kap kc-ic"><h1>Tek çatı altında dokuz hizmet.</h1><p>{ALT}</p><Fragment set:html={Cta} /></div>
+    </section>
+  ) : (
+    <section class="kt">
+      <div class="kap kt-ic">
+        <div class="kt-yaz"><h1>Tek çatı altında <span class="vk">dokuz hizmet.</span></h1><p>{ALT}</p><Fragment set:html={Cta} /></div>
+        <Geo><Isaret /></Geo>
+      </div>
+    </section>
+  )}
+  {yon === 't' && <Serit />}
+  <section class="bolum">
+    <div class="kap" data-rv>
+      <h2 class="bas">Neden Idexya</h2>
+      <p class="bas-not">Her hizmette aynı çalışma ilkeleri geçerlidir.</p>
+      <ul class="ilke-g">{ILKELER.map(([b, m]) => <li><h3>{b}</h3><p>{m}</p></li>)}</ul>
+    </div>
+  </section>
+  <section class="bolum" style="padding-top:0">
+    <div class="kap" data-rv>
+      <h2 class="bas">Nasıl ilerleriz</h2>
+      <ol class="surec">{SUREC.map(([b, m], i) => <li><span class="no" aria-hidden="true">{i + 1}</span><h3>{b}</h3><p>{m}</p></li>)}</ol>
+    </div>
+  </section>
+  <section class="cta-band">
+    <div class="kap">
+      <div data-rv><h2>Nereden başlayacağınızı birlikte bulalım</h2><p>Formu doldurun, işinizi ve hesaplarınızı inceleyip 1 iş günü içinde dönüş yapalım.</p><div class="cta-sira"><a class="btn" href="/tr/iletisim/#form">Teklif iste</a></div></div>
+      <ul data-rv><li><a href="tel:+905078700629">0507 870 06 29</a></li><li><a href="mailto:info@idexya.com">info@idexya.com</a></li><li><a href="https://wa.me/905078700629" rel="noopener">WhatsApp: 0507 870 06 29</a></li><li>Ankara, hafta içi 09.00–18.00</li></ul>
+    </div>
+  </section>
+</Cati>
