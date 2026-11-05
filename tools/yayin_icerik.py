@@ -13,9 +13,6 @@ DEGISIM = {p: [
     ('anonim hâle getirilir. [Veri türlerine göre saklama süreleri tablosu eklenecek.]\'', 'anonim hâle getirilir.\', \'' + SAKLAMA + '\''),
 ] for p in YASAL}
 DEGISIM['src/pages/tr/sayfa/hakkimizda.astro'] = [
-    ("{ yil: '[Yıl]', ad: 'İlk adım'", "{ yil: '2018', ad: 'İlk adım'"),
-    ("{ yil: '[Yıl]', ad: 'Idexya kuruldu', metin: 'Ajans olarak markalara 360° hizmet.' }",
-     "{ yil: '2026', ad: 'Idexya kuruldu', metin: 'Haziran 2026’da resmî olarak kuruldu; markalara 360° hizmet.' }"),
     # Rakamı doğrulanmamış iki kutu yerine sözleşmeye bağlı iki ilke
     ("{ deger: '[X]', ad: 'yönetilen marka' }, { deger: '[X]', ad: 'yönetilen reklam bütçesi' }",
      "{ deger: '360°', ad: 'reklam, mağaza, SEO ve yazılım tek planda' }, { deger: '%100', ad: 'reklam hesapları ve veriler sizde kalır' }"),
