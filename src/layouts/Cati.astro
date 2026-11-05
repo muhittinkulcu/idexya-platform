@@ -1,0 +1,41 @@
+---
+// Çatı site yerleşimi. Yalnız bayrak açıkken derlenen yollardan kullanılır (src/cati/bayrak.mjs); arama motorlarına kapalıdır.
+import '../cati/cati.css';
+import Ust from '../components/cati/Ust.astro';
+import Alt from '../components/cati/Alt.astro';
+import unbounded from '../cati/yazi/unbounded-latin.woff2?url';
+import figtree from '../cati/yazi/figtree-latin.woff2?url';
+import archivo from '../cati/yazi/archivo-latin.woff2?url';
+interface Props { baslik: string; aciklama?: string; yon?: 'c' | 't'; teklifHref?: string; aktif?: string; }
+const { baslik, aciklama = '', yon = 'c', teklifHref, aktif } = Astro.props;
+const tamBaslik = `${baslik} | Idexya | Good Things`;
+const kanonik = new URL(Astro.url.pathname, Astro.site);
+const onYukleme = yon === 't' ? [archivo] : [unbounded, figtree];
+const turnstile = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || undefined;
+---
+<!doctype html>
+<html lang="tr" data-yon={yon} data-tema="koyu" data-turnstile={turnstile}>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{tamBaslik}</title>
+{aciklama && <meta name="description" content={aciklama}>}
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href={kanonik.href}>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content={yon === 't' ? '#000000' : '#140F3A'}>
+{onYukleme.map((href) => <link rel="preload" as="font" type="font/woff2" href={href} crossorigin>)}
+<script is:inline>if(!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('hareket')</script>
+</head>
+<body>
+<a class="gizli-ok atla" href="#ana">İçeriğe geç</a>
+{yon === 't' && <div id="ilerleme" aria-hidden="true"></div>}
+<Ust teklifHref={teklifHref} aktif={aktif} />
+<main id="ana" tabindex="-1"><slot /></main>
+<Alt />
+<script>
+  import '../cati/ust.js';
+  import '../cati/hareket.js';
+</script>
+</body>
+</html>

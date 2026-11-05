@@ -1,0 +1,35 @@
+---
+// Yeni üst menü. Referanslar yazılı izin gelene kadar yok; Giriş menüsünde IDOS yok (Muhittin kararı).
+import Isaret from './Isaret.astro';
+import Motif from './Motif.astro';
+import { GRUPLAR, HIZMET_MENU, GIRISLER } from '../../cati/icerik.mjs';
+const { teklifHref = '/tr/iletisim/#form', aktif = '' } = Astro.props;
+const BAGLANTILAR = [['Paketler', '/tr/paketler/'], ['Blog', '/tr/haberler/'], ['Hakkımızda', '/tr/sayfa/hakkimizda/'], ['İletişim', '/tr/iletisim/']];
+const Ok = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m2 4 4 4 4-4"/></svg>';
+---
+<header class="ust">
+  <div class="kap ust-ic">
+    <a class="logo" href="/" aria-label="Idexya ana sayfa"><Isaret /><span class="logo-ad"><b>Idexya</b><small>GOOD THINGS</small></span></a>
+    <button class="burger" type="button" data-burger aria-label="Menüyü aç" aria-expanded="false" aria-controls="anaNav"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg></button>
+    <nav class="nav" id="anaNav" aria-label="Ana menü">
+      <button class="nav-a" type="button" data-ac="m-hiz" aria-expanded="false" aria-controls="m-hiz">Hizmetler<Fragment set:html={Ok} /></button>
+      <div class="acilir" id="m-hiz">
+        <div class="kap mega">
+          {GRUPLAR.map((g) => (
+            <div>
+              <h3>{g.ad}</h3>
+              {HIZMET_MENU.filter((s) => s.g === g.k).map((s) => <a href={`/${s.s}/`} aria-current={aktif === s.s ? 'page' : undefined}><span class="mi"><Motif ad={s.m} /></span>{s.ad}</a>)}
+            </div>
+          ))}
+          <a class="mega-tum" href="/hizmetler/">Bütün hizmetler</a>
+        </div>
+      </div>
+      {BAGLANTILAR.map(([ad, href]) => <a class="nav-a" href={href}>{ad}</a>)}
+      <button class="nav-a" type="button" data-ac="m-gir" aria-expanded="false" aria-controls="m-gir">Giriş<Fragment set:html={Ok} /></button>
+      <div class="acilir" id="m-gir">
+        <div class="kap"><div class="giris-pan"><ul>{GIRISLER.map((p) => <li><a href={p.href} rel={p.href.startsWith('http') ? 'noopener' : undefined}><b>{p.ad}</b><span>{p.alt}</span></a></li>)}</ul></div></div>
+      </div>
+      <a class="btn ust-cta" href={teklifHref}>Teklif iste</a>
+    </nav>
+  </div>
+</header>

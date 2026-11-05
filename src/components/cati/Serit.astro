@@ -1,0 +1,8 @@
+---
+// Kayan platform şeridi. Ekran okuyucuya tek cümle olarak okunur; ikinci kopya yalnız döngü içindir.
+import { PLATFORMLAR } from '../../cati/icerik.mjs';
+---
+<div class="serit" data-surekli>
+  <span class="gizli-ok">Çalıştığımız platformlar: {PLATFORMLAR.join(', ')}.</span>
+  <div class="serit-ic" aria-hidden="true">{[...PLATFORMLAR, ...PLATFORMLAR].map((p) => <span>{p}</span>)}</div>
+</div>

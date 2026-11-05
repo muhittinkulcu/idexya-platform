@@ -1,0 +1,26 @@
+---
+// Yeni alt bilgi. Referanslar bağlantısı yok; yasal sayfalar ve English sürümü mevcut adreslerinde kalır.
+import Isaret from './Isaret.astro';
+import { GRUPLAR, HIZMET_MENU } from '../../cati/icerik.mjs';
+const hizmetler = (...g) => HIZMET_MENU.filter((s) => g.includes(s.g));
+const SAYFALAR = [['Bütün hizmetler', '/hizmetler/'], ['Paketler', '/tr/paketler/'], ['Blog', '/tr/haberler/'], ['Çalıştığımız platformlar', '/tr/platformlar/'], ['IDOS', '/tr/idos/'], ['Hakkımızda', '/tr/sayfa/hakkimizda/'], ['İletişim', '/tr/iletisim/'], ['Üye girişi', '/giris/']];
+const YASAL = [['KVKK aydınlatma metni', '/tr/sayfa/kvkk-aydinlatma-metni/'], ['Çerez politikası', '/tr/sayfa/cerez-politikasi/'], ['Gizlilik politikası', '/tr/sayfa/gizlilik-politikasi/'], ['English', '/en/']];
+---
+<footer class="alt">
+  <div class="kap">
+    <div class="alt-g">
+      <div>
+        <a class="logo" href="/" aria-label="Idexya ana sayfa"><Isaret /><span class="logo-ad"><b>Idexya</b><small>GOOD THINGS</small></span></a>
+        <p style="margin-top:.9rem;max-width:42ch">Tek çatı altında reklam, içerik, web, e-ticaret, görünürlük, otomasyon ve prodüksiyon.</p>
+        <ul style="margin-top:.9rem"><li>Ankara</li><li><a href="tel:+905078700629">0507 870 06 29</a></li><li><a href="mailto:info@idexya.com">info@idexya.com</a></li><li>Hafta içi 09.00–18.00</li></ul>
+      </div>
+      {GRUPLAR.slice(0, 2).map((g) => <div><h3>{g.ad}</h3><ul>{hizmetler(g.k).map((s) => <li><a href={`/${s.s}/`}>{s.ad}</a></li>)}</ul></div>)}
+      <div><h3>Diğer</h3><ul>{hizmetler('gorunur', 'prod').map((s) => <li><a href={`/${s.s}/`}>{s.ad}</a></li>)}{SAYFALAR.map(([ad, href]) => <li><a href={href}>{ad}</a></li>)}</ul></div>
+    </div>
+    <div class="alt-son">
+      <span>© {new Date().getFullYear()} Idexya | Good Things</span>
+      <span class="alt-yasal">{YASAL.map(([ad, href]) => <a href={href}>{ad}</a>)}</span>
+      <span><a href="https://www.instagram.com/idexya.goodthings" rel="noopener">Instagram: @idexya.goodthings</a></span>
+    </div>
+  </div>
+</footer>

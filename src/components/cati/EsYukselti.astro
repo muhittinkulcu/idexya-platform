@@ -1,0 +1,18 @@
+---
+// Gece Hattı kahramanı: eş yükselti çizgileri, imleç ışığı ve uçan dron izi.
+import { MOTIF } from '../../cati/icerik.mjs';
+const yollar = [];
+for (let k = 0; k < 16; k++) {
+  const r0 = 70 + k * 62, n = 64, p = [];
+  for (let t = 0; t <= n; t++) {
+    const a = (t / n) * Math.PI * 2;
+    const rr = r0 * (1 + 0.11 * Math.sin(3 * a + k * 0.45) + 0.06 * Math.sin(5 * a - k * 0.7) + 0.03 * Math.sin(9 * a + k));
+    p.push(`${(1120 + rr * Math.cos(a)).toFixed(1)} ${(430 + rr * 0.8 * Math.sin(a)).toFixed(1)}`);
+  }
+  yollar.push(`<path d="M${p.join('L')}Z"/>`);
+}
+const g = yollar.join('');
+---
+<svg class="es" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g class="don" set:html={g}></g></svg>
+<svg class="es uc" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><path class="iz" d="M-60 720C260 560 420 760 720 560S1180 170 1680 240"></path><g class="c-dron"><g transform="translate(-30 -30) scale(.6)" style="stroke-width:4" set:html={MOTIF.dron}></g></g></svg>
+<svg class="es isik" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><g class="don" set:html={g}></g></svg>
