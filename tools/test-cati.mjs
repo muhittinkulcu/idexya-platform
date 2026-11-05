@@ -13,8 +13,8 @@ const t = await chromium.launch(hedef);
 const kalan = []; let gecen = 0;
 const k = (ad, x, ek = '') => { if (x) gecen++; else { kalan.push(ad); console.log(`KALDI ${ad} ${ek}`); } };
 const GENISLIK = [390, 1440, 2560];
-// Yazılmayacaklar: sayısal deneyim süresi (şirket deneyimi yalnız "2018'den beri"), proje ve marka sayısı, kapalı Referanslar, taslak izi.
-const YASAK = [/\b\d+\+/, /\b\d+ *(yıl|yıllık)\b/i, /\b\d+ *(proje|marka|müşteri)\b/i, /Referanslar/, /Örnek içerik/, /Taslakta/, /gerçek veri gelince/, /₺/, /\d\s*TL\b/];
+// Yazılmayacaklar: uydurma deneyim süresi ("10+ yıl" dışında), 2018, proje ve marka sayısı, kapalı Referanslar, taslak izi.
+const YASAK = [/\b(?!10\+)\d+\+/, /\b2018\b/, /\b\d+ *(yıl|yıllık)\b/i, /\b\d+ *(proje|marka|müşteri)\b/i, /Referanslar/, /Örnek içerik/, /Taslakta/, /gerçek veri gelince/, /₺/, /\d\s*TL\b/];
 // Bir sonraki aşamada açılacak adresler (bayraklı önizlemede henüz yok).
 const SONRA = JSON.parse(process.env.CATI_SONRA || '[]');
 const yollar = ONIZLEME_YOLLARI.map((y) => `/${y}/`);
