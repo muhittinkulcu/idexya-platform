@@ -1,10 +1,19 @@
 ---
 // Bayrak açıkken eklenen kök yol (src/cati/bayrak.mjs). Bayrak kapalıyken bu dosya derlemeye girmez.
 import Vitrin from './Vitrin.astro';
+import HizmetSablon from './HizmetSablon.astro';
+import HizmetDizin from './HizmetDizin.astro';
 import { VITRINLER } from './yollar.mjs';
+import { HIZMETLER } from './hizmetler.mjs';
 export function getStaticPaths() {
-  return VITRINLER.map((v) => ({ params: { cati: v.yol }, props: { yon: v.yon } }));
+  return [
+    ...VITRINLER.map((v) => ({ params: { cati: v.yol }, props: { tur: 'vitrin', yon: v.yon } })),
+    { params: { cati: 'hizmetler' }, props: { tur: 'dizin' } },
+    ...HIZMETLER.map((s) => ({ params: { cati: s.s }, props: { tur: 'hizmet', s } }))
+  ];
 }
-const { yon } = Astro.props;
+const { tur, yon, s } = Astro.props;
 ---
-<Vitrin yon={yon} />
+{tur === 'vitrin' && <Vitrin yon={yon} />}
+{tur === 'dizin' && <HizmetDizin />}
+{tur === 'hizmet' && <HizmetSablon s={s} />}

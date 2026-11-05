@@ -1,0 +1,50 @@
+---
+// Dokuz hizmetin ortak şablonu. Yön sayfanın kaydındadır: c Gece Hattı, t Teknoloji (ağ, altıgenler, şerit).
+// Görsel kaynaktaki "Örnek işler" alanı alınmadı: gerçek iş örneği gelene kadar yer tutucu yayımlanmaz.
+import Cati from '../layouts/Cati.astro';
+import './cati-hizmet.css';
+import Motif from '../components/cati/Motif.astro';
+import Geo from '../components/cati/Geo.astro';
+import Serit from '../components/cati/Serit.astro';
+import TeklifFormu from '../components/cati/TeklifFormu.astro';
+import { GRUPLAR, HIZMET_MENU } from './icerik.mjs';
+const { s } = Astro.props;
+const t = s.yon === 't';
+const grup = GRUPLAR.find((g) => g.k === s.g);
+const komsu = HIZMET_MENU.filter((x) => x.g === s.g && x.s !== s.s);
+const digerleri = komsu.length ? komsu : HIZMET_MENU.filter((x) => x.g !== s.g);
+const v = s.vurgu || '';
+const [bas, son] = t && v ? s.ad.split(v) : [s.ad, ''];
+---
+<Cati baslik={s.ad} aciklama={s.kisa} yon={s.yon} teklifHref="#teklif" aktif={s.s}>
+  <article class="hz">
+    <header class="hz-bas" data-surekli>
+      {t && <canvas class="ag" aria-hidden="true"></canvas>}
+      <div class="kap hz-bas-ic">
+        <div>
+          <p class="hz-yol"><a href="/hizmetler/">Hizmetler</a> / {grup.ad}</p>
+          <h1>{bas}{t && v && <span class="vk">{v}</span>}{son}</h1>
+          <p class="hz-kisa">{s.kisa}</p>
+          <div><a class="btn" href="#teklif">Teklif iste</a></div>
+        </div>
+        {t ? <div class="hz-geo"><Geo mo><Motif ad={s.m} /></Geo></div> : <div class="hz-motif"><Motif ad={s.m} /></div>}
+      </div>
+    </header>
+    {t && <Serit />}
+    <div class="kap hz-govde">
+      <div class="hz-ana">
+        <section data-rv><h2 class="bas">Ne yapılır</h2><p class="yasli">{s.ne}</p></section>
+        <section data-rv><h2 class="bas">Süreç</h2><ol class="surec">{s.surec.map(([b, m], i) => <li><span class="no" aria-hidden="true">{i + 1}</span><h3>{b}</h3><p>{m}</p></li>)}</ol></section>
+        <section data-rv><h2 class="bas">Kapsam</h2><ul class="kapsam">{s.kapsam.map((k) => <li>{k}</li>)}</ul><p class="ipucu" style="margin-top:.8rem">Kesin kapsam ve fiyat teklifte yazılı olarak iletilir.</p></section>
+        <section data-rv class="sss"><h2 class="bas">Sık sorular</h2>{s.sss.map(([b, m]) => <details><summary>{b}</summary><p>{m}</p></details>)}</section>
+      </div>
+      <aside class="hz-form" id="teklif"><TeklifFormu secili={s.s} /></aside>
+    </div>
+    <section class="diger bolum" style="padding-block:2.2rem">
+      <div class="kap">
+        <h2 style="font-size:1.25rem;margin-bottom:.9rem">{komsu.length ? `${grup.ad} grubundaki diğer hizmetler` : 'Diğer hizmetler'}</h2>
+        <div class="diger-g">{digerleri.map((x) => <a href={`/${x.s}/`}>{x.ad}</a>)}</div>
+      </div>
+    </section>
+  </article>
+</Cati>

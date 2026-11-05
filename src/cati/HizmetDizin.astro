@@ -1,0 +1,22 @@
+---
+// /hizmetler dizini (Gece Hattı). Menüye bu aşamada bağlanmaz; mevcut /tr/hizmetler/ yerinde kalır.
+import Cati from '../layouts/Cati.astro';
+import './cati-hizmet.css';
+import Motif from '../components/cati/Motif.astro';
+import { GRUPLAR, HIZMET_MENU } from './icerik.mjs';
+---
+<Cati baslik="Hizmetler" aciklama="Dört grupta dokuz hizmet. Her hizmetin kendi sayfası, süreci ve teklif formu var." yon="c">
+  <header class="say-bas"><div class="kap"><h1>Hizmetler</h1><p>Dört grupta dokuz hizmet. Her hizmetin kendi sayfası, süreci ve teklif formu var.</p></div></header>
+  <section class="bolum" style="padding-top:0">
+    <div class="kap">
+      <div class="yigin">
+        {GRUPLAR.map((g, i) => (
+          <article class="yigin-p" style={`--i:${i}`}>
+            <div><h2 class="yigin-b">{g.ad}</h2><p style="color:var(--soluk);margin-top:.5rem">{g.kisa}</p></div>
+            <ul class="yigin-l">{HIZMET_MENU.filter((s) => s.g === g.k).map((s) => <li><a href={`/${s.s}/`}><span class="mi"><Motif ad={s.m} /></span><span><b>{s.ad}</b><small>{s.kisa}</small></span></a></li>)}</ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</Cati>

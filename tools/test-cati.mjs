@@ -13,8 +13,8 @@ const t = await chromium.launch(hedef);
 const kalan = []; let gecen = 0;
 const k = (ad, x, ek = '') => { if (x) gecen++; else { kalan.push(ad); console.log(`KALDI ${ad} ${ek}`); } };
 const GENISLIK = [390, 1440, 2560];
-// Yazılmayacaklar: deneyim yılı, proje ve marka sayısı, kapalı Referanslar, taslak izi.
-const YASAK = [/\b\d+\+/, /\b2018\b/, /\b\d+\s*(yıl|yıllık)\b/i, /\b\d+\s*(proje|marka|müşteri)\b/i, /Referanslar/, /Örnek içerik/, /Taslakta/, /gerçek veri gelince/, /₺/, /\d\s*TL\b/];
+// Yazılmayacaklar: sayısal deneyim süresi (şirket deneyimi yalnız "2018'den beri"), proje ve marka sayısı, kapalı Referanslar, taslak izi.
+const YASAK = [/\b\d+\+/, /\b\d+ *(yıl|yıllık)\b/i, /\b\d+ *(proje|marka|müşteri)\b/i, /Referanslar/, /Örnek içerik/, /Taslakta/, /gerçek veri gelince/, /₺/, /\d\s*TL\b/];
 // Bir sonraki aşamada açılacak adresler (bayraklı önizlemede henüz yok).
 const SONRA = JSON.parse(process.env.CATI_SONRA || '[]');
 const yollar = ONIZLEME_YOLLARI.map((y) => `/${y}/`);
@@ -31,7 +31,7 @@ for (const yol of yollar) {
     s.on('response', (y) => { if (y.status() >= 400 && y.url().startsWith(B)) hata.push(`${y.status()} ${y.url()}`); });
     await s.goto(B + yol, { waitUntil: 'load' });
     await s.evaluate(() => document.fonts.ready);
-    await s.evaluate(async () => { for (let y = 0; y < document.documentElement.scrollHeight; y += 500) { scrollTo(0, y); await new Promise((c) => setTimeout(c, 25)); } scrollTo(0, 0); });
+    await s.evaluate(async () => { for (let y = 0; y < document.documentElement.scrollHeight; y += 500) { scrollTo({ top: y, behavior: 'instant' }); await new Promise((c) => setTimeout(c, 25)); } scrollTo({ top: 0, behavior: 'instant' }); });
     await s.waitForTimeout(900);
     const d = await s.evaluate(() => ({
       tasma: document.documentElement.scrollWidth - innerWidth,
@@ -101,7 +101,7 @@ for (const h of baglantilar) {
 }
 // Site haritasına girmemeli.
 const harita = await (await fetch(`${B}/sitemap.xml`)).text();
-for (const yol of yollar) k(`${yol} site haritasında yok`, !harita.includes(yol));
+for (const yol of yollar) k(`${yol} site haritasında yok`, !harita.includes(`idexya.com${yol}`));
 // Ek denetimler (hizmet sayfaları).
 const EK = new URL('./test-cati-hizmet.mjs', import.meta.url);
 if (existsSync(EK)) await (await import(EK.href)).default({ t, B, SS, k });

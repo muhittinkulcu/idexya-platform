@@ -49,7 +49,19 @@ function imlecIsigi() {
   });
 }
 
+// Teknoloji yönünde hareketli ağ: yalnız tuval olan sayfada ve sayfa yüklendikten sonra indirilir.
+function ag() {
+  const c = document.querySelector('canvas.ag');
+  if (!c || !hareketVar) return;
+  const basla = () => import('./ag.js').then((m) => m.agBaslat(c));
+  // İlk etkileşimi ve yüklemeyi yormasın diye sayfa yüklendikten biraz sonra, tarayıcı boştayken başlar.
+  const bosta = () => ('requestIdleCallback' in window ? requestIdleCallback(basla, { timeout: 1500 }) : basla());
+  const bekle = () => setTimeout(bosta, 2000);
+  if (document.readyState === 'complete') bekle(); else addEventListener('load', bekle, { once: true });
+}
+
 belirme();
 kaydirma();
 surekliDurdur();
 imlecIsigi();
+ag();
