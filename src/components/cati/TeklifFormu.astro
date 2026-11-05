@@ -1,0 +1,33 @@
+---
+// Teklif formu: mevcut /api/talep akışı (src/scripts/form.js). KVKK onayı, tuzak alan, hız sınırı ve robot doğrulaması sunucuda aynen geçerlidir.
+// Sunucu değişikliği yok: seçilen hizmet "alan" alanıyla konuya yazılır, kaynak "Site formu" görünür. Müşteriye otomatik e-posta gitmez.
+import { GRUPLAR, HIZMET_MENU } from '../../cati/icerik.mjs';
+const { secili = '' } = Astro.props;
+---
+<form class="form" data-talep="teklif" novalidate>
+  <h2>Teklif isteyin</h2>
+  <label>Ad soyad *<input name="ad" autocomplete="name" required></label>
+  <label>Firma<input name="firma" autocomplete="organization"></label>
+  <div class="iki">
+    <label>E-posta<input name="eposta" type="email" autocomplete="email"></label>
+    <label>Telefon<input name="telefon" type="tel" autocomplete="tel"></label>
+  </div>
+  <p class="ipucu">Size ulaşabilmemiz için e-posta ya da telefondan biri yeterli.</p>
+  <label>Web siteniz<input name="site" inputmode="url" placeholder="ornek.com"></label>
+  <label>İlgilendiğiniz hizmet
+    <select name="alan">
+      {GRUPLAR.map((g) => <optgroup label={g.ad}>{HIZMET_MENU.filter((s) => s.g === g.k).map((s) => <option selected={secili === s.s}>{s.ad}</option>)}</optgroup>)}
+      <option selected={!secili}>Emin değilim</option>
+    </select>
+  </label>
+  <label>Mesajınız<textarea name="mesaj" rows="3"></textarea></label>
+  <label class="onay"><input type="checkbox" name="kvkk"><span><a href="/tr/sayfa/kvkk-aydinlatma-metni/" target="_blank" rel="noopener">KVKK aydınlatma metnini</a> okudum, iletişim için bilgilerimin işlenmesini kabul ediyorum. *</span></label>
+  <label aria-hidden="true" class="form-tuzak">Bu alanı boş bırakın<input type="text" name="web_adresi_tekrar" tabindex="-1" autocomplete="off"></label>
+  <div data-turnstile></div>
+  <p class="form-durum" data-form-durum role="status" aria-live="polite" hidden></p>
+  <button class="btn" type="submit">Teklif iste</button>
+</form>
+<script>
+  import { formlar } from '../../scripts/form.js';
+  formlar();
+</script>

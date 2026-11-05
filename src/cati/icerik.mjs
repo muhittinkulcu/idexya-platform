@@ -5,18 +5,8 @@ export const GRUPLAR = [
   { k: 'gorunur', ad: 'Görünürlük ve otomasyon', kisa: 'Arama motorlarında görünürlük, tekrar eden işlerde otomasyon.' },
   { k: 'prod', ad: 'Prodüksiyon', kisa: 'Havadan görüntü ile markanızın mekânını ve işini gösterin.' }
 ];
-// Menü sırası. Ayrıntılı metinler hizmet şablonuyla birlikte gelir.
-export const HIZMET_MENU = [
-  { s: 'sosyal-medya-icerik-yonetimi', ad: 'Sosyal Medya İçerik Yönetimi', g: 'sosyal', m: 'icerik' },
-  { s: 'sosyal-medya-reklam-yonetimi', ad: 'Sosyal Medya Reklam Yönetimi', g: 'sosyal', m: 'reklam' },
-  { s: 'google-ads-reklam-yonetimi', ad: 'Google Ads Reklam Yönetimi', g: 'sosyal', m: 'google' },
-  { s: 'kurumsal-web-site-tasarimi', ad: 'Kurumsal Web Site Tasarımı', g: 'web', m: 'kurumsal' },
-  { s: 'e-ticaret-web-site-tasarimi', ad: 'E-Ticaret Web Site Tasarımı', g: 'web', m: 'eticaret' },
-  { s: 'e-ticaret-pazaryeri-yonetimi', ad: 'E-Ticaret Pazaryeri Yönetimi', g: 'web', m: 'pazaryeri' },
-  { s: 'seo-geo-yonetimi', ad: 'SEO & GEO Yönetimi', g: 'gorunur', m: 'seo' },
-  { s: 'ai-agent-otomasyon-yonetimi', ad: 'AI Agent Otomasyon Yönetimi', g: 'gorunur', m: 'ai' },
-  { s: 'dron-cekimi', ad: 'Dron Çekimi', g: 'prod', m: 'dron' }
-];
+// Menü sırası ve sayfa metinleri tek kaynaktan gelir.
+export { HIZMETLER as HIZMET_MENU } from './hizmetler.mjs';
 export const ILKELER = [
   ['Hesaplar sizin adınıza', 'Reklam hesabı, analiz ve mağaza hesapları size aittir. Biz yönetici olarak erişiriz; çalışma bitince erişimimiz kaldırılır, veriler sizde kalır.'],
   ['Onayınız olmadan değişiklik yok', 'Bütçe, teklif stratejisi ve kampanya açma-kapatma gibi kararlar önce size gerekçesiyle sunulur, onayınızla uygulanır.'],

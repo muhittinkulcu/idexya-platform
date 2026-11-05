@@ -25,7 +25,7 @@ idexya.com’un yeni sitesi ve ileride yönetim paneli. Astro (statik) + Cloudfl
 Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` altında gelişir. Bayrak kapalıyken bu dosyalar derlemeye girmez.
 
 - Bayrak: `CATI_ONIZLEME=evet` ya da Workers Builds'te `main` dışındaki dal (`src/cati/bayrak.mjs`). `CATI_ONIZLEME=kapali` her durumda kapatır.
-- Yerel: `CATI_ONIZLEME=evet npm run build && npx wrangler dev --port 8795 --local --persist-to <geçici klasör>`, adres `/cati-onizleme/`.
+- Yerel: `CATI_ONIZLEME=evet npm run build && npx wrangler dev --port 8795 --local --persist-to <geçici klasör>`, adresler `/cati-onizleme/`, `/hizmetler/`, dokuz hizmet sayfası (`src/cati/hizmetler.mjs`). Hepsi noindex, menü dışı, site haritası dışı.
 - Denetim: `PW_KOK=<playwright klasörü> node tools/test-cati.mjs http://127.0.0.1:8795 <ekran klasörü>`.
 - Canlı değişmedi kanıtı: main'de ve dalda bayraksız `npm run build`, sonra `node tools/cati-kanit.mjs <main dist> dist`.
 
