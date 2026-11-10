@@ -11,7 +11,7 @@
 
 .cam {
   --cam-zemin: 239 233 225;
-  --cam-leke-1: 30 158 90;   --cam-leke-1-a: .30;   /* Panel yeşili (Marketing kopyasında mavi) */
+  --cam-leke-1: 0 37 89;     --cam-leke-1-a: .16;   /* Site laciverdi (10 Kas 2026; önce panel yeşiliydi). Marketing kopyasında mavi */
   --cam-leke-2: 240 122 35;  --cam-leke-2-a: .26;   /* Idexya turuncusu */
   --cam-leke-3: 13 148 136;  --cam-leke-3-a: .18;   /* AI yeşili */
   --cam-yuzey: 255 255 255;  --cam-yuzey-a: .64;    /* menü ve üst çubuk (üçüncül yazı karşıtlığı için .64 altına inilmez) */
