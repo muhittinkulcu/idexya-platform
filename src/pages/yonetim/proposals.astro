@@ -63,7 +63,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const yerelGun = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   let sekme = SEKMELER.some((s) => s[0] === prm('sekme')) ? prm('sekme') : 'taslak';
-  let tum = [], musteriler = null, seciliId = prm('id') || '', duzenlenen = null;
+  let tum = [], dosyalar = [], musteriler = null, seciliId = prm('id') || '', duzenlenen = null;
 
   function adresYaz() {
     history.replaceState(null, '', location.pathname + adresMetni({ sekme, id: seciliId }));
@@ -72,27 +72,42 @@ import Yonetim from '../../layouts/Yonetim.astro';
   // --- Liste ---
   function ciz() {
     sekmeKutu.replaceChildren(...SEKMELER.map(([k, ad]) => {
-      const s = k === sekme, n = k === 'hepsi' ? tum.length : tum.filter((x) => x.durum === k).length;
+      const s = k === sekme, n = [...tum, ...dosyalar].filter((x) => k === 'hepsi' || x.durum === k).length;
       return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), class: 'dugme kucuk', style: s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => { sekme = k; adresYaz(); ciz(); } }, ad + ' ', el('span', { style: 'opacity: .7' }, String(n)));
     }));
-    const gor = tum.filter((x) => sekme === 'hepsi' || x.durum === sekme);
+    // Panelde hazırlananlar ve Canva'dan yüklenen PDF'ler birlikte; yüklenenler müşteri kartında yönetilir.
+    const gor = [...tum.map((x) => ({ ...x, kaynak: 'panel' })), ...dosyalar.map((x) => ({ ...x, kaynak: 'pdf' }))]
+      .filter((x) => sekme === 'hepsi' || x.durum === sekme)
+      .sort((a, b) => ((a.guncelleme || '') < (b.guncelleme || '') ? 1 : -1));
     if (!gor.length) {
-      liste.replaceChildren(el('div', { class: 'bos' }, tum.length ? BOS[sekme] : 'Henüz teklif yok. “Yeni teklif” ile CRM’deki bir müşteriye teklif hazırlayın; taslağı yazdırıp PDF olarak kaydedebilirsiniz.'));
+      liste.replaceChildren(el('div', { class: 'bos' }, tum.length + dosyalar.length ? BOS[sekme] : 'Henüz teklif yok. “Yeni teklif” ile CRM’deki bir müşteriye teklif hazırlayın; taslağı yazdırıp PDF olarak kaydedebilirsiniz.'));
       return;
     }
     liste.replaceChildren(el('table', { style: 'width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px' },
-      el('thead', {}, el('tr', {}, ...['No', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 3 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
-      el('tbody', {}, ...gor.map((t) => el('tr', { style: t.id === seciliId ? 'background: var(--card2)' : '' },
+      el('thead', {}, el('tr', {}, ...['No', 'Kaynak', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 4 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
+      el('tbody', {}, ...gor.map((t) => t.kaynak === 'pdf' ? el('tr', { 'data-kaynak': 'pdf' },
+        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya`, target: '_blank', rel: 'noopener', style: 'font-weight: 600' }, 'PDF’i aç')),
+        el('td', { style: hucre }, el('span', { class: 'cip' , style: 'border: 1px solid rgb(var(--line)); color: var(--tx2)' }, 'Canva PDF')),
+        el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi({ firma: t.firma, ad: t.musteri_ad })) : '—'),
+        el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.ad),
+        el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, t.tutar_kurus === null || t.tutar_kurus === undefined ? '—' : tutar(t.tutar_kurus / 100), el('br'), el('small', { style: 'color: var(--tx2)' }, 'KDV hariç')),
+        el('td', { style: hucre }, el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
+        el('td', { style: hucre + '; color: var(--tx2); white-space: nowrap' }, gun(t.tarih)))
+      : el('tr', { style: t.id === seciliId ? 'background: var(--card2)' : '' },
         el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: adresMetni({ sekme, id: t.id }), style: 'font-weight: 600', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
+        el('td', { style: hucre }, el('span', { class: 'cip', style: 'border: 1px solid rgb(var(--line)); color: var(--tx2)' }, 'Panel')),
         el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.baslik),
-        el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, tutar(t.toplam)),
+        el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, tutar(t.toplam), el('br'), el('small', { style: 'color: var(--tx2)' }, 'KDV dâhil')),
         el('td', { style: hucre }, el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
         el('td', { style: hucre + '; color: var(--tx2); white-space: nowrap' }, tarih(t.karar_zamani || t.gonderim_zamani || t.olusturma, false)))))));
   }
 
   async function yukle() {
-    try { tum = (await api('teklifler')).teklifler; genelHata(''); ciz(); }
+    try {
+      const [p, d] = await Promise.all([api('teklifler'), api('teklif-dosyalari').catch(() => ({ dosyalar: [] }))]);
+      tum = p.teklifler; dosyalar = d.dosyalar; genelHata(''); ciz();
+    }
     catch (h) { genelHata('Teklifler yüklenemedi: ' + h.message); liste.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); }
   }
 

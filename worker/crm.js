@@ -208,7 +208,7 @@ export async function yonetimCrmApi(db, env, yontem, yol, govde, kim) {
     const enEski = kartlar.reduce((e, x) => (x.olusturma < e ? x.olusturma : e), tut.olusturma);
     const z = simdi();
     const set = Object.keys(yeni).map((a) => `${a} = ?`).concat(['olusturma = ?', 'guncelleme = ?']).join(', ');
-    const tabloAdi = { kayitlar: 'günlük kaydı', talepler: 'talep', reklam_eslesme: 'reklam hesabı', uye_musteri: 'üye bağlantısı', davetler: 'davet' };
+    const tabloAdi = { kayitlar: 'günlük kaydı', talepler: 'talep', reklam_eslesme: 'reklam hesabı', uye_musteri: 'üye bağlantısı', davetler: 'davet', teklif_dosyalari: 'teklif dosyası' };
     const detay = sirali.map((x) => `${musteriAdi(x)}${x.eposta ? ' <' + x.eposta + '>' : ''}${x.telefon ? ' · ' + x.telefon : ''}`).join('; ') + ' kartı bu karta birleştirildi.'
       + (tasinan.length ? ' Taşınan: ' + tasinan.map(([t, n]) => `${n} ${tabloAdi[t] || t}`).join(', ') + '.' : '')
       + (dolan.length ? ' Doldurulan alanlar: ' + dolan.join(', ') + '.' : '');

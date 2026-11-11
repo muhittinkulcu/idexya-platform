@@ -31,10 +31,41 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <ol data-gunluk style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ol>
 </section>
 </div>
-<section class="kart" aria-label="Teklifler" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Bu müşteri için hazırlanan tekliflerin numarası, tutarı ve durumudur.">Teklifler: bu müşteriye hazırlananlar</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler</small></div><a class="dugme kucuk" data-teklif-yeni href="/proposals?new=1">+ Bu müşteriye teklif hazırla</a></div>
-<ul data-teklifler style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ul>
+<section class="kart" aria-label="Teklifler" data-teklif-bolum style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Panelde hazırlanan ve dışarıda (Canva) hazırlanıp PDF olarak yüklenen tekliflerin tümü. Tutarlar KDV hariçtir. Panel hiçbir teklifi müşteriye göndermez.">Teklifler: bu müşteriye gönderilenler</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler · panelde hazırlanan ve yüklenen dosya</small></div><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme kucuk" data-teklif-yukle>⬆ Teklif dosyası yükle (PDF)</button><a class="dugme ana kucuk" data-teklif-yeni href="/proposals?new=1">+ Panelde teklif hazırla</a></div></div>
+<div role="group" aria-label="Teklif süzgeci" data-teklif-suzgec style="display: flex; gap: 6px; flex-wrap: wrap"></div>
+<div data-teklifler style="overflow-x: auto"></div>
+<div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center"><span data-teklif-ozet style="font-size: 13px; color: var(--tx2)"></span><a href="/proposals?tab=all" style="font-size: 13px; font-weight: 600">Tüm teklifler →</a></div>
 </section>
+<dialog class="tk-pencere" data-teklif-pencere aria-labelledby="tk-baslik">
+<form method="dialog" data-teklif-form novalidate style="display: flex; flex-direction: column; gap: 12px">
+<h2 id="tk-baslik" style="margin: 0; font-size: 18px; color: var(--head)">Teklif dosyası yükle</h2>
+<label class="tk-birak" data-birak tabindex="0"><input type="file" name="dosya" accept="application/pdf,.pdf" data-dosya style="position: absolute; left: -10000px"><span data-birak-metin>PDF dosyasını buraya bırakın ya da <b>bilgisayardan seçin</b></span><small>Yalnız PDF · en fazla 20 MB · dosyayı yalnız panel kullanıcıları açabilir</small></label>
+<label class="alan">Teklif adı<input name="ad" maxlength="200" required placeholder="Ör. Kasım dijital paket teklifi"></label>
+<div class="tk-iki"><label class="alan">Teklif tarihi<input name="tarih" type="date" required></label><label class="alan">Geçerlilik<input name="gecerlilik" type="date"></label></div>
+<div class="tk-iki"><label class="alan">Tutar (KDV hariç, TL)<input name="tutar" inputmode="decimal" placeholder="45.000,00"></label><label class="alan">Durum<select name="durum"><option value="gonderildi">Gönderildi</option><option value="taslak">Taslak</option><option value="kabul">Kabul edildi</option><option value="red">Reddedildi</option></select></label></div>
+<label style="display: flex; gap: 8px; align-items: flex-start; font-size: 13px"><input type="checkbox" name="asama" value="1" checked> <span>Kartın aşamasını “Teklif gönderildi” yap ve günlüğe yaz (ileri aşamadaki kart geri alınmaz)</span></label>
+<p data-teklif-hata role="status" class="uyari hata" hidden style="margin: 0"></p>
+<div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme" data-teklif-vazgec>Vazgeç</button><button type="submit" class="dugme ana" data-teklif-kaydet>Yükle ve kaydet</button></div>
+</form>
+</dialog>
+<style is:global>
+.tk-pencere{max-width:560px;width:calc(100% - 32px);padding:22px;border:1px solid rgb(var(--line));border-radius:18px;background:rgb(var(--card));color:var(--tx);box-sizing:border-box}
+.tk-pencere::backdrop{background:rgba(0,37,89,.35)}
+.tk-birak{position:relative;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;padding:22px;border:2px dashed rgb(var(--line));border-radius:14px;background:var(--card2);color:var(--tx2);cursor:pointer}
+.tk-birak b{color:var(--head)}.tk-birak[data-ustunde]{border-color:var(--brand);background:var(--tint)}.tk-birak:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.tk-iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
+.tk-tablo{width:100%;min-width:720px;border-collapse:collapse;font-size:13.5px}
+.tk-tablo th{text-align:left;color:var(--tx2);font-weight:600;font-size:12px;padding:8px 10px;border-bottom:1px solid rgb(var(--line))}
+.tk-tablo td{padding:10px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
+.tk-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tk-kaynak{font-size:11.5px;color:var(--tx2);border:1px solid rgb(var(--line));border-radius:6px;padding:1px 6px;white-space:nowrap}
+.tk-menu{position:relative;display:inline-block}.tk-menu summary{list-style:none}.tk-menu summary::-webkit-details-marker{display:none}
+.tk-menu-ic{position:absolute;right:0;top:calc(100% + 4px);z-index:20;min-width:200px;display:flex;flex-direction:column;gap:2px;padding:6px;background:rgb(var(--card));border:1px solid rgb(var(--line));border-radius:12px;box-shadow:0 20px 40px -18px var(--shadow)}
+.tk-menu-ic button{text-align:left;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
+.tk-menu-ic button:hover{background:var(--card2)}.tk-menu-ic button.tk-sil{color:var(--err)}
+.cip.taslak{background:var(--card2);color:var(--tx2)}.cip.gonderildi{background:var(--infob);color:var(--info)}
+</style>
 <script>
   import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata, prm } from '../../scripts/yonetim/ortak.js';
   const id = new URLSearchParams(location.search).get('id') || '';
@@ -84,20 +115,130 @@ import Yonetim from '../../layouts/Yonetim.astro';
       : [el('li', { class: 'bos' }, 'Günlükte kayıt yok.')]));
   }
 
-  // Müşterinin teklifleri (worker/teklif.js)
-  const TEKLIF_DURUM = { taslak: ['Taslak', 'yeni'], gonderildi: ['Gönderildi', 'teklif'], kabul: ['Kabul edildi', 'kazanildi'], red: ['Reddedildi', 'kaybedildi'] };
-  const tl = (n) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(n) || 0) + ' TL';
+  // Müşterinin teklifleri: panelde hazırlananlar (worker/teklif.js) ve yüklenen PDF'ler (worker/teklif-dosya.js).
+  // Tutarlar KDV hariç gösterilir; bilinmeyen tutar "—". Panel hiçbir teklifi müşteriye göndermez.
+  const TEKLIF_DURUM = { taslak: ['Taslak', 'taslak'], gonderildi: ['Gönderildi', 'gonderildi'], kabul: ['Kabul edildi', 'kazanildi'], red: ['Reddedildi', 'kaybedildi'] };
+  const tlK = (k) => (k === null || k === undefined ? '—' : new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(k / 100) + ' TL');
+  const gunYaz = (s) => (s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.split('-').reverse().join('.') : '—');
+  const boyutYaz = (b) => (b >= 1048576 ? new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 1 }).format(b / 1048576) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB');
+  const yerelGun = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const EN_BUYUK = 20 * 1024 * 1024;
+  let teklifSuzgec = 'hepsi', teklifSatirlar = [], depoVar = true;
+
+  function teklifCiz() {
+    const kutu = document.querySelector('[data-teklifler]');
+    const say = (d) => teklifSatirlar.filter((t) => d === 'hepsi' || t.durum === d).length;
+    document.querySelector('[data-teklif-suzgec]').replaceChildren(...[['hepsi', 'Tümü'], ['gonderildi', 'Gönderildi'], ['kabul', 'Kabul'], ['red', 'Red']].map(([k, ad]) => el('button', {
+      type: 'button', class: 'dugme kucuk', 'aria-pressed': String(k === teklifSuzgec), 'data-suzgec': k,
+      style: k === teklifSuzgec ? 'background: var(--tint); border-color: transparent; color: var(--tintx)' : '',
+      onclick: () => { teklifSuzgec = k; teklifCiz(); }
+    }, `${ad} (${say(k)})`)));
+    const gor = teklifSatirlar.filter((t) => teklifSuzgec === 'hepsi' || t.durum === teklifSuzgec);
+    // Alt satır: kabul oranı (taslak hariç) ve açık (gönderilmiş, sonuçlanmamış) teklif tutarı
+    const sonuc = teklifSatirlar.filter((t) => t.durum !== 'taslak'), acik = teklifSatirlar.filter((t) => t.durum === 'gonderildi');
+    const bilinen = acik.filter((t) => t.tutar !== null);
+    const acikTutar = acik.length && !bilinen.length ? '—' : tlK(bilinen.reduce((a, t) => a + t.tutar, 0));
+    document.querySelector('[data-teklif-ozet]').textContent = `Kabul oranı: ${sonuc.length ? `${sonuc.filter((t) => t.durum === 'kabul').length} / ${sonuc.length}` : '—'} · Açık teklif tutarı: ${acikTutar}`
+      + (bilinen.length < acik.length && bilinen.length ? ` (${acik.length - bilinen.length} teklifte tutar girilmedi)` : '');
+    if (!gor.length) {
+      kutu.replaceChildren(el('p', { class: 'bos', style: 'padding: 16px; margin: 0' }, teklifSatirlar.length ? 'Bu süzgeçte teklif yok.' : 'Bu müşteriye henüz teklif yok. Canva’da hazırladığınız PDF’i “Teklif dosyası yükle” ile ekleyin ya da panelde teklif hazırlayın.'));
+      return;
+    }
+    kutu.replaceChildren(el('table', { class: 'tk-tablo' },
+      el('thead', {}, el('tr', {}, ...['Teklif', 'Kaynak', 'Tarih', 'Geçerlilik', 'Tutar (KDV hariç)', 'Durum', ''].map((b, i) => el('th', { scope: 'col', class: i === 4 ? 'sayi' : '' }, b)))),
+      el('tbody', {}, ...gor.map((t) => el('tr', { 'data-kaynak': t.kaynak },
+        el('td', {}, el('a', t.kaynak === 'pdf' ? { href: t.ac, target: '_blank', rel: 'noopener', style: 'font-weight: 600' } : { href: t.ac, style: 'font-weight: 600' }, t.ad), el('br'), el('small', { style: 'color: var(--tx2)' }, t.alt)),
+        el('td', {}, el('span', { class: 'tk-kaynak' }, t.kaynak === 'pdf' ? 'Canva PDF' : 'Panel')),
+        el('td', { style: 'white-space: nowrap' }, gunYaz(t.tarih)),
+        el('td', { style: 'white-space: nowrap' }, gunYaz(t.gecerlilik)),
+        el('td', { class: 'sayi' }, tlK(t.tutar)),
+        el('td', {}, el('span', { class: 'cip ' + (TEKLIF_DURUM[t.durum] || ['', ''])[1] }, (TEKLIF_DURUM[t.durum] || [t.durum])[0])),
+        el('td', { style: 'white-space: nowrap; text-align: right' },
+          el('a', t.kaynak === 'pdf' ? { class: 'dugme kucuk', href: t.ac, target: '_blank', rel: 'noopener' } : { class: 'dugme kucuk', href: t.ac }, 'Aç'), ' ',
+          t.kaynak === 'pdf' ? pdfMenu(t) : ''))))));
+  }
+
+  function pdfMenu(t) {
+    const islem = async (yol, govde, d) => {
+      d.removeAttribute('open');
+      try { await api(`teklif-dosyalari/${encodeURIComponent(t.id)}/${yol}`, govde); yukle(); }
+      catch (h) { genelHata('İşlem yapılamadı: ' + h.message); }
+    };
+    const d = el('details', { class: 'tk-menu' }, el('summary', { class: 'dugme kucuk', 'aria-label': 'Seçenekler: ' + t.ad, title: 'Seçenekler' }, '⋮'));
+    d.append(el('div', { class: 'tk-menu-ic', role: 'menu' },
+      ...Object.entries(TEKLIF_DURUM).filter(([k]) => k !== t.durum).map(([k, [ad]]) => el('button', { type: 'button', role: 'menuitem', onclick: () => islem('durum', { durum: k }, d) }, 'Durum: ' + ad)),
+      el('button', { type: 'button', role: 'menuitem', class: 'tk-sil', onclick: () => {
+        const taslak = t.durum === 'taslak';
+        if (!confirm(taslak ? `“${t.ad}” silinsin mi? PDF dosyası da silinir; geri alınamaz.` : `“${t.ad}” ${TEKLIF_DURUM[t.durum][0].toLocaleLowerCase('tr')} durumunda. Yine de silinsin mi? PDF dosyası da silinir; geri alınamaz.`)) { d.removeAttribute('open'); return; }
+        islem('sil', taslak ? {} : { onay: true }, d);
+      } }, 'Sil')));
+    return d;
+  }
+
   async function teklifleriYukle() {
     const kutu = document.querySelector('[data-teklifler]');
     document.querySelector('[data-teklif-yeni]').href = '/proposals?new=1&customer=' + encodeURIComponent(id);
     try {
-      const r = await api('teklifler/musteri/' + encodeURIComponent(id));
-      kutu.replaceChildren(...(r.teklifler.length ? r.teklifler.map((t) => el('li', { style: 'display: flex; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid rgb(var(--line))' },
-        el('span', { style: 'display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0' }, el('a', { href: '/proposals?id=' + encodeURIComponent(t.id), style: 'font-weight: 600' }, t.no), el('span', { style: 'overflow-wrap: anywhere' }, t.baslik)),
-        el('span', { style: 'display: flex; gap: 8px; align-items: center' }, el('span', { style: 'white-space: nowrap; font-variant-numeric: tabular-nums' }, tl(t.toplam)), el('span', { class: 'cip ' + (TEKLIF_DURUM[t.durum] || ['', ''])[1] }, (TEKLIF_DURUM[t.durum] || [t.durum])[0]))))
-        : [el('li', { class: 'bos', style: 'padding: 16px' }, 'Bu müşteriye henüz teklif hazırlanmadı. “Bu müşteriye teklif hazırla” ile başlayabilirsiniz.')]));
-    } catch (h) { kutu.replaceChildren(el('li', { class: 'bos', style: 'padding: 16px' }, 'Teklifler yüklenemedi: ' + h.message)); }
+      const [p, d] = await Promise.all([api('teklifler/musteri/' + encodeURIComponent(id)), api('teklif-dosyalari/musteri/' + encodeURIComponent(id))]);
+      depoVar = d.depo !== false;
+      teklifSatirlar = [
+        ...p.teklifler.map((t) => ({ kaynak: 'panel', id: t.id, ad: t.baslik, alt: t.no, tarih: (t.olusturma || '').slice(0, 10), gecerlilik: t.gecerlilik, tutar: Math.round(((Number(t.toplam) || 0) - (Number(t.kdv) || 0)) * 100), durum: t.durum, ac: '/proposals?id=' + encodeURIComponent(t.id) })),
+        ...d.dosyalar.map((t) => ({ kaynak: 'pdf', id: t.id, ad: t.ad, alt: `${t.dosya_adi || 'teklif.pdf'} · ${boyutYaz(t.boyut)}`, tarih: t.tarih, gecerlilik: t.gecerlilik, tutar: t.tutar_kurus ?? null, durum: t.durum, ac: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya` }))
+      ].sort((a, b) => (a.tarih < b.tarih ? 1 : a.tarih > b.tarih ? -1 : 0));
+      teklifCiz();
+    } catch (h) { kutu.replaceChildren(el('p', { class: 'bos', style: 'padding: 16px; margin: 0' }, 'Teklifler yüklenemedi: ' + h.message)); }
   }
+
+  // Yükleme penceresi
+  const pencere = document.querySelector('[data-teklif-pencere]'), tForm = document.querySelector('[data-teklif-form]');
+  const tHata = document.querySelector('[data-teklif-hata]'), birak = document.querySelector('[data-birak]'), dosyaGir = document.querySelector('[data-dosya]');
+  let secilen = null;
+  const hataYaz = (m) => { tHata.hidden = !m; tHata.textContent = m || ''; };
+  async function dosyaSec(f) {
+    secilen = null; hataYaz('');
+    if (!f) return;
+    if (f.size > EN_BUYUK) { hataYaz('Dosya en fazla 20 MB olabilir.'); return; }
+    const bas = new Uint8Array(await f.slice(0, 5).arrayBuffer());
+    if (String.fromCharCode(...bas) !== '%PDF-') { hataYaz('Bu dosya PDF değil. Yalnız PDF yüklenebilir.'); return; }
+    secilen = f;
+    document.querySelector('[data-birak-metin]').replaceChildren(el('b', {}, f.name), ' · ' + boyutYaz(f.size));
+    if (!tForm.elements.ad.value) tForm.elements.ad.value = f.name.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').slice(0, 200);
+  }
+  document.querySelector('[data-teklif-yukle]').addEventListener('click', () => {
+    tForm.reset(); secilen = null; hataYaz('');
+    document.querySelector('[data-birak-metin]').replaceChildren('PDF dosyasını buraya bırakın ya da ', el('b', {}, 'bilgisayardan seçin'));
+    tForm.elements.tarih.value = yerelGun();
+    if (!depoVar) hataYaz('Dosya deposu (R2) bağlı değil; teklif dosyası şu an yüklenemez.');
+    pencere.showModal();
+  });
+  document.querySelector('[data-teklif-vazgec]').addEventListener('click', () => pencere.close());
+  dosyaGir.addEventListener('change', () => dosyaSec(dosyaGir.files[0]));
+  birak.addEventListener('keydown', (o) => { if (o.key === 'Enter' || o.key === ' ') { o.preventDefault(); dosyaGir.click(); } });
+  ['dragenter', 'dragover'].forEach((t) => birak.addEventListener(t, (o) => { o.preventDefault(); birak.setAttribute('data-ustunde', ''); }));
+  ['dragleave', 'drop'].forEach((t) => birak.addEventListener(t, () => birak.removeAttribute('data-ustunde')));
+  birak.addEventListener('drop', (o) => { o.preventDefault(); dosyaSec(o.dataTransfer.files[0]); });
+  // Taslak teklif "gönderildi" sayılmaz: aşama kutusu kendiliğinden kalkar.
+  tForm.elements.durum.addEventListener('change', () => { tForm.elements.asama.checked = tForm.elements.durum.value !== 'taslak'; tForm.elements.asama.disabled = tForm.elements.durum.value === 'taslak'; });
+  tForm.addEventListener('submit', async (o) => {
+    o.preventDefault(); hataYaz('');
+    if (!secilen) { hataYaz('Önce PDF dosyasını seçin.'); return; }
+    if (!tForm.elements.ad.value.trim()) { hataYaz('Teklif adı gerekli.'); return; }
+    if (!tForm.elements.tarih.value) { hataYaz('Teklif tarihi gerekli.'); return; }
+    const fd = new FormData();
+    fd.append('dosya', secilen, secilen.name);
+    fd.append('musteri_id', id);
+    ['ad', 'tarih', 'gecerlilik', 'tutar', 'durum'].forEach((k) => fd.append(k, tForm.elements[k].value));
+    fd.append('asama', tForm.elements.asama.checked ? '1' : '0');
+    const dugme = document.querySelector('[data-teklif-kaydet]');
+    dugme.disabled = true; dugme.textContent = 'Yükleniyor…';
+    try {
+      const r = await fetch('/api/yonetim/teklif-dosyalari', { method: 'POST', credentials: 'same-origin', body: fd });
+      const s = await r.json().catch(() => ({ ok: false, hata: `Sunucudan geçersiz yanıt geldi (${r.status})` }));
+      if (!r.ok || !s.ok) throw new Error(s.hata || `İstek başarısız (${r.status})`);
+      pencere.close(); yukle();
+    } catch (h) { hataYaz('Yüklenemedi: ' + h.message); }
+    finally { dugme.disabled = false; dugme.textContent = 'Yükle ve kaydet'; }
+  });
 
   // Reklam özeti (IDOS): yalnız IDOS eşitleme sayfasında bu müşteriye eşleştirilmiş hesap varsa görünür.
   // Para birimleri birbirine eklenmez; her platform + para birimi ayrı satırdır.
