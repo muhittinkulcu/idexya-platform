@@ -19,7 +19,7 @@ const DEPO_YOK = 'Dosya deposu (R2) bağlı değil; teklif dosyası yüklenemez 
 export const depoKurulu = (env) => !!(env && env.YEDEK);
 export const dosyaAnahtari = (musteriId, id) => `${ONEK}${musteriId}/${id}.pdf`;
 
-const SUTUNLAR = 'd.id, d.musteri_id, d.ad, d.tarih, d.gecerlilik, d.tutar_kurus, d.durum, d.dosya_adi, d.boyut, d.olusturan, d.olusturma, d.guncelleme, d.karar_zamani';
+const SUTUNLAR = 'd.id, d.musteri_id, d.ad, d.tarih, d.gecerlilik, d.tutar_kurus, d.durum, d.dosya_adi, d.boyut, d.olusturan, d.olusturma, d.guncelleme, d.karar_zamani, d.kaynak';
 
 function gecerliTarih(v) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return false;
@@ -116,6 +116,8 @@ export async function teklifDosyasiYukle(istek, env, kim) {
   if (Number.isNaN(tutar)) return hata('Tutar geçersiz (ör. 45.000,00)', 422);
   const durum = kirp(f.get('durum'), 20) || 'gonderildi';
   if (!TEKLIF_DURUM[durum]) return hata('Durum geçersiz', 422);
+  // Kaynak: panelde şablondan üretilen PDF 'sablon', elle yüklenen 'yukleme'.
+  const kaynak = kirp(f.get('kaynak'), 20) === 'sablon' ? 'sablon' : 'yukleme';
   const asamaIste = durum !== 'taslak' && ['1', 'evet', 'true', 'on'].includes(kirp(f.get('asama'), 10));
 
   const bayt = new Uint8Array(await dosya.arrayBuffer());
@@ -125,12 +127,13 @@ export async function teklifDosyasiYukle(istek, env, kim) {
   const id = kimlik(), z = simdi(), anahtar = dosyaAnahtari(mus.id, id), dosyaAdi = dosyaAdiTemiz(dosya.name);
   await env.YEDEK.put(anahtar, bayt, { httpMetadata: { contentType: 'application/pdf' }, customMetadata: { musteri_id: mus.id, yukleyen: String(kim.eposta).slice(0, 120) } });
   try {
-    const sorgular = [db.prepare(`INSERT INTO teklif_dosyalari (id, musteri_id, ad, tarih, gecerlilik, tutar_kurus, durum, dosya_anahtari, dosya_adi, boyut, olusturan, olusturma, guncelleme, karar_zamani)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(id, mus.id, ad, tarih, gecerlilik || null, tutar, durum, anahtar, dosyaAdi, bayt.byteLength, kim.eposta, z, z, durum === 'kabul' || durum === 'red' ? z : null)];
+    const sorgular = [db.prepare(`INSERT INTO teklif_dosyalari (id, musteri_id, ad, tarih, gecerlilik, tutar_kurus, durum, dosya_anahtari, dosya_adi, boyut, olusturan, olusturma, guncelleme, karar_zamani, kaynak)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(id, mus.id, ad, tarih, gecerlilik || null, tutar, durum, anahtar, dosyaAdi, bayt.byteLength, kim.eposta, z, z, durum === 'kabul' || durum === 'red' ? z : null, kaynak)];
     // Günlük: kutu işaretliyse ya da teklif kabul edilmiş olarak yüklendiyse yazılır.
     const hedef = durum === 'kabul' ? 'kazanildi' : asamaIste ? 'teklif' : null;
     if (asamaIste || durum === 'kabul') {
-      const baslik = durum === 'kabul' ? 'Teklif kabul edildi (dosya yüklendi)' : 'Teklif gönderildi (dosya yüklendi)';
+      const nasil = kaynak === 'sablon' ? 'şablondan oluşturuldu' : 'dosya yüklendi';
+      const baslik = durum === 'kabul' ? `Teklif kabul edildi (${nasil})` : `Teklif gönderildi (${nasil})`;
       sorgular.push(...gunlukSorgulari(db, mus, z, kim.eposta, baslik, `${ad} · ${TEKLIF_DURUM[durum]} · Tutar ${tlYaz(tutar)} (KDV hariç) · ${dosyaAdi}`, hedef));
     }
     await db.batch(sorgular);
@@ -138,7 +141,7 @@ export async function teklifDosyasiYukle(istek, env, kim) {
     await env.YEDEK.delete(anahtar).catch(() => {});
     throw e;
   }
-  await islemYaz(db, kim.eposta, 'teklif_dosyasi_yukle', id, `${ad} · ${dosyaAdi} · ${Math.round(bayt.byteLength / 1024)} KB`);
+  await islemYaz(db, kim.eposta, kaynak === 'sablon' ? 'teklif_sablondan' : 'teklif_dosyasi_yukle', id, `${ad} · ${dosyaAdi} · ${Math.round(bayt.byteLength / 1024)} KB`);
   return json({ ok: true, id });
 }
 
@@ -198,7 +201,7 @@ export async function yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim) {
     if (mus) {
       const baslik = { taslak: 'Teklif taslağa alındı', gonderildi: 'Teklif gönderildi olarak işaretlendi', kabul: 'Teklif kabul edildi', red: 'Teklif reddedildi' }[durum];
       const hedef = durum === 'kabul' ? 'kazanildi' : durum === 'gonderildi' ? 'teklif' : null;
-      await db.batch(gunlukSorgulari(db, mus, z, kim.eposta, baslik, `${k.ad} · Tutar ${tlYaz(k.tutar_kurus)} (KDV hariç) · Canva PDF`, hedef));
+      await db.batch(gunlukSorgulari(db, mus, z, kim.eposta, baslik, `${k.ad} · Tutar ${tlYaz(k.tutar_kurus)} (KDV hariç) · ${k.kaynak === 'sablon' ? 'Şablon PDF' : 'Canva PDF'}`, hedef));
     }
     await islemYaz(db, kim.eposta, 'teklif_dosyasi_durum', k.id, `${k.ad}: ${TEKLIF_DURUM[k.durum] || k.durum} → ${TEKLIF_DURUM[durum]}`);
     return json({ ok: true, degisen: true });

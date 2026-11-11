@@ -32,7 +32,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </section>
 </div>
 <section class="kart" aria-label="Teklifler" data-teklif-bolum style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
-<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Panelde hazırlanan ve dışarıda (Canva) hazırlanıp PDF olarak yüklenen tekliflerin tümü. Tutarlar KDV hariçtir. Panel hiçbir teklifi müşteriye göndermez.">Teklifler: bu müşteriye gönderilenler</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler · panelde hazırlanan ve yüklenen dosya</small></div><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme kucuk" data-teklif-yukle>⬆ Teklif dosyası yükle (PDF)</button><a class="dugme ana kucuk" data-teklif-yeni href="/proposals?new=1">+ Panelde teklif hazırla</a></div></div>
+<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Panelde hazırlanan, şablondan oluşturulan ve dışarıda (Canva) hazırlanıp PDF olarak yüklenen tekliflerin tümü. Tutarlar KDV hariçtir. Panel hiçbir teklifi müşteriye göndermez.">Teklifler: bu müşteriye gönderilenler</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler · panelde hazırlanan ve yüklenen dosya</small></div><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme kucuk" data-teklif-yukle>⬆ Teklif dosyası yükle (PDF)</button><a class="dugme kucuk" data-teklif-sablon href="/templates?tab=create">Şablondan teklif oluştur</a><a class="dugme ana kucuk" data-teklif-yeni href="/proposals?new=1">+ Panelde teklif hazırla</a></div></div>
 <div role="group" aria-label="Teklif süzgeci" data-teklif-suzgec style="display: flex; gap: 6px; flex-wrap: wrap"></div>
 <div data-teklifler style="overflow-x: auto"></div>
 <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center"><span data-teklif-ozet style="font-size: 13px; color: var(--tx2)"></span><a href="/proposals?tab=all" style="font-size: 13px; font-weight: 600">Tüm teklifler →</a></div>
@@ -148,7 +148,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('thead', {}, el('tr', {}, ...['Teklif', 'Kaynak', 'Tarih', 'Geçerlilik', 'Tutar (KDV hariç)', 'Durum', ''].map((b, i) => el('th', { scope: 'col', class: i === 4 ? 'sayi' : '' }, b)))),
       el('tbody', {}, ...gor.map((t) => el('tr', { 'data-kaynak': t.kaynak },
         el('td', {}, el('a', t.kaynak === 'pdf' ? { href: t.ac, target: '_blank', rel: 'noopener', style: 'font-weight: 600' } : { href: t.ac, style: 'font-weight: 600' }, t.ad), el('br'), el('small', { style: 'color: var(--tx2)' }, t.alt)),
-        el('td', {}, el('span', { class: 'tk-kaynak' }, t.kaynak === 'pdf' ? 'Canva PDF' : 'Panel')),
+        el('td', {}, el('span', { class: 'tk-kaynak' }, t.kaynak === 'pdf' ? (t.sablon ? 'Şablon' : 'Canva PDF') : 'Panel')),
         el('td', { style: 'white-space: nowrap' }, gunYaz(t.tarih)),
         el('td', { style: 'white-space: nowrap' }, gunYaz(t.gecerlilik)),
         el('td', { class: 'sayi' }, tlK(t.tutar)),
@@ -178,12 +178,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   async function teklifleriYukle() {
     const kutu = document.querySelector('[data-teklifler]');
     document.querySelector('[data-teklif-yeni]').href = '/proposals?new=1&customer=' + encodeURIComponent(id);
+    document.querySelector('[data-teklif-sablon]').href = '/templates?tab=create&customer=' + encodeURIComponent(id);
     try {
       const [p, d] = await Promise.all([api('teklifler/musteri/' + encodeURIComponent(id)), api('teklif-dosyalari/musteri/' + encodeURIComponent(id))]);
       depoVar = d.depo !== false;
       teklifSatirlar = [
         ...p.teklifler.map((t) => ({ kaynak: 'panel', id: t.id, ad: t.baslik, alt: t.no, tarih: (t.olusturma || '').slice(0, 10), gecerlilik: t.gecerlilik, tutar: Math.round(((Number(t.toplam) || 0) - (Number(t.kdv) || 0)) * 100), durum: t.durum, ac: '/proposals?id=' + encodeURIComponent(t.id) })),
-        ...d.dosyalar.map((t) => ({ kaynak: 'pdf', id: t.id, ad: t.ad, alt: `${t.dosya_adi || 'teklif.pdf'} · ${boyutYaz(t.boyut)}`, tarih: t.tarih, gecerlilik: t.gecerlilik, tutar: t.tutar_kurus ?? null, durum: t.durum, ac: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya` }))
+        ...d.dosyalar.map((t) => ({ kaynak: 'pdf', id: t.id, ad: t.ad, alt: `${t.dosya_adi || 'teklif.pdf'} · ${boyutYaz(t.boyut)}`, tarih: t.tarih, gecerlilik: t.gecerlilik, tutar: t.tutar_kurus ?? null, durum: t.durum, sablon: t.kaynak === 'sablon', ac: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya` }))
       ].sort((a, b) => (a.tarih < b.tarih ? 1 : a.tarih > b.tarih ? -1 : 0));
       teklifCiz();
     } catch (h) { kutu.replaceChildren(el('p', { class: 'bos', style: 'padding: 16px; margin: 0' }, 'Teklifler yüklenemedi: ' + h.message)); }

@@ -11,7 +11,7 @@
     "binding": "ASSETS",
     "run_worker_first": ["/", "/api/*", "/yonetim*", "/icerik/*", "/kabuk/*", "/uye/*", "/tr/bulten", "/tr/bulten/*", "/sitemap-bulten.xml",
       // Yönetim paneli (panel.idexya.com) İngilizce adresleri: worker/panel-yollar.js ("/leads*" hem /leads hem /leads/… için; liste en çok 100 kural)
-      "/accounting*", "/accounts*", "/activity-log*", "/articles*", "/assistant*", "/backups*", "/banners*", "/client-portal*", "/client-sites*", "/conversions*", "/crm*", "/customer*", "/dashboard*", "/data-sync*", "/documents*", "/instagram*", "/integrations*", "/leads*", "/media*", "/members*", "/notifications*", "/performance*", "/proposal-print*", "/proposals*", "/seo*", "/settings*", "/site-content*", "/subscribers*", "/support*", "/tasks*", "/theme*", "/visitors*", "/weekly-newsletter*"],
+      "/accounting*", "/accounts*", "/activity-log*", "/articles*", "/assistant*", "/backups*", "/banners*", "/client-portal*", "/client-sites*", "/conversions*", "/crm*", "/customer*", "/dashboard*", "/data-sync*", "/documents*", "/instagram*", "/integrations*", "/leads*", "/media*", "/members*", "/notifications*", "/performance*", "/proposal-print*", "/proposals*", "/seo*", "/settings*", "/site-content*", "/subscribers*", "/support*", "/tasks*", "/templates*", "/theme*", "/visitors*", "/weekly-newsletter*"],
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
   },

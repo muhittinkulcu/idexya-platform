@@ -9,7 +9,7 @@ export const ESKI = {
   destek: 'support', donusum: 'conversions', entegrasyonlar: 'integrations', gecmis: 'activity-log', gorevler: 'tasks',
   'haftalik-bulten': 'weekly-newsletter', hesaplar: 'accounts', hiz: 'performance', icerikler: 'articles', instagram: 'instagram',
   medya: 'media', muhasebe: 'accounting', musteri: 'customer', portal: 'client-portal', seo: 'seo', 'site-icerik': 'site-content',
-  'site-saglik': 'client-sites', talepler: 'leads', 'teklif-yazdir': 'proposal-print', teklifler: 'proposals', tema: 'theme',
+  'site-saglik': 'client-sites', sablonlar: 'templates', talepler: 'leads', 'teklif-yazdir': 'proposal-print', teklifler: 'proposals', tema: 'theme',
   uyeler: 'members', 'veri-esitleme': 'data-sync', yedekler: 'backups', ziyaretciler: 'visitors'
 };
 export const SAYFALAR = new Set(Object.values(ESKI));

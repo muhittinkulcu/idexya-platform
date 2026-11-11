@@ -191,7 +191,19 @@ export const SEMA = [
     musteri_id TEXT PRIMARY KEY, aday_id TEXT NOT NULL, durum TEXT NOT NULL, ana_kayit_id TEXT, red_gerekcesi TEXT,
     gonderim TEXT NOT NULL, gonderen TEXT NOT NULL, son_kontrol TEXT, kisi_gonderildi INTEGER NOT NULL DEFAULT 0)`,
   // Toplu seçim etiketleri (worker/etiket.js): tur = musteri | site | reklam_hesap; hedef = kaydın kimliği.
-  `CREATE TABLE IF NOT EXISTS etiketler (tur TEXT NOT NULL, hedef TEXT NOT NULL, etiket TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (tur, hedef, etiket))`
+  `CREATE TABLE IF NOT EXISTS etiketler (tur TEXT NOT NULL, hedef TEXT NOT NULL, etiket TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (tur, hedef, etiket))`,
+  // Belge şablonları (worker/belge-sablon.js): şablon, sürümleri (sayfalar JSON; eski sürümler silinmez) ve hizmet kataloğu.
+  // tur: teklif | sozlesme | erisim | odeme_hatirlatma | teslim | fiyat_guncelleme · durum: hazir | taslak | onerilen
+  `CREATE TABLE IF NOT EXISTS belge_sablonlari (
+    id TEXT PRIMARY KEY, tur TEXT NOT NULL, ad TEXT NOT NULL, durum TEXT NOT NULL DEFAULT 'taslak', aktif_surum INTEGER,
+    olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS belge_sablon_surumleri (
+    sablon_id TEXT NOT NULL, surum INTEGER NOT NULL, sayfalar TEXT NOT NULL, olusturan TEXT NOT NULL, olusturma TEXT NOT NULL,
+    PRIMARY KEY (sablon_id, surum))`,
+  // Hizmet kataloğu: tur aylik | tek_seferlik; varsayılan fiyat kuruş, KDV hariç, bilinmiyorsa NULL. Silinmez, pasife alınır.
+  `CREATE TABLE IF NOT EXISTS hizmet_katalogu (
+    id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL DEFAULT 'aylik', varsayilan_fiyat_kurus INTEGER, simge TEXT NOT NULL DEFAULT 'genel',
+    sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`
 ];
 
 // Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.
@@ -200,7 +212,9 @@ export const EK_SUTUNLAR = [
   ['musteriler', 'ana_kayit_id', 'TEXT'],
   // Silme yerine arşiv (toplu seçim kuralı): arşivlenme zamanı; boşsa kayıt etkin. Arşivlenen kayıt listelerde gizlenir, silinmez.
   ['musteriler', 'arsiv', 'TEXT'],
-  ['site_saglik_hedef', 'arsiv', 'TEXT']
+  ['site_saglik_hedef', 'arsiv', 'TEXT'],
+  // Teklif dosyasının kaynağı: 'yukleme' (Canva PDF'i yüklendi) | 'sablon' (panelde şablondan üretildi)
+  ['teklif_dosyalari', 'kaynak', "TEXT NOT NULL DEFAULT 'yukleme'"]
 ];
 export const EK_DIZINLER = [
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,

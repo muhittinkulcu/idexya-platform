@@ -1,0 +1,467 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="Belge şablonları" aktif="sablonlar" yol="Satış ve müşteri" aciklama="Şablonu bir kez hazırlayın; her müşteri için panel doldurur, PDF’i müşteri kartına kaydeder. Panel hiçbir belgeyi müşteriye göndermez, gönderimi siz yaparsınız.">
+<style is:global>
+  .sb-sekmeler{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:12px;background:var(--track,var(--card2));max-width:100%;width:max-content}
+  .sb-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:14px}
+  .sb-kart{padding:16px;display:flex;flex-direction:column;gap:8px}
+  .sb-kart h3{margin:0;font-size:16px;color:var(--head)}
+  .sb-kart p{margin:0;color:var(--tx2);font-size:13px;flex:1}
+  .sb-kart .sb-alt{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+  .cip.sb-hazir{background:var(--okb);color:var(--ok)}.cip.sb-onerilen{background:var(--card2);color:var(--tx2)}.cip.sb-pasif{background:var(--card2);color:var(--tx2)}
+  .sb-tablo{width:100%;border-collapse:collapse;font-size:14px}
+  .sb-tablo th{padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2);border-bottom:1px solid rgb(var(--line))}
+  .sb-tablo td{padding:8px 10px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
+  .sb-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .sb-tablo input[type=text],.sb-tablo select{min-height:36px;padding:4px 10px;border:1px solid rgb(var(--line));border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;box-sizing:border-box;max-width:100%}
+  .sb-tablo input.sb-fiyat{width:140px;text-align:right}
+  .sb-tablo input[aria-invalid=true]{border-color:var(--err)}
+  .sb-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
+  .sb-form .genis{grid-column:1/-1}
+  .sb-duzen{display:grid;grid-template-columns:220px minmax(0,1fr) 320px;gap:16px;align-items:start}
+  .sb-sayfalar{display:flex;flex-direction:column;gap:8px}
+  .sb-sk{border:2px solid rgb(var(--line));border-radius:12px;padding:6px;background:rgb(var(--card));cursor:pointer;display:flex;gap:8px;align-items:center;text-align:left;font:inherit;color:var(--tx)}
+  .sb-sk[aria-current=true]{border-color:var(--brand)}
+  .sb-sk img{width:52px;aspect-ratio:210/297;object-fit:cover;border-radius:4px;border:1px solid rgb(var(--line));background:#fff}
+  .sb-sk b{display:block;font-size:13px;color:var(--head)}.sb-sk small{font-size:12px;color:var(--tx2)}
+  .sb-onizleme{background:var(--card2);border-radius:16px;padding:16px;display:flex;justify-content:center}
+  .sb-a4{width:min(100%,520px);aspect-ratio:1654/2339;background:#fff;position:relative;box-shadow:0 10px 30px var(--shadow);overflow:hidden}
+  .sb-a4 img,.sb-a4 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .sb-alan{position:absolute;outline:2px dashed var(--brand);background:rgba(240,122,35,.08);font-size:11px;color:#A9420A;font-weight:700;padding:2px 4px;box-sizing:border-box;overflow:hidden}
+  .sb-yan{padding:16px;display:flex;flex-direction:column;gap:12px}
+  .sb-adimlar{display:flex;gap:14px;flex-wrap:wrap;color:var(--tx2);font-size:13px;align-items:center}
+  .sb-adimlar span{display:inline-flex;gap:6px;align-items:center}
+  .sb-adimlar b{background:var(--fill);color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+  .sb-onizle-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));gap:12px}
+  .sb-onizle-izgara figure{margin:0;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--tx2)}
+  .sb-onizle-izgara img{width:100%;aspect-ratio:1654/2339;border:1px solid rgb(var(--line));border-radius:6px;background:#fff}
+  .sb-toplam{display:flex;gap:8px 16px;flex-wrap:wrap;align-items:center;font-size:14px}
+  .sb-gizli{position:absolute;left:-10000px}
+  @media (max-width:1100px){.sb-duzen{grid-template-columns:180px minmax(0,1fr)}.sb-duzen .sb-yan{grid-column:1/-1}}
+  @media (max-width:700px){.sb-duzen{grid-template-columns:minmax(0,1fr)}.sb-sayfalar{flex-direction:row;overflow-x:auto}.sb-sk{flex:none}}
+</style>
+<div role="tablist" aria-label="Belge şablonları bölümleri" class="sb-sekmeler" data-sekmeler></div>
+
+<!-- 1. Şablonlar ve hizmet kataloğu -->
+<div data-s="liste" style="display: flex; flex-direction: column; gap: 16px">
+  <div class="sb-izgara" data-sablonlar><p class="bos">Şablonlar yükleniyor…</p></div>
+  <section class="kart" id="catalog" aria-label="Hizmet kataloğu" data-katalog-bolum style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center">
+      <div><h2 style="margin: 0; font-size: 16px; color: var(--head)">Hizmet kataloğu</h2><small style="color: var(--tx2)">Teklif oluştururken seçilen hizmetler ve varsayılan fiyatları (KDV hariç). Fiyat her teklifte değiştirilebilir. Hizmet silinmez, pasife alınır.</small></div>
+      <button type="button" class="dugme ana kucuk" data-hizmet-yeni>+ Hizmet ekle</button>
+    </div>
+    <form class="kart sb-form" data-hizmet-form hidden novalidate style="background: var(--card2)">
+      <h3 class="genis" style="margin: 0; font-size: 15px; color: var(--head)" data-hizmet-baslik>Yeni hizmet</h3>
+      <label class="alan genis">Hizmet adı<input name="ad" maxlength="120" required autocomplete="off" placeholder="Ör. Google Reklam Yönetimi"></label>
+      <label class="alan">Tür<select name="tur"><option value="aylik">Aylık</option><option value="tek_seferlik">Tek seferlik</option></select></label>
+      <label class="alan">Varsayılan fiyat (KDV hariç, TL)<input name="fiyat" inputmode="decimal" autocomplete="off" placeholder="Boş bırakılabilir, ör. 20.000"></label>
+      <label class="alan">Simge (Proje hakkında sayfası)<select name="simge"><option value="genel">Sade turuncu simge</option><option value="google">Google</option><option value="meta">Meta</option></select></label>
+      <div class="genis" style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+        <button type="submit" class="dugme ana">Kaydet</button><button type="button" class="dugme" data-hizmet-vazgec>Vazgeç</button>
+        <span role="status" data-hizmet-durum style="font-size: 14px; color: var(--err)"></span>
+      </div>
+    </form>
+    <div data-katalog style="overflow-x: auto"></div>
+  </section>
+</div>
+
+<!-- 2. Şablonu düzenle -->
+<div data-s="duzen" hidden style="display: flex; flex-direction: column; gap: 14px">
+  <div class="uyari bilgi">Sabit sayfa Canva’dan gelen görseldir; değiştirmek için sayfayı seçip “Sayfa görselini değiştir” ile Canva’dan JPG olarak indirdiğiniz görseli yükleyin. Turuncu kesikli alanlar değişkendir, her belgede müşteriye göre dolar. Kaydet yeni şablon sürümü oluşturur; eski sürümler silinmez, eski belgeler kendi sürümüyle kalır.</div>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between">
+    <label style="display: flex; gap: 8px; align-items: center; font-size: 14px">Sürüm <select data-surum style="min-height: 36px; border-radius: 10px; border: 1px solid rgb(var(--line)); background: var(--bg); color: var(--tx); padding: 0 8px; font: inherit"></select></label>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+      <span role="status" data-duzen-durum style="font-size: 14px"></span>
+      <button type="button" class="dugme" data-ornek>Örnek veriyle göster</button>
+      <button type="button" class="dugme ana" data-kaydet disabled>Kaydet</button>
+    </div>
+  </div>
+  <div class="sb-duzen">
+    <div class="sb-sayfalar" data-sayfalar></div>
+    <div class="sb-onizleme"><div class="sb-a4" data-a4><img alt="" data-a4-gorsel><canvas data-a4-canvas hidden></canvas><div data-alanlar></div></div></div>
+    <aside class="kart sb-yan" data-yan></aside>
+  </div>
+  <input type="file" accept="image/jpeg,image/png" class="sb-gizli" data-gorsel-dosya tabindex="-1" aria-hidden="true">
+</div>
+
+<!-- 3. Müşteriye belge oluştur -->
+<div data-s="olustur" hidden style="display: flex; flex-direction: column; gap: 14px">
+  <div class="sb-adimlar" aria-hidden="true"><span><b>1</b> Müşteri</span><span><b>2</b> Hizmetler ve fiyatlar</span><span><b>3</b> Önizleme</span><span><b>4</b> PDF oluştur ve karta kaydet</span></div>
+  <form class="kart sb-form" data-belge-form novalidate>
+    <label class="alan">Müşteri (CRM)<select name="musteri_id" data-musteri required><option value="">Müşteri seçin</option></select></label>
+    <label class="alan">Şablon<select name="sablon" data-belge-sablon></select></label>
+    <label class="alan genis">Teklif adı<input name="ad" maxlength="200" required autocomplete="off" placeholder="Ör. Kasım dijital pazarlama teklifi"></label>
+    <label class="alan">Teklif tarihi<input name="tarih" type="date" required></label>
+    <label class="alan">Geçerlilik<input name="gecerlilik" type="date"></label>
+    <label class="alan">Hazırlayan<input name="hazirlayan" maxlength="80" autocomplete="off" placeholder="Ör. Muhittin Külcü"></label>
+    <label class="alan">Kayıt durumu<select name="durum"><option value="taslak">Taslak (henüz gönderilmedi)</option><option value="gonderildi">Gönderildi (ben gönderdim)</option></select></label>
+    <label class="genis" style="display: flex; gap: 8px; align-items: flex-start; font-size: 13px"><input type="checkbox" name="asama" value="1" disabled> <span>Kartın aşamasını “Teklif gönderildi” yap ve günlüğe yaz (yalnız “Gönderildi” seçiliyse; ileri aşamadaki kart geri alınmaz)</span></label>
+  </form>
+  <section class="kart" aria-label="Hizmetler ve fiyatlar" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center">
+      <div><h2 style="margin: 0; font-size: 16px; color: var(--head)">Hizmetler ve fiyatlar</h2><small style="color: var(--tx2)">Varsayılan fiyatlar hizmet kataloğundan gelir; bu teklif için değiştirilebilir. ** aylık, * tek seferlik hizmettir.</small></div>
+      <button type="button" class="dugme kucuk" data-satir-ekle>+ Satır ekle</button>
+    </div>
+    <div data-kalemler style="overflow-x: auto"></div>
+    <div class="sb-toplam" data-toplam></div>
+  </section>
+  <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: flex-end">
+    <span role="status" data-belge-durum style="font-size: 14px; margin-right: auto"></span>
+    <button type="button" class="dugme" data-onizle>Önizle</button>
+    <button type="button" class="dugme ana" data-pdf>PDF oluştur ve karta kaydet</button>
+  </div>
+  <div class="uyari ok" data-sonuc hidden></div>
+  <section class="kart" aria-label="Önizleme" data-onizleme-bolum hidden style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+    <h2 style="margin: 0; font-size: 16px; color: var(--head)">Önizleme</h2>
+    <div class="sb-onizle-izgara" data-onizleme></div>
+  </section>
+  <p style="margin: 0; font-size: 13px; color: var(--tx2)">PDF oluşunca müşteri kartının “Teklifler” listesine düşer (kaynak: Şablon). PDF’i indirip WhatsApp ya da e-postayla siz gönderirsiniz; panel kendiliğinden göndermez.</p>
+</div>
+
+<script>
+  import { api, el, prm, adresMetni, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { bugunIst, gun, musterileriDoldur, dosyaIndir } from '../../scripts/yonetim/kayit.js';
+  import { SAYFA_EN, SAYFA_BOY, tlTam, tlBelge, kurusOku, toplamlar, teklifTutari } from '../../scripts/yonetim/sablon-hesap.js';
+  import { gorselAdresi, sayfaPlani, sayfaCiz, belgePdf } from '../../scripts/yonetim/belge-uret.js';
+
+  const $ = (s) => document.querySelector(s);
+  const TUR = { aylik: 'Aylık', tek_seferlik: 'Tek seferlik' };
+  const SIMGE = { genel: 'Sade', google: 'Google', meta: 'Meta' };
+  const TIP = { sabit: 'Sabit görsel', kapak: 'Görsel + firma adı ve tarih', hizmetler: 'Görsel + hizmet listesi', kalemler: 'Görsel + fiyat tablosu' };
+  const ACIKLAMA = {
+    teklif: 'Kapak, Neler yapıyoruz, hizmet açıklamaları, Proje hakkında, Fiyat teklifi, Teşekkür. Hizmetler ve fiyatlar müşteriye göre dolar.',
+    sozlesme: 'Teklif kabul edilince kalemler, ücretler, süre ve ödeme vadesiyle dolar. Taraf bilgisi müşteri kartından. Avukat kontrolü gerekir.',
+    erisim: 'Yeni müşteriden istenen erişimlerin listesi (Meta iş ortağı, Google Ads, GA4, GTM, Search Console, site yönetici) ve adım adım nasıl verileceği.',
+    odeme_hatirlatma: 'Vadesi geçen fatura için kibar hatırlatma; fatura no, tutar ve vade dolar. Muhasebe bölümünden taslak.',
+    teslim: 'Web sitesi, e-ticaret kurulumu gibi tek seferlik işlerin teslimi: teslim edilenler, erişim devri (şifresiz), imza alanları.',
+    fiyat_guncelleme: 'Yıllık ya da dönemsel ücret değişikliği: eski ve yeni ücret, yürürlük tarihi, gerekçe.'
+  };
+  const ORNEK = { firma: 'Örnek Reklam Ajansı', tarih: bugunIst(), kalemler: [
+    { ad: 'Google Reklam Yönetimi', tur: 'aylik', fiyat_kurus: 2000000, simge: 'google' },
+    { ad: 'Meta Reklam Yönetimi', tur: 'aylik', fiyat_kurus: 2000000, simge: 'meta' },
+    { ad: 'Kurumsal Website Tasarımı', tur: 'tek_seferlik', fiyat_kurus: 6000000, simge: 'genel' }] };
+  const fiyatMetni = (k) => (k === null || k === undefined ? '' : tlTam(k).replace(/ TL$/, ''));
+  const gunEkle = (g, n) => { const d = new Date(g + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+
+  // ---------- Sekmeler ----------
+  const SEKMELER = [['liste', 'Şablonlar'], ['duzen', 'Şablonu düzenle: Fiyat teklifi'], ['olustur', 'Müşteriye belge oluştur']];
+  const ilk = prm('sekme');
+  let sekme = ilk === 'olustur' || ilk === 'duzen' ? ilk : 'liste';
+  let kirli = false;
+  function sekmeCiz() {
+    $('[data-sekmeler]').replaceChildren(...SEKMELER.map(([k, ad]) => {
+      const s = k === sekme;
+      return el('button', { type: 'button', role: 'tab', 'aria-selected': String(s), 'data-sekme': k, class: 'dugme kucuk', style: s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent', onclick: () => sekmeAc(k) }, ad);
+    }));
+    document.querySelectorAll('[data-s]').forEach((d) => { d.hidden = d.dataset.s !== sekme; });
+  }
+  function sekmeAc(k, ek = {}) {
+    sekme = k;
+    const p = { sekme: k === 'liste' ? null : k, ...ek };
+    if (k === 'olustur' && !('musteri' in ek) && prm('musteri')) p.musteri = prm('musteri');
+    history.replaceState(null, '', location.pathname + adresMetni(p));
+    sekmeCiz();
+    if (k === 'duzen') duzenHazirla();
+    if (k === 'olustur') olusturHazirla();
+  }
+  window.addEventListener('beforeunload', (o) => { if (kirli) { o.preventDefault(); o.returnValue = ''; } });
+
+  // ---------- 1. Şablonlar ----------
+  let sablonlar = [], depoVar = true;
+  async function sablonlariYukle() {
+    const kutu = $('[data-sablonlar]');
+    try {
+      const r = await api('belge-sablonlari');
+      sablonlar = r.sablonlar; depoVar = r.depo;
+      kutu.replaceChildren(...sablonlar.map((s) => {
+        const hazir = s.durum === 'hazir';
+        return el('article', { class: 'kart sb-kart', 'data-sablon': s.id },
+          el('span', { class: 'cip ' + (hazir ? 'sb-hazir' : 'sb-onerilen') }, hazir ? `Hazır · sürüm ${s.aktif_surum}` : s.durum === 'taslak' ? 'Taslak' : 'Önerilen'),
+          el('h3', {}, s.ad),
+          el('p', {}, ACIKLAMA[s.tur] || ''),
+          el('div', { class: 'sb-alt' }, hazir
+            ? [el('button', { type: 'button', class: 'dugme kucuk', onclick: () => sekmeAc('duzen') }, 'Düzenle'), el('button', { type: 'button', class: 'dugme ana kucuk', onclick: () => sekmeAc('olustur') }, 'Belge oluştur')]
+            : el('small', { style: 'color: var(--tx2)' }, 'Düzenleyicisi henüz yok; sırası gelince eklenecek.')));
+      }));
+    } catch (h) { kutu.replaceChildren(el('p', { class: 'bos' }, 'Şablonlar yüklenemedi: ' + h.message)); }
+  }
+
+  // Hizmet kataloğu
+  let katalog = [], duzenlenenHizmet = null;
+  const hForm = $('[data-hizmet-form]'), hDurum = $('[data-hizmet-durum]');
+  async function katalogYukle() {
+    try { katalog = (await api('hizmet-katalogu')).hizmetler; } catch (h) { $('[data-katalog]').replaceChildren(el('p', { class: 'bos' }, 'Katalog yüklenemedi: ' + h.message)); return; }
+    katalogCiz();
+  }
+  function katalogCiz() {
+    if (!katalog.length) { $('[data-katalog]').replaceChildren(el('p', { class: 'bos' }, 'Katalogda hizmet yok. “Hizmet ekle” ile ekleyin.')); return; }
+    $('[data-katalog]').replaceChildren(el('table', { class: 'sb-tablo', style: 'min-width: 640px' },
+      el('thead', {}, el('tr', {}, ...['Hizmet', 'Tür', 'Varsayılan fiyat (KDV hariç)', 'Simge', 'Durum', ''].map((b, i) => el('th', { scope: 'col', class: i === 2 ? 'sayi' : '' }, b)))),
+      el('tbody', {}, ...katalog.map((h) => el('tr', { 'data-hizmet': h.id, style: h.aktif ? '' : 'opacity: .65' },
+        el('td', { style: 'font-weight: 600; color: var(--head)' }, h.ad),
+        el('td', {}, TUR[h.tur] || h.tur),
+        el('td', { class: 'sayi' }, tlTam(h.varsayilan_fiyat_kurus)),
+        el('td', {}, SIMGE[h.simge] || h.simge),
+        el('td', {}, el('span', { class: 'cip ' + (h.aktif ? 'sb-hazir' : 'sb-pasif') }, h.aktif ? 'Etkin' : 'Pasif')),
+        el('td', { style: 'text-align: right; white-space: nowrap' },
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: () => hizmetFormAc(h) }, 'Düzenle'), ' ',
+          el('button', { type: 'button', class: 'dugme kucuk', onclick: (o) => hizmetAktif(h, o.currentTarget) }, h.aktif ? 'Pasife al' : 'Etkinleştir')))))));
+  }
+  function hizmetFormAc(h) {
+    duzenlenenHizmet = h || null; hForm.reset(); hDurum.textContent = '';
+    $('[data-hizmet-baslik]').textContent = h ? 'Hizmeti düzenle' : 'Yeni hizmet';
+    if (h) { hForm.ad.value = h.ad; hForm.tur.value = h.tur; hForm.fiyat.value = fiyatMetni(h.varsayilan_fiyat_kurus); hForm.simge.value = h.simge; }
+    hForm.hidden = false; hForm.ad.focus();
+  }
+  async function hizmetAktif(h, d) {
+    d.disabled = true;
+    try { await api('hizmet-katalogu/' + encodeURIComponent(h.id), { aktif: !h.aktif }); genelHata(''); await katalogYukle(); }
+    catch (x) { genelHata('Değiştirilemedi: ' + x.message); d.disabled = false; }
+  }
+  $('[data-hizmet-yeni]').addEventListener('click', () => hizmetFormAc(null));
+  $('[data-hizmet-vazgec]').addEventListener('click', () => { hForm.hidden = true; duzenlenenHizmet = null; });
+  hForm.addEventListener('submit', async (o) => {
+    o.preventDefault();
+    const v = { ad: hForm.ad.value.trim(), tur: hForm.tur.value, fiyat: hForm.fiyat.value.trim(), simge: hForm.simge.value };
+    if (!v.ad) { hDurum.textContent = 'Hizmet adı gerekli.'; hForm.ad.focus(); return; }
+    if (Number.isNaN(kurusOku(v.fiyat))) { hDurum.textContent = 'Fiyat geçersiz (ör. 20.000 ya da 20.000,50).'; hForm.fiyat.focus(); return; }
+    const d = hForm.querySelector('[type=submit]'); d.disabled = true; hDurum.textContent = '';
+    try { await api(duzenlenenHizmet ? 'hizmet-katalogu/' + encodeURIComponent(duzenlenenHizmet.id) : 'hizmet-katalogu', v); hForm.hidden = true; duzenlenenHizmet = null; await katalogYukle(); }
+    catch (h) { hDurum.textContent = h.message; } finally { d.disabled = false; }
+  });
+
+  // ---------- 2. Şablonu düzenle ----------
+  const SABLON = 'teklif';
+  let ed = null; // { sablon, surumler, surum, sayfalar (taslak), secili }
+  const dDurum = $('[data-duzen-durum]'), kaydetD = $('[data-kaydet]');
+  const durumYaz = (m, hata = false) => { dDurum.textContent = m || ''; dDurum.style.color = hata ? 'var(--err)' : 'var(--tx2)'; };
+  function kirliYap() { kirli = true; kaydetD.disabled = false; durumYaz('Kaydedilmemiş değişiklik var.'); }
+  async function duzenHazirla(surum) {
+    if (ed && surum === undefined) { duzenCiz(); return; }
+    try {
+      const r = await api(`belge-sablonlari/${SABLON}` + (surum ? `/surum/${surum}` : ''));
+      ed = { sablon: r.sablon, surumler: r.surumler, surum: r.surum.surum, sayfalar: structuredClone(r.surum.sayfalar), secili: ed ? Math.min(ed.secili, r.surum.sayfalar.length - 1) : 0 };
+      kirli = false; kaydetD.disabled = true; durumYaz('');
+      depoVar = r.depo;
+      duzenCiz();
+    } catch (h) { durumYaz('Şablon yüklenemedi: ' + h.message, true); }
+  }
+  function yeniSurumNo() { return Math.max(0, ...ed.surumler.map((s) => s.surum)) + 1; }
+  function duzenCiz() {
+    const sec = $('[data-surum]');
+    sec.replaceChildren(...ed.surumler.map((s) => el('option', { value: s.surum }, `Sürüm ${s.surum}${s.surum === ed.sablon.aktif_surum ? ' (kullanımda)' : ''} · ${gun((s.olusturma || '').slice(0, 10))}`)));
+    sec.value = String(ed.surum);
+    kaydetD.textContent = `Kaydet (sürüm ${yeniSurumNo()})`;
+    $('[data-sayfalar]').replaceChildren(...ed.sayfalar.map((s, i) => el('button', { type: 'button', class: 'sb-sk', 'aria-current': String(i === ed.secili), onclick: () => { ed.secili = i; duzenCiz(); } },
+      el('img', { src: gorselAdresi(s.gorsel), alt: '', loading: 'lazy' }),
+      el('span', {}, el('b', {}, `${i + 1}. ${s.ad}`), el('small', {}, TIP[s.tip] || s.tip)))),
+      el('button', { type: 'button', class: 'dugme kucuk', onclick: () => gorselSec(null) }, '+ Sayfa ekle (görsel yükle)'));
+    const s = ed.sayfalar[ed.secili];
+    $('[data-a4-canvas]').hidden = true;
+    const img = $('[data-a4-gorsel]'); img.hidden = false; img.src = gorselAdresi(s.gorsel); img.alt = `${ed.secili + 1}. sayfa: ${s.ad}`;
+    alanlariCiz(s);
+    yanCiz(s);
+  }
+  const yuzde = (v, olcu) => `${(v / olcu * 100).toFixed(2)}%`;
+  function alanKutusu(x, y, w, h, metin) { return el('div', { class: 'sb-alan', style: `left: ${yuzde(x, SAYFA_EN)}; top: ${yuzde(y, SAYFA_BOY)}; width: ${yuzde(w, SAYFA_EN)}; height: ${yuzde(h, SAYFA_BOY)}` }, metin); }
+  function alanlariCiz(s) {
+    const a = s.alanlar || {}, k = [];
+    if (s.tip === 'kapak') {
+      const b = a.baslik || { x: 82, y: 2049, boyut: 33 }, t = a.tarih || { x: 80, y: 2218, boyut: 31 };
+      k.push(alanKutusu(b.x - 6, b.y - b.boyut * 1.2, 940, b.boyut * 1.7, 'Firma adı + başlık'), alanKutusu(t.x - 6, t.y - t.boyut * 1.2, 520, t.boyut * 1.7, 'Teklif tarihi'));
+    } else if (s.tip === 'hizmetler' || s.tip === 'kalemler') {
+      const l = a.liste || {}, ust = l.y ?? (s.tip === 'hizmetler' ? 1172 : 1268), alt = l.alt ?? (s.tip === 'hizmetler' ? 2150 : 2050);
+      k.push(alanKutusu(70, ust - 10, 1520, alt - ust + 20, s.tip === 'hizmetler' ? 'Seçilen hizmetler, simgeleriyle' : 'Hizmet, ** / * işareti, fiyat'));
+    }
+    $('[data-alanlar]').replaceChildren(...k);
+  }
+  const yanAlan = (etiket, girdi) => el('label', { class: 'alan' }, etiket, girdi);
+  function yanCiz(s) {
+    const i = ed.secili, n = ed.sayfalar.length, parca = [];
+    parca.push(el('div', {}, el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, `${i + 1}. ${s.ad}`), el('small', { style: 'color: var(--tx2)' }, TIP[s.tip] || s.tip)));
+    parca.push(yanAlan('Sayfa adı', el('input', { value: s.ad, maxlength: 80, oninput: (o) => { s.ad = o.target.value; kirliYap(); } })));
+    const metin = (anahtar, etiket, yer) => yanAlan(etiket, el('input', { value: (s.metinler || {})[anahtar] ?? '', maxlength: 300, placeholder: yer || '', oninput: (o) => { s.metinler = { ...(s.metinler || {}), [anahtar]: o.target.value }; kirliYap(); } }));
+    if (s.tip === 'kapak') parca.push(metin('baslik', 'Kapak başlığı ({FIRMA} müşterinin firma adıyla değişir)', '{FIRMA} - PROJE TEKLİFİ'));
+    if (s.tip === 'kalemler') parca.push(metin('aylik_isaret', 'Aylık hizmet işareti', '**'), metin('tek_isaret', 'Tek seferlik hizmet işareti', '*'));
+    if (s.tip === 'hizmetler' || s.tip === 'kalemler') {
+      const l = (s.alanlar && s.alanlar.liste) || {};
+      const sayi = (k, etiket, vars) => yanAlan(etiket, el('input', { type: 'number', min: 0, max: SAYFA_BOY, value: l[k] ?? vars, oninput: (o) => { const v = Number(o.target.value); if (!Number.isFinite(v)) return; s.alanlar = { ...(s.alanlar || {}), liste: { ...l, [k]: v } }; Object.assign(l, { [k]: v }); kirliYap(); alanlariCiz(s); } }));
+      parca.push(el('div', { style: 'display: grid; grid-template-columns: 1fr 1fr; gap: 8px' }, sayi('y', 'Liste başı (piksel)', s.tip === 'hizmetler' ? 1172 : 1268), sayi('alt', 'Liste sonu (piksel)', s.tip === 'hizmetler' ? 2150 : 2050)));
+      parca.push(el('small', { style: 'color: var(--tx2)' }, 'Çok hizmet seçilirse satır aralığı daralır; yine sığmazsa aynı sayfa ikinci kez eklenir.'));
+    }
+    parca.push(el('button', { type: 'button', class: 'dugme', disabled: !depoVar, onclick: () => gorselSec(i) }, '⬆ Sayfa görselini değiştir (JPG / PNG)'));
+    if (!depoVar) parca.push(el('small', { style: 'color: var(--err)' }, 'Dosya deposu (R2) bağlı değil; görsel değiştirilemez.'));
+    parca.push(el('small', { style: 'color: var(--tx2)' }, 'Canva’da sayfayı JPG olarak indirin; dikey A4 (ör. 1654 × 2339 piksel), en fazla 8 MB.'));
+    const tasi = (yon) => { const j = i + yon; [ed.sayfalar[i], ed.sayfalar[j]] = [ed.sayfalar[j], ed.sayfalar[i]]; ed.secili = j; kirliYap(); duzenCiz(); };
+    parca.push(el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' },
+      el('button', { type: 'button', class: 'dugme kucuk', disabled: i === 0, onclick: () => tasi(-1) }, '↑ Yukarı'),
+      el('button', { type: 'button', class: 'dugme kucuk', disabled: i === n - 1, onclick: () => tasi(1) }, '↓ Aşağı'),
+      s.tip === 'sabit' ? el('button', { type: 'button', class: 'dugme kucuk', disabled: n <= 1, onclick: () => { if (!confirm(`“${s.ad}” sayfası şablondan çıkarılsın mı? Kaydedince yeni sürümde yer almaz; eski sürümler değişmez.`)) return; ed.sayfalar.splice(i, 1); ed.secili = Math.max(0, i - 1); kirliYap(); duzenCiz(); } }, 'Sayfayı çıkar') : ''));
+    $('[data-yan]').replaceChildren(...parca);
+  }
+  // Görsel yükleme: hedef null ise sona yeni sabit sayfa eklenir.
+  let gorselHedef = null;
+  const dosyaGir = $('[data-gorsel-dosya]');
+  function gorselSec(hedef) { if (!depoVar) { durumYaz('Dosya deposu (R2) bağlı değil; görsel yüklenemez.', true); return; } gorselHedef = hedef; dosyaGir.value = ''; dosyaGir.click(); }
+  dosyaGir.addEventListener('change', async () => {
+    const f = dosyaGir.files[0];
+    if (!f) return;
+    if (f.size > 8 * 1024 * 1024) { durumYaz('Görsel en fazla 8 MB olabilir.', true); return; }
+    const sira = gorselHedef === null ? ed.sayfalar.length + 1 : gorselHedef + 1;
+    if (sira > 20) { durumYaz('Şablonda en çok 20 sayfa olabilir.', true); return; }
+    const fd = new FormData(); fd.append('dosya', f); fd.append('sayfa', String(sira));
+    durumYaz('Görsel yükleniyor…');
+    try {
+      const r = await fetch(`/api/yonetim/belge-sablonlari/${SABLON}/gorsel`, { method: 'POST', credentials: 'same-origin', body: fd });
+      const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
+      if (!r.ok || !s.ok) throw new Error(s.hata || `Yüklenemedi (${r.status})`);
+      if (gorselHedef === null) { ed.sayfalar.push({ tip: 'sabit', ad: `Yeni sayfa ${sira}`, gorsel: s.anahtar, metinler: {}, alanlar: {} }); ed.secili = ed.sayfalar.length - 1; }
+      else ed.sayfalar[gorselHedef].gorsel = s.anahtar;
+      kirliYap(); duzenCiz();
+      durumYaz(`Görsel yüklendi (${s.en} × ${s.boy}). Kaydedince yeni sürümde kullanılır.`);
+    } catch (h) { durumYaz(h.message, true); }
+  });
+  $('[data-surum]').addEventListener('change', (o) => {
+    if (kirli && !confirm('Kaydedilmemiş değişiklikler kaybolacak. Devam edilsin mi?')) { o.target.value = String(ed.surum); return; }
+    duzenHazirla(Number(o.target.value));
+  });
+  kaydetD.addEventListener('click', async () => {
+    kaydetD.disabled = true; durumYaz('Kaydediliyor…');
+    try {
+      const r = await api(`belge-sablonlari/${SABLON}/surum`, { sayfalar: ed.sayfalar });
+      kirli = false; ed = null; await duzenHazirla(); durumYaz(`Sürüm ${r.surum} kaydedildi. Yeni belgeler bu sürümle oluşur; eski sürümler duruyor.`);
+      sablonlariYukle();
+    } catch (h) { durumYaz('Kaydedilemedi: ' + h.message, true); kaydetD.disabled = false; }
+  });
+  $('[data-ornek]').addEventListener('click', async () => {
+    const s = ed.sayfalar[ed.secili], c = $('[data-a4-canvas]');
+    durumYaz('Örnek çiziliyor…');
+    try {
+      const p = sayfaPlani([s], ORNEK)[0];
+      await sayfaCiz(c, p, ORNEK);
+      c.hidden = false; $('[data-a4-gorsel]').hidden = true; $('[data-alanlar]').replaceChildren();
+      durumYaz('Örnek veri: Örnek Reklam Ajansı · Google, Meta, Kurumsal Website Tasarımı.');
+    } catch (h) { durumYaz(h.message, true); }
+  });
+
+  // ---------- 3. Müşteriye belge oluştur ----------
+  const bForm = $('[data-belge-form]'), bDurum = $('[data-belge-durum]');
+  const bYaz = (m, hata = false) => { bDurum.textContent = m || ''; bDurum.style.color = hata ? 'var(--err)' : 'var(--tx2)'; };
+  let musteriler = [], kalemler = null, olusturHazir = false, aktifSurum = null;
+  async function olusturHazirla() {
+    if (olusturHazir) return;
+    olusturHazir = true;
+    bForm.tarih.value = bugunIst(); bForm.gecerlilik.value = gunEkle(bugunIst(), 14);
+    const [liste, k, s] = await Promise.all([musterileriDoldur([[bForm.musteri_id, 'Müşteri seçin']]), api('hizmet-katalogu').catch(() => ({ hizmetler: [] })), api(`belge-sablonlari/${SABLON}`).catch((h) => ({ hata: h }))]);
+    musteriler = liste;
+    if (s.hata) { bYaz('Şablon yüklenemedi: ' + s.hata.message, true); return; }
+    aktifSurum = s.surum;
+    $('[data-belge-sablon]').replaceChildren(el('option', { value: SABLON }, `${s.sablon.ad} · sürüm ${s.surum.surum}`));
+    kalemler = k.hizmetler.filter((h) => h.aktif).map((h) => ({ kid: h.id, ad: h.ad, tur: h.tur, simge: h.simge, fiyat: fiyatMetni(h.varsayilan_fiyat_kurus), secili: false }));
+    const pm = prm('musteri');
+    if (pm && musteriler.some((m) => m.id === pm)) { bForm.musteri_id.value = pm; musteriSecildi(); }
+    kalemCiz();
+  }
+  const firmaAdi = (m) => (m ? m.firma || m.ad || '' : '');
+  function musteriSecildi() {
+    const m = musteriler.find((x) => x.id === bForm.musteri_id.value);
+    if (m && (!bForm.ad.value || bForm.ad.dataset.oto === '1')) { bForm.ad.value = `${firmaAdi(m)} proje teklifi`; bForm.ad.dataset.oto = '1'; }
+  }
+  bForm.musteri_id.addEventListener('change', musteriSecildi);
+  bForm.ad.addEventListener('input', () => { bForm.ad.dataset.oto = '0'; });
+  bForm.durum.addEventListener('change', () => { const g = bForm.durum.value === 'gonderildi'; bForm.asama.disabled = !g; bForm.asama.checked = g; });
+
+  function kalemCiz() {
+    // Seçim formu olduğu için sayfalanmaz (seçilmemiş hizmet gizli sayfada kalmasın).
+    $('[data-kalemler]').replaceChildren(el('table', { class: 'sb-tablo', style: 'min-width: 640px', 'data-sayfalama': 'yok' },
+      el('thead', {}, el('tr', {}, el('th', { scope: 'col' }, el('span', { class: 'sb-gizli' }, 'Seç')), ...['Hizmet', 'Tür', 'Fiyat (KDV hariç, TL)', ''].map((b, i) => el('th', { scope: 'col', class: i === 2 ? 'sayi' : '' }, b)))),
+      el('tbody', {}, ...kalemler.map((k, i) => {
+        const fiyatGir = el('input', { type: 'text', class: 'sb-fiyat', inputmode: 'decimal', value: k.fiyat, placeholder: '—', 'aria-label': `${k.ad || 'Satır'} fiyatı`, 'aria-invalid': String(Number.isNaN(kurusOku(k.fiyat))),
+          oninput: (o) => { k.fiyat = o.target.value; o.target.setAttribute('aria-invalid', String(Number.isNaN(kurusOku(k.fiyat)))); if (k.fiyat.trim()) { k.secili = true; o.target.closest('tr').querySelector('input[type=checkbox]').checked = true; } toplamCiz(); } });
+        return el('tr', { 'data-kalem': k.kid || 'ozel' },
+          el('td', { style: 'width: 32px' }, el('input', { type: 'checkbox', checked: k.secili, 'aria-label': `${k.ad || 'Satır'} teklife eklensin`, onchange: (o) => { k.secili = o.target.checked; toplamCiz(); } })),
+          el('td', {}, k.kid ? el('span', { style: 'font-weight: 600; color: var(--head)' }, k.ad) : el('input', { type: 'text', value: k.ad, maxlength: 120, placeholder: 'Hizmet adı', 'aria-label': 'Katalog dışı hizmet adı', style: 'width: 100%', oninput: (o) => { k.ad = o.target.value; } })),
+          el('td', {}, k.kid ? TUR[k.tur] + (k.tur === 'aylik' ? ' **' : ' *') : el('select', { 'aria-label': 'Tür', onchange: (o) => { k.tur = o.target.value; toplamCiz(); } }, ...Object.entries(TUR).map(([v, ad]) => el('option', { value: v, selected: v === k.tur }, ad)))),
+          el('td', { class: 'sayi' }, fiyatGir),
+          el('td', { style: 'text-align: right' }, k.kid ? '' : el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { kalemler.splice(i, 1); kalemCiz(); } }, 'Kaldır')));
+      }))));
+    toplamCiz();
+  }
+  $('[data-satir-ekle]').addEventListener('click', () => { if (!kalemler) return; kalemler.push({ kid: null, ad: '', tur: 'aylik', simge: 'genel', fiyat: '', secili: true }); kalemCiz(); $('[data-kalem=ozel]:last-child input[type=text]')?.focus(); });
+  function seciliKalemler() { return (kalemler || []).filter((k) => k.secili).map((k) => ({ ad: k.ad.trim(), tur: k.tur, simge: k.simge || 'genel', fiyat_kurus: kurusOku(k.fiyat) })); }
+  function toplamCiz() {
+    const s = seciliKalemler(), t = toplamlar(s.filter((k) => !Number.isNaN(k.fiyat_kurus)));
+    const kutu = $('[data-toplam]');
+    if (!s.length) { kutu.replaceChildren(el('span', { style: 'color: var(--tx2)' }, 'Henüz hizmet seçilmedi.')); return; }
+    kutu.replaceChildren(
+      el('span', {}, 'Aylık toplam: ', el('b', {}, tlTam(t.aylik))), el('span', {}, 'Tek seferlik toplam: ', el('b', {}, tlTam(t.tek))),
+      el('span', { style: 'color: var(--tx2)' }, 'Fiyatlara KDV dahil değildir.'),
+      t.bilinmeyen ? el('span', { style: 'color: var(--warn)' }, `${t.bilinmeyen} kalemin fiyatı girilmedi; PDF’te “—” görünür.`) : '',
+      el('span', { style: 'color: var(--tx2)' }, `Müşteri kartına yazılacak tutar: ${tlTam(teklifTutari(s.filter((k) => !Number.isNaN(k.fiyat_kurus))))} (${s.some((k) => k.tur !== 'tek_seferlik') ? 'aylık toplam' : 'tek seferlik toplam'}, KDV hariç)`));
+  }
+  function denetle() {
+    const m = musteriler.find((x) => x.id === bForm.musteri_id.value);
+    if (!m) { bYaz('Müşteri seçin.', true); bForm.musteri_id.focus(); return null; }
+    if (!bForm.ad.value.trim()) { bYaz('Teklif adı gerekli.', true); bForm.ad.focus(); return null; }
+    if (!bForm.tarih.value) { bYaz('Teklif tarihi gerekli.', true); bForm.tarih.focus(); return null; }
+    if (bForm.gecerlilik.value && bForm.gecerlilik.value < bForm.tarih.value) { bYaz('Geçerlilik teklif tarihinden önce olamaz.', true); return null; }
+    const s = seciliKalemler();
+    if (!s.length) { bYaz('En az bir hizmet seçin.', true); return null; }
+    if (s.some((k) => !k.ad)) { bYaz('Seçili satırlardan birinde hizmet adı boş.', true); return null; }
+    if (s.some((k) => Number.isNaN(k.fiyat_kurus))) { bYaz('Geçersiz fiyat var (ör. 20.000 ya da 20.000,50).', true); return null; }
+    return { m, veri: { firma: firmaAdi(m), tarih: bForm.tarih.value, kalemler: s } };
+  }
+  let onizlemeUrller = [];
+  $('[data-onizle]').addEventListener('click', async (o) => {
+    const d = denetle(); if (!d || !aktifSurum) return;
+    const dugme = o.currentTarget; dugme.disabled = true;
+    onizlemeUrller.forEach((u) => URL.revokeObjectURL(u)); onizlemeUrller = [];
+    const kutu = $('[data-onizleme]'); kutu.replaceChildren(); $('[data-onizleme-bolum]').hidden = false;
+    try {
+      const plan = sayfaPlani(aktifSurum.sayfalar, d.veri), c = document.createElement('canvas');
+      for (const [i, p] of plan.entries()) {
+        bYaz(`Önizleme hazırlanıyor (${i + 1} / ${plan.length})…`);
+        let src;
+        if (p.sayfa.tip === 'sabit') src = gorselAdresi(p.sayfa.gorsel);
+        else { await sayfaCiz(c, p, d.veri); src = URL.createObjectURL(await new Promise((t) => c.toBlob(t, 'image/jpeg', 0.85))); onizlemeUrller.push(src); }
+        kutu.append(el('figure', {}, el('img', { src, alt: `${i + 1}. sayfa: ${p.sayfa.ad}` }), el('figcaption', {}, `${i + 1}. ${p.sayfa.ad}${p.devam ? ' (devam)' : ''}`)));
+      }
+      bYaz(`Önizleme hazır: ${plan.length} sayfa.`);
+    } catch (h) { bYaz('Önizleme hazırlanamadı: ' + h.message, true); } finally { dugme.disabled = false; }
+  });
+  const dosyaAdi = (firma, tarih) => `${String(firma).toLocaleLowerCase('tr').replace(/ı/g, 'i').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'musteri'}-teklif-${tarih}.pdf`;
+  $('[data-pdf]').addEventListener('click', async (o) => {
+    const d = denetle(); if (!d || !aktifSurum) return;
+    const bilinmeyen = d.veri.kalemler.filter((k) => k.fiyat_kurus === null).length;
+    if (bilinmeyen && !confirm(`${bilinmeyen} kalemin fiyatı boş; PDF’te “—” görünecek. Yine de oluşturulsun mu?`)) return;
+    const dugme = o.currentTarget; dugme.disabled = true; $('[data-sonuc]').hidden = true;
+    try {
+      const { pdf, sayfaSayisi } = await belgePdf(aktifSurum.sayfalar, d.veri, { baslik: bForm.ad.value.trim(), yazar: bForm.hazirlayan.value.trim() || 'Idexya', ilerleme: (i, n) => bYaz(`PDF hazırlanıyor (${i} / ${n})…`) });
+      bYaz('Müşteri kartına kaydediliyor…');
+      const tutar = teklifTutari(d.veri.kalemler.filter((k) => k.fiyat_kurus !== null));
+      const ad = dosyaAdi(d.veri.firma, d.veri.tarih);
+      const fd = new FormData();
+      fd.append('dosya', new File([pdf], ad, { type: 'application/pdf' }));
+      for (const [k, v] of Object.entries({ musteri_id: d.m.id, ad: bForm.ad.value.trim(), tarih: d.veri.tarih, gecerlilik: bForm.gecerlilik.value, tutar: `${Math.floor(tutar / 100)},${String(tutar % 100).padStart(2, '0')}`, durum: bForm.durum.value, kaynak: 'sablon' })) fd.append(k, v);
+      if (!bForm.asama.disabled && bForm.asama.checked) fd.append('asama', '1');
+      const r = await fetch('/api/yonetim/teklif-dosyalari', { method: 'POST', credentials: 'same-origin', body: fd });
+      const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
+      if (!r.ok || !s.ok) throw new Error(s.hata || `Kaydedilemedi (${r.status})`);
+      bYaz('');
+      const kutu = $('[data-sonuc]');
+      kutu.replaceChildren(el('b', {}, 'PDF oluşturuldu ve müşteri kartına kaydedildi. '), `${sayfaSayisi} sayfa · ${Math.round(pdf.byteLength / 1024)} KB · tutar ${tlBelge(tutar)} (KDV hariç). Panel bu belgeyi müşteriye göndermez. `,
+        el('a', { href: '/customer?id=' + encodeURIComponent(d.m.id) }, 'Müşteri kartını aç'), ' · ',
+        el('a', { href: '#', onclick: (x) => { x.preventDefault(); dosyaIndir(pdf, ad, 'application/pdf'); } }, 'PDF’i indir'));
+      kutu.hidden = false; kutu.scrollIntoView({ block: 'nearest' });
+    } catch (h) { bYaz('PDF oluşturulamadı: ' + h.message, true); } finally { dugme.disabled = false; }
+  });
+
+  // ---------- Başlangıç ----------
+  sekmeCiz();
+  sablonlariYukle();
+  katalogYukle().then(() => { if (prm('sekme') === 'katalog') document.getElementById('catalog').scrollIntoView(); });
+  if (sekme === 'duzen') duzenHazirla();
+  if (sekme === 'olustur') olusturHazirla();
+</script>
+</Yonetim>
