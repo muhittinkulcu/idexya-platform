@@ -4,7 +4,6 @@
 import Site from '../../../layouts/Site.astro';
 import CagriKutusu from '../../../components/CagriKutusu.astro';
 import KapakGorsel from '../../../components/KapakGorsel.astro';
-import InstagramAkis from '../../../components/InstagramAkis.astro';
 import Baslik from '../../../components/ana/Baslik.astro';
 import gruplar from '../../../data/hizmetler.json';
 import { IKON } from '../../../data/hizmet-ikon';
@@ -122,7 +121,6 @@ const ld = {
     <ul class="hd-diger">
       {digerleri.map((x) => (<li><a href={`/tr/hizmet/${x.slug}/`}><b>{x.ad}</b><span>{x.ozet}</span><i aria-hidden="true">→</i></a></li>))}
     </ul>
-    {g.id === 'tasarim-icerik' && <InstagramAkis baslik="Instagram’daki çalışmalarımızdan" />}
   </div>
 </section>
 
