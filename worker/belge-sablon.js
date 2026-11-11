@@ -177,6 +177,7 @@ export async function sablonGorselYukle(istek, env, kim, sablonId) {
   const boy = gorselBoyutu(bayt);
   if (!boy || !boy.en || !boy.boy) return hata('Görselin boyutu okunamadı', 422);
   const oran = boy.boy / boy.en;
+  if (boy.en > 4000) return hata(`Görsel en fazla 4000 piksel genişlikte olabilir; yüklenen ${boy.en} × ${boy.boy}`, 422);
   if (oran < 1.36 || oran > 1.48 || boy.en < 800) return hata(`Görsel dikey A4 olmalı (ör. 1654 × 2339 piksel); yüklenen ${boy.en} × ${boy.boy}`, 422);
   // Görsel henüz kaydedilmemiş sonraki sürüme yazılır; "Kaydet" bu anahtarla yeni sürümü oluşturur.
   const son = await db.prepare('SELECT MAX(surum) AS n FROM belge_sablon_surumleri WHERE sablon_id = ?').bind(sab.id).first();

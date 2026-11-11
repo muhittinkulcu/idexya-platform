@@ -147,6 +147,7 @@ k('uzantısı .jpg ama içerik PDF → 415', r.status === 415);
 r = await gYukle(gform(new TextEncoder().encode('<svg onload=alert(1)>'), 2, 'a.png', 'image/png'));
 k('SVG → 415', r.status === 415);
 k('yatay görsel → 422', (await gYukle(gform(jpeg(2339, 1654)))).status === 422);
+k('çok büyük görsel (40000 piksel) → 422', (await gYukle(gform(png(40000, 56000)))).status === 422);
 k('çok küçük görsel → 422', (await gYukle(gform(jpeg(400, 566)))).status === 422);
 const iriJpeg = new Uint8Array(8 * 1024 * 1024 + 1); iriJpeg.set(jpeg(1654, 2339));
 k('8 MB üstü → 413', (await gYukle(gform(iriJpeg))).status === 413);
