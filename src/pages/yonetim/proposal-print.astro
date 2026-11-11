@@ -22,8 +22,13 @@ html,body{margin:0;background:#EEEAE4;color:var(--tx);font-family:system-ui,-app
 .arac{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(238,234,228,.95);border-bottom:1px solid var(--line)}
 .arac span{font-size:13px;color:var(--tx2)}
 .dugme{min-height:40px;display:inline-flex;align-items:center;justify-content:center;padding:0 14px;border:1px solid var(--line);border-radius:12px;background:#FFFFFF;color:var(--tx);font:inherit;font-weight:600;cursor:pointer;text-decoration:none}
-.dugme.ana{border:0;background:var(--acc);color:#FFFFFF}
+.dugme.ana{border:0;background:var(--acc);color:#FFFFFF;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
+/* Üzerine gelme: panel ana düğmesiyle aynı davranış (layouts/Yonetim.astro), renk bu sayfanın --acc değerinden türer. */
+.dugme.ana:hover{background:color-mix(in srgb,var(--acc) 91%,#000000);color:#FFFFFF;transform:translateY(-1px);box-shadow:0 6px 14px -6px color-mix(in srgb,var(--acc) 35%,transparent)}
+.dugme.ana:active{transform:none;box-shadow:none}
+@media (prefers-reduced-motion:reduce){.dugme.ana{transition:none}.dugme.ana:hover{transform:none}}
 .dugme:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.dugme.ana:focus-visible{outline-color:var(--head)}
 .hata{max-width:210mm;margin:16px auto;padding:12px 14px;border-radius:14px;background:#FBE2DF;color:#A62A20}
 .sayfa{width:210mm;max-width:calc(100% - 32px);min-height:297mm;margin:16px auto 40px;background:#FFFFFF;padding:18mm 16mm;box-shadow:0 10px 30px -18px rgba(0,0,0,.35)}
 .bas{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start;padding-bottom:14px;border-bottom:3px solid var(--brand)}

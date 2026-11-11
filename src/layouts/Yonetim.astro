@@ -256,8 +256,16 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 .ara-sonuc a:hover,.ara-sonuc a.secili{background:var(--tint);color:var(--tintx)}
 .dugme{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;border:1px solid rgb(var(--line));border-radius:12px;background:rgb(var(--card));color:var(--head);font:inherit;font-weight:600;cursor:pointer;text-decoration:none;box-sizing:border-box}
 .dugme:hover{background:var(--card2);color:var(--head)}
-.dugme.ana{border:0;background:var(--fill);color:#FFFFFF}
-.dugme.ana:hover{background:#9E3A05;color:#FFFFFF}
+/* Ana (birincil) düğme: üzerine gelince aynı tema renginin ~%9 koyusu (--fill-ust), yazı beyaz, 1 piksel yükselme ve yumuşak gölge.
+   Renk sabit yazılmaz; --fill'den türetilir, açık ve koyu temada kendiliğinden doğru tonu alır. .birincil eski addır, aynı davranır. */
+.acik,.koyu{--fill-ust:color-mix(in srgb,var(--fill) 91%,#000000);--fill-golge:color-mix(in srgb,var(--fill) 35%,transparent)}
+.dugme.ana,.dugme.birincil{border:0;background:var(--fill);color:#FFFFFF;transition:background-color .15s ease,box-shadow .15s ease,transform .15s ease}
+.dugme.ana:hover,.dugme.birincil:hover{background:var(--fill-ust);color:#FFFFFF;transform:translateY(-1px);box-shadow:0 6px 14px -6px var(--fill-golge)}
+.dugme.ana:active,.dugme.birincil:active{background:var(--fill-ust);transform:none;box-shadow:none}
+.dugme.ana:focus-visible,.dugme.birincil:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.dugme.ana:disabled,.dugme.birincil:disabled{background:var(--fill);transform:none;box-shadow:none}
+@supports not (color:color-mix(in srgb,red 50%,blue)){.dugme.ana:hover,.dugme.birincil:hover,.dugme.ana:active,.dugme.birincil:active{background:var(--fill);filter:brightness(.9);box-shadow:none}}
+@media (prefers-reduced-motion:reduce){.dugme.ana,.dugme.birincil{transition:none}.dugme.ana:hover,.dugme.birincil:hover{transform:none}}
 .dugme.ikincil{border-color:var(--btnline);color:var(--acc)}
 .dugme:disabled{opacity:.55;cursor:default}
 .dugme.kucuk{min-height:32px;padding:0 10px;font-size:13px}
