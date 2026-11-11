@@ -1,9 +1,8 @@
 ---
-// Ana sayfa: son blog yazıları, Instagram kartı ve sık sorulan sorular (FAQPage yapılandırılmış verisiyle).
+// Ana sayfa: son blog yazıları, Instagram kartı ve sık sorulan sorular (Instagram gönderi şeridi artık her sayfada footer üstünde, Site.astro) (FAQPage yapılandırılmış verisiyle).
 // SSS metinleri src/data/sss.json'dan gelir (panelde Menüler ve SSS'ten düzenlenir).
 import Baslik from './Baslik.astro';
 import Bulten from './Bulten.astro';
-import InstagramAkis from '../InstagramAkis.astro';
 import yazilar from '../../data/yazilar.json';
 import sss from '../../data/sss.json';
 const SSS = sss.map((x) => [x.soru, x.cevap]);
@@ -27,7 +26,6 @@ const son = yazilar.slice(0, 3);
     <Bulten />
   </div>
 </section>
-<InstagramAkis />
 <section class="bs bs-sss" aria-labelledby="bs-sss">
   <div class="bs-ic bs-sss-ic">
     <Baslik id="bs-sss" etiket="Sık sorulan sorular" baslik="Merak edilenler" aciklama="Cevabını bulamadığınız bir soru varsa yazın, 1 iş günü içinde dönelim." baglanti={{ href: '/tr/iletisim/', ad: 'İletişim' }} />

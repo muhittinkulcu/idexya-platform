@@ -1,5 +1,6 @@
 ---
 import HizliTalep from '../components/HizliTalep.astro';
+import InstagramAkis from '../components/InstagramAkis.astro';
 import BannerStil from '../components/BannerStil.astro';
 // Ortak yerleşim: üst menü, alt kısım, tema, çerez onayı.
 // gorsel: paylaşım görseli (/ ile başlayan site içi PNG/JPG yolu; yoksa sitenin genel görseli). ogTur: 'article' blog yazıları için.
@@ -1047,6 +1048,7 @@ p,li,blockquote{hyphens:auto;-webkit-hyphens:auto}@media (min-width:640px){main 
 <div class="bn-yuva bn-yuva-kap" data-bn-yuva="icerik-sonu" hidden></div>
 </main>
 <div class="bn-yuva" data-bn-yuva="footer-ustu" hidden></div>
+{dil === 'tr' && <InstagramAkis />}
 <footer style="background: var(--bg2); border-top: 1px solid var(--line)">
 <div style="max-width: 1240px; margin: 0 auto; padding: 60px 24px 32px; box-sizing: border-box; display: flex; flex-direction: column; gap: 40px">
 <div style="display: flex; flex-wrap: wrap; gap: 40px">
