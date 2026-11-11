@@ -6,7 +6,7 @@ export const DEGER = {
   yeni: 'new', hepsi: 'all', taslak: 'draft', gonderildi: 'sent', kabul: 'accepted', red: 'rejected',
   erisim: 'access', davet: 'invites', acik: 'open', yanitlandi: 'answered', kapali: 'closed',
   hizmetler: 'services', urunler: 'products', paketler: 'packages', referanslar: 'references', yazilar: 'posts', sss: 'faq', yasal: 'legal',
-  kategoriler: 'categories', onay: 'approvals', uyari: 'alerts'
+  kategoriler: 'categories', onay: 'approvals', uyari: 'alerts', olustur: 'create', duzen: 'edit', katalog: 'catalog'
 };
 const DEGERLI = new Set(['sekme', 'dosya']);
 const ters = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [v, k]));

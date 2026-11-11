@@ -16,6 +16,7 @@ import { medyaApi, yonetimSistemApi } from './sistem.js';
 import { yonetimYayinApi } from './yayin.js';
 import { yonetimTeklifApi } from './teklif.js';
 import { yonetimTeklifDosyaApi, teklifDosyasiYukle } from './teklif-dosya.js';
+import { yonetimBelgeSablonApi, sablonGorselYukle } from './belge-sablon.js';
 import { yonetimCrmApi } from './crm.js';
 import { yonetimAnaKayitApi, anaKayitEsitle, anaKayitKurulu } from './ana-kayit.js';
 import { yonetimEtiketApi } from './etiket.js';
@@ -119,6 +120,9 @@ async function yonetimApi(istek, env, yol, kim) {
   }
   // Teklif PDF yükleme çok parçalı gövdeyle gelir (en fazla 20 MB); JSON gövde okunmadan önce ayrılır.
   if (yol === 'teklif-dosyalari' && yontem === 'POST') return await teklifDosyasiYukle(istek, env, kim);
+  // Şablon sayfa görseli de çok parçalı gelir (JPG/PNG, en fazla 8 MB).
+  const sg = yontem === 'POST' && yol.match(/^belge-sablonlari\/([\w-]{1,40})\/gorsel$/);
+  if (sg) return await sablonGorselYukle(istek, env, kim, sg[1]);
   let govde = {};
   if (yontem === 'POST') {
     const ham = await istek.text();
@@ -289,7 +293,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
     || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
