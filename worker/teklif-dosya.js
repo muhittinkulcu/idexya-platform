@@ -80,8 +80,22 @@ export async function teklifDosyasiYukle(istek, env, kim) {
   if (!(istek.headers.get('content-type') || '').toLowerCase().startsWith('multipart/form-data')) return hata('Dosya çok parçalı form olarak gönderilmeli', 415);
   const boy = Number(istek.headers.get('content-length') || 0);
   if (boy > EN_BUYUK + ZARF_PAYI) return hata('Dosya en fazla 20 MB olabilir', 413);
+  // Gövde sayılarak okunur: Content-Length gelmese (ör. HTTP/2) ya da yanlış olsa da sınır aşılınca okuma kesilir
+  // (güvenlik incelemesi, 11 Kas 2026).
+  const parcalar = []; let okunan = 0;
+  try {
+    const okuyucu = istek.body ? istek.body.getReader() : null;
+    while (okuyucu) {
+      const { done, value } = await okuyucu.read();
+      if (done) break;
+      okunan += value.byteLength;
+      if (okunan > EN_BUYUK + ZARF_PAYI) { await okuyucu.cancel(); return hata('Dosya en fazla 20 MB olabilir', 413); }
+      parcalar.push(value);
+    }
+  } catch (e) { return hata('Geçersiz istek', 400); }
   let f;
-  try { f = await istek.formData(); } catch (e) { return hata('Geçersiz istek', 400); }
+  try { f = await new Response(new Blob(parcalar), { headers: { 'content-type': istek.headers.get('content-type') } }).formData(); }
+  catch (e) { return hata('Geçersiz istek', 400); }
   const dosya = f.get('dosya');
   if (!dosya || typeof dosya === 'string' || typeof dosya.arrayBuffer !== 'function') return hata('PDF dosyası seçin', 422);
   if (dosya.size > EN_BUYUK) return hata('Dosya en fazla 20 MB olabilir', 413);

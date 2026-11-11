@@ -110,6 +110,14 @@ r = await yukle(form({ musteri_id: 'm-yeni' }, buyuk));
 k('20 MB üstü → 413', r.status === 413);
 r = await yukle(form({ musteri_id: 'm-yeni' }), { headers: { 'content-length': String(25 * 1024 * 1024) } });
 k('content-length 25 MB → 413 (gövde okunmadan)', r.status === 413);
+{ // Content-Length olmadan akışla gelen büyük gövde: sayılarak okunur, sınırda kesilir
+  const buyuk = new Uint8Array(21 * 1024 * 1024); buyuk.set(new TextEncoder().encode('%PDF-1.4'));
+  const yanit = new Response(form({ musteri_id: 'm-yeni' }, buyuk));
+  const tip = yanit.headers.get('content-type'); const govde = await yanit.blob();
+  const akis = new ReadableStream({ start(c) { c.enqueue(new Uint8Array(0)); govde.arrayBuffer().then((b) => { c.enqueue(new Uint8Array(b)); c.close(); }); } });
+  r = await istek('teklif-dosyalari', { method: 'POST', headers: { origin: B, 'content-type': tip }, body: akis, duplex: 'half' });
+  k('content-length yokken 21 MB akış → 413', r.status === 413);
+}
 k('müşteri yoksa 404', (await yukle(form({ musteri_id: 'yok' }))).status === 404);
 k('ad boşsa 422', (await yukle(form({ musteri_id: 'm-yeni', ad: '' }))).status === 422);
 k('tarih geçersizse 422', (await yukle(form({ musteri_id: 'm-yeni', tarih: '10.11.2026' }))).status === 422);
