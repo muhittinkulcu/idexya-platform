@@ -106,6 +106,13 @@ export const SEMA = [
   `CREATE INDEX IF NOT EXISTS teklif_musteri ON teklifler (musteri_id, olusturma)`,
   `CREATE INDEX IF NOT EXISTS teklif_durum ON teklifler (durum, guncelleme)`,
   `CREATE TABLE IF NOT EXISTS teklif_sayac (yil INTEGER PRIMARY KEY, son INTEGER NOT NULL)`,
+  // Teklif dosyaları (worker/teklif-dosya.js): Canva'da hazırlanıp PDF olarak yüklenen teklifler. Dosya R2'de (YEDEK bağlaması)
+  // teklif-dosyalari/<musteri_id>/<id>.pdf anahtarıyla durur; burada yalnız bilgisi. Tutar kuruş, KDV hariç, isteğe bağlı.
+  `CREATE TABLE IF NOT EXISTS teklif_dosyalari (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, ad TEXT NOT NULL, tarih TEXT NOT NULL, gecerlilik TEXT, tutar_kurus INTEGER,
+    durum TEXT NOT NULL DEFAULT 'gonderildi', dosya_anahtari TEXT NOT NULL UNIQUE, dosya_adi TEXT, boyut INTEGER NOT NULL,
+    olusturan TEXT NOT NULL, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, karar_zamani TEXT)`,
+  `CREATE INDEX IF NOT EXISTS teklif_dosya_musteri ON teklif_dosyalari (musteri_id, tarih)`,
   // IDOS eşitleme (worker/crm.js): IDOS reklam hesabı (platform + hesap) ↔ IDP CRM müşterisi. Yönetici elle eşleştirir.
   `CREATE TABLE IF NOT EXISTS reklam_eslesme (
     platform TEXT NOT NULL, hesap TEXT NOT NULL, musteri_id TEXT NOT NULL, eslestiren TEXT NOT NULL, zaman TEXT NOT NULL,
