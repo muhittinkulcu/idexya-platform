@@ -61,7 +61,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('td', {}, x.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(x.musteri_id) }, x.firma || x.ad || 'Müşteri') : el('span', { style: 'color: var(--tx2)' }, 'CRM’e alınmadı')),
         el('td', {}, x.kazanildi ? el('span', { class: 'cip kazanildi' }, 'Kazanıldı') : el('span', { class: 'cip yeni' }, 'Henüz değil'), x.donusum_zamani ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, tarih(x.donusum_zamani)) : null,
           x.pencere_disi ? el('div', { style: 'font-size: 12px; color: var(--warn)' }, 'Google için 90 gün aşıldı') : null, (x.gbraid || x.wbraid) && !x.gclid ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, 'iOS kimliği: dosyaya girmez') : null),
-        el('td', {}, tl(x.deger)),
+        el('td', {}, tl(x.deger), x.deger_yillik ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, 'Yıllık değer (aylık × 12 + tek seferlik)') : null),
         el('td', { style: 'font-size: 12px; color: var(--tx2)' }, x.google_aktarim ? 'Google ✓ ' + tarih(x.google_aktarim) : null, x.meta_aktarim ? el('div', {}, 'Meta ✓ ' + tarih(x.meta_aktarim)) : null, !x.google_aktarim && !x.meta_aktarim ? '—' : null))))));
   }
   async function yukle() { try { v = await api('donusum'); genelHata(''); ciz(); } catch (h) { genelHata('Dönüşümler yüklenemedi: ' + h.message); } }

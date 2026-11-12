@@ -132,8 +132,9 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     if (!t) return hata('Teklif bulunamadı', 404);
     t.kalemler = JSON.parse(t.kalemler || '[]');
     const mus = await db.prepare('SELECT id, firma, ad, eposta, telefon, asama FROM musteriler WHERE id = ?').bind(t.musteri_id).first();
-    const gelir = await db.prepare("SELECT id, durum, vade, odeme_tarihi, tutar FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? LIMIT 1").bind(t.no).first();
-    return json({ ok: true, teklif: t, musteri: mus || null, gelir: gelir || null });
+    // Karışık teklifte iki gelir kaydı olur (aylık ilk ay, tek seferlik); gelir ilk kayıttır (eski istemcilerle uyum).
+    const gelirler = (await db.prepare("SELECT id, durum, vade, odeme_tarihi, tutar, aciklama FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? ORDER BY olusturma, aciklama LIMIT 10").bind(t.no).all()).results;
+    return json({ ok: true, teklif: t, musteri: mus || null, gelir: gelirler[0] || null, gelirler });
   }
 
   // Güncelleme: yalnız taslak
@@ -152,7 +153,9 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     return json({ ok: true, id: t.id });
   }
 
-  // Kabul edilen tekliften gelir (alacak) kaydı: muhasebede belge_no = teklif no. Aynı teklif için ikinci kayıt açılmaz.
+  // Kabul edilen tekliften gelir (alacak) kaydı: muhasebede belge_no = teklif no. Aynı teklif için ikinci kez kayıt açılmaz.
+  // Aylık ve tek seferlik kalemli teklifte (Muhittin, 12 Kas 2026) iki ayrı kayıt açılır: "<no> · aylık (ilk ay)" tutarı aylık toplam,
+  // "<no> · tek seferlik" tutarı tek seferlik toplam (ikisi de KDV dâhil). İki tutar toplanmaz; iki kayıt tek seferde (batch) yazılır.
   m = yol.match(/^teklifler\/([\w-]+)\/gelir$/);
   if (m && yontem === 'POST') {
     const t = await db.prepare('SELECT * FROM teklifler WHERE id = ?').bind(m[1]).first();
@@ -160,18 +163,29 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     if (t.durum !== 'kabul') return hata('Gelir kaydı yalnız kabul edilen tekliften oluşturulur', 409);
     const var_ = await db.prepare("SELECT id FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? LIMIT 1").bind(t.no).first();
     if (var_) return hata('Bu teklif için gelir kaydı zaten var', 409);
-    if (teklifBloklari(t).length > 1) return hata('Bu teklifte aylık ve tek seferlik tutarlar ayrı; tek tutarlı gelir kaydı açılamaz. Kayıtları Muhasebe sayfasından ayrı ayrı ekleyin', 409);
     const bugun = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
     const vade = kirp(govde.vade, 10);
     if (vade && (!gecerliTarih(vade) || vade < bugun)) return hata('Vade bugün ya da sonrası geçerli bir tarih olmalı', 422);
-    const tutar = Math.round(t.toplam * 100);
-    if (!(tutar > 0)) return hata('Teklif toplamı sıfır; gelir kaydı oluşturulamaz', 422);
-    const id = kimlik(), z = simdi();
-    await db.prepare(`INSERT INTO muhasebe (id, tur, tarih, tutar, kdv_orani, aciklama, kategori, musteri_id, belge_no, durum, vade, odeme_tarihi, olusturma, ekleyen)
-      VALUES (?, 'gelir', ?, ?, ?, ?, 'Hizmet geliri', ?, ?, 'bekliyor', ?, NULL, ?, ?)`)
-      .bind(id, bugun, tutar, Math.round(t.kdv_orani), kirp(`${t.no} · ${t.baslik}`, 300), t.musteri_id, t.no, vade || null, z, kim.eposta).run();
-    await islemYaz(db, kim.eposta, 'teklif_gelir', t.id, `${t.no} → gelir kaydı ${tl(tutar)}${vade ? ' · vade ' + vade : ''}`);
-    return json({ ok: true, id });
+    const bloklar = teklifBloklari(t);
+    const ETIKET = { aylik: 'aylık (ilk ay)', tek_seferlik: 'tek seferlik' };
+    const kayitlar = bloklar.length > 1
+      ? bloklar.map((b) => ({ tutar: Math.round(b.toplam * 100), aciklama: `${t.no} · ${ETIKET[b.tur]} · ${t.baslik}` }))
+      : [{ tutar: Math.round(t.toplam * 100), aciklama: `${t.no} · ${t.baslik}` }];
+    if (kayitlar.some((x) => !(x.tutar > 0))) return hata(bloklar.length > 1 ? 'Aylık ya da tek seferlik toplam sıfır; gelir kaydı oluşturulamaz' : 'Teklif toplamı sıfır; gelir kaydı oluşturulamaz', 422);
+    const z = simdi();
+    const idler = kayitlar.map(() => kimlik());
+    // Her satır, bu teklif için gelir kaydı yokken yazılır (aynı anda gelen iki istekte de mükerrer açılmaz; batch tek işlemdir).
+    const sonuc = await db.batch(kayitlar.map((x, i) => db.prepare(`INSERT INTO muhasebe (id, tur, tarih, tutar, kdv_orani, aciklama, kategori, musteri_id, belge_no, durum, vade, odeme_tarihi, olusturma, ekleyen)
+      SELECT ?, 'gelir', ?, ?, ?, ?, 'Hizmet geliri', ?, ?, 'bekliyor', ?, NULL, ?, ?
+      WHERE NOT EXISTS (SELECT 1 FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? AND id NOT IN (${idler.map(() => '?').join(', ')}))`)
+      .bind(idler[i], bugun, x.tutar, Math.round(t.kdv_orani), kirp(x.aciklama, 300), t.musteri_id, t.no, vade || null, z, kim.eposta, t.no, ...idler)));
+    if (!sonuc.every((x) => x && x.meta && x.meta.changes)) {
+      // Başka bir istek araya girdi: bu istekte yazılan satır varsa geri alınır.
+      await db.prepare(`DELETE FROM muhasebe WHERE id IN (${idler.map(() => '?').join(', ')})`).bind(...idler).run();
+      return hata('Bu teklif için gelir kaydı zaten var', 409);
+    }
+    await islemYaz(db, kim.eposta, 'teklif_gelir', t.id, `${t.no} → gelir kaydı ${kayitlar.map((x) => tl(x.tutar)).join(' · ')}${vade ? ' · vade ' + vade : ''}`);
+    return json({ ok: true, id: idler[0], idler });
   }
 
   m = yol.match(/^teklifler\/([\w-]+)\/(gonderildi|kabul|red|kopyala|sil)$/);
