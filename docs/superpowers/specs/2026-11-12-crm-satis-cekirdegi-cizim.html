@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM 1. parça: satış çekirdeği (çizim)</title>
+<style>
+:root{--bg:#FBF8F4;--side:#fff;--card:#fff;--card2:#F7F1EA;--line:#E9DED2;--track:#F1E9DF;--tx:#2A2622;--tx2:#5F574F;--head:#002559;--brand:#F07A23;--acc:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--err:#8A1F2E;--errb:#FCE4E6}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx)}
+.cizim-ust{background:var(--head);color:#fff;padding:10px 18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-size:13px}
+.cizim-ust b{font-size:14px}.cizim-ust .not{opacity:.8}
+.sekmeler{display:flex;gap:6px;margin-left:auto}.sekmeler button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:999px;padding:5px 12px;cursor:pointer;font:inherit}
+.sekmeler button[aria-pressed=true]{background:var(--brand);border-color:var(--brand)}
+.duzen{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 44px)}
+nav{background:var(--side);border-right:1px solid var(--line);padding:16px 10px;font-size:13.5px}
+nav .logo{font-weight:700;color:var(--head);padding:0 8px 14px}nav .logo span{color:var(--brand)}
+nav .grup{font-size:11px;letter-spacing:.06em;color:var(--tx2);margin:14px 8px 6px;text-transform:uppercase}
+nav a{display:flex;justify-content:space-between;padding:6px 10px;border-radius:8px;color:var(--tx);text-decoration:none;cursor:pointer}
+nav a.alt{padding-left:26px;color:var(--tx2)}nav a.aktif{background:var(--tint);color:var(--tintx);font-weight:600}
+nav a .s{background:var(--errb);color:var(--err);border-radius:999px;padding:0 7px;font-size:11.5px;font-weight:600}
+nav a .yeni{background:var(--okb);color:var(--ok);border-radius:4px;padding:0 5px;font-size:10.5px}
+main{padding:20px 24px 60px;overflow:auto}
+h1{margin:0;color:var(--head);font-size:22px}.alt-baslik{color:var(--tx2);margin:2px 0 16px}
+.kart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;position:relative}
+.kart h2{margin:0 0 10px;font-size:15px;color:var(--head);display:flex;justify-content:space-between;align-items:center}
+.ikon{display:inline-flex;gap:6px;color:var(--tx2);font-weight:400;font-size:13px}.ikon span{border:1px solid var(--line);border-radius:6px;width:22px;height:22px;display:inline-grid;place-items:center}
+.dugme{border:1px solid #F5C7A6;background:#fff;color:var(--acc);border-radius:9px;padding:6px 12px;font:inherit;font-weight:600;cursor:pointer}
+.dugme.ana{background:var(--acc);border-color:var(--acc);color:#fff}.dugme.kucuk{padding:3px 9px;font-size:12.5px}
+.cip{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600}
+.c-ok{background:var(--okb);color:var(--ok)}.c-err{background:var(--errb);color:var(--err)}.c-warn{background:var(--warnb);color:var(--warn)}.c-info{background:var(--infob);color:var(--info)}.c-gri{background:var(--track);color:var(--tx2)}.c-tint{background:var(--tint);color:var(--tintx)}
+.av{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;font-size:11px;font-weight:700;color:#fff}
+.a1{background:#B84406}.a2{background:#1F4E8C}.a3{background:#176041}
+.arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+input,select{font:inherit;border:1px solid var(--line);border-radius:9px;padding:6px 10px;background:#fff;color:var(--tx)}
+.ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:14px}
+.ozet .kart b{display:block;font-size:20px;color:var(--head)}.ozet .kart small{color:var(--tx2)}
+.pano{display:grid;grid-template-columns:repeat(6,minmax(200px,1fr));gap:10px;overflow-x:auto;padding-bottom:6px}
+.sutun{background:var(--card2);border-radius:12px;padding:8px}.sutun h3{margin:2px 4px 8px;font-size:13px;display:flex;justify-content:space-between;color:var(--head)}
+.sutun h3 small{color:var(--tx2);font-weight:400}
+.fk{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px;font-size:13px}
+.fk a{color:var(--head);font-weight:600;text-decoration:none}.fk .s{display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:var(--tx2);font-size:12px}
+.fk.gecikti{border-left:4px solid var(--err)}.fk.bugun{border-left:4px solid var(--warn)}
+.adim{font-size:12px;margin-top:5px}.adim.err{color:var(--err)}.adim.warn{color:var(--warn)}
+.izgara{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+@media(max-width:1100px){.izgara{grid-template-columns:1fr}}
+.satir{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line);align-items:center}.satir:first-of-type{border-top:0}
+.akis{list-style:none;margin:0;padding:0}.akis li{display:grid;grid-template-columns:30px 1fr;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
+.akis li:first-child{border-top:0}.akis .i{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--track);font-size:14px}
+.akis small{color:var(--tx2)}
+.sekme-cubuk{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:4px 0 14px;flex-wrap:wrap}.sekme-cubuk span{padding:7px 12px;color:var(--tx2);font-weight:600;font-size:13px}
+.sekme-cubuk span.ak{color:var(--acc);border-bottom:2px solid var(--acc)}.sekme-cubuk span.sonra{opacity:.55}
+.etk{font-size:11px;color:var(--tx2)}
+.ust-kart{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.ust-kart .ad{font-size:22px;font-weight:700;color:var(--head)}
+.sonraki{background:var(--warnb);border:1px solid #F0D9A8;border-radius:12px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.not-kutu{background:#FFFBEA;border:1px dashed #E0C060;border-radius:10px;padding:10px 12px;font-size:12.5px;color:#5c4a00;margin-top:18px}
+.not-kutu b{color:#3d3100}
+table{width:100%;border-collapse:collapse;font-size:13px}th{text-align:left;color:var(--tx2);font-weight:600;font-size:12px;padding:6px 8px;border-bottom:1px solid var(--line)}td{padding:8px;border-bottom:1px solid var(--line)}
+.ekran{display:none}.ekran.ak{display:block}
+.form-satir{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;align-items:end}
+label.alan{display:grid;gap:3px;font-size:12px;color:var(--tx2)}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ===== Yeni: ince ve ferah (body.ferah) ===== */
+body.ferah{font-family:'Inter',system-ui,sans-serif;font-weight:300;font-size:14.5px;line-height:1.65;letter-spacing:.005em;color:#3A352F}
+body.ferah b,body.ferah strong{font-weight:500}
+body.ferah h1{font-weight:500;font-size:24px;letter-spacing:-.01em}
+body.ferah .kart h2{font-weight:500;font-size:15.5px;margin-bottom:14px}
+body.ferah .ust-kart .ad{font-weight:500;font-size:24px;letter-spacing:-.01em}
+body.ferah .dugme{font-weight:400;padding:8px 14px;border-radius:10px}
+body.ferah .dugme.kucuk{padding:5px 11px}
+body.ferah .dugme.ana{font-weight:500}
+body.ferah .cip{font-weight:400;padding:2px 10px}
+body.ferah .kart{padding:20px 22px;border-radius:16px;border-color:#EFE6DC}
+body.ferah .izgara{gap:20px}
+body.ferah .satir{padding:14px 0;border-top-color:#F2EAE1}
+body.ferah .akis li{padding:16px 0;gap:12px;border-top-color:#F2EAE1}
+body.ferah .akis small,body.ferah .etk{color:#8A8178;font-size:12.5px}
+body.ferah .akis .i{background:#F7F1EA;color:#8A8178;width:30px;height:30px}
+body.ferah .fk{padding:12px 13px;margin-bottom:10px;line-height:1.55}
+body.ferah .fk a{font-weight:500}
+body.ferah .sutun{padding:10px}
+body.ferah .sutun h3{font-weight:500}
+body.ferah .sekme-cubuk span{font-weight:400;padding:9px 14px}
+body.ferah .sekme-cubuk span.ak{font-weight:500}
+body.ferah nav{font-size:14px}
+body.ferah nav a{padding:8px 12px;font-weight:300}
+body.ferah nav a.aktif{font-weight:500}
+body.ferah nav .logo{font-weight:500}
+body.ferah .av{font-weight:500;font-size:10.5px}
+body.ferah .sonraki{padding:14px 18px}
+body.ferah .ozet .kart b{font-weight:400;font-size:22px}
+body.ferah main{padding:28px 32px 60px}
+body.ferah .alt-baslik{margin:4px 0 22px}
+body.ferah .not-kutu{font-weight:300}
+body.ferah .not-kutu b{font-weight:500}
+.karsilastir{border:1px solid rgba(255,255,255,.35);border-radius:999px;display:flex;overflow:hidden}
+.karsilastir button{border:0;background:transparent;color:#fff;padding:5px 12px;cursor:pointer;font:inherit}
+.karsilastir button[aria-pressed=true]{background:#fff;color:var(--head)}
+</style>
+</head>
+<body class="ferah">
+<div class="cizim-ust"><b>ÇİZİM · CRM 1. parça: satış çekirdeği</b><span class="not">Tüm adlar ve tutarlar sahtedir. Tıklanabilir: üstteki sekmeler ve soldaki menü.</span>
+<div class="karsilastir" role="group" aria-label="Yazı görünümü"><button data-g="ferah" aria-pressed="true">Yeni: ince, ferah</button><button data-g="eski" aria-pressed="false">Önceki</button></div><div class="sekmeler" role="group"><button data-e="bugun" aria-pressed="true">1 · Bugün</button><button data-e="pano" aria-pressed="false">2 · Satış panosu</button><button data-e="kart" aria-pressed="false">3 · Müşteri kartı</button></div></div>
+<div class="duzen">
+<nav>
+<div class="logo"><span>✕</span> Idexya · Website Yönetim</div>
+<div class="grup">Satış</div>
+<a>Talepler <span class="s" style="background:var(--infob);color:var(--info)">3</span></a>
+<a data-e="bugun" class="aktif">Bugün <span class="s">4</span></a>
+<a data-e="pano">Satış panosu</a>
+<a data-e="kart">Müşteriler</a>
+<a>Kişiler <span class="yeni">yeni</span></a>
+<a class="alt" style="opacity:.55">Raporlar (3. parça)</a>
+<a class="alt">IDOS eşitleme</a>
+<a class="alt">Çakışmalar</a>
+<a>Teklifler</a><a>Belge şablonları</a><a>Görevler ve takvim</a>
+<div class="grup">Pazarlama ve iletişim</div><a>Asistan sohbetleri</a><a>Bülten listesi</a>
+</nav>
+<main>
+
+<!-- 1 BUGÜN -->
+<section class="ekran ak" id="bugun">
+<h1>Bugün</h1><p class="alt-baslik">Perşembe, 12.11.2026 · Sana ve ekibine düşen satış ve müşteri işleri. Liste sonraki adım tarihine göre sıralanır.</p>
+<div class="arac"><select><option>Bana atananlar</option><option>Tüm ekip</option><option>Ayşe K.</option></select><span class="cip c-err">2 gecikti</span><span class="cip c-warn">2 bugün</span><span class="cip c-gri">5 bu hafta</span></div>
+<div class="izgara">
+<div class="kart"><h2>Sonraki adımlar <span class="ikon"><span>i</span><span>⋮</span></span></h2>
+<div class="satir"><div><span class="cip c-err">3 gün gecikti</span> <b>Ara:</b> teklif hakkında geri dönüş<br><a href="#" data-e="kart" style="color:var(--head);font-weight:600">Örnek Mobilya Ltd.</a> · <span class="etk">Fırsat: Google + Meta reklam yönetimi · 40.000 TL / ay</span></div><div style="display:flex;gap:6px;align-items:center"><span class="av a1">MK</span><button class="dugme kucuk">Yapıldı</button><button class="dugme kucuk">Ertele</button></div></div>
+<div class="satir"><div><span class="cip c-err">1 gün gecikti</span> <b>E-posta:</b> erişim bilgilerini iste<br><a style="color:var(--head);font-weight:600">Deneme Diş Kliniği</a> · <span class="etk">Fırsat: SEO yönetimi · fiyat girilmedi</span></div><div style="display:flex;gap:6px;align-items:center"><span class="av a2">AK</span><button class="dugme kucuk">Yapıldı</button><button class="dugme kucuk">Ertele</button></div></div>
+<div class="satir"><div><span class="cip c-warn">Bugün 14.00</span> <b>Toplantı:</b> web sitesi tanışma görüşmesi<br><a style="color:var(--head);font-weight:600">Mavi Kafe</a> · <span class="etk">Fırsat: Kurumsal Website Tasarımı · 60.000 TL tek seferlik</span></div><div style="display:flex;gap:6px;align-items:center"><span class="av a1">MK</span><button class="dugme kucuk">Yapıldı</button><button class="dugme kucuk">Ertele</button></div></div>
+<div class="satir"><div><span class="cip c-warn">Bugün</span> <b>Teklif:</b> şablondan teklif hazırla<br><a style="color:var(--head);font-weight:600">Örnek Tekstil</a> · <span class="etk">Fırsat: Sosyal Medya İçerik Yönetimi</span></div><div style="display:flex;gap:6px;align-items:center"><span class="av a1">MK</span><button class="dugme kucuk">Teklif oluştur</button></div></div>
+<div class="satir"><div><span class="cip c-gri">Cuma</span> <b>Ara:</b> sözleşme imzası<br><a style="color:var(--head);font-weight:600">Örnek Otomotiv</a></div><div><span class="av a3">EY</span></div></div>
+<p class="etk" style="margin:10px 0 0">"Yapıldı" denince panel sonraki adımı sorar. Adımsız kalan açık fırsat sağdaki listeye düşer.</p>
+</div>
+<div style="display:grid;gap:14px;align-content:start">
+<div class="kart"><h2>Sonraki adımı olmayan fırsatlar <span class="ikon"><span>i</span></span></h2>
+<div class="satir"><span>Örnek Kuyumcu · <span class="etk">Görüşülüyor, 9 gündür hareket yok</span></span><button class="dugme kucuk">Adım ekle</button></div>
+<div class="satir"><span>Ankara Pilates · <span class="etk">Teklif gönderildi, 6 gün</span></span><button class="dugme kucuk">Adım ekle</button></div></div>
+<div class="kart"><h2>Yeni talepler <span class="ikon"><span>i</span></span></h2>
+<div class="satir"><span>Web formu · Kaya Hukuk <span class="etk">· 2 saat önce</span></span><button class="dugme kucuk">CRM'e al</button></div>
+<div class="satir"><span>Paket sihirbazı · Ece Butik <span class="etk">· dün</span></span><button class="dugme kucuk">CRM'e al</button></div>
+<div class="satir"><span>IDOS sohbet hunisi · Instagram'dan gelen kişi <span class="etk">· dün</span></span><button class="dugme kucuk">CRM'e al</button></div></div>
+<div class="kart"><h2>Bu ay <span class="ikon"><span>i</span></span></h2>
+<div class="satir"><span>Kazanılan</span><b>2 fırsat · 35.000 TL / ay</b></div>
+<div class="satir"><span>Kaybedilen</span><b>1 fırsat <span class="etk">(en sık neden: fiyat)</span></b></div>
+<div class="satir"><span>Açık fırsat</span><b>9 · 112.000 TL / ay + 120.000 TL tek seferlik</b></div></div>
+</div></div>
+<div class="not-kutu"><b>Not:</b> "Bugün" CRM'in açılış sayfası olur. Hiçbir hatırlatma müşteriye gitmez; yalnız panelde görünür. Aylık ve tek seferlik tutarlar hiçbir yerde toplanmaz.</div>
+</section>
+
+<!-- 2 PANO -->
+<section class="ekran" id="pano">
+<h1>Satış panosu</h1><p class="alt-baslik">Kartlar artık müşteri değil <b>fırsat</b>: bir müşteride birden çok satış ayrı ilerler (örnek: önce reklam yönetimi, sonra web sitesi).</p>
+<div class="arac"><input type="search" placeholder="Firma, kişi, fırsat ara" style="flex:1 1 240px"><select><option>Tüm ekip</option><option>Bana atananlar</option></select><select><option>Tüm hizmetler</option><option>Google Reklam Yönetimi</option></select><select><option>Tüm kaynaklar</option><option>Web formu</option><option>IDOS sohbet</option><option>Tavsiye</option></select><button class="dugme">Liste görünümü</button><button class="dugme ana">+ Yeni fırsat</button></div>
+<div class="ozet">
+<div class="kart"><small>Açık fırsat (aylık)</small><b>112.000 TL</b></div>
+<div class="kart"><small>Açık fırsat (tek seferlik)</small><b>120.000 TL</b></div>
+<div class="kart"><small>Gecikmiş sonraki adım</small><b style="color:var(--err)">2</b></div>
+<div class="kart"><small>Bu ay kazanma oranı</small><b>%67</b><small>2 kazanıldı / 1 kaybedildi</small></div>
+</div>
+<div class="pano">
+<div class="sutun"><h3>Yeni <small>2</small></h3>
+<div class="fk"><a>Kaya Hukuk</a><div class="etk">SEO Yönetimi · —</div><div class="adim">→ İlk arama · Cuma</div><div class="s"><span>Web formu</span><span class="av a2">AK</span></div></div>
+<div class="fk"><a>Ece Butik</a><div class="etk">E-Ticaret Website Tasarımı · —</div><div class="adim warn">⚠ Sonraki adım yok</div><div class="s"><span>Paket sihirbazı</span><span class="av a1">MK</span></div></div></div>
+<div class="sutun"><h3>Görüşülüyor <small>3</small></h3>
+<div class="fk bugun"><a>Mavi Kafe</a><div class="etk">Kurumsal Website Tasarımı · 60.000 TL tek</div><div class="adim warn">→ Toplantı · bugün 14.00</div><div class="s"><span>Tavsiye</span><span class="av a1">MK</span></div></div>
+<div class="fk"><a>Örnek Kuyumcu</a><div class="etk">Meta Reklam Yönetimi · 20.000 TL / ay</div><div class="adim warn">⚠ Sonraki adım yok · 9 gün</div><div class="s"><span>IDOS sohbet</span><span class="av a3">EY</span></div></div>
+<div class="fk gecikti"><a>Deneme Diş Kliniği</a><div class="etk">SEO Yönetimi · —</div><div class="adim err">→ E-posta · 1 gün gecikti</div><div class="s"><span>Web formu</span><span class="av a2">AK</span></div></div></div>
+<div class="sutun"><h3>Teklif gönderildi <small>2</small></h3>
+<div class="fk gecikti"><a data-e="kart" href="#">Örnek Mobilya Ltd.</a><div class="etk">Google + Meta · 40.000 TL / ay</div><div class="adim err">→ Ara · 3 gün gecikti</div><div class="s"><span>Teklif #T-0012 · 7 gün yanıtsız</span><span class="av a1">MK</span></div></div>
+<div class="fk"><a>Ankara Pilates</a><div class="etk">Sosyal Medya · 15.000 TL / ay</div><div class="adim warn">⚠ Sonraki adım yok</div><div class="s"><span>Teklif #T-0013</span><span class="av a1">MK</span></div></div></div>
+<div class="sutun"><h3>Teklif görüldü <small>1</small></h3>
+<div class="fk"><a>Örnek Otomotiv</a><div class="etk">Google Reklam · 20.000 TL / ay<br>Web Sitesi Programlama · 60.000 TL tek</div><div class="adim">→ Sözleşme imzası · Cuma</div><div class="s"><span>Tavsiye</span><span class="av a3">EY</span></div></div></div>
+<div class="sutun"><h3>Kazanıldı <small>bu ay 2</small></h3>
+<div class="fk"><a>Örnek Tekstil</a><div class="etk">Meta Reklam · 20.000 TL / ay</div><div class="s"><span>03.11.2026</span><span class="av a1">MK</span></div></div></div>
+<div class="sutun"><h3>Kaybedildi <small>bu ay 1</small></h3>
+<div class="fk"><a>Örnek Market</a><div class="etk">Google Reklam · 20.000 TL / ay</div><div class="adim"><span class="cip c-gri">Neden: fiyat</span></div><div class="s"><span>05.11.2026</span><span class="av a2">AK</span></div></div></div>
+</div>
+<div class="not-kutu"><b>Kural:</b> Kart "Kaybedildi"ye sürüklenince kayıp nedeni sorulur (fiyat · zamanlama · rakibi seçti · yanıt yok · ihtiyaç kalmadı · diğer + not). "Kazanıldı"ya sürüklenince "Müşteri 360'a geçsin mi, sözleşme başlangıç tarihi?" sorulur (2. parça). Kenarda kırmızı çizgi = sonraki adım gecikti, sarı = bugün.</div>
+</section>
+
+<!-- 3 MÜŞTERİ KARTI -->
+<section class="ekran" id="kart">
+<p class="alt-baslik" style="margin:0 0 6px"><a style="color:var(--tx2)">Müşteriler</a> › Örnek Mobilya Ltd.</p>
+<div class="kart ust-kart" style="margin-bottom:12px">
+<div style="flex:1 1 320px"><div class="ad">Örnek Mobilya Ltd.</div>
+<div class="etk" style="font-size:13px">Mobilya · Ankara · ornekmobilya.com · Kaynak: web formu · Müşteri olalı: — (henüz aday)</div>
+<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><span class="cip c-info">Aday</span><span class="cip c-tint">e-ticaret</span><span class="cip c-gri">+ etiket</span></div></div>
+<div style="display:grid;gap:4px;font-size:13px"><span>Sorumlu: <span class="av a1">MK</span> Muhittin K.</span><span>Açık fırsat: <b>40.000 TL / ay</b></span></div>
+<div style="display:flex;gap:6px;flex-wrap:wrap"><button class="dugme">+ Not</button><button class="dugme">+ Arama / toplantı kaydı</button><button class="dugme ana">Şablondan teklif oluştur</button></div>
+</div>
+<div class="sonraki" style="margin-bottom:12px"><b>Sonraki adım:</b> <span class="cip c-err">3 gün gecikti</span> Ara: teklif hakkında geri dönüş · 09.11.2026 · <span class="av a1">MK</span><span style="margin-left:auto;display:flex;gap:6px"><button class="dugme kucuk">Yapıldı</button><button class="dugme kucuk">Ertele</button><button class="dugme kucuk">Değiştir</button></span></div>
+<div class="sekme-cubuk"><span class="ak">Genel bakış</span><span>Fırsatlar (2)</span><span>Kişiler (3)</span><span>Teklifler (1)</span><span>Belgeler</span><span class="sonra">Sözleşmeler · 2. parça</span><span class="sonra">Tahsilat · 2. parça</span><span class="sonra">Görevler · 2. parça</span><span class="sonra">Destek · 2. parça</span></div>
+<div class="izgara">
+<div class="kart"><h2>Zaman çizelgesi <span style="display:flex;gap:6px"><select style="font-size:12px;padding:3px 6px"><option>Tümü</option><option>Notlar</option><option>Aramalar ve toplantılar</option><option>Teklifler</option><option>Sistem kayıtları</option></select><span class="ikon"><span>i</span></span></span></h2>
+<ul class="akis">
+<li><span class="i">📞</span><div><b>Arama</b> · Ali Yılmaz ile · 8 dk · <span class="cip c-ok">ulaşıldı</span><br>Teklifi ortağına gösterecek, hafta başı dönecek. <br><small>06.11.2026 11.20 · Muhittin K.</small></div></li>
+<li><span class="i">📄</span><div><b>Teklif gönderildi</b> · T-0012 · Google + Meta reklam yönetimi · 40.000 TL / ay<br><small>05.11.2026 16.05 · Muhittin K. · şablondan oluşturuldu</small></div></li>
+<li><span class="i">🤝</span><div><b>Toplantı</b> · tanışma (Google Meet) · Ali Yılmaz, Zeynep Demir<br>Aylık bütçe 60–80 bin TL; e-ticaret sitesinde dönüşüm izleme yok. <br><small>03.11.2026 14.00 · Muhittin K.</small></div></li>
+<li><span class="i">↔</span><div><b>Aşama değişti</b> · Yeni → Görüşülüyor<br><small>02.11.2026 · Muhittin K.</small></div></li>
+<li><span class="i">✉</span><div><b>Talep geldi</b> · web formu · "Reklamlarımızı yönetecek ajans arıyoruz"<br><small>01.11.2026 21.40 · sistem</small></div></li>
+</ul>
+<div class="etk" style="margin-top:8px">E-posta ve WhatsApp yazışmaları şimdilik elle "not" olarak girilir; panel hiçbir mesaj göndermez.</div>
+</div>
+<div style="display:grid;gap:12px;align-content:start">
+<div class="kart"><h2>Fırsatlar <span class="ikon"><span>i</span><span>⋮</span></span></h2>
+<div class="satir"><div><b>Google + Meta reklam yönetimi</b><br><span class="etk">Teklif gönderildi · 40.000 TL / ay · tahmini kapanış 20.11.2026</span></div><span class="av a1">MK</span></div>
+<div class="satir"><div><b>E-Ticaret Website Tasarımı</b><br><span class="etk">Yeni · — · "sonra konuşalım" dedi</span></div><span class="av a1">MK</span></div>
+<button class="dugme kucuk" style="margin-top:8px">+ Fırsat ekle</button></div>
+<div class="kart"><h2>Kişiler <span class="ikon"><span>i</span><span>⋮</span></span></h2>
+<div class="satir"><div><b>Ali Yılmaz</b> <span class="cip c-tint">Karar verici</span><br><span class="etk">Genel müdür · 0555 000 00 00 · ali@ornek.com</span></div></div>
+<div class="satir"><div><b>Zeynep Demir</b> <span class="cip c-gri">Pazarlama</span><br><span class="etk">zeynep@ornek.com</span></div></div>
+<div class="satir"><div><b>Muhasebe</b> <span class="cip c-gri">Fatura</span><br><span class="etk">muhasebe@ornek.com</span></div></div>
+<button class="dugme kucuk" style="margin-top:8px">+ Kişi ekle</button></div>
+<div class="kart"><h2>IDOS · reklam performansı <span class="ikon"><span>i</span></span></h2>
+<p class="etk" style="margin:0">Bu firma IDOS'ta henüz müşteri değil. Kazanılınca ve reklam hesabı bağlanınca burada son 30 gün harcama, sonuç türleri (ayrı ayrı) ve veri tazeliği salt okunur görünür.</p></div>
+</div></div>
+<div class="not-kutu"><b>Kart başlığı:</b> sorumlu, etiketler ve sonraki adım her sekmede üstte sabit. Soluk sekmeler 2. parçada (Müşteri 360) dolacak; 1. parçada görünmezler, burada yalnız yerlerini göstermek için soluk.</div>
+</section>
+
+</main></div>
+<script>
+const ac=(e)=>{document.querySelectorAll('.ekran').forEach(s=>s.classList.toggle('ak',s.id===e));document.querySelectorAll('.sekmeler button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.e===e));document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('aktif',a.dataset.e===e));scrollTo(0,0)};
+document.addEventListener('click',(ev)=>{const g=ev.target.closest('[data-g]');if(g){document.body.classList.toggle('ferah',g.dataset.g==='ferah');document.querySelectorAll('[data-g]').forEach(b=>b.setAttribute('aria-pressed',b===g));return}const t=ev.target.closest('[data-e]');if(t){ev.preventDefault();ac(t.dataset.e)}});
+</script>
+</body></html>
