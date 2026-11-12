@@ -7,6 +7,7 @@
 import { json, hata, simdi, kimlik, kirp, islemYaz, GUVENLIK_BASLIKLARI } from './ortak.js';
 import { pdfImzasi, EN_BUYUK } from './teklif-dosya.js';
 import { SABLON_TUR, sablonTohumla } from './belge-sablon.js';
+import { vknDenetle } from '../src/scripts/yonetim/sablon-tanim.js';
 
 export const BELGE_ONEK = 'belge-dosyalari/';
 export const BELGE_NO_ONEK = { sozlesme: 'SZL', erisim: 'ERT', odeme_hatirlatma: 'OHT', teslim: 'TTN', fiyat_guncelleme: 'FGB' };
@@ -64,24 +65,34 @@ export async function belgeDosyasiYukle(istek, env, kim) {
   if (!ad) return hata('Belge adı gerekli', 422);
   const tarih = kirp(f.get('tarih'), 10);
   if (!gecerliTarih(tarih)) return hata('Belge tarihi geçersiz', 422);
-  const belgeNo = kirp(f.get('belge_no'), 40);
+  let belgeNo = kirp(f.get('belge_no'), 40);
   if (belgeNo && !/^[\p{L}\p{N} ._/-]{1,40}$/u.test(belgeNo)) return hata('Belge numarası geçersiz', 422);
+  // Veri asgarisi: müşteri vergi numarası yalnız şirket VKN'si (10 hane); TCKN (11 hane) reddedilir. Değer saklanmaz.
+  const vknHata = vknDenetle(kirp(f.get('firma_vkn'), 40));
+  if (vknHata) return hata(vknHata, 422);
 
   const bayt = new Uint8Array(await dosya.arrayBuffer());
   if (!pdfImzasi(bayt)) return hata('Dosya PDF değil', 415);
   const id = kimlik(), z = simdi(), anahtar = belgeAnahtari(mus.id, id), dosyaAdi = dosyaAdiTemiz(dosya.name);
   await env.YEDEK.put(anahtar, bayt, { httpMetadata: { contentType: 'application/pdf' }, customMetadata: { musteri_id: mus.id, sablon: sab.id, yukleyen: String(kim.eposta).slice(0, 120) } });
-  try {
-    await db.batch([
+  const ekle = () => db.batch([
       db.prepare('INSERT INTO belge_dosyalari (id, musteri_id, sablon_id, sablon_surum, ad, belge_no, tarih, dosya_anahtari, dosya_adi, boyut, taslak, olusturan, olusturma) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         .bind(id, mus.id, sab.id, surum, ad, belgeNo || null, tarih, anahtar, dosyaAdi, bayt.byteLength, sab.durum === 'taslak' ? 1 : 0, kim.eposta, z),
       db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)')
         .bind(kimlik(), mus.id, z, 'sistem', `Belge oluşturuldu: ${SABLON_TUR[sab.id] || sab.ad}`, `${ad}${belgeNo ? ' · ' + belgeNo : ''}${sab.durum === 'taslak' ? ' · TASLAK' : ''} · panel göndermedi`, kim.eposta),
       db.prepare('UPDATE musteriler SET guncelleme = ? WHERE id = ?').bind(z, mus.id)
     ]);
+  try {
+    try { await ekle(); }
+    catch (e) {
+      // Aynı numara bu arada kullanıldıysa (eşzamanlı kayıt) bir kez sıradaki numarayla denenir.
+      if (!belgeNo || !/UNIQUE/i.test(String(e && e.message))) throw e;
+      belgeNo = await siradakiNo(db, sab.id, tarih);
+      await ekle();
+    }
   } catch (e) { await env.YEDEK.delete(anahtar); throw e; }
   await islemYaz(db, kim.eposta, 'belge_sablondan', id, `${sab.ad} · ${ad} · ${Math.round(bayt.byteLength / 1024)} KB`);
-  return json({ ok: true, id });
+  return json({ ok: true, id, belge_no: belgeNo || null });
 }
 
 export async function yonetimBelgeDosyaApi(db, env, yontem, yol, govde, kim) {

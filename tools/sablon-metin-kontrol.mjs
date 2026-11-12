@@ -111,6 +111,20 @@ export async function calistir({ k, istek, post, jsn, db, r2, env, B, worker, pd
   k('ödeme: toplam "42.000,50 TL", gecikme 35 gün, tarih 08.10.2026', od.toplam_borc === '42.000,50 TL' && od.gecikme_gun === '35' && od.faturalar[0][2] === '08.10.2026' && od.tarih === '12.11.2026');
   k('fiyat değişimi: %15 artış, değişmedi', fiyatDegisim(2000000, 2300000) === '%15 artış' && fiyatDegisim(100, 100) === 'Değişmedi');
   k('fiyat güncelleme: 30 günden kısa bildirimde uyarı', !!TANIMLAR.fiyat_guncelleme.uyari({}, { yururluk_tarihi: '2026-11-20' }, { tarih: bugun }) && !TANIMLAR.fiyat_guncelleme.uyari({}, { yururluk_tarihi: '2027-01-01' }, { tarih: bugun }));
+  // --- Veri asgarisi: müşteri VKN'si yalnız şirket (10 hane); TCKN (11 hane) girilemez ---
+  const { vknDenetle } = await import('../src/scripts/yonetim/sablon-tanim.js');
+  const vb = { tarih: bugun, musteri, ajans };
+  const vkn = (x) => degerleriHazirla('sozlesme', { firma_vkn: x }, vb).firma_vkn;
+  k('VKN: 10 hane kabul', vknDenetle('1234567890') === '' && vkn('1234567890') === '1234567890');
+  k('VKN: 11 hane (TCKN) açık mesajla reddedilir ve belgeye girmez', /TCKN girilemez/.test(vknDenetle('12345678901')) && vkn('12345678901') === '');
+  k('VKN: harf reddedilir', !!vknDenetle('12345abcde') && vkn('12345abcde') === '');
+  k('VKN: boş bırakılabilir, belgede "—"', vknDenetle('') === '' && metinAyristir('VKN {firma_vkn}', degerleriHazirla('sozlesme', { firma_vkn: '' }, vb))[0].parcalar[0].metin === 'VKN —');
+  k('sözleşme metninde serbest vergi alanı yok, VKN ayrı alan', !SABLON_ICERIK.sozlesme.sayfalar.some((x) => /\{firma_vergi\}/.test(x.metin || '')) && TANIMLAR.sozlesme.alanlar.find((a) => a.k === 'firma_vkn').tur === 'vkn');
+  // --- IBAN boşsa ödeme hatırlatma hesap cümlesi ---
+  const ibansiz = (ton) => metinPlani(SABLON_ICERIK.odeme_hatirlatma.sayfalar, degerleriHazirla('odeme_hatirlatma', { ton }, { tarih: bugun, musteri, ajans }), olc).flatMap((p) => yazilar(p.ops)).join(' ');
+  k('IBAN boşsa "Hesap bilgilerimiz faturada yer almaktadır." (iki tonda), "IBAN: —" yok', [ibansiz('1'), ibansiz('2')].every((x) => x.includes('Hesap bilgilerimiz faturada yer almaktadır.') && !/IBAN/.test(x) && !/— numaralı/.test(x)));
+  const ibanli = metinPlani(SABLON_ICERIK.odeme_hatirlatma.sayfalar, degerleriHazirla('odeme_hatirlatma', { ton: '1' }, { tarih: bugun, musteri, ajans: { ...ajans, ajans_iban: 'TR00 0000' } }), olc).flatMap((p) => yazilar(p.ops)).join(' ');
+  k('IBAN doluysa yazılır', ibanli.includes('TR00 0000') && !ibanli.includes('faturada yer almaktadır'));
   k('ajans bilgisi boşsa belge "—" basar', metinAyristir('MCC: {ajans_mcc_id}', ajans)[0].parcalar[0].metin === 'MCC: —');
 
   // --- Sunucu: sürüm denetimi ---
@@ -174,6 +188,15 @@ export async function calistir({ k, istek, post, jsn, db, r2, env, B, worker, pd
   k('belge açılır: application/pdf, nosniff, no-store', ac.status === 200 && ac.headers.get('content-type') === 'application/pdf' && ac.headers.get('x-content-type-options') === 'nosniff' && /no-store/.test(ac.headers.get('cache-control')));
   const xr = Number(/startxref\n(\d+)/.exec(acM)[1]);
   k('kaydedilen PDF yapısı geçerli (%PDF, xref, %%EOF)', acM.startsWith('%PDF-1.4') && acM.slice(xr, xr + 4) === 'xref' && acM.trimEnd().endsWith('%%EOF') && acB.byteLength === pdf.byteLength);
+  // Sunucu: VKN alanı (yalnız doğrulama için gelir, saklanmaz) 11 hane ya da harf → 422; 10 hane ve boş kabul
+  k('sunucu: TCKN (11 hane) VKN olarak gelirse 422 ve açık mesaj', await (async () => { const x = await jsn(await bYukle(bf({ sablon_id: 'sozlesme', belge_no: '', firma_vkn: '12345678901' }))); return x.d === 422 && /TCKN girilemez/.test(x.hata); })());
+  k('sunucu: harfli VKN 422, 10 hane ve boş kabul', (await bYukle(bf({ sablon_id: 'sozlesme', belge_no: '', firma_vkn: 'abc' }))).status === 422
+    && (await bYukle(bf({ sablon_id: 'sozlesme', belge_no: '', firma_vkn: '1234567890' }))).status === 200 && (await bYukle(bf({ sablon_id: 'sozlesme', belge_no: '', firma_vkn: '' }))).status === 200);
+  // Belge numarası tekil: aynı numarayla aynı anda iki kayıt farklı numara alır
+  const [c1, c2] = await Promise.all([bYukle(bf({ belge_no: 'ERT-2026-050' })).then(jsn), bYukle(bf({ belge_no: 'ERT-2026-050' })).then(jsn)]);
+  const nolar = db.ham.prepare('SELECT belge_no FROM belge_dosyalari WHERE id IN (?, ?)').all(c1.id || '', c2.id || '').map((x) => x.belge_no);
+  k('aynı anda iki kayıt: ikisi de kaydedilir, numaralar farklı', c1.ok && c2.ok && nolar.length === 2 && nolar[0] !== nolar[1] && [c1.belge_no, c2.belge_no].includes('ERT-2026-050'));
+  k('belge no tekil dizini var', db.ham.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type = 'index' AND name = 'belge_dosya_no' AND sql LIKE '%UNIQUE%'").get().n === 1);
   k('PDF olmayan dosya 415', (await bYukle(bf({}, new TextEncoder().encode('<html><script>alert(1)</script>')))).status === 415);
   k('önerilen şablon 409, teklif şablonu 422, olmayan sürüm 422', (await bYukle(bf({ sablon_id: 'brief' }))).status === 409 && (await bYukle(bf({ sablon_id: 'teklif' }))).status === 422 && (await bYukle(bf({ sablon_surum: '99' }))).status === 422);
   k('olmayan müşteri 404, geçersiz tarih ve belge no 422', (await bYukle(bf({ musteri_id: 'yok' }))).status === 404 && (await bYukle(bf({ tarih: '2026-13-40' }))).status === 422 && (await bYukle(bf({ belge_no: '<b>x</b>' }))).status === 422);
@@ -186,6 +209,6 @@ export async function calistir({ k, istek, post, jsn, db, r2, env, B, worker, pd
     && (await istek('belge-sablonlari/sozlesme/surum', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ sayfalar: v }) })).status === 403);
   k('başka kaynaktan belge yükleme 403', (await bYukle(bf(), { origin: 'https://kotu.example' })).status === 403);
   k('R2 yokken belge yükleme 409', (await bYukle(bf(), { env: { DB: db, YEREL_GIRIS: 'evet' } })).status === 409);
-  k('reddedilen yüklemeler depoya yazılmadı', [...r2.m.keys()].filter((a) => a.startsWith('belge-dosyalari/')).length === 2);
+  k('reddedilen yüklemeler depoya yazılmadı', [...r2.m.keys()].filter((a) => a.startsWith('belge-dosyalari/')).length === 6);
   void worker;
 }

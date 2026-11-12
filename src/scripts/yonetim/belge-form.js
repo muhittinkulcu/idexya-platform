@@ -2,7 +2,7 @@
 // girdi kullanılır (tarih seçici, TL alanı, açılır liste, işaret kutusu, küçük tablo). Metinler textContent ile yazılır.
 import { el } from './ortak.js';
 import { kurusOku } from './sablon-hesap.js';
-import { TANIMLAR, MUSTERI_ALANLARI, degerleriHazirla, varsayilan } from './sablon-tanim.js';
+import { TANIMLAR, MUSTERI_ALANLARI, degerleriHazirla, varsayilan, vknDenetle } from './sablon-tanim.js';
 import { sayfaKosulu, degiskenleriBul, SINIR } from './sablon-metin.js';
 
 const GIRDI = 'min-height: 38px; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; box-sizing: border-box; width: 100%';
@@ -34,6 +34,8 @@ export function belgeFormu(kutu, { tur, sayfalar, b, katalog = [], degisti = () 
         oninput: (o) => { o.target.setAttribute('aria-invalid', String(Number.isNaN(kurusOku(o.target.value)))); yaz(o.target.value); } });
       return g;
     }
+    if (a.tur === 'vkn') return el('input', { ...ortak, type: 'text', inputmode: 'numeric', maxlength: 11, pattern: '[0-9]{10}', autocomplete: 'off', placeholder: '10 hane', value: deger || '', 'aria-invalid': String(!!vknDenetle(deger)),
+      oninput: (o) => { o.target.setAttribute('aria-invalid', String(!!vknDenetle(o.target.value))); o.target.title = vknDenetle(o.target.value); yaz(o.target.value); } });
     if (a.tur === 'secim') return el('select', { ...ortak, onchange: (o) => yaz(o.target.value) }, ...a.secenekler.map((s) => el('option', { value: s.v, selected: s.v === deger }, s.ad)));
     if (a.tur === 'katalog') return el('input', { ...ortak, list: 'belge-katalog', maxlength: 200, value: deger || '', placeholder: 'Katalogdan seçin', oninput: (o) => yaz(o.target.value) });
     if (a.tur === 'uzun') return el('textarea', { ...ortak, rows: 3, maxlength: SINIR.uzun, style: GIRDI + '; resize: vertical', oninput: (o) => yaz(o.target.value) }, deger || '');
@@ -102,6 +104,7 @@ export function belgeFormu(kutu, { tur, sayfalar, b, katalog = [], degisti = () 
       const l = [];
       for (const a of t.alanlar) {
         if (a.tur === 'tutar' && Number.isNaN(kurusOku(ham[a.k]))) l.push(a.ad);
+        if (a.tur === 'vkn' && gorunur(a, degerler()) && vknDenetle(ham[a.k])) l.push(vknDenetle(ham[a.k]));
         if (a.tur === 'satirlar') for (const s of a.sutunlar) if (s.tur === 'tutar' && ham[a.k].some((r) => Number.isNaN(kurusOku(r[s.k])))) l.push(`${a.ad}: ${s.ad}`);
       }
       return l;

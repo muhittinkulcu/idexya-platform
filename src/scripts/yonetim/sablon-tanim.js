@@ -43,6 +43,15 @@ export function tutarYaziyla(kurus) {
   return `${sayiYaziyla(tl)} Türk lirası${kr ? ' ' + sayiYaziyla(kr) + ' kuruş' : ''}`;
 }
 
+// Veri asgarisi: müşterinin vergi numarası yalnız şirket VKN'si (10 hane). Şahıs VKN'si TCKN ile aynıdır (11 hane) ve
+// IDOS/panel kuralı gereği belgeye ve depoya girmez. Boş bırakılabilir (belgede "—"). Hata metni döner; geçerliyse ''.
+export function vknDenetle(v) {
+  const s = String(v ?? '').trim();
+  if (!s) return '';
+  if (/^\d{11}$/.test(s)) return 'TCKN girilemez; yalnız şirket vergi numarası (10 hane)';
+  return /^\d{10}$/.test(s) ? '' : 'Vergi numarası yalnız 10 hane rakam olmalı (şirket VKN’si)';
+}
+
 // --- Tarih yardımcıları ('YYYY-AA-GG') ---
 export const gunEkle = (g, n) => { const d = new Date(g + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 export const gunFarki = (a, b) => (/^\d{4}-\d{2}-\d{2}$/.test(a) && /^\d{4}-\d{2}-\d{2}$/.test(b) ? Math.round((Date.parse(b) - Date.parse(a)) / 86400000) : null);
@@ -159,7 +168,8 @@ export const TANIMLAR = {
     alanlar: [
       { k: 'ekler', ad: 'Sözleşmeye eklenecekler', tur: 'coklu', vars: ['ek_1a', 'ek_2'], secenekler: [{ v: 'ek_1a', ad: 'Ek-1A Aylık hizmet' }, { v: 'ek_1b', ad: 'Ek-1B Web projesi' }, { v: 'ek_2', ad: 'Ek-2 KVKK veri işleme' }] },
       { k: 'firma_adres', ad: 'Müşteri adresi', tur: 'metin' },
-      { k: 'firma_vergi', ad: 'Müşteri vergi dairesi ve VKN (yalnız şirket; şahıs VKN’si ya da TCKN yazmayın)', tur: 'metin' },
+      { k: 'firma_vergi_dairesi', ad: 'Müşteri vergi dairesi', tur: 'metin' },
+      { k: 'firma_vkn', ad: 'Müşteri vergi numarası (yalnız şirket, 10 hane; TCKN girilemez)', tur: 'vkn' },
       { k: 'yetkili_unvan', ad: 'Müşteri yetkilisinin unvanı', tur: 'secim', vars: 'Genel Müdür', secenekler: secenek('Genel Müdür', 'Şirket Ortağı', 'Pazarlama Müdürü', 'Yönetim Kurulu Üyesi', 'Kurucu') },
       { k: 'musteri_tacir', ad: 'Müşteri tacir mi? (şirket ise evet)', tur: 'secim', secenekler: EVET_HAYIR },
       { k: 'baslangic', ad: 'Yürürlük ve başlangıç tarihi', tur: 'tarih', vars: (b) => ayBasi(b.tarih) },
@@ -239,6 +249,7 @@ export function degerleriHazirla(tur, ham, b) {
   for (const a of t.alanlar) {
     const v = ham[a.k];
     if (a.tur === 'tarih') d[a.k] = v ? tarihKisa(v) : '';
+    else if (a.tur === 'vkn') d[a.k] = vknDenetle(v) ? '' : String(v ?? '').trim();
     else if (a.tur === 'tutar') d[a.k] = tutarYaz(v);
     else if (a.tur === 'coklu') {
       const l = Array.isArray(v) ? v : [];

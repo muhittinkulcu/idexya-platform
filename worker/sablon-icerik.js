@@ -87,8 +87,9 @@ Sayın {yetkili},
 
 Aşağıdaki faturanın vadesi geçmiş görünüyor. Yoğunluk içinde gözden kaçmış olabileceğini düşünerek hatırlatmak istedik.
 ${FATURA_TABLO}
-Ödemeyi aşağıdaki hesaba, açıklamaya fatura numarasını yazarak yapabilirsiniz:
-**{ajans_unvan}** · IBAN: **{ajans_iban}**
+?{ajans_iban!=} Ödemeyi aşağıdaki hesaba, açıklamaya fatura numarasını yazarak yapabilirsiniz:
+?{ajans_iban!=} **{ajans_unvan}** · IBAN: **{ajans_iban}**
+?{ajans_iban=} Ödemeyi açıklamaya fatura numarasını yazarak yapabilirsiniz. Hesap bilgilerimiz faturada yer almaktadır.
 
 Ödemeyi son günlerde yaptıysanız bu yazıyı dikkate almayınız; dekontu bizimle paylaşırsanız kayıtlarımızı güncelleriz. Faturayla ilgili bir sorunuz ya da farklı bir ödeme planı ihtiyacınız varsa {ajans_eposta} ya da {ajans_telefon} üzerinden bize ulaşabilirsiniz.
 
@@ -107,7 +108,8 @@ Sayın {yetkili},
 
 {onceki_hatirlatma_tarihi} tarihli hatırlatmamıza rağmen aşağıdaki faturaların ödemesi henüz yapılmamıştır. En eski fatura {gecikme_gun} gündür gecikmededir.
 ${FATURA_TABLO}
-Toplam **{toplam_borc}** tutarın en geç **{son_odeme_tarihi}** tarihine kadar {ajans_unvan} adına kayıtlı **{ajans_iban}** numaralı hesabımıza ödenmesini rica ederiz.
+?{ajans_iban!=} Toplam **{toplam_borc}** tutarın en geç **{son_odeme_tarihi}** tarihine kadar {ajans_unvan} adına kayıtlı **{ajans_iban}** numaralı hesabımıza ödenmesini rica ederiz.
+?{ajans_iban=} Toplam **{toplam_borc}** tutarın en geç **{son_odeme_tarihi}** tarihine kadar ödenmesini rica ederiz. Hesap bilgilerimiz faturada yer almaktadır.
 
 Bu tarihe kadar ödeme yapılmazsa:
 - {faiz_dayanagi} uyarınca vade tarihinden itibaren {faiz_orani} oranında temerrüt faizi işletilecek ve {asgari_giderim} tutarındaki asgari giderim (tahsil masrafı) talep edilecektir;
@@ -243,7 +245,7 @@ Sözleşme no: {belge_no} · Tarih: {tarih}
 
 ## Madde 1 – Taraflar
 1.1. {ajans_unvan}, {ajans_adres}, {ajans_vergi}, MERSİS {ajans_mersis} (bundan sonra "Ajans").
-1.2. {firma}, {firma_adres}, {firma_vergi} (bundan sonra "Müşteri").
+1.2. {firma}, {firma_adres}, {firma_vergi_dairesi} V.D. {firma_vkn} (bundan sonra "Müşteri").
 ?{musteri_tacir=evet} 1.3. Taraflar bu sözleşmede birlikte "Taraflar" olarak anılır. Taraflar ticari işletmeleriyle ilgili olarak hareket ettiklerini beyan eder.
 ?{musteri_tacir=hayir} 1.3. Taraflar bu sözleşmede birlikte "Taraflar" olarak anılır.
 

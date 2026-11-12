@@ -578,7 +578,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (!bForm.belge_ad.value.trim()) { bYaz('Belge adı gerekli.', true); bForm.belge_ad.focus(); return null; }
     if (!bForm.belge_tarih.value) { bYaz('Belge tarihi gerekli.', true); bForm.belge_tarih.focus(); return null; }
     const h = bForm2.hatalar();
-    if (h.length) { bYaz('Geçersiz tutar: ' + h.join(', ') + ' (ör. 18.000 ya da 18.000,50).', true); return null; }
+    if (h.length) { bYaz('Düzeltin: ' + h.join(' · '), true); return null; }
     bForm2.yenile({ tarih: bForm.belge_tarih.value, belgeNo: bForm.belge_no.value.trim() });
     return { m, veri: { firma: bForm2.ham.firma || firmaAdi(m), tarih: bForm.belge_tarih.value, degerler: bForm2.degerler(), taslak: bSablon.sablon.durum === 'taslak', belgeNo: bForm.belge_no.value.trim(), altSatir: altSatir(ajansAyar || {}) } };
   }
@@ -626,12 +626,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
       const ad = dosyaAdi(d.veri.firma, d.veri.tarih, sade(bSablon.sablon.ad).slice(0, 40));
       const fd = new FormData();
       fd.append('dosya', new File([pdf], ad, { type: 'application/pdf' }));
-      for (const [k, v] of Object.entries({ musteri_id: d.m.id, sablon_id: bSablon.id, sablon_surum: String(aktifSurum.surum), ad: bForm.belge_ad.value.trim(), belge_no: bForm.belge_no.value.trim(), tarih: d.veri.tarih })) fd.append(k, v);
+      for (const [k, v] of Object.entries({ musteri_id: d.m.id, sablon_id: bSablon.id, sablon_surum: String(aktifSurum.surum), ad: bForm.belge_ad.value.trim(), belge_no: bForm.belge_no.value.trim(), tarih: d.veri.tarih, firma_vkn: String(bForm2.ham.firma_vkn ?? '').trim() })) fd.append(k, v);
       const r = await fetch('/api/yonetim/belge-dosyalari', { method: 'POST', credentials: 'same-origin', body: fd });
       const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
       if (!r.ok || !s.ok) throw new Error(s.hata || `Kaydedilemedi (${r.status})`);
       bYaz('');
       bForm.belge_no.dataset.oto = '1'; bForm.belge_no.value = '';
+      if (s.belge_no && s.belge_no !== d.veri.belgeNo) bYaz(`Belge no ${d.veri.belgeNo} bu arada kullanıldığı için kayıt ${s.belge_no} numarasıyla yapıldı (PDF’te ${d.veri.belgeNo} yazar).`);
       const kutu = $('[data-sonuc]');
       kutu.replaceChildren(el('span', { style: 'font-weight: 500' }, 'PDF oluşturuldu ve müşteri kartının Belgeler bölümüne kaydedildi. '), `${bSablon.sablon.ad}${d.veri.taslak ? ' (TASLAK damgalı)' : ''} · ${sayfaSayisi} sayfa · ${Math.round(pdf.byteLength / 1024)} KB. Panel bu belgeyi müşteriye göndermez. `,
         el('a', { href: '/customer?id=' + encodeURIComponent(d.m.id) + '#belgeler' }, 'Müşteri kartını aç'), ' · ',

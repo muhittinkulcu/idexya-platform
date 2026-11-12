@@ -226,6 +226,8 @@ export const EK_SUTUNLAR = [
   ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL']
 ];
 export const EK_DIZINLER = [
+  // Şablondan üretilen belgenin numarası tekil (boş numara serbest). Tablo yeni olduğundan mevcut veriyle çakışmaz.
+  `CREATE UNIQUE INDEX IF NOT EXISTS belge_dosya_no ON belge_dosyalari (belge_no)`,
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,
   `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`
 ];
