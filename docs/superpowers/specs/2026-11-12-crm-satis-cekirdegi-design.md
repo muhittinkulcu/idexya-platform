@@ -164,3 +164,13 @@ Her PR Muhittin'in "birleştir" onayıyla; canlıya çıkıştan sonra Cloudflar
 
 - Ekip üyelerinin panel girişi: e-postaları `YONETICILER` ve Cloudflare Access listesine Muhittin ekler (kimlik ayarı).
 - İsteğe bağlı: ekip görünen adları (ör. "Ayşe K.").
+
+## 11. 2. parça için alınmış kararlar (ileride kendi belgesine taşınır)
+
+- **KDV görünümü (Muhittin, 12.11.2026):** Tutarlar KDV hariç ya da dahil gösterilebilir; kullanıcı seçer, **varsayılan
+  KDV hariç**. Seçim kişi bazında saklanır ve her tutarın yanında "KDV hariç" / "KDV dahil" yazar. Bunun için finans
+  kayıtlarında net tutar, KDV oranı ve KDV tutarı ayrı saklanır; görünüm hesapla değişir, veri değişmez. BizimHesap'tan
+  gelen KDV dahil tutarlar içe aktarmada nete ayrıştırılır (oran yoksa satır "KDV oranı bilinmiyor" işaretiyle gelir,
+  tutar uydurulmaz). 1. parçadaki fırsat ve hizmet kataloğu tutarları zaten KDV hariçtir.
+- Çizim: `scratchpad/crm-cizim/parca2.html` (Finans, Sözleşmeler, Genel bakış, Tahsilatlar, İçe aktar). Fatura ve
+  tahsilatın aslı BizimHesap'ta; panel yalnız takip eder, hiçbir şey göndermez.
