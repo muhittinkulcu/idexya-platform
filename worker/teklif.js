@@ -10,6 +10,10 @@ const EN_FAZLA_KALEM = 50;
 const BIRIM_SINIR = 10000000; // TL, tek kalemin birim fiyatı
 const ADET_SINIR = 10000;
 const TOPLAM_SINIR_KURUS = 100000000000; // 1 milyar TL (kuruş taşmasını önler)
+// Kalemin katalog bağı (12 Kas 2026): hizmet_id hizmet kataloğundaki kimlik (katalog dışı kalemde null), tur ödeme biçimi.
+// Yalnız bu iki alan eklenir (beyaz liste); katalogda varlığı aranmaz, çünkü hizmet sonradan pasife alınabilir ya da adı değişebilir.
+const KALEM_TUR = ['aylik', 'tek_seferlik'];
+const HIZMET_ID = /^[\w-]{1,64}$/;
 
 const SUTUNLAR = 't.id, t.no, t.musteri_id, t.baslik, t.kdv_orani, t.indirim, t.para, t.gecerlilik, t.durum, t.ara_toplam, t.kdv, t.toplam, t.olusturma, t.guncelleme, t.gonderim_zamani, t.karar_zamani, t.olusturan';
 const tl = (kurus) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(kurus / 100) + ' TL';
@@ -39,6 +43,10 @@ function dogrula(g) {
     const k = g.kalemler[i] || {}, sira = i + 1;
     const ad = kirp(k.ad, 200), aciklama = kirp(k.aciklama, 1000);
     if (!ad) return { hata: `${sira}. kalemin adı gerekli` };
+    const hizmetId = k.hizmet_id === undefined || k.hizmet_id === null || k.hizmet_id === '' ? null : k.hizmet_id;
+    if (hizmetId !== null && (typeof hizmetId !== 'string' || !HIZMET_ID.test(hizmetId))) return { hata: `${sira}. kalemin hizmet kimliği geçersiz` };
+    const tur = k.tur === undefined || k.tur === null || k.tur === '' ? null : k.tur;
+    if (tur !== null && !KALEM_TUR.includes(tur)) return { hata: `${sira}. kalemin türü “Aylık” ya da “Tek seferlik” olmalı` };
     const adet = sayi(k.adet), birim = sayi(k.birim_fiyat);
     if (!Number.isFinite(adet) || adet <= 0 || adet > ADET_SINIR) return { hata: `${sira}. kalemin adedi 0'dan büyük ve en fazla ${ADET_SINIR} olmalı` };
     if (!Number.isFinite(birim) || birim < 0 || birim > BIRIM_SINIR) return { hata: `${sira}. kalemin birim fiyatı 0 ile ${new Intl.NumberFormat('tr-TR').format(BIRIM_SINIR)} TL arasında olmalı` };
@@ -46,7 +54,7 @@ function dogrula(g) {
     if (adetYuz <= 0) return { hata: `${sira}. kalemin adedi en az 0,01 olmalı` };
     const tutarKurus = Math.round((adetYuz * birimKurus) / 100);
     araKurus += tutarKurus;
-    kalemler.push({ ad, aciklama, adet: adetYuz / 100, birim_fiyat: birimKurus / 100, tutar: tutarKurus / 100 });
+    kalemler.push({ ad, aciklama, adet: adetYuz / 100, birim_fiyat: birimKurus / 100, tutar: tutarKurus / 100, hizmet_id: hizmetId, tur });
   }
   if (araKurus > TOPLAM_SINIR_KURUS) return { hata: 'Teklif toplamı çok büyük' };
   const oran = g.kdv_orani === undefined || g.kdv_orani === '' || g.kdv_orani === null ? 20 : sayi(g.kdv_orani);
