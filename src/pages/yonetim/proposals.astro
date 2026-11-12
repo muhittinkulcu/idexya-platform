@@ -19,10 +19,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <label class="alan" style="grid-column: span 2">Teklif başlığı<input name="baslik" maxlength="160" required placeholder="Ör. Kurumsal web sitesi ve SEO paketi"></label>
 <label class="alan">Geçerlilik tarihi<input name="gecerlilik" type="date"></label>
 <label class="alan">KDV oranı<select name="kdv_orani"><option value="20">%20</option><option value="10">%10</option><option value="1">%1</option><option value="0">%0 (KDV yok)</option></select></label>
-<label class="alan">İndirim (TL)<input name="indirim" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"></label>
+<label class="alan">İndirim (TL)<input name="indirim" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0" aria-describedby="indirim-not"><small id="indirim-not" data-indirim-not hidden style="font-weight: 400; color: var(--tx2)">Aylık ve tek seferlik kalemler birlikteyken indirim uygulanmaz; indirimi kalem fiyatına yansıtın.</small></label>
 </div>
 <div style="display: flex; flex-direction: column; gap: 10px">
 <h3 style="margin: 0; font-size: 15px; color: var(--head)">Kalemler</h3>
+<div data-katalog-uyari hidden class="uyari bilgi" role="status"></div>
 <ol data-kalemler style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px"></ol>
 <button type="button" class="dugme" data-kalem-ekle style="align-self: flex-start">+ Kalem ekle</button>
 </div>
@@ -43,6 +44,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
 <script>
   import { api, el, tarih, genelHata, prm, adresMetni } from '../../scripts/yonetim/ortak.js';
+  import { hizmetSecici, katalogHazirla, kalemSecimi, secimUygula, TUR_ADI } from '../../scripts/yonetim/hizmet-secici.js';
+  import { teklifHesapla, teklifBloklari, toplamSatirlari } from '../../scripts/yonetim/teklif-toplam.js';
   const $ = (s) => document.querySelector(s);
   const liste = $('[data-liste]'), sekmeKutu = $('[data-sekmeler]'), detay = $('[data-detay]'), form = $('[data-duzenleyici]');
   const kalemKutu = $('[data-kalemler]'), toplamKutu = $('[data-toplamlar]'), duzDurum = $('[data-duz-durum]');
@@ -64,6 +67,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   let sekme = SEKMELER.some((s) => s[0] === prm('sekme')) ? prm('sekme') : 'taslak';
   let tum = [], dosyalar = [], musteriler = null, seciliId = prm('id') || '', duzenlenen = null;
+  // Hizmet kataloğu (yalnız etkinler, sıraya göre). Yüklenemezse kalemler "Katalog dışı kalem" ile yazılır; form çalışır.
+  let katalog = null, katalogUyari = '';
 
   function adresYaz() {
     history.replaceState(null, '', location.pathname + adresMetni({ sekme, id: seciliId }));
@@ -98,7 +103,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('td', { style: hucre }, el('span', { class: 'cip', style: 'border: 1px solid rgb(var(--line)); color: var(--tx2)' }, 'Panel')),
         el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.baslik),
-        el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, tutar(t.toplam), el('br'), el('small', { style: 'color: var(--tx2)' }, 'KDV dâhil')),
+        el('td', { style: hucre + '; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' }, ...teklifBloklari(t).flatMap((b, i, l) => [i ? el('br') : '', tutar(b.toplam) + (b.tur === 'aylik' ? ' / ay' : ''), l.length > 1 ? el('small', { style: 'color: var(--tx2)' }, b.tur === 'aylik' ? ' aylık' : ' tek seferlik') : '']), el('br'), el('small', { style: 'color: var(--tx2)' }, 'KDV dâhil')),
         el('td', { style: hucre }, el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
         el('td', { style: hucre + '; color: var(--tx2); white-space: nowrap' }, tarih(t.karar_zamani || t.gonderim_zamani || t.olusturma, false)))))));
   }
@@ -141,6 +146,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('span', { class: 'cip ' + (odendi ? 'kazanildi' : 'teklif'), style: 'margin-right: 6px' }, odendi ? 'Tahsil edildi' : 'Tahsilat bekliyor'),
         odendi ? (gelir.odeme_tarihi ? gun(gelir.odeme_tarihi) : '') : gelir.vade ? 'vade ' + gun(gelir.vade) : 'vade yok');
     }
+    // Aylık ve tek seferlik tutarlar toplanmaz: iki türlü teklifte tek tutarlı gelir kaydı açılmaz (sunucu da 409 döner).
+    if (teklifBloklari(t).length > 1) return el('span', { style: 'font-size: 13px; color: var(--tx2); max-width: 420px' }, 'Bu teklifte aylık ve tek seferlik tutarlar ayrı. Gelir kayıtlarını Muhasebe sayfasından ayrı ayrı ekleyin.');
     const ileri = new Date(Date.now() + 3 * 3600000 + 30 * 86400000).toISOString().slice(0, 10);
     const vade = el('input', { type: 'date', value: ileri, 'aria-label': 'Vade tarihi', style: 'min-height: 38px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit' });
     return el('span', { style: 'display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap' }, vade,
@@ -180,60 +187,103 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('dl', { style: 'margin: 0; display: flex; gap: 6px 20px; flex-wrap: wrap; font-size: 13px' }, ...bilgi.map(([a, b]) => el('div', { style: 'display: flex; gap: 6px' }, el('dt', { style: 'color: var(--tx2)' }, a + ':'), el('dd', { style: 'margin: 0' }, b)))),
       el('div', { style: 'overflow-x: auto; border: 1px solid rgb(var(--line)); border-radius: 14px' }, el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 13px' },
         el('thead', {}, el('tr', {}, th('Kalem'), th('Adet', true), th('Birim fiyat', true), th('Tutar', true))),
-        el('tbody', {}, ...t.kalemler.map((k) => el('tr', {}, td([el('strong', {}, k.ad), k.aciklama ? el('div', { style: 'font-size: 13px; color: var(--tx2); white-space: pre-wrap' }, k.aciklama) : '']), td(sayiYaz(k.adet), true), td(tutar(k.birim_fiyat), true), td(tutar(k.tutar), true)))))),
+        el('tbody', {}, ...t.kalemler.map((k) => el('tr', {}, td([el('strong', {}, k.ad), TUR_ADI[k.tur] ? el('span', { style: 'margin-left: 6px; font-size: 12px; color: var(--tx2)' }, '· ' + TUR_ADI[k.tur]) : '', k.aciklama ? el('div', { style: 'font-size: 13px; color: var(--tx2); white-space: pre-wrap' }, k.aciklama) : '']), td(sayiYaz(k.adet), true), td(tutar(k.birim_fiyat), true), td(tutar(k.tutar), true)))))),
       el('div', { style: 'display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start' },
         el('div', { style: 'flex: 2 1 280px; min-width: 0' }, t.notlar ? [el('strong', { style: 'font-size: 13px; color: var(--tx2)' }, 'Notlar'), el('p', { style: 'margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere' }, t.notlar)] : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Not yok.')),
-        toplamListesi(t, { flex: '1 1 240px' })),
+        toplamListesi(toplamSatirlari(teklifBloklari(t), t.kdv_orani), { flex: '1 1 240px' })),
       el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, ...eylemler));
     detay.hidden = false;
     ciz();
     detay.scrollIntoView({ block: 'nearest' });
   }
 
-  function toplamListesi(t, ek) {
+  // Toplam kutusu: aylık ve tek seferlik tutarlar ayrı bloklarda (src/scripts/yonetim/teklif-toplam.js); "Genel toplam" yalnız tek blokta.
+  function toplamListesi(satirlar, ek) {
     const sat = (a, b, guclu) => [el('dt', { style: guclu ? 'font-weight: 500; color: var(--head)' : 'color: var(--tx2)' }, a), el('dd', { style: 'margin: 0; text-align: right; white-space: nowrap' + (guclu ? '; font-weight: 500; color: var(--head)' : '') }, b)];
-    const d = el('dl', { style: 'margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid rgb(var(--line)); font-variant-numeric: tabular-nums' + (ek ? '; flex: ' + ek.flex : '') },
-      ...sat('Ara toplam', tutar(t.ara_toplam)), ...(Number(t.indirim) > 0 ? sat('İndirim', '−' + tutar(t.indirim)) : []),
-      ...sat(`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)), ...sat('Genel toplam', tutar(t.toplam), true));
-    return d;
+    return el('dl', { style: 'margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid rgb(var(--line)); font-variant-numeric: tabular-nums' + (ek ? '; flex: ' + ek.flex : '') },
+      ...satirlar.flatMap(([a, b, g]) => sat(a, b, g)));
   }
 
   // --- Düzenleyici ---
-  // Sunucudaki hesapla aynı (kuruş üzerinden); yalnız önizleme içindir.
-  function hesapla(kalemler, indirim, oran) {
-    let ara = 0;
-    const satirlar = kalemler.map((k) => { const a = Math.round((Number(k.adet) || 0) * 100), b = Math.round((Number(k.birim_fiyat) || 0) * 100); const tt = Math.round((a * b) / 100); ara += tt; return tt / 100; });
-    const ind = Math.min(Math.max(0, Math.round((Number(indirim) || 0) * 100)), ara);
-    const kdv = Math.round(((ara - ind) * Math.round((Number(oran) || 0) * 100)) / 10000);
-    return { satirlar, ara_toplam: ara / 100, indirim: ind / 100, kdv_orani: Number(oran) || 0, kdv: kdv / 100, toplam: (ara - ind + kdv) / 100 };
-  }
-
+  // Kalem: hizmet katalogdan seçilir (ad, tür ve varsayılan fiyat gelir; fiyat bu teklif için değiştirilebilir).
+  // "Katalog dışı kalem" seçilince ad elle yazılır (eski davranış). Eski kalemler (hizmet_id yok) katalog dışı olarak açılır.
   function kalemSatiri(k = {}) {
     const g = (ad, tip, deger, ek) => el('input', { name: ad, type: tip, value: deger ?? '', ...ek });
+    const ilk = kalemSecimi(k, katalog || []);
+    const adGirdi = g('ad', 'text', ilk && ilk.disi ? ilk.ad : '', { maxlength: '200', placeholder: 'Ör. Logo tasarımı' });
+    // Katalog dışı kalemin türü elle seçilir (varsayılan tek seferlik). Türü kayıtlı olmayan eski kalemde "Belirtilmemiş" kalır.
+    const eskiTursuz = !!(ilk && ilk.disi && k.ad && !TUR_ADI[k.tur]);
+    const turSec = el('select', { name: 'tur' }, eskiTursuz ? el('option', { value: '' }, 'Belirtilmemiş') : '',
+      el('option', { value: 'tek_seferlik' }, 'Tek seferlik'), el('option', { value: 'aylik' }, 'Aylık'));
+    turSec.value = eskiTursuz ? '' : TUR_ADI[k.tur] && ilk && ilk.disi ? k.tur : 'tek_seferlik';
+    const turKutu = el('label', { class: 'alan', 'data-tur-kutu': '', hidden: !(ilk && ilk.disi), style: 'flex: 1 1 130px; min-width: 0' }, 'Tür', turSec);
+    const adKutu = el('label', { class: 'alan', 'data-ad-kutu': '', hidden: !(ilk && ilk.disi), style: 'flex: 3 1 220px; min-width: 0' }, 'Kalem adı', adGirdi);
+    const turEtiket = el('span', { class: 'cip', 'data-tur': '', hidden: !(ilk && !ilk.disi && ilk.tur), style: 'align-self: flex-start; border: 1px solid rgb(var(--line)); color: var(--tx2)' }, ilk && TUR_ADI[ilk.tur] ? TUR_ADI[ilk.tur] : '');
+    const fiyat = g('birim_fiyat', 'number', k.birim_fiyat ?? '', { min: '0', step: '0.01', inputmode: 'decimal', placeholder: '0,00' });
+    const secici = hizmetSecici({ katalog: katalog || [], secim: ilk, uyari: katalogUyari, onSec: (h) => {
+      const s = secimUygula(h);
+      li.secim = s.disi ? { disi: true, hizmet_id: null, tur: null } : { disi: false, hizmet_id: s.hizmet_id, ad: s.ad, tur: s.tur };
+      adKutu.hidden = !s.disi; turKutu.hidden = !s.disi;
+      turEtiket.textContent = s.disi ? '' : TUR_ADI[s.tur] || '';
+      turEtiket.hidden = s.disi || !s.tur;
+      if (s.disi) adGirdi.focus();
+      else { fiyat.value = s.birim_fiyat; if (s.fiyatYok) fiyat.focus(); }
+      kalemDegisti();
+    } });
     const li = el('li', { style: 'border: 1px solid rgb(var(--line)); border-radius: 14px; padding: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 10px' },
       el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end' },
-        el('label', { class: 'alan', style: 'flex: 3 1 220px; min-width: 0' }, 'Hizmet / ürün', g('ad', 'text', k.ad, { maxlength: '200', required: true, placeholder: 'Ör. Aylık sosyal medya yönetimi' })),
+        secici.kutu, adKutu, turKutu,
         el('label', { class: 'alan', style: 'flex: 1 1 90px; min-width: 0' }, 'Adet', g('adet', 'number', k.adet ?? 1, { min: '0.01', step: '0.01', inputmode: 'decimal' })),
-        el('label', { class: 'alan', style: 'flex: 1 1 130px; min-width: 0' }, 'Birim fiyat (TL)', g('birim_fiyat', 'number', k.birim_fiyat ?? '', { min: '0', step: '0.01', inputmode: 'decimal', placeholder: '0,00' })),
+        el('label', { class: 'alan', style: 'flex: 1 1 130px; min-width: 0' }, 'Birim fiyat (TL)', fiyat),
         el('div', { style: 'flex: 1 1 120px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--head)' }, 'Tutar', el('span', { 'data-tutar': '', style: 'min-height: 42px; display: flex; align-items: center; font-weight: 500; font-variant-numeric: tabular-nums' }, tutar(0))),
         el('button', { type: 'button', class: 'dugme kucuk', 'data-kaldir': '', onclick: () => { li.remove(); kalemDegisti(); } }, 'Kaldır')),
+      turEtiket,
       el('label', { class: 'alan' }, 'Açıklama (isteğe bağlı)', el('textarea', { name: 'aciklama', rows: '2', maxlength: '1000', style: 'resize: vertical', placeholder: 'Kapsam, süre, teslim edilecekler…' }, k.aciklama || '')));
+    li.secim = ilk;
+    li.secici = secici;
     return li;
   }
 
-  const kalemleriOku = () => [...kalemKutu.children].map((li) => ({ ad: li.querySelector('[name=ad]').value.trim(), aciklama: li.querySelector('[name=aciklama]').value.trim(), adet: li.querySelector('[name=adet]').value, birim_fiyat: li.querySelector('[name=birim_fiyat]').value }));
+  // Seçimsiz satırda ad boştur (kaydetmede "hizmet seçin" uyarısı); katalog kaleminde ad katalogdan gelir.
+  const kalemleriOku = () => [...kalemKutu.children].map((li) => {
+    const s = li.secim;
+    return { ad: s && !s.disi ? s.ad : s ? li.querySelector('[name=ad]').value.trim() : '', aciklama: li.querySelector('[name=aciklama]').value.trim(), adet: li.querySelector('[name=adet]').value, birim_fiyat: li.querySelector('[name=birim_fiyat]').value,
+      hizmet_id: s && !s.disi ? s.hizmet_id : null, tur: s && !s.disi ? s.tur || null : s ? li.querySelector('[name=tur]').value || null : null };
+  });
+
+  async function katalogYukle() {
+    if (katalog) return;
+    const uyari = $('[data-katalog-uyari]');
+    try {
+      const k = katalogHazirla((await api('hizmet-katalogu')).hizmetler);
+      katalogUyari = k.length ? '' : 'Hizmet kataloğu boş; yalnız katalog dışı kalem eklenebilir.';
+      if (k.length) katalog = k; // boşsa bir sonraki açılışta yeniden denenir
+      uyari.textContent = k.length ? '' : katalogUyari + ' Hizmetleri Belge şablonları sayfasındaki katalogdan ekleyebilirsiniz.';
+      uyari.hidden = !!k.length;
+      return k;
+    } catch (h) {
+      katalogUyari = 'Hizmet kataloğu yüklenemedi; yalnız katalog dışı kalem eklenebilir.';
+      uyari.textContent = katalogUyari + ' (' + h.message + ')';
+      uyari.hidden = false;
+    }
+  }
 
   function kalemDegisti() {
     const kl = kalemleriOku();
-    const h = hesapla(kl, form.elements.indirim.value, form.elements.kdv_orani.value);
+    // Önizleme sunucuyla aynı işlevle (teklifHesapla, kuruş) hesaplanır.
+    const h = teklifHesapla(kl, form.elements.indirim.value, form.elements.kdv_orani.value);
     [...kalemKutu.children].forEach((li, i) => {
-      li.querySelector('[data-tutar]').textContent = tutar(h.satirlar[i]);
+      li.querySelector('[data-tutar]').textContent = tutar(h.satirlar[i] / 100);
       li.querySelector('[data-kaldir]').disabled = kalemKutu.children.length === 1;
     });
     $('[data-kalem-ekle]').disabled = kalemKutu.children.length >= 50;
-    const fazla = Math.round((Number(form.elements.indirim.value) || 0) * 100) > Math.round(h.ara_toplam * 100);
-    toplamKutu.replaceChildren(...toplamListesi(h).children);
-    if (fazla) toplamKutu.append(el('dd', { style: 'grid-column: 1 / -1; margin: 0; color: var(--err); font-size: 13px' }, 'İndirim ara toplamdan büyük olamaz.'));
+    // İki tür birlikteyken indirimin hangi bloğa düşeceği belirsiz olduğundan alan kapatılır; değer girilmişse (eski taslak) silinmesi istenir.
+    const ind = form.elements.indirim;
+    ind.disabled = h.karisik && !((Number(ind.value) || 0) > 0);
+    $('[data-indirim-not]').hidden = !h.karisik;
+    toplamKutu.replaceChildren(...toplamListesi(toplamSatirlari(h.bloklar, form.elements.kdv_orani.value, { kurus: true })).children);
+    if (h.hata) toplamKutu.append(el('dd', { 'data-toplam-hata': '', style: 'grid-column: 1 / -1; margin: 0; color: var(--err); font-size: 13px' }, h.hata + '.'));
+    return h;
   }
 
   async function musteriSecenekleri(secili) {
@@ -247,7 +297,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   async function duzenle(t) {
     duzenlenen = t || null; duzDurum.textContent = '';
-    try { await musteriSecenekleri(t ? t.musteri_id : prm('musteri') || ''); }
+    try { await Promise.all([musteriSecenekleri(t ? t.musteri_id : prm('musteri') || ''), katalogYukle()]); }
     catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); return; }
     $('[data-duz-baslik]').textContent = t ? 'Taslağı düzenle' : 'Yeni teklif';
     $('[data-duz-no]').textContent = t ? t.no : 'Numara kaydedince verilir';
@@ -269,7 +319,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   form.addEventListener('input', kalemDegisti);
   form.addEventListener('change', kalemDegisti);
-  $('[data-kalem-ekle]').addEventListener('click', () => { const li = kalemSatiri(); kalemKutu.append(li); kalemDegisti(); li.querySelector('[name=ad]').focus(); });
+  $('[data-kalem-ekle]').addEventListener('click', () => { const li = kalemSatiri(); kalemKutu.append(li); kalemDegisti(); (li.secim && li.secim.disi ? li.querySelector('[name=ad]') : li.secici.girdi).focus(); });
   $('[data-vazgec]').addEventListener('click', () => { form.hidden = true; if (duzenlenen) ac(duzenlenen.id); duzenlenen = null; });
   $('[data-yeni]').addEventListener('click', () => { seciliId = ''; adresYaz(); duzenle(null); });
 
@@ -280,7 +330,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (!form.elements.musteri_id.value) { duzDurum.textContent = 'Müşteri seçin.'; form.elements.musteri_id.focus(); return; }
     if (!form.elements.baslik.value.trim()) { duzDurum.textContent = 'Teklif başlığını yazın.'; form.elements.baslik.focus(); return; }
     const eksik = kalemler.findIndex((k) => !k.ad);
-    if (eksik >= 0) { duzDurum.textContent = `${eksik + 1}. kalemin adını yazın.`; kalemKutu.children[eksik].querySelector('[name=ad]').focus(); return; }
+    if (eksik >= 0) {
+      const li = kalemKutu.children[eksik], secimsiz = !li.secim;
+      duzDurum.textContent = secimsiz ? `${eksik + 1}. kalem için hizmet seçin ya da “Katalog dışı kalem”i seçin.` : `${eksik + 1}. kalemin adını yazın.`;
+      (secimsiz ? li.secici.girdi : li.querySelector('[name=ad]')).focus(); return;
+    }
+    const h = kalemDegisti();
+    if (h.hata) { duzDurum.textContent = h.hata + '.'; if (!form.elements.indirim.disabled) form.elements.indirim.focus(); return; }
     const v = { musteri_id: form.elements.musteri_id.value, baslik: form.elements.baslik.value.trim(), gecerlilik: form.elements.gecerlilik.value, kdv_orani: form.elements.kdv_orani.value,
       indirim: form.elements.indirim.value || 0, notlar: form.elements.notlar.value.trim(), kalemler: kalemler.map((k) => ({ ...k, adet: k.adet === '' ? 0 : Number(k.adet), birim_fiyat: k.birim_fiyat === '' ? 0 : Number(k.birim_fiyat) })) };
     v.kdv_orani = Number(v.kdv_orani); v.indirim = Number(v.indirim);

@@ -2,6 +2,7 @@
 // Üye yalnız kendi CRM müşteri kaydına (uye_musteri) ait, gönderilmiş teklifleri ve yöneticinin açıkça paylaştığı belgeleri görür.
 // Taslak teklifler ve paylaşılmamış belgeler hiçbir zaman üyeye dönmez. Uygulama e-posta göndermez.
 import { json, hata, simdi, kimlik, kirp, islemYaz, ayniKaynak, govdeOku } from './ortak.js';
+import { teklifBloklari, bloklarMetni } from '../src/scripts/yonetim/teklif-toplam.js';
 import { oturumUyesi, uyeModulleri } from './uye.js';
 import { yonetimTeklifApi, TEKLIF_DURUM } from './teklif.js';
 import { ekibeBildir, uyeyeBildir } from './eposta.js';
@@ -42,7 +43,7 @@ export async function uyeMusteriApi(istek, env, yol) {
     if (!musteriId) return json({ ok: true, bagli: false, teklifler: [], belgeler: [], yetki });
     if (yol === 'belgelerim' && yontem === 'GET') {
       const [t, b] = await db.batch([
-        db.prepare(`SELECT id, no, baslik, durum, toplam, gecerlilik, gonderim_zamani, karar_zamani FROM teklifler
+        db.prepare(`SELECT id, no, baslik, durum, toplam, toplam_aylik, toplam_tek, gecerlilik, gonderim_zamani, karar_zamani FROM teklifler
           WHERE musteri_id = ? AND durum IN ('gonderildi','kabul','red') ORDER BY COALESCE(gonderim_zamani, guncelleme) DESC LIMIT 200`).bind(musteriId),
         db.prepare(`SELECT b.id, b.ad, b.tur, b.baglanti, b.tarih, b.aciklama FROM belgeler b JOIN belge_paylasim p ON p.belge_id = b.id
           WHERE b.musteri_id = ? ORDER BY b.tarih DESC LIMIT 300`).bind(musteriId)
@@ -51,7 +52,7 @@ export async function uyeMusteriApi(istek, env, yol) {
     }
     let m = yol.match(/^belgelerim\/teklif\/([\w-]+)$/);
     if (m && yontem === 'GET') {
-      const t = await db.prepare(`SELECT id, no, baslik, kalemler, kdv_orani, indirim, para, gecerlilik, notlar, durum, ara_toplam, kdv, toplam, gonderim_zamani, karar_zamani
+      const t = await db.prepare(`SELECT id, no, baslik, kalemler, kdv_orani, indirim, para, gecerlilik, notlar, durum, ara_toplam, kdv, toplam, ara_aylik, kdv_aylik, toplam_aylik, ara_tek, kdv_tek, toplam_tek, gonderim_zamani, karar_zamani
         FROM teklifler WHERE id = ? AND musteri_id = ? AND durum IN ('gonderildi','kabul','red')`).bind(m[1], musteriId).first();
       if (!t) return hata('Teklif bulunamadı', 404);
       t.kalemler = JSON.parse(t.kalemler || '[]');
@@ -67,8 +68,8 @@ export async function uyeMusteriApi(istek, env, yol) {
       // Durum geçişi, CRM günlüğü ve aşama değişikliği yönetim tarafıyla aynı kodla yapılır.
       const y = await yonetimTeklifApi(db, 'POST', `teklifler/${t.id}/${m[2]}`, {}, { eposta: 'üye: ' + u.eposta });
       if (y.ok) {
-        const d = await db.prepare('SELECT no, baslik, toplam FROM teklifler WHERE id = ?').bind(t.id).first();
-        await ekibeBildir(env, `Teklif ${m[2] === 'kabul' ? 'kabul edildi' : 'reddedildi'}: ${d.no}`, [['Teklif', `${d.no} · ${d.baslik}`], ['Toplam (KDV dâhil)', new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2 }).format(d.toplam) + ' TL'], ['Karar veren', `${u.ad} (${u.eposta})`]],
+        const d = await db.prepare('SELECT no, baslik, indirim, ara_toplam, kdv, toplam, toplam_aylik, toplam_tek FROM teklifler WHERE id = ?').bind(t.id).first();
+        await ekibeBildir(env, `Teklif ${m[2] === 'kabul' ? 'kabul edildi' : 'reddedildi'}: ${d.no}`, [['Teklif', `${d.no} · ${d.baslik}`], ['Toplam (KDV dâhil)', bloklarMetni(teklifBloklari(d))], ['Karar veren', `${u.ad} (${u.eposta})`]],
           { metin: 'Teklifi aç', yol: `/proposals?tab=${m[2] === 'kabul' ? 'accepted' : 'rejected'}&id=${encodeURIComponent(t.id)}` });
       }
       return y;

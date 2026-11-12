@@ -3,6 +3,8 @@
 // Tutarlar sunucuda kuruş (tam sayı) üzerinden hesaplanır; istemcinin gönderdiği toplamlar dikkate alınmaz.
 // Durum akışı: taslak → gonderildi → kabul | red. Yalnız taslak düzenlenir ve silinir.
 import { json, hata, simdi, kimlik, kirp, islemYaz } from './ortak.js';
+// Aylık ve tek seferlik tutarlar toplanmaz (12 Kas 2026): hesap ekran önizlemesiyle ortak modülde.
+import { teklifHesapla, toplamSutunlari, teklifBloklari, bloklarMetni } from '../src/scripts/yonetim/teklif-toplam.js';
 
 export const TEKLIF_DURUM = { taslak: 'Taslak', gonderildi: 'Gönderildi', kabul: 'Kabul edildi', red: 'Reddedildi' };
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -10,8 +12,12 @@ const EN_FAZLA_KALEM = 50;
 const BIRIM_SINIR = 10000000; // TL, tek kalemin birim fiyatı
 const ADET_SINIR = 10000;
 const TOPLAM_SINIR_KURUS = 100000000000; // 1 milyar TL (kuruş taşmasını önler)
+// Kalemin katalog bağı (12 Kas 2026): hizmet_id hizmet kataloğundaki kimlik (katalog dışı kalemde null), tur ödeme biçimi.
+// Yalnız bu iki alan eklenir (beyaz liste); katalogda varlığı aranmaz, çünkü hizmet sonradan pasife alınabilir ya da adı değişebilir.
+const KALEM_TUR = ['aylik', 'tek_seferlik'];
+const HIZMET_ID = /^[\w-]{1,64}$/;
 
-const SUTUNLAR = 't.id, t.no, t.musteri_id, t.baslik, t.kdv_orani, t.indirim, t.para, t.gecerlilik, t.durum, t.ara_toplam, t.kdv, t.toplam, t.olusturma, t.guncelleme, t.gonderim_zamani, t.karar_zamani, t.olusturan';
+const SUTUNLAR = 't.id, t.no, t.musteri_id, t.baslik, t.kdv_orani, t.indirim, t.para, t.gecerlilik, t.durum, t.ara_toplam, t.kdv, t.toplam, t.ara_aylik, t.kdv_aylik, t.toplam_aylik, t.ara_tek, t.kdv_tek, t.toplam_tek, t.olusturma, t.guncelleme, t.gonderim_zamani, t.karar_zamani, t.olusturan';
 const tl = (kurus) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(kurus / 100) + ' TL';
 
 // Sayı: number ya da "1250,50" / "1250.50" gibi metin. Geçersizse NaN.
@@ -39,6 +45,10 @@ function dogrula(g) {
     const k = g.kalemler[i] || {}, sira = i + 1;
     const ad = kirp(k.ad, 200), aciklama = kirp(k.aciklama, 1000);
     if (!ad) return { hata: `${sira}. kalemin adı gerekli` };
+    const hizmetId = k.hizmet_id === undefined || k.hizmet_id === null || k.hizmet_id === '' ? null : k.hizmet_id;
+    if (hizmetId !== null && (typeof hizmetId !== 'string' || !HIZMET_ID.test(hizmetId))) return { hata: `${sira}. kalemin hizmet kimliği geçersiz` };
+    const tur = k.tur === undefined || k.tur === null || k.tur === '' ? null : k.tur;
+    if (tur !== null && !KALEM_TUR.includes(tur)) return { hata: `${sira}. kalemin türü “Aylık” ya da “Tek seferlik” olmalı` };
     const adet = sayi(k.adet), birim = sayi(k.birim_fiyat);
     if (!Number.isFinite(adet) || adet <= 0 || adet > ADET_SINIR) return { hata: `${sira}. kalemin adedi 0'dan büyük ve en fazla ${ADET_SINIR} olmalı` };
     if (!Number.isFinite(birim) || birim < 0 || birim > BIRIM_SINIR) return { hata: `${sira}. kalemin birim fiyatı 0 ile ${new Intl.NumberFormat('tr-TR').format(BIRIM_SINIR)} TL arasında olmalı` };
@@ -46,23 +56,19 @@ function dogrula(g) {
     if (adetYuz <= 0) return { hata: `${sira}. kalemin adedi en az 0,01 olmalı` };
     const tutarKurus = Math.round((adetYuz * birimKurus) / 100);
     araKurus += tutarKurus;
-    kalemler.push({ ad, aciklama, adet: adetYuz / 100, birim_fiyat: birimKurus / 100, tutar: tutarKurus / 100 });
+    kalemler.push({ ad, aciklama, adet: adetYuz / 100, birim_fiyat: birimKurus / 100, tutar: tutarKurus / 100, hizmet_id: hizmetId, tur });
   }
   if (araKurus > TOPLAM_SINIR_KURUS) return { hata: 'Teklif toplamı çok büyük' };
   const oran = g.kdv_orani === undefined || g.kdv_orani === '' || g.kdv_orani === null ? 20 : sayi(g.kdv_orani);
   if (!Number.isFinite(oran) || oran < 0 || oran > 100) return { hata: 'KDV oranı 0 ile 100 arasında olmalı' };
   const indirim = g.indirim === undefined || g.indirim === '' || g.indirim === null ? 0 : sayi(g.indirim);
   if (!Number.isFinite(indirim) || indirim < 0) return { hata: 'İndirim 0 ya da daha büyük bir tutar olmalı' };
-  const indirimKurus = Math.round(indirim * 100);
-  if (indirimKurus > araKurus) return { hata: 'İndirim ara toplamdan büyük olamaz' };
-  const oranYuz = Math.round(oran * 100);
-  const matrah = araKurus - indirimKurus;
-  const kdvKurus = Math.round((matrah * oranYuz) / 10000);
+  const h = teklifHesapla(kalemler, indirim, oran);
+  if (h.hata) return { hata: h.hata };
   const gecerlilik = kirp(g.gecerlilik, 10);
   if (gecerlilik && !gecerliTarih(gecerlilik)) return { hata: 'Geçerlilik tarihi geçersiz' };
   return { veri: {
-    baslik, kalemler, kdv_orani: oranYuz / 100, indirim: indirimKurus / 100, gecerlilik: gecerlilik || null, notlar: kirp(g.notlar, 4000) || null,
-    ara_toplam: araKurus / 100, kdv: kdvKurus / 100, toplam: (matrah + kdvKurus) / 100
+    baslik, kalemler, kdv_orani: h.oranYuz / 100, gecerlilik: gecerlilik || null, notlar: kirp(g.notlar, 4000) || null, ...toplamSutunlari(h)
   } };
 }
 
@@ -73,6 +79,8 @@ async function yeniNo(db) {
   return `IDX-${yil}-${String(r.son).padStart(4, '0')}`;
 }
 
+// İki türlü teklifte eski ara_toplam/kdv/toplam sütunları 0'dır; tutarlar tür sütunlarındadır (src/scripts/yonetim/teklif-toplam.js).
+const TUR_SUTUN = ['ara_aylik', 'kdv_aylik', 'toplam_aylik', 'ara_tek', 'kdv_tek', 'toplam_tek'];
 const kayitEkle = (db, musteriId, z, baslik, detay, kim) =>
   db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), musteriId, z, 'teklif', baslik, detay, kim);
 
@@ -82,9 +90,9 @@ async function ekle(db, v, musteriId, kim) {
   for (let deneme = 0; deneme < 5; deneme++) {
     const no = await yeniNo(db);
     try {
-      await db.prepare(`INSERT INTO teklifler (id, no, musteri_id, baslik, kalemler, kdv_orani, indirim, para, gecerlilik, notlar, durum, ara_toplam, kdv, toplam, olusturma, guncelleme, olusturan)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 'TRY', ?, ?, 'taslak', ?, ?, ?, ?, ?, ?)`)
-        .bind(id, no, musteriId, v.baslik, JSON.stringify(v.kalemler), v.kdv_orani, v.indirim, v.gecerlilik, v.notlar, v.ara_toplam, v.kdv, v.toplam, z, z, kim).run();
+      await db.prepare(`INSERT INTO teklifler (id, no, musteri_id, baslik, kalemler, kdv_orani, indirim, para, gecerlilik, notlar, durum, ara_toplam, kdv, toplam, ${TUR_SUTUN.join(', ')}, olusturma, guncelleme, olusturan)
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'TRY', ?, ?, 'taslak', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        .bind(id, no, musteriId, v.baslik, JSON.stringify(v.kalemler), v.kdv_orani, v.indirim, v.gecerlilik, v.notlar, v.ara_toplam, v.kdv, v.toplam, ...TUR_SUTUN.map((a) => v[a]), z, z, kim).run();
       return { id, no };
     } catch (e) {
       if (!/UNIQUE/i.test(String(e && e.message))) throw e;
@@ -137,8 +145,8 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     if (!mus) return hata('Müşteri seçin (CRM’de kayıtlı olmalı)', 422);
     const { veri, hata: h } = dogrula(govde);
     if (h) return hata(h, 422);
-    const r = await db.prepare(`UPDATE teklifler SET musteri_id = ?, baslik = ?, kalemler = ?, kdv_orani = ?, indirim = ?, gecerlilik = ?, notlar = ?, ara_toplam = ?, kdv = ?, toplam = ?, guncelleme = ?
-      WHERE id = ? AND durum = 'taslak'`).bind(mus.id, veri.baslik, JSON.stringify(veri.kalemler), veri.kdv_orani, veri.indirim, veri.gecerlilik, veri.notlar, veri.ara_toplam, veri.kdv, veri.toplam, simdi(), t.id).run();
+    const r = await db.prepare(`UPDATE teklifler SET musteri_id = ?, baslik = ?, kalemler = ?, kdv_orani = ?, indirim = ?, gecerlilik = ?, notlar = ?, ara_toplam = ?, kdv = ?, toplam = ?, ${TUR_SUTUN.map((a) => a + ' = ?').join(', ')}, guncelleme = ?
+      WHERE id = ? AND durum = 'taslak'`).bind(mus.id, veri.baslik, JSON.stringify(veri.kalemler), veri.kdv_orani, veri.indirim, veri.gecerlilik, veri.notlar, veri.ara_toplam, veri.kdv, veri.toplam, ...TUR_SUTUN.map((a) => veri[a]), simdi(), t.id).run();
     if (!r.meta || !r.meta.changes) return hata('Teklif bu arada değişti; sayfayı yenileyin', 409);
     await islemYaz(db, kim.eposta, 'teklif_guncelle', t.id, t.no);
     return json({ ok: true, id: t.id });
@@ -152,6 +160,7 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     if (t.durum !== 'kabul') return hata('Gelir kaydı yalnız kabul edilen tekliften oluşturulur', 409);
     const var_ = await db.prepare("SELECT id FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? LIMIT 1").bind(t.no).first();
     if (var_) return hata('Bu teklif için gelir kaydı zaten var', 409);
+    if (teklifBloklari(t).length > 1) return hata('Bu teklifte aylık ve tek seferlik tutarlar ayrı; tek tutarlı gelir kaydı açılamaz. Kayıtları Muhasebe sayfasından ayrı ayrı ekleyin', 409);
     const bugun = new Date(Date.now() + 3 * 3600000).toISOString().slice(0, 10);
     const vade = kirp(govde.vade, 10);
     if (vade && (!gecerliTarih(vade) || vade < bugun)) return hata('Vade bugün ya da sonrası geçerli bir tarih olmalı', 422);
@@ -199,7 +208,7 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     // Müşteri günlüğü ve aşama
     const mus = await musteriVar(db, t.musteri_id);
     if (mus) {
-      const detay = `${t.no} · ${t.baslik} · Toplam ${tl(Math.round(t.toplam * 100))} (KDV dâhil)`;
+      const detay = `${t.no} · ${t.baslik} · Toplam ${bloklarMetni(teklifBloklari(t))} (KDV dâhil)`;
       const baslik = { gonderildi: 'Teklif gönderildi olarak işaretlendi', kabul: 'Teklif kabul edildi', red: 'Teklif reddedildi' }[ne];
       const sorgular = [kayitEkle(db, mus.id, z, baslik, detay, kim.eposta)];
       let yeniAsama = null;

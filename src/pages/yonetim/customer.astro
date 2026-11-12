@@ -68,6 +68,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </style>
 <script>
   import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata, prm } from '../../scripts/yonetim/ortak.js';
+  import { teklifBloklari } from '../../scripts/yonetim/teklif-toplam.js';
   const id = new URLSearchParams(location.search).get('id') || '';
   const ust = document.querySelector('[data-ust]'), bilgi = document.querySelector('[data-bilgi]'), gunluk = document.querySelector('[data-gunluk]');
   const TUR = [['not', 'Not'], ['gorusme', 'Görüşme'], ['eposta', 'E-posta'], ['gorev', 'Görev']];
@@ -136,8 +137,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const gor = teklifSatirlar.filter((t) => teklifSuzgec === 'hepsi' || t.durum === teklifSuzgec);
     // Alt satır: kabul oranı (taslak hariç) ve açık (gönderilmiş, sonuçlanmamış) teklif tutarı
     const sonuc = teklifSatirlar.filter((t) => t.durum !== 'taslak'), acik = teklifSatirlar.filter((t) => t.durum === 'gonderildi');
-    const bilinen = acik.filter((t) => t.tutar !== null);
-    const acikTutar = acik.length && !bilinen.length ? '—' : tlK(bilinen.reduce((a, t) => a + t.tutar, 0));
+    // Aylık ve tek seferlik tutarlar toplanmaz (12 Kas 2026): açık tutar türe göre ayrı yazılır; türü belirsiz (eski, PDF) ayrı kalır.
+    const bilinen = acik.filter((t) => t.tutar !== null || t.tutarlar);
+    const kume = { aylik: null, tek_seferlik: null, '': null };
+    bilinen.forEach((t) => (t.tutarlar || [{ tur: '', kurus: t.tutar }]).forEach((x) => { kume[x.tur || ''] = (kume[x.tur || ''] || 0) + x.kurus; }));
+    const parca = [kume.aylik !== null ? tlK(kume.aylik) + ' / ay' : '', kume.tek_seferlik !== null ? tlK(kume.tek_seferlik) + ' tek seferlik' : '', kume[''] !== null ? tlK(kume['']) + (kume.aylik !== null || kume.tek_seferlik !== null ? ' türü belirsiz' : '') : ''].filter(Boolean);
+    const acikTutar = !parca.length ? (acik.length ? '—' : tlK(0)) : parca.join(' · ');
     document.querySelector('[data-teklif-ozet]').textContent = `Kabul oranı: ${sonuc.length ? `${sonuc.filter((t) => t.durum === 'kabul').length} / ${sonuc.length}` : '—'} · Açık teklif tutarı: ${acikTutar}`
       + (bilinen.length < acik.length && bilinen.length ? ` (${acik.length - bilinen.length} teklifte tutar girilmedi)` : '');
     if (!gor.length) {
@@ -151,7 +156,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('td', {}, el('span', { class: 'tk-kaynak' }, t.kaynak === 'pdf' ? (t.sablon ? 'Şablon' : 'Canva PDF') : 'Panel')),
         el('td', { style: 'white-space: nowrap' }, gunYaz(t.tarih)),
         el('td', { style: 'white-space: nowrap' }, gunYaz(t.gecerlilik)),
-        el('td', { class: 'sayi' }, tlK(t.tutar)),
+        el('td', { class: 'sayi' }, ...(t.tutarlar ? t.tutarlar.flatMap((x, i) => [i ? el('br') : '', tlK(x.kurus) + (x.tur === 'aylik' ? ' / ay' : ''), t.tutarlar.length > 1 ? el('small', { style: 'color: var(--tx2)' }, x.tur === 'aylik' ? ' aylık' : ' tek seferlik') : '']) : [tlK(t.tutar)])),
         el('td', {}, el('span', { class: 'cip ' + (TEKLIF_DURUM[t.durum] || ['', ''])[1] }, (TEKLIF_DURUM[t.durum] || [t.durum])[0])),
         el('td', { style: 'white-space: nowrap; text-align: right' },
           el('a', t.kaynak === 'pdf' ? { class: 'dugme kucuk', href: t.ac, target: '_blank', rel: 'noopener' } : { class: 'dugme kucuk', href: t.ac }, 'Aç'), ' ',
@@ -183,7 +188,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       const [p, d] = await Promise.all([api('teklifler/musteri/' + encodeURIComponent(id)), api('teklif-dosyalari/musteri/' + encodeURIComponent(id))]);
       depoVar = d.depo !== false;
       teklifSatirlar = [
-        ...p.teklifler.map((t) => ({ kaynak: 'panel', id: t.id, ad: t.baslik, alt: t.no, tarih: (t.olusturma || '').slice(0, 10), gecerlilik: t.gecerlilik, tutar: Math.round(((Number(t.toplam) || 0) - (Number(t.kdv) || 0)) * 100), durum: t.durum, ac: '/proposals?id=' + encodeURIComponent(t.id) })),
+        ...p.teklifler.map((t) => ({ kaynak: 'panel', id: t.id, ad: t.baslik, alt: t.no, tarih: (t.olusturma || '').slice(0, 10), gecerlilik: t.gecerlilik, tutar: Math.round(((Number(t.toplam) || 0) - (Number(t.kdv) || 0)) * 100), tutarlar: teklifBloklari(t).some((b) => b.tur) ? teklifBloklari(t).map((b) => ({ tur: b.tur, kurus: Math.round(((Number(b.toplam) || 0) - (Number(b.kdv) || 0)) * 100) })) : null, durum: t.durum, ac: '/proposals?id=' + encodeURIComponent(t.id) })),
         ...d.dosyalar.map((t) => ({ kaynak: 'pdf', id: t.id, ad: t.ad, alt: `${t.dosya_adi || 'teklif.pdf'} · ${boyutYaz(t.boyut)}`, tarih: t.tarih, gecerlilik: t.gecerlilik, tutar: t.tutar_kurus ?? null, durum: t.durum, sablon: t.kaynak === 'sablon', ac: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya` }))
       ].sort((a, b) => (a.tarih < b.tarih ? 1 : a.tarih > b.tarih ? -1 : 0));
       teklifCiz();

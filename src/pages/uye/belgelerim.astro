@@ -14,6 +14,7 @@ import UyeCerceve from '../../components/UyeCerceve.astro';
 </section>
 <script>
   import { uyeIstek } from '../../scripts/uye-sayfa.js';
+  import { teklifBloklari, toplamSatirlari } from '../../scripts/yonetim/teklif-toplam.js';
   const $ = (s, k = document) => k.querySelector(s);
   const durum = $('[data-durum]');
   const para = (v) => new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v || 0) + ' TL';
@@ -47,11 +48,9 @@ import UyeCerceve from '../../components/UyeCerceve.astro';
           el('tbody', {}, d.kalemler.map((k) => el('tr', {},
             el('td', {}, el('strong', {}, k.ad), k.aciklama ? el('div', { style: 'color: var(--tx2); font-size: 14px; white-space: pre-wrap' }, k.aciklama) : null),
             el('td', { style: 'text-align: right' }, String(k.adet).replace('.', ',')), el('td', { style: 'text-align: right; white-space: nowrap' }, para(k.birim_fiyat)), el('td', { style: 'text-align: right; white-space: nowrap' }, para(k.tutar))))))),
-        el('dl', { class: 'bm-toplam' },
-          el('dt', {}, 'Ara toplam'), el('dd', {}, para(d.ara_toplam)),
-          d.indirim ? [el('dt', {}, 'İndirim'), el('dd', {}, '−' + para(d.indirim))] : null,
-          el('dt', {}, `KDV (%${String(d.kdv_orani).replace('.', ',')})`), el('dd', {}, para(d.kdv)),
-          el('dt', { style: 'font-weight: 700; color: var(--head)' }, 'Genel toplam'), el('dd', { style: 'font-weight: 700; color: var(--head)' }, para(d.toplam))),
+        // Aylık ve tek seferlik tutarlar toplanmaz: iki türlü teklifte iki ayrı blok.
+        el('dl', { class: 'bm-toplam' }, ...toplamSatirlari(teklifBloklari(d), d.kdv_orani).flatMap(([a, b, g]) => [
+          el('dt', g ? { style: 'font-weight: 700; color: var(--head)' } : {}, a), el('dd', g ? { style: 'font-weight: 700; color: var(--head)' } : {}, b)])),
         d.notlar ? el('p', { style: 'margin: 0; white-space: pre-wrap; color: var(--tx2)' }, d.notlar) : null,
         d.durum === 'gonderildi' && yetki === 'kullan' ? el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap; align-items: center' },
           suresiDoldu ? el('span', { style: 'color: var(--err)' }, 'Geçerlilik süresi doldu; güncel teklif için bizimle iletişime geçin.')
@@ -78,7 +77,7 @@ import UyeCerceve from '../../components/UyeCerceve.astro';
             el('span', { style: 'font-size: 13px; color: var(--tx2)' }, t.no + (t.gonderim_zamani ? ' · ' + gun(t.gonderim_zamani) : '')),
             el('strong', { style: 'font-size: 18px; color: var(--head); overflow-wrap: anywhere' }, t.baslik),
             el('span', { style: 'color: var(--tx2); font-size: 14px' }, t.durum === 'gonderildi' ? (t.gecerlilik ? (t.gecerlilik < bugun ? 'Geçerlilik süresi doldu (' + gun(t.gecerlilik) + ')' : 'Geçerlilik: ' + gun(t.gecerlilik)) : 'Yanıtınızı bekliyor') : 'Karar: ' + gun(t.karar_zamani))),
-          el('div', { class: 'bm-sag' }, cip(t.durum, durumlar[t.durum] || t.durum), el('strong', { style: 'font-size: 20px; color: var(--head); white-space: nowrap' }, para(t.toplam)), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'KDV dâhil'))),
+          el('div', { class: 'bm-sag' }, cip(t.durum, durumlar[t.durum] || t.durum), ...teklifBloklari(t).map((b) => el('strong', { style: 'font-size: 20px; color: var(--head); white-space: nowrap' }, para(b.toplam) + (b.tur === 'aylik' ? ' / ay' : ''), b.tur && teklifBloklari(t).length > 1 ? el('small', { style: 'font-size: 12px; font-weight: 400; color: var(--tx2)' }, b.tur === 'aylik' ? ' aylık' : ' tek seferlik') : '')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'KDV dâhil'))),
         dugme, kap);
     }) : [el('p', { class: 'uye-kart', style: 'margin: 0; color: var(--tx2); box-shadow: none' }, 'Size gönderilmiş bir teklif henüz yok.')]));
     $('[data-belgeler]').replaceChildren(...(belgeler.length ? belgeler.map((b) => el('a', { class: 'bm-belge', href: b.baglanti, target: '_blank', rel: 'noopener noreferrer' },
