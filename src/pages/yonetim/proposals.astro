@@ -139,24 +139,34 @@ import Yonetim from '../../layouts/Yonetim.astro';
   }
 
   // Kabul edilen teklif → muhasebede bekleyen gelir (alacak) kaydı. Kayıt varsa durumunu gösterir.
-  function gelirAlani(t, gelir) {
-    if (gelir) {
-      const odendi = gelir.durum === 'odendi';
-      return el('a', { class: 'dugme', href: '/accounting', title: 'Muhasebede aç' },
-        el('span', { class: 'cip ' + (odendi ? 'kazanildi' : 'teklif'), style: 'margin-right: 6px' }, odendi ? 'Tahsil edildi' : 'Tahsilat bekliyor'),
-        odendi ? (gelir.odeme_tarihi ? gun(gelir.odeme_tarihi) : '') : gelir.vade ? 'vade ' + gun(gelir.vade) : 'vade yok');
+  // Aylık ve tek seferlik kalemli teklifte iki ayrı kayıt açılır (aylık ilk ay, tek seferlik); tutarlar toplanmaz.
+  const GELIR_ETIKET = { aylik: 'Aylık (ilk ay)', tek_seferlik: 'Tek seferlik' };
+  function gelirAlani(t, gelirler) {
+    if (gelirler && gelirler.length) {
+      const iki = gelirler.length > 1;
+      return el('span', { style: 'display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap' }, ...gelirler.map((gelir) => {
+        const odendi = gelir.durum === 'odendi';
+        const tur = iki ? (/· aylık \(ilk ay\)/.test(gelir.aciklama || '') ? GELIR_ETIKET.aylik : /· tek seferlik/.test(gelir.aciklama || '') ? GELIR_ETIKET.tek_seferlik : '') : '';
+        return el('a', { class: 'dugme', href: '/accounting', title: 'Muhasebede aç' },
+          tur ? el('span', { style: 'margin-right: 6px; color: var(--tx2)' }, tur) : null,
+          el('span', { class: 'cip ' + (odendi ? 'kazanildi' : 'teklif'), style: 'margin-right: 6px' }, odendi ? 'Tahsil edildi' : 'Tahsilat bekliyor'),
+          odendi ? (gelir.odeme_tarihi ? gun(gelir.odeme_tarihi) : '') : gelir.vade ? 'vade ' + gun(gelir.vade) : 'vade yok');
+      }));
     }
-    // Aylık ve tek seferlik tutarlar toplanmaz: iki türlü teklifte tek tutarlı gelir kaydı açılmaz (sunucu da 409 döner).
-    if (teklifBloklari(t).length > 1) return el('span', { style: 'font-size: 13px; color: var(--tx2); max-width: 420px' }, 'Bu teklifte aylık ve tek seferlik tutarlar ayrı. Gelir kayıtlarını Muhasebe sayfasından ayrı ayrı ekleyin.');
+    const bloklar = teklifBloklari(t);
     const ileri = new Date(Date.now() + 3 * 3600000 + 30 * 86400000).toISOString().slice(0, 10);
     const vade = el('input', { type: 'date', value: ileri, 'aria-label': 'Vade tarihi', style: 'min-height: 38px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit' });
     return el('span', { style: 'display: inline-flex; gap: 6px; align-items: center; flex-wrap: wrap' }, vade,
       el('button', { type: 'button', class: 'dugme ana', onclick: async (o) => {
-        if (!confirm(`${t.no} için muhasebeye ${tutar(t.toplam)} tutarında, ${vade.value ? 'vadesi ' + gun(vade.value) : 'vadesiz'} bekleyen gelir kaydı eklensin mi?`)) return;
+        const vadeMetni = vade.value ? 'vadesi ' + gun(vade.value) : 'vadesiz';
+        const soru = bloklar.length > 1
+          ? `${t.no} için muhasebeye ${vadeMetni} iki ayrı bekleyen gelir kaydı eklensin mi?\n\n` + bloklar.map((b) => `· ${GELIR_ETIKET[b.tur]}: ${tutar(b.toplam)} (KDV dâhil)`).join('\n') + '\n\nİki tutar toplanmaz; her biri ayrı kayıt olur.'
+          : `${t.no} için muhasebeye ${tutar(t.toplam)} tutarında, ${vadeMetni} bekleyen gelir kaydı eklensin mi?`;
+        if (!confirm(soru)) return;
         const d = o.currentTarget; d.disabled = true;
-        try { await api(`teklifler/${encodeURIComponent(t.id)}/gelir`, { vade: vade.value }); await ac(t.id, 'Gelir kaydı oluşturuldu; Muhasebe sayfasında “bekliyor” olarak görünür.'); }
+        try { await api(`teklifler/${encodeURIComponent(t.id)}/gelir`, { vade: vade.value }); await ac(t.id, bloklar.length > 1 ? 'İki gelir kaydı oluşturuldu (aylık ilk ay ve tek seferlik); Muhasebe sayfasında “bekliyor” olarak görünür.' : 'Gelir kaydı oluşturuldu; Muhasebe sayfasında “bekliyor” olarak görünür.'); }
         catch (h) { genelHata('Gelir kaydı oluşturulamadı: ' + h.message); d.disabled = false; }
-      } }, 'Gelir kaydı oluştur'));
+      } }, bloklar.length > 1 ? 'İki gelir kaydı oluştur' : 'Gelir kaydı oluştur'));
   }
 
   async function ac(id, mesaj = '') {
@@ -170,7 +180,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const eylemler = {
       taslak: [el('button', { type: 'button', class: 'dugme', onclick: () => duzenle(t) }, 'Düzenle'), yazdir, dugme('Gönderildi olarak işaretle', 'gonderildi', true), dugme('Kopyala', 'kopyala'), dugme('Sil', 'sil')],
       gonderildi: [dugme('Kabul edildi', 'kabul', true), dugme('Reddedildi', 'red'), yazdir, dugme('Kopyala', 'kopyala')],
-      kabul: [gelirAlani(t, v.gelir), yazdir, dugme('Kopyala', 'kopyala')], red: [yazdir, dugme('Kopyala', 'kopyala')]
+      kabul: [gelirAlani(t, v.gelirler || (v.gelir ? [v.gelir] : [])), yazdir, dugme('Kopyala', 'kopyala')], red: [yazdir, dugme('Kopyala', 'kopyala')]
     }[t.durum] || [yazdir];
     const bilgi = [['Oluşturma', tarih(t.olusturma)], ['Geçerlilik', gun(t.gecerlilik)], t.gonderim_zamani ? ['Gönderildi', tarih(t.gonderim_zamani)] : null,
       t.karar_zamani ? [t.durum === 'kabul' ? 'Kabul' : 'Ret', tarih(t.karar_zamani)] : null, ['Hazırlayan', t.olusturan]].filter(Boolean);

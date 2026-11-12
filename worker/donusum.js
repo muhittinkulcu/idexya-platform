@@ -23,13 +23,18 @@ export const talepReklamSorgu = (db, talepId, v) => db.prepare(`INSERT INTO tale
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(talepId, v.gclid || null, v.gbraid || null, v.wbraid || null, v.fbclid || null, v.utm_source || null, v.utm_medium || null, v.utm_campaign || null, v.utm_term || null, v.utm_content || null, v.zaman);
 
 // Kazanılan müşterilere bağlı, tıklama kimliği olan talepler. Dönüşüm zamanı: kabul edilen son teklifin kararı, yoksa
-// aşamanın "Kazanıldı" olduğu kayıt, yoksa müşterinin son güncellemesi. Değer: kabul edilen tekliflerin KDV hariç toplamı, yoksa CRM değeri.
-// Aylık ve tek seferlik kalemi birlikte olan teklif (12 Kas 2026) değere katılmaz: iki tür toplanmaz (değer kuralı Muhittin'den bekleniyor).
+// aşamanın "Kazanıldı" olduğu kayıt, yoksa müşterinin son güncellemesi. Değer: kabul edilen tekliflerin KDV hariç, indirim düşülmüş değeri, yoksa CRM değeri.
+// Teklif değeri (Muhittin, 12 Kas 2026): aylık kalemli teklifte YILLIK değer = aylık net × 12 + tek seferlik net; yalnız tek seferlikte
+// tek seferlik net; türsüz (eski) teklifte ara_toplam − indirim. Bu yalnız platforma giden dönüşüm değeridir; ekranda
+// "Yıllık değer (aylık × 12 + tek seferlik)" diye adlandırılmadan gösterilmez (deger_yillik = 1).
+const TEKLIF_DEGER = `CASE WHEN x.toplam_aylik IS NOT NULL AND x.toplam_tek IS NOT NULL THEN x.ara_aylik * 12 + x.ara_tek
+  WHEN x.toplam_aylik IS NOT NULL THEN (x.ara_toplam - x.indirim) * 12 ELSE x.ara_toplam - x.indirim END`;
 async function adaylar(db) {
   const r = await db.prepare(`SELECT t.id AS talep_id, t.olusturma AS talep_zamani, t.kaynak, m.id AS musteri_id, m.firma, m.ad, m.deger, m.guncelleme,
       r.gclid, r.gbraid, r.wbraid, r.fbclid, r.utm_source, r.utm_medium, r.utm_campaign, r.tiklama_zamani,
       (SELECT MAX(karar_zamani) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul') AS kabul_zamani,
-      (SELECT SUM(ara_toplam - indirim) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul' AND NOT (x.toplam_aylik IS NOT NULL AND x.toplam_tek IS NOT NULL)) AS teklif_degeri,
+      (SELECT SUM(${TEKLIF_DEGER}) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul') AS teklif_degeri,
+      (SELECT MAX(CASE WHEN x.toplam_aylik IS NOT NULL THEN 1 ELSE 0 END) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul') AS teklif_yillik,
       (SELECT MAX(zaman) FROM kayitlar k WHERE k.musteri_id = m.id AND k.baslik = 'Aşama değişti' AND k.detay LIKE '%→ Kazanıldı%') AS asama_zamani,
       (SELECT zaman FROM donusum_aktarim a WHERE a.talep_id = t.id AND a.platform = 'google') AS google_aktarim,
       (SELECT zaman FROM donusum_aktarim a WHERE a.talep_id = t.id AND a.platform = 'meta') AS meta_aktarim
@@ -40,7 +45,8 @@ async function adaylar(db) {
     const donusum = x.kabul_zamani || x.asama_zamani || null;
     const deger = x.teklif_degeri ? Math.round(x.teklif_degeri * 100) / 100 : x.deger || null;
     const pencereDisi = !!(donusum && x.gclid && Date.parse(donusum) - Date.parse(x.tiklama_zamani) > GOOGLE_PENCERE);
-    return { ...x, kazanildi, donusum_zamani: donusum, deger, pencere_disi: pencereDisi };
+    const degerYillik = x.teklif_degeri && x.teklif_yillik ? 1 : 0;
+    return { ...x, kazanildi, donusum_zamani: donusum, deger, deger_yillik: degerYillik, pencere_disi: pencereDisi };
   });
 }
 

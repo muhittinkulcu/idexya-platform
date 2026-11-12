@@ -160,7 +160,55 @@ await post(`teklifler/${kid}/gonderildi`, {});
 await post(`teklifler/${kid}/kabul`, {});
 const gunluk = db.ham.prepare("SELECT detay FROM kayitlar WHERE musteri_id = 'm1' AND tur = 'teklif' ORDER BY zaman DESC LIMIT 1").get();
 k('günlük: iki tutar ayrı, toplam yok', gunluk && gunluk.detay.includes('24.000,00 TL / ay') && gunluk.detay.includes('6.000,00 TL') && !gunluk.detay.includes('30.000'));
-k('karışık teklifte tek tutarlı gelir kaydı 409', (await post(`teklifler/${kid}/gelir`, {})).status === 409);
+
+// --- Muhasebe: karışık teklifte iki ayrı gelir kaydı (Muhittin, 12 Kas 2026) ---
+const gelirler = (no) => db.ham.prepare("SELECT tutar, aciklama, belge_no FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? ORDER BY aciklama").all(no).map((x) => ({ ...x }));
+const kno = (await jsn(await istek('teklifler/' + kid))).teklif.no;
+r = await jsn(await post(`teklifler/${kid}/gelir`, {}));
+let gl = gelirler(kno);
+const glA = gl.find((x) => x.aciklama.includes('aylık (ilk ay)')), glT = gl.find((x) => x.aciklama.includes('tek seferlik'));
+k('karışık teklifte gelir kaydı 200', r.d === 200);
+k('karışık: iki gelir kaydı açılır', gl.length === 2);
+k('karışık: aylık (ilk ay) kaydı 24.000 TL (KDV dahil)', glA && glA.tutar === 2400000 && glA.aciklama.startsWith(kno + ' · aylık (ilk ay)'));
+k('karışık: tek seferlik kaydı 6.000 TL (KDV dahil)', glT && glT.tutar === 600000 && glT.aciklama.startsWith(kno + ' · tek seferlik'));
+k('karışık: 30.000 TL tutarlı kayıt yok', !gl.some((x) => x.tutar === 3000000));
+k('karışık: ikinci istek 409, mükerrer kayıt açılmaz', (await post(`teklifler/${kid}/gelir`, {})).status === 409 && gelirler(kno).length === 2);
+r = await jsn(await istek('teklifler/' + kid));
+k('teklif ayrıntısı iki gelir kaydını döner', Array.isArray(r.gelirler) && r.gelirler.length === 2 && !!r.gelir);
+
+// Tek türlü teklif: tek kayıt (indirimli aylık: 22.800 TL)
+const kabulEt = async (musteri, kalemler, indirim = 0) => {
+  const x = await jsn(await post('teklifler', { ...govde(kalemler), musteri_id: musteri, indirim }));
+  await post(`teklifler/${x.id}/gonderildi`, {}); await post(`teklifler/${x.id}/kabul`, {});
+  return x;
+};
+const z2 = new Date().toISOString();
+for (const [mid, gc, fb] of [['d1', 'gclid_karisik_0001', null], ['d2', 'gclid_aylik_00001', null], ['d3', null, 'fbclid_tek_000001'], ['d4', 'gclid_eski_000001', null]]) {
+  db.ham.prepare("INSERT INTO musteriler (id, olusturma, guncelleme, kaynak, firma, asama) VALUES (?, ?, ?, 'elle', ?, 'yeni')").run(mid, z2, z2, 'Firma ' + mid);
+  db.ham.prepare("INSERT INTO talepler (id, olusturma, kaynak, dogrulama, musteri_id) VALUES (?, ?, 'iletisim', 'test', ?)").run('t-' + mid, z2, mid);
+  db.ham.prepare('INSERT INTO talep_reklam (talep_id, gclid, fbclid, tiklama_zamani) VALUES (?, ?, ?, ?)').run('t-' + mid, gc, fb, z2);
+}
+const tekAylik = await kabulEt('d2', [KARISIK[0]], 1000);
+const tekNo = (await jsn(await istek('teklifler/' + tekAylik.id))).teklif.no;
+r = await jsn(await post(`teklifler/${tekAylik.id}/gelir`, {}));
+gl = gelirler(tekNo);
+k('tek türlü teklif: tek gelir kaydı, 22.800 TL', r.d === 200 && gl.length === 1 && gl[0].tutar === 2280000);
+k('tek türlü teklif: ikinci istek 409', (await post(`teklifler/${tekAylik.id}/gelir`, {})).status === 409 && gelirler(tekNo).length === 1);
+
+// --- Reklam dönüşüm değeri: yıllık değer = aylık net × 12 + tek seferlik net (KDV hariç, indirim düşülmüş) ---
+await kabulEt('d1', KARISIK);
+await kabulEt('d3', [KARISIK[1]], 500);
+db.ham.prepare(`INSERT INTO teklifler (id, no, musteri_id, baslik, kalemler, kdv_orani, indirim, para, durum, ara_toplam, kdv, toplam, olusturma, guncelleme, karar_zamani, olusturan)
+  VALUES ('eski-kabul', 'IDX-2026-0950', 'd4', 'Eski kabul', '[]', 20, 10, 'TRY', 'kabul', 100, 18, 108, ?, ?, ?, 'test')`).run(z2, z2, z2);
+r = await jsn(await istek('donusum'));
+const dd = (mid) => r.adaylar.find((x) => x.musteri_id === mid) || {};
+k('dönüşüm: karışık teklif değeri = 20.000 × 12 + 5.000 = 245.000', dd('d1').deger === 245000);
+k('dönüşüm: yalnız aylık (indirimli) = 19.000 × 12 = 228.000', dd('d2').deger === 228000);
+k('dönüşüm: yalnız tek seferlik (indirimli) = 4.500', dd('d3').deger === 4500);
+k('dönüşüm: eski türsüz teklif eskisi gibi (100 − 10 = 90)', dd('d4').deger === 90);
+k('dönüşüm: aylık kalemli değer yıllık olarak işaretli, diğerleri değil', dd('d1').deger_yillik === 1 && dd('d2').deger_yillik === 1 && !dd('d3').deger_yillik && !dd('d4').deger_yillik);
+const csvG = await (await istek('donusum/csv/google')).text();
+k('Google CSV: karışık teklif değeri 245000', csvG.includes('gclid_karisik_0001') && /gclid_karisik_0001,[^\r\n]*,245000,TRY/.test(csvG));
 
 if (h.length) { console.error(`\n${h.length} kontrol KALDI`); process.exit(1); }
 console.log('\nTüm kontroller geçti.');
