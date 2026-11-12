@@ -2,12 +2,12 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Medya kütüphanesi" aktif="medya" yol="İçerik" aciklama="İçeriklerde kullanacağınız görseller. Görseller yüklenmeden önce tarayıcıda küçültülür (en fazla 1280 piksel) ve sitenin kendi adresinden sunulur. Adresi kopyalayıp içerik metnine ekleyebilirsiniz.">
-<div class="kart" style="padding: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+<div class="kart" style="padding: 20px 22px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
 <label class="dugme ana" style="cursor: pointer">Görsel yükle<input type="file" accept="image/jpeg,image/png,image/webp" multiple data-dosya style="position: absolute; width: 1px; height: 1px; opacity: 0"></label>
 <input type="search" data-ara placeholder="Ada göre ara" aria-label="Görsel ara" style="flex: 1 1 200px; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit">
 <span data-durum role="status" style="font-size: 14px; color: var(--tx2)"></span>
 </div>
-<section class="kart" aria-label="Görseller" data-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px"></section>
+<section class="kart" aria-label="Görseller" data-liste style="padding: 20px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px"></section>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
   const liste = document.querySelector('[data-liste]'), durum = document.querySelector('[data-durum]'), ara = document.querySelector('[data-ara]');

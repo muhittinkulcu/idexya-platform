@@ -64,7 +64,7 @@ export function reklamBolumu(kok) {
     const alan = el('div', { class: 'cubuk-alan', style: 'height: 180px' }), x = el('div', { class: 'x-eksen' });
     const lejant = el('div', { class: 'lejant' }, ...seriler.map((sr) => el('span', {}, el('i', { style: `background: ${sr.renk}` }), `${sr.ad} `, el('b', { style: 'color: var(--head)' }, tl(Object.values(sr.degerler).reduce((a, b) => a + b, 0))))), el('span', { style: 'color: var(--tx2)' }, '28 gün · TRY'));
 
-    govde.replaceChildren(...uyari, el('div', { class: 'kpi-sira' }, ...kartlar), lejant, el('div', {}, alan, x), el('h3', { style: 'margin: 6px 0 0; font-size: 15px; color: var(--head); font-weight: 700' }, 'Hesap ayrıntıları'), reklamTablosu(r, yukle));
+    govde.replaceChildren(...uyari, el('div', { class: 'kpi-sira' }, ...kartlar), lejant, el('div', {}, alan, x), el('h3', { style: 'margin: 6px 0 0; font-size: 15px; color: var(--head); font-weight: 500' }, 'Hesap ayrıntıları'), reklamTablosu(r, yukle));
     yiginCiz(alan, x, g28, seriler, tl);
   }
 

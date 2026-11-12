@@ -16,12 +16,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hb-y{display:flex;flex-direction:column;gap:16px}
   .hb-y-ust{display:flex;flex-wrap:wrap;align-items:center;gap:8px}.hb-y-bosluk{flex:1}
   .hb-y-sekme{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--track,var(--card2))}
-  .hb-y-sekme button{min-height:34px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+  .hb-y-sekme button{min-height:34px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:500;cursor:pointer}
   .hb-y-sekme button[aria-selected=true]{background:rgb(var(--card));color:var(--head);box-shadow:0 1px 3px var(--shadow)}
   .dugme.birincil{background:var(--fill);border-color:var(--fill);color:#fff}
   .hb-y-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
   .hb-y-sayi{display:flex;flex-direction:column;gap:8px;padding:18px}
-  .hb-y-sayi small{color:var(--acc);font-weight:700}.hb-y-sayi b{font-size:17px;color:var(--head);line-height:1.3}
+  .hb-y-sayi small{color:var(--acc);font-weight:500}.hb-y-sayi b{font-size:17px;color:var(--head);line-height:1.3}
   .hb-y-ilerle{height:6px;border-radius:999px;background:var(--track,var(--card2));overflow:hidden}.hb-y-ilerle i{display:block;height:100%;background:var(--ok)}
   .hb-y-satir{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font-size:13px;color:var(--tx2)}
   .hb-y-eylem{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
@@ -30,7 +30,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hb-y-yan h3{margin:0;font-size:14px;color:var(--head)}
   .hb-y-sayac{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.hb-y-sayac div{padding:10px;border-radius:12px;background:var(--card2);text-align:center}.hb-y-sayac b{display:block;font-size:22px;color:var(--head)}.hb-y-sayac span{font-size:11.5px;color:var(--tx2)}
   .hb-y-suzgec{display:flex;flex-wrap:wrap;gap:6px}
-  .hb-y-cip{min-height:30px;padding:0 10px;border-radius:999px;border:1px solid rgb(var(--line));background:rgb(var(--card));color:var(--tx2);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+  .hb-y-cip{min-height:30px;padding:0 10px;border-radius:999px;border:1px solid rgb(var(--line));background:rgb(var(--card));color:var(--tx2);font:inherit;font-size:12.5px;font-weight:500;cursor:pointer}
   .hb-y-cip[aria-pressed=true]{background:var(--tint);border-color:var(--btnline);color:var(--tintx)}
   .hb-y-grup{display:flex;flex-direction:column;gap:10px}
   .hb-y-grup>h3{display:flex;align-items:center;gap:8px;margin:10px 0 0;font-size:15px;color:var(--head)}
@@ -121,7 +121,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
     gor.replaceChildren(el('div', { class: 'hb-y-editor' },
       el('div', { style: 'display:flex;flex-direction:column;gap:14px;min-width:0' },
-        el('div', { class: 'kart', style: 'padding:16px;display:flex;flex-direction:column;gap:10px' },
+        el('div', { class: 'kart', style: 'padding: 20px 22px;display:flex;flex-direction:column;gap:10px' },
           el('div', { class: 'hb-y-satir' }, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { acik = null; duzenlenen = null; kreatif = false; ciz(); } }, '← Sayılar'), el('b', { style: 'color:var(--acc)' }, `Sayı #${sayi.no} · ${gunYaz(sayi.hafta_bas)} – ${gunYaz(sayi.hafta_bit)}`), el('span', { class: 'cip ' + (yayinda ? 'kazanildi' : 'gorusme') }, yayinda ? 'Yayında' : 'Taslak')),
           el('label', { class: 'alan' }, 'Sayı başlığı', baslik), el('label', { class: 'alan' }, 'Özet', ozet), el('div', {}, kaydetSayi)),
         el('div', { class: 'hb-y-ust' },
@@ -196,7 +196,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       try { if (m) await api('haftalik-bulten/madde/' + m.id, g); else await api(`haftalik-bulten/sayi/${acik.sayi.id}/madde`, g); duzenlenen = null; genelHata(''); await yukle(); }
       catch (h) { genelHata(h.message); }
     };
-    return el('div', { class: 'kart', style: 'padding:16px;display:flex;flex-direction:column;gap:12px;border:2px solid var(--btnline)' },
+    return el('div', { class: 'kart', style: 'padding: 20px 22px;display:flex;flex-direction:column;gap:12px;border:2px solid var(--btnline)' },
       el('b', { style: 'color:var(--head)' }, m ? 'Maddeyi düzenle' : 'Yeni madde (taslak olarak eklenir)'),
       el('div', { class: 'hb-y-form' },
         el('label', { class: 'alan' }, 'Konu', f.konu), el('label', { class: 'alan' }, 'Gelişme tarihi', f.tarih), el('label', { class: 'alan' }, 'Etki', f.etki),

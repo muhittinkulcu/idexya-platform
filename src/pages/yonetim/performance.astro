@@ -86,7 +86,7 @@ import '../../scripts/yonetim/grafik.css';
       el('tbody', {}, ...Object.entries(o.basliklar.beklenen || {}).map(([b, beklenen]) => {
         const eksik = o.basliklar.eksik[b] || 0, yanlis = o.basliklar.yanlis[b];
         const iyi = !eksik && !yanlis && ornek[b];
-        return el('tr', {}, el('td', { style: hucre + '; font-weight: 600; white-space: nowrap' }, b.replace(/(^|-)([a-z])/g, (m, a, c) => a + c.toUpperCase())),
+        return el('tr', {}, el('td', { style: hucre + '; font-weight: 500; white-space: nowrap' }, b.replace(/(^|-)([a-z])/g, (m, a, c) => a + c.toUpperCase())),
           el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, beklenen),
           el('td', { style: hucre }, el('span', { class: 'cip ' + (iyi ? 'kazanildi' : 'kaybedildi') }, iyi ? `${o.basliklar.kontrol} sayfada var` : eksik ? `${eksik} sayfada eksik` : yanlis ? 'farklı değer: ' + yanlis : 'denetlenemedi')));
       }))));
@@ -106,7 +106,7 @@ import '../../scripts/yonetim/grafik.css';
         el('thead', {}, el('tr', {}, bas('Sayfa'), bas('HTML'), bas('Betik'), bas('Stil dosyası'), bas('Görsel'), bas('Bulgu'))),
         el('tbody', {}, ...gor.map((p) => { const s = hizKod(p); return el('tr', {},
           el('td', { style: hucre + '; min-width: 180px; overflow-wrap: anywhere' }, p.yol),
-          el('td', { style: hucre + '; white-space: nowrap; font-weight: 600' }, kb(p.boyut)),
+          el('td', { style: hucre + '; white-space: nowrap; font-weight: 500' }, kb(p.boyut)),
           el('td', { style: hucre }, sayi(p.betik)), el('td', { style: hucre }, sayi(p.stil)), el('td', { style: hucre }, sayi(p.gorsel)),
           el('td', { style: hucre + '; min-width: 200px' }, s.length ? s.map((x) => el('span', { class: 'cip ' + AGIRLIK_CIP[SORUN[x.k].agirlik], title: SORUN[x.k].aciklama + ' ' + SORUN[x.k].cozum, style: 'margin: 0 4px 4px 0' }, SORUN[x.k].ad)) : el('span', { class: 'cip kazanildi' }, 'Uygun'))); }))));
   }

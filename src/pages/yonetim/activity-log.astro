@@ -3,8 +3,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="İşlem geçmişi" aktif="gecmis" yol="Sistem" aciklama="Panelde ve sitede yapılan kayıtlı işlemler: kim, neyi, ne zaman yaptı. Kayıtlar değiştirilemez ve silinemez.">
 <div class="kart" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
-<label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">Ara<input data-ara type="search" placeholder="İşlem, kişi veya ayrıntı" style="min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
-<label style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 600">İşlem türü<select data-tur style="min-height: 40px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"><option value="">Tümü</option></select></label>
+<label style="flex: 1 1 240px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 500">Ara<input data-ara type="search" placeholder="İşlem, kişi veya ayrıntı" style="min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<label style="flex: 0 1 220px; display: flex; flex-direction: column; gap: 4px; font-size: 13px; font-weight: 500">İşlem türü<select data-tur style="min-height: 40px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"><option value="">Tümü</option></select></label>
 <button type="button" class="dugme" data-csv style="align-self: flex-end">CSV indir</button>
 </div>
 <section class="kart" aria-label="İşlemler" data-liste style="overflow-x: auto"></section>
@@ -25,7 +25,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('tbody', {}, ...g.slice(0, 500).map((k) => el('tr', {},
         el('td', { style: hucre + '; white-space: nowrap' }, tarih(k.zaman)),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, k.kim),
-        el('td', { style: hucre + '; font-weight: 600' }, ad(k.islem)),
+        el('td', { style: hucre + '; font-weight: 500' }, ad(k.islem)),
         el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, [k.detay, k.hedef].filter(Boolean).join(' · ') || '—'))))),
       g.length > 500 ? el('p', { style: 'padding: 10px 14px; color: var(--tx2); font-size: 13px' }, `İlk 500 kayıt gösteriliyor (toplam ${g.length}). Süzgeci daraltın ya da CSV indirin.`) : null].filter(Boolean));
   }

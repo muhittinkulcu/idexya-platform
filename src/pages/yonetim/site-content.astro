@@ -5,7 +5,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <nav class="kart" aria-label="İçerik dosyaları" data-dosyalar style="padding: 8px; display: flex; flex-wrap: wrap; gap: 4px"></nav>
 <div data-durum-kutu></div>
 <p data-aciklama style="margin: 0; color: var(--tx2)"></p>
-<section class="kart" data-duzenleyici style="padding: 16px; display: flex; flex-direction: column; gap: 12px" aria-live="polite"><div class="bos">Yükleniyor…</div></section>
+<section class="kart" data-duzenleyici style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px" aria-live="polite"><div class="bos">Yükleniyor…</div></section>
 <div class="kart si-cubuk" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: sticky; bottom: 12px; z-index: 5; box-shadow: 0 10px 30px var(--shadow)">
 <input data-not maxlength="120" placeholder="Değişiklik notu (isteğe bağlı)" aria-label="Değişiklik notu" style="flex: 1 1 240px; min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit">
 <button type="button" class="dugme ana" data-yayinla>Yayınla</button>
@@ -18,14 +18,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div data-medya-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; max-height: 60vh; overflow: auto"></div>
 </dialog>
 <style is:global>
-  .si-alan{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:600}
+  .si-alan{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500}
   .si-alan input,.si-alan textarea,.si-alan select{min-height:40px;padding:8px 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;font-weight:400}
   .si-alan textarea{min-height:80px;resize:vertical;line-height:1.5}
   .si-alan small{font-weight:400;color:var(--tx2)}
   .si-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
   .si-liste{display:flex;flex-direction:column;gap:8px;padding-left:10px;border-left:2px solid rgb(var(--line))}
   .si-oge{border:1px solid rgb(var(--line));border-radius:12px;background:rgb(var(--card))}
-  .si-oge>summary{cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 12px;font-weight:600;list-style:none}
+  .si-oge>summary{cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 12px;font-weight:500;list-style:none}
   .si-oge>summary::-webkit-details-marker{display:none}
   .si-oge>summary::before{content:"▸";color:var(--tx2);transition:transform .15s}
   .si-oge[open]>summary::before{transform:rotate(90deg)}
@@ -78,7 +78,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (s.tur === 'mantik') {
       const k = el('input', { id, type: 'checkbox', checked: deger ?? s.varsayilan ?? false, style: 'width: 20px; height: 20px; min-height: 0' });
       k.addEventListener('change', () => { ata(k.checked); isaretle(); });
-      return el('label', { for: id, style: 'display: flex; gap: 10px; align-items: center; font-weight: 600; font-size: 14px' }, k, s.etiket);
+      return el('label', { for: id, style: 'display: flex; gap: 10px; align-items: center; font-weight: 500; font-size: 14px' }, k, s.etiket);
     }
     if (s.tur === 'metinListe') {
       const paragraf = s.oge === 'paragraf', ayir = paragraf ? '\n\n' : '\n';

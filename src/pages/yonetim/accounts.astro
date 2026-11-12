@@ -10,7 +10,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hs-grup{display:flex;flex-direction:column}
   .hs-grup-bas{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgb(var(--line));flex-wrap:wrap}
   .hs-tablo{width:100%;min-width:860px;border-collapse:collapse;font-size:14px}
-  .hs-tablo th{padding:8px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
+  .hs-tablo th{padding:8px 16px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2)}
   .hs-tablo td{padding:10px 16px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
   .hs-kimlik{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
   .hs-uyari{display:flex;flex-direction:column;gap:6px}
@@ -108,14 +108,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
       return el('section', { class: 'kart hs-grup', 'aria-label': ilk.musteri_firma || ilk.musteri_ad || 'Müşteri' },
         el('div', { class: 'hs-grup-bas' },
           el('span', { style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' },
-            el('a', { href: '/customer?id=' + encodeURIComponent(mid), style: 'font-weight: 700; font-size: 16px; text-decoration: none' }, ilk.musteri_firma || ilk.musteri_ad || 'Adsız müşteri'),
+            el('a', { href: '/customer?id=' + encodeURIComponent(mid), style: 'font-weight: 500; font-size: 16px; text-decoration: none' }, ilk.musteri_firma || ilk.musteri_ad || 'Adsız müşteri'),
             kayip ? el('span', { class: 'cip kaybedildi' }, 'Çalışma bitti') : null,
             el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${ks.length} hesap · ${ks.filter((x) => x.durum === 'aktif').length} açık erişim`)),
           el('button', { type: 'button', class: 'dugme kucuk', onclick: () => formAc(null, mid) }, '+ Bu müşteriye ekle')),
         el('div', { style: 'overflow-x: auto' }, el('table', { class: 'hs-tablo' },
           el('thead', {}, el('tr', {}, ...['Platform', 'Hesap', 'Erişim', 'Erişen', 'Tarih', ''].map((b) => el('th', { scope: 'col' }, b)))),
           el('tbody', {}, ...ks.map((k) => el('tr', {},
-            el('td', { style: 'white-space: nowrap; font-weight: 600' }, v.platformlar[k.platform]?.ad || k.platform),
+            el('td', { style: 'white-space: nowrap; font-weight: 500' }, v.platformlar[k.platform]?.ad || k.platform),
             el('td', { style: 'max-width: 300px' }, k.hesap_adi ? el('div', { style: 'overflow-wrap: anywhere' }, k.hesap_adi) : null, k.hesap_kimligi ? el('div', { class: 'hs-kimlik', style: 'color: var(--tx2)' }, k.hesap_kimligi) : null,
               k.not_ ? el('div', { style: 'font-size: 12px; color: var(--tx2); white-space: pre-wrap; margin-top: 2px' }, k.not_) : null),
             el('td', {}, el('span', { class: 'cip ' + (CIP[k.durum] || '') }, v.durumlar[k.durum] || k.durum), el('div', { style: 'font-size: 12px; color: var(--tx2); margin-top: 4px' }, v.erisimTurleri[k.erisim_turu] || k.erisim_turu)),

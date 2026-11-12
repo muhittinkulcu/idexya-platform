@@ -24,7 +24,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     liste.replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
       el('thead', {}, el('tr', {}, ...['E-posta', 'Durum', 'Onay zamanı', 'Onay metni', 'Sayfa', 'Ayrılma', ''].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
       el('tbody', {}, ...gor.map((k) => el('tr', {},
-        el('td', { style: hucre + '; font-weight: 600; overflow-wrap: anywhere' }, k.eposta),
+        el('td', { style: hucre + '; font-weight: 500; overflow-wrap: anywhere' }, k.eposta),
         el('td', { style: hucre }, el('span', { class: 'cip ' + (k.durum === 'aktif' ? 'kazanildi' : 'kaybedildi') }, DURUM[k.durum] || k.durum)),
         el('td', { style: hucre }, tarih(k.onay_zamani)),
         el('td', { style: hucre }, k.onay_surum),
