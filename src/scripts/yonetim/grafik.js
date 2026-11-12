@@ -58,7 +58,7 @@ export function kpiKart({ ad, deger, onceki, metin, oncekiMetin, aciklama, seri,
     else if (onceki === 0) d = el('span', { class: 'degisim' }, el('span', { class: notr ? '' : 'ok-u' }, '▲ yeni'), `önceki dönemde 0 · ${alt}`);
     else {
       const f = Math.round((deger - onceki) / onceki * 100);
-      d = el('span', { class: 'degisim' }, f === 0 ? el('span', {}, '= %0') : el('span', { class: notr ? '' : f > 0 ? 'ok-u' : 'ok-a', style: notr ? 'font-weight: 700; color: var(--head)' : undefined }, (f > 0 ? '▲ %' : '▼ %') + Math.abs(f)), `${alt} (${sayi(onceki)})`);
+      d = el('span', { class: 'degisim' }, f === 0 ? el('span', {}, '= %0') : el('span', { class: notr ? '' : f > 0 ? 'ok-u' : 'ok-a', style: notr ? 'font-weight: 500; color: var(--head)' : undefined }, (f > 0 ? '▲ %' : '▼ %') + Math.abs(f)), `${alt} (${sayi(onceki)})`);
     }
     satirlar.push(d);
   }

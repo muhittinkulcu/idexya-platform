@@ -8,7 +8,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <button type="button" class="dugme ana" data-yeni>+ Yeni teklif</button>
 </div>
 
-<form class="kart" data-duzenleyici hidden novalidate style="padding: 18px; display: flex; flex-direction: column; gap: 16px">
+<form class="kart" data-duzenleyici hidden novalidate style="padding: 20px 22px; display: flex; flex-direction: column; gap: 16px">
 <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline">
 <h2 data-duz-baslik style="margin: 0; font-size: 20px; color: var(--head)">Yeni teklif</h2>
 <span data-duz-no style="font-size: 13px; color: var(--tx2)"></span>
@@ -38,7 +38,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 </form>
 
-<section class="kart" data-detay hidden aria-label="Teklif ayrıntısı" style="padding: 18px; display: flex; flex-direction: column; gap: 14px"></section>
+<section class="kart" data-detay hidden aria-label="Teklif ayrıntısı" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px"></section>
 <section class="kart" aria-label="Teklif listesi" data-liste style="overflow-x: auto"></section>
 
 <script>
@@ -86,7 +86,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     liste.replaceChildren(el('table', { style: 'width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px' },
       el('thead', {}, el('tr', {}, ...['No', 'Kaynak', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 4 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
       el('tbody', {}, ...gor.map((t) => t.kaynak === 'pdf' ? el('tr', { 'data-kaynak': 'pdf' },
-        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya`, target: '_blank', rel: 'noopener', style: 'font-weight: 600' }, 'PDF’i aç')),
+        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya`, target: '_blank', rel: 'noopener', style: 'font-weight: 500' }, 'PDF’i aç')),
         el('td', { style: hucre }, el('span', { class: 'cip' , style: 'border: 1px solid rgb(var(--line)); color: var(--tx2)' }, t.kaynak_dosya === 'sablon' ? 'Şablon' : 'Canva PDF')),
         el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi({ firma: t.firma, ad: t.musteri_ad })) : '—'),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.ad),
@@ -94,7 +94,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('td', { style: hucre }, el('span', { class: 'cip ' + CIP[t.durum] }, DURUM[t.durum] || t.durum)),
         el('td', { style: hucre + '; color: var(--tx2); white-space: nowrap' }, gun(t.tarih)))
       : el('tr', { style: t.id === seciliId ? 'background: var(--card2)' : '' },
-        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: adresMetni({ sekme, id: t.id }), style: 'font-weight: 600', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
+        el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: adresMetni({ sekme, id: t.id }), style: 'font-weight: 500', onclick: (o) => { o.preventDefault(); ac(t.id); } }, t.no)),
         el('td', { style: hucre }, el('span', { class: 'cip', style: 'border: 1px solid rgb(var(--line)); color: var(--tx2)' }, 'Panel')),
         el('td', { style: hucre }, t.musteri_id ? el('a', { href: '/customer?id=' + encodeURIComponent(t.musteri_id), style: 'text-decoration: none' }, musteriAdi(t)) : '—'),
         el('td', { style: hucre + '; overflow-wrap: anywhere' }, t.baslik),
@@ -191,7 +191,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   }
 
   function toplamListesi(t, ek) {
-    const sat = (a, b, guclu) => [el('dt', { style: guclu ? 'font-weight: 700; color: var(--head)' : 'color: var(--tx2)' }, a), el('dd', { style: 'margin: 0; text-align: right; white-space: nowrap' + (guclu ? '; font-weight: 700; color: var(--head)' : '') }, b)];
+    const sat = (a, b, guclu) => [el('dt', { style: guclu ? 'font-weight: 500; color: var(--head)' : 'color: var(--tx2)' }, a), el('dd', { style: 'margin: 0; text-align: right; white-space: nowrap' + (guclu ? '; font-weight: 500; color: var(--head)' : '') }, b)];
     const d = el('dl', { style: 'margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; padding: 14px; border-radius: 14px; background: var(--card2); border: 1px solid rgb(var(--line)); font-variant-numeric: tabular-nums' + (ek ? '; flex: ' + ek.flex : '') },
       ...sat('Ara toplam', tutar(t.ara_toplam)), ...(Number(t.indirim) > 0 ? sat('İndirim', '−' + tutar(t.indirim)) : []),
       ...sat(`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)), ...sat('Genel toplam', tutar(t.toplam), true));
@@ -215,7 +215,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('label', { class: 'alan', style: 'flex: 3 1 220px; min-width: 0' }, 'Hizmet / ürün', g('ad', 'text', k.ad, { maxlength: '200', required: true, placeholder: 'Ör. Aylık sosyal medya yönetimi' })),
         el('label', { class: 'alan', style: 'flex: 1 1 90px; min-width: 0' }, 'Adet', g('adet', 'number', k.adet ?? 1, { min: '0.01', step: '0.01', inputmode: 'decimal' })),
         el('label', { class: 'alan', style: 'flex: 1 1 130px; min-width: 0' }, 'Birim fiyat (TL)', g('birim_fiyat', 'number', k.birim_fiyat ?? '', { min: '0', step: '0.01', inputmode: 'decimal', placeholder: '0,00' })),
-        el('div', { style: 'flex: 1 1 120px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--head)' }, 'Tutar', el('span', { 'data-tutar': '', style: 'min-height: 42px; display: flex; align-items: center; font-weight: 600; font-variant-numeric: tabular-nums' }, tutar(0))),
+        el('div', { style: 'flex: 1 1 120px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 500; color: var(--head)' }, 'Tutar', el('span', { 'data-tutar': '', style: 'min-height: 42px; display: flex; align-items: center; font-weight: 500; font-variant-numeric: tabular-nums' }, tutar(0))),
         el('button', { type: 'button', class: 'dugme kucuk', 'data-kaldir': '', onclick: () => { li.remove(); kalemDegisti(); } }, 'Kaldır')),
       el('label', { class: 'alan' }, 'Açıklama (isteğe bağlı)', el('textarea', { name: 'aciklama', rows: '2', maxlength: '1000', style: 'resize: vertical', placeholder: 'Kapsam, süre, teslim edilecekler…' }, k.aciklama || '')));
     return li;

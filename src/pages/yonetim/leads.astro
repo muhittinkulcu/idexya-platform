@@ -5,7 +5,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div role="tablist" aria-label="Talep durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line)); align-self: flex-start; flex-wrap: wrap"></div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="Talep listesi" class="kart" data-liste style="flex: 2 1 380px; overflow: hidden"></section>
-<section aria-label="Talep ayrıntısı" class="kart" data-ayrinti style="flex: 3 1 460px; padding: 18px; display: flex; flex-direction: column; gap: 14px"></section>
+<section aria-label="Talep ayrıntısı" class="kart" data-ayrinti style="flex: 3 1 460px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px"></section>
 </div>
 <script>
   import { api, el, tarih, once, KAYNAK, TALEP_DURUM, genelHata, prm, adresMetni } from '../../scripts/yonetim/ortak.js';
@@ -66,7 +66,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('div', { style: 'display: flex; flex-direction: column; gap: 2px' }, el('strong', { style: 'font-size: 18px; color: var(--head)' }, t.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, (KAYNAK[t.kaynak] || t.kaynak) + ' · ' + tarih(t.olusturma))),
         el('span', { class: 'cip ' + t.durum, style: 'align-self: flex-start' }, TALEP_DURUM[t.durum] || t.durum)),
       el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px; font-size: 13px' },
-        alanlar.map(([ad, d]) => el('div', { style: 'padding: 10px 12px; border-radius: 10px; background: var(--card2); display: flex; flex-direction: column; min-width: 0' }, el('span', { style: 'font-size: 11px; color: var(--tx2)' }, ad), el('span', { style: 'font-weight: 600; overflow-wrap: anywhere' }, d)))),
+        alanlar.map(([ad, d]) => el('div', { style: 'padding: 10px 12px; border-radius: 10px; background: var(--card2); display: flex; flex-direction: column; min-width: 0' }, el('span', { style: 'font-size: 11px; color: var(--tx2)' }, ad), el('span', { style: 'font-weight: 500; overflow-wrap: anywhere' }, d)))),
       el('div', { style: 'padding: 12px 14px; border-radius: 12px; border: 1px solid rgb(var(--line)); font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere' }, t.mesaj || ek.not || 'Mesaj yazılmamış.'),
       el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, dugmeler),
       durumYaz

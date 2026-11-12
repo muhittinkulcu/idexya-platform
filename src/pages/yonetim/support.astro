@@ -61,7 +61,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
           ...s.mesajlar.map((m) => el('li', { class: 'ds-mesaj' + (m.yazan === 'ekip' ? ' ekip' : '') },
             el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${m.yazan === 'ekip' ? 'Idexya ekibi' : m.ad || 'Üye'} · ${tarih(m.zaman)}`),
             el('div', { style: 'white-space: pre-wrap; overflow-wrap: anywhere' }, m.metin)))),
-        el('label', { style: 'display: flex; flex-direction: column; gap: 6px; font-weight: 600' }, 'Yanıt', metin),
+        el('label', { style: 'display: flex; flex-direction: column; gap: 6px; font-weight: 500' }, 'Yanıt', metin),
         el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap' },
           el('button', { type: 'button', class: 'dugme ana', onclick: (o) => gonder(false, o.currentTarget) }, 'Yanıtla'),
           el('button', { type: 'button', class: 'dugme', onclick: (o) => gonder(true, o.currentTarget) }, 'Yanıtla ve kapat'),

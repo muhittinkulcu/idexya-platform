@@ -11,7 +11,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .sb-kart .sb-alt{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
   .cip.sb-hazir{background:var(--okb);color:var(--ok)}.cip.sb-onerilen{background:var(--card2);color:var(--tx2)}.cip.sb-pasif{background:var(--card2);color:var(--tx2)}
   .sb-tablo{width:100%;border-collapse:collapse;font-size:14px}
-  .sb-tablo th{padding:8px 10px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2);border-bottom:1px solid rgb(var(--line))}
+  .sb-tablo th{padding:8px 10px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2);border-bottom:1px solid rgb(var(--line))}
   .sb-tablo td{padding:8px 10px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
   .sb-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   .sb-tablo input[type=text],.sb-tablo select{min-height:36px;padding:4px 10px;border:1px solid rgb(var(--line));border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;box-sizing:border-box;max-width:100%}
@@ -28,7 +28,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .sb-onizleme{background:var(--card2);border-radius:16px;padding:16px;display:flex;justify-content:center}
   .sb-a4{width:min(100%,520px);aspect-ratio:1654/2339;background:#fff;position:relative;box-shadow:0 10px 30px var(--shadow);overflow:hidden}
   .sb-a4 img,.sb-a4 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
-  .sb-alan{position:absolute;outline:2px dashed var(--brand);background:rgba(240,122,35,.08);font-size:11px;color:#A9420A;font-weight:700;padding:2px 4px;box-sizing:border-box;overflow:hidden}
+  .sb-alan{position:absolute;outline:2px dashed var(--brand);background:rgba(240,122,35,.08);font-size:11px;color:#A9420A;font-weight:500;padding:2px 4px;box-sizing:border-box;overflow:hidden}
   .sb-yan{padding:16px;display:flex;flex-direction:column;gap:12px}
   .sb-adimlar{display:flex;gap:14px;flex-wrap:wrap;color:var(--tx2);font-size:13px;align-items:center}
   .sb-adimlar span{display:inline-flex;gap:6px;align-items:center}
@@ -46,7 +46,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <!-- 1. Şablonlar ve hizmet kataloğu -->
 <div data-s="liste" style="display: flex; flex-direction: column; gap: 16px">
   <div class="sb-izgara" data-sablonlar><p class="bos">Şablonlar yükleniyor…</p></div>
-  <section class="kart" id="catalog" aria-label="Hizmet kataloğu" data-katalog-bolum style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+  <section class="kart" id="catalog" aria-label="Hizmet kataloğu" data-katalog-bolum style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
     <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center">
       <div><h2 style="margin: 0; font-size: 16px; color: var(--head)">Hizmet kataloğu</h2><small style="color: var(--tx2)">Teklif oluştururken seçilen hizmetler ve varsayılan fiyatları (KDV hariç). Fiyat her teklifte değiştirilebilir. Hizmet silinmez, pasife alınır.</small></div>
       <button type="button" class="dugme ana kucuk" data-hizmet-yeni>+ Hizmet ekle</button>
@@ -98,7 +98,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     <label class="alan">Kayıt durumu<select name="durum"><option value="taslak">Taslak (henüz gönderilmedi)</option><option value="gonderildi">Gönderildi (ben gönderdim)</option></select></label>
     <label class="genis" style="display: flex; gap: 8px; align-items: flex-start; font-size: 13px"><input type="checkbox" name="asama" value="1" disabled> <span>Kartın aşamasını “Teklif gönderildi” yap ve günlüğe yaz (yalnız “Gönderildi” seçiliyse; ileri aşamadaki kart geri alınmaz)</span></label>
   </form>
-  <section class="kart" aria-label="Hizmetler ve fiyatlar" style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+  <section class="kart" aria-label="Hizmetler ve fiyatlar" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
     <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center">
       <div><h2 style="margin: 0; font-size: 16px; color: var(--head)">Hizmetler ve fiyatlar</h2><small style="color: var(--tx2)">Varsayılan fiyatlar hizmet kataloğundan gelir; bu teklif için değiştirilebilir. ** aylık, * tek seferlik hizmettir.</small></div>
       <button type="button" class="dugme kucuk" data-satir-ekle>+ Satır ekle</button>
@@ -112,7 +112,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     <button type="button" class="dugme ana" data-pdf>PDF oluştur ve karta kaydet</button>
   </div>
   <div class="uyari ok" data-sonuc hidden></div>
-  <section class="kart" aria-label="Önizleme" data-onizleme-bolum hidden style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+  <section class="kart" aria-label="Önizleme" data-onizleme-bolum hidden style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
     <h2 style="margin: 0; font-size: 16px; color: var(--head)">Önizleme</h2>
     <div class="sb-onizle-izgara" data-onizleme></div>
   </section>
@@ -199,7 +199,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     $('[data-katalog]').replaceChildren(el('table', { class: 'sb-tablo', style: 'min-width: 640px' },
       el('thead', {}, el('tr', {}, ...['Hizmet', 'Tür', 'Varsayılan fiyat (KDV hariç)', 'Simge', 'Durum', ''].map((b, i) => el('th', { scope: 'col', class: i === 2 ? 'sayi' : '' }, b)))),
       el('tbody', {}, ...katalog.map((h) => el('tr', { 'data-hizmet': h.id, style: h.aktif ? '' : 'opacity: .65' },
-        el('td', { style: 'font-weight: 600; color: var(--head)' }, h.ad),
+        el('td', { style: 'font-weight: 500; color: var(--head)' }, h.ad),
         el('td', {}, TUR[h.tur] || h.tur),
         el('td', { class: 'sayi' }, tlTam(h.varsayilan_fiyat_kurus)),
         el('td', {}, SIMGE[h.simge] || h.simge),
@@ -381,7 +381,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
           oninput: (o) => { k.fiyat = o.target.value; o.target.setAttribute('aria-invalid', String(Number.isNaN(kurusOku(k.fiyat)))); if (k.fiyat.trim()) { k.secili = true; o.target.closest('tr').querySelector('input[type=checkbox]').checked = true; } toplamCiz(); } });
         return el('tr', { 'data-kalem': k.kid || 'ozel' },
           el('td', { style: 'width: 32px' }, el('input', { type: 'checkbox', checked: k.secili, 'aria-label': `${k.ad || 'Satır'} teklife eklensin`, onchange: (o) => { k.secili = o.target.checked; toplamCiz(); } })),
-          el('td', {}, k.kid ? el('span', { style: 'font-weight: 600; color: var(--head)' }, k.ad) : el('input', { type: 'text', value: k.ad, maxlength: 120, placeholder: 'Hizmet adı', 'aria-label': 'Katalog dışı hizmet adı', style: 'width: 100%', oninput: (o) => { k.ad = o.target.value; } })),
+          el('td', {}, k.kid ? el('span', { style: 'font-weight: 500; color: var(--head)' }, k.ad) : el('input', { type: 'text', value: k.ad, maxlength: 120, placeholder: 'Hizmet adı', 'aria-label': 'Katalog dışı hizmet adı', style: 'width: 100%', oninput: (o) => { k.ad = o.target.value; } })),
           el('td', {}, k.kid ? TUR[k.tur] + (k.tur === 'aylik' ? ' **' : ' *') : el('select', { 'aria-label': 'Tür', onchange: (o) => { k.tur = o.target.value; toplamCiz(); } }, ...Object.entries(TUR).map(([v, ad]) => el('option', { value: v, selected: v === k.tur }, ad)))),
           el('td', { class: 'sayi' }, fiyatGir),
           el('td', { style: 'text-align: right' }, k.kid ? '' : el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { kalemler.splice(i, 1); kalemCiz(); } }, 'Kaldır')));

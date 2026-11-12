@@ -7,13 +7,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .mh-arac input,.mh-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
   .mh-ozet{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(170px,100%),1fr));gap:10px}
   .mh-ozet .kart{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-radius:16px}
-  .mh-ozet .mh-ad{font-size:12px;font-weight:600;color:var(--tx2)}
-  .mh-ozet .mh-deger{font-size:21px;font-weight:800;color:var(--head);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .mh-ozet .mh-ad{font-size:12px;font-weight:500;color:var(--tx2)}
+  .mh-ozet .mh-deger{font-size:21px;font-weight:500;color:var(--head);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
   .mh-ozet .mh-alt{font-size:12px;color:var(--tx2)}
   .mh-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));gap:12px;align-items:end}
   .mh-form .genis{grid-column:1/-1}
   .mh-tablo{width:100%;min-width:920px;border-collapse:collapse;font-size:14px}
-  .mh-tablo th{padding:10px 12px;text-align:left;font-size:12px;font-weight:600;color:var(--tx2)}
+  .mh-tablo th{padding:10px 12px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2)}
   .mh-tablo td{padding:10px 12px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
   .mh-tablo .sayi{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
 </style>
@@ -138,11 +138,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const durumHucre = (k) => el('td', {},
     el('span', { class: 'cip ' + (k.durum === 'odendi' ? 'kazanildi' : gecikti(k) ? 'kaybedildi' : 'gorusme') }, durumAdi(k)),
     k.durum === 'odendi' && k.odeme_tarihi ? el('div', { style: 'font-size: 12px; color: var(--tx2); margin-top: 2px' }, gun(k.odeme_tarihi)) : null,
-    k.durum === 'bekliyor' && k.vade ? el('div', { style: `font-size: 12px; margin-top: 2px; color: ${gecikti(k) ? 'var(--err); font-weight: 600' : 'var(--tx2)'}` }, 'Vade ' + gun(k.vade) + (gecikti(k) ? ' · geçti' : '')) : null);
+    k.durum === 'bekliyor' && k.vade ? el('div', { style: `font-size: 12px; margin-top: 2px; color: ${gecikti(k) ? 'var(--err); font-weight: 500' : 'var(--tx2)'}` }, 'Vade ' + gun(k.vade) + (gecikti(k) ? ' · geçti' : '')) : null);
   const aciklamaHucre = (k) => el('td', { style: 'max-width: 320px' },
-    el('div', { style: 'font-weight: 600; overflow-wrap: anywhere' }, k.aciklama),
+    el('div', { style: 'font-weight: 500; overflow-wrap: anywhere' }, k.aciklama),
     el('div', { style: 'font-size: 12px; color: var(--tx2); display: flex; gap: 4px 8px; flex-wrap: wrap' }, k.kategori ? el('span', {}, k.kategori) : null, musteriBag(k), k.belge_no ? el('span', {}, 'No: ' + k.belge_no) : null));
-  const tutarHucre = (k) => el('td', { class: 'sayi', style: 'font-weight: 700; color: ' + (k.tur === 'gelir' ? 'var(--ok)' : 'var(--err)') }, (k.tur === 'gider' ? '−' : '+') + tl(k.tutar));
+  const tutarHucre = (k) => el('td', { class: 'sayi', style: 'font-weight: 500; color: ' + (k.tur === 'gelir' ? 'var(--ok)' : 'var(--err)') }, (k.tur === 'gider' ? '−' : '+') + tl(k.tutar));
   const turHucre = (k) => el('td', {}, k.tur === 'gelir' ? 'Gelir' : 'Gider');
 
   function suzulmus() {
@@ -161,7 +161,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('td', { style: 'white-space: nowrap' }, gun(k.tarih)), turHucre(k), aciklamaHucre(k), tutarHucre(k),
         el('td', { class: 'sayi', style: 'color: var(--tx2); font-size: 13px' }, `%${k.kdv_orani}`, el('div', {}, tl(kdvPay(k.tutar, k.kdv_orani)))),
         durumHucre(k), el('td', {}, eylemler(k))))),
-      el('tfoot', {}, el('tr', {}, el('td', { colspan: '3', style: 'font-weight: 600; color: var(--tx2)' }, `${gor.length} kayıt` + (gor.length !== veri.kayitlar.length ? ' (süzülmüş)' : '')),
+      el('tfoot', {}, el('tr', {}, el('td', { colspan: '3', style: 'font-weight: 500; color: var(--tx2)' }, `${gor.length} kayıt` + (gor.length !== veri.kayitlar.length ? ' (süzülmüş)' : '')),
         el('td', { class: 'sayi', colspan: '2', style: 'font-size: 13px' }, el('div', { style: 'color: var(--ok)' }, '+' + tl(top('gelir'))), el('div', { style: 'color: var(--err)' }, '−' + tl(top('gider')))), el('td', { colspan: '2' })))));
   }
   function gecikenCiz() {

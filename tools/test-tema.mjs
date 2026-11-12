@@ -49,4 +49,29 @@ await s3.goto(B + '/dashboard'); await s3.waitForSelector('[data-tema-grup]');
 k('mobilde yatay taşma yok', await s3.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
 k('mobilde grup görünür', await s3.isVisible('[data-tema-grup]'));
 await s3.screenshot({ path: SS + '/tema-mobil-koyu.png' });
+// 7) İnce ve ferah tipografi (Muhittin, 12 Kas 2026): Inter yerel dosyadan, dış yazı tipi isteği yok; gövde 300 ve satır aralığı 1,65;
+//    düğme ve menü öğeleri en çok 500 (logo yazısı `.logo b` hariç). Açık ve koyu temada aynı.
+for (const renk of ['light', 'dark']) {
+  const c4 = await t.newContext({ colorScheme: renk, viewport: { width: 1280, height: 800 } }); const s4 = await c4.newPage();
+  const dis = []; s4.on('request', (r) => { const u = new URL(r.url()); if (!['panel.localhost', '127.0.0.1', 'localhost'].includes(u.hostname)) dis.push(u.hostname); });
+  await s4.goto(B + '/dashboard'); await s4.waitForSelector('[data-tema-grup]'); await s4.waitForLoadState('networkidle');
+  const ty = await s4.evaluate(async () => {
+    await document.fonts.ready;
+    const yuzler = []; let google = !!document.querySelector('link[href*="fonts.googleapis.com"],link[href*="fonts.gstatic.com"]');
+    for (const ss of document.styleSheets) { let kurallar = []; try { kurallar = [...ss.cssRules]; } catch { google = google || /googleapis|gstatic/.test(ss.href || ''); continue; }
+      for (const r of kurallar) { if (r.constructor.name === 'CSSFontFaceRule') yuzler.push([r.style.getPropertyValue('font-family'), r.style.getPropertyValue('src')]); if (/googleapis|gstatic/.test(r.cssText)) google = true; } }
+    const k = getComputedStyle(document.querySelector('.kabuk')); const ag = (q) => [...document.querySelectorAll(q)].map((e) => Number(getComputedStyle(e).fontWeight));
+    return { yuzler, google, agirlik: k.fontWeight, satir: parseFloat(k.lineHeight) / parseFloat(k.fontSize), aile: k.fontFamily,
+      dugme: ag('.dugme'), menu: ag('.mo, .alt a, .alt span, .mg>.grup-ad, .rozet, .ucan-bas'), baslik: ag('.sayfa h1, .sayfa-yolu [aria-current=page]'),
+      yuklu: document.fonts.check('300 14px Inter') && [...document.fonts].some((f) => f.family.replace(/"/g, '') === 'Inter' && f.status === 'loaded') };
+  });
+  const interYerel = ty.yuzler.filter(([a, src]) => /Inter/.test(a) && /\/fonts\/inter-/.test(src));
+  k(`tipografi (${renk}): @font-face Inter yerel /fonts/inter- yolundan`, interYerel.length >= 6);
+  k(`tipografi (${renk}): Google Fonts ve dış istek yok`, !ty.google && dis.length === 0);
+  k(`tipografi (${renk}): gövde Inter, 300, satır aralığı 1,65`, /^"?Inter/.test(ty.aile) && ty.agirlik === '300' && Math.abs(ty.satir - 1.65) < 0.01 && ty.yuklu);
+  k(`tipografi (${renk}): düğmeler en çok 500`, ty.dugme.length > 0 && ty.dugme.every((w) => w <= 500));
+  k(`tipografi (${renk}): menü öğeleri en çok 500`, ty.menu.length > 0 && ty.menu.every((w) => w <= 500));
+  k(`tipografi (${renk}): başlıklar 500`, ty.baslik.length > 0 && ty.baslik.every((w) => w === 500));
+  await c4.close();
+}
 await t.close(); console.log(h.length ? 'KALAN: ' + h.join(', ') : 'Hepsi geçti.'); process.exit(h.length ? 1 : 0);
