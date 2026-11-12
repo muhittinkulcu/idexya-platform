@@ -1,7 +1,11 @@
 // Belge şablonları ve hizmet kataloğu (Muhittin, 11 Kas 2026): teklif gibi belgeler panelde şablondan üretilir.
 // · Şablon = sayfa listesi (sürümlü). Her kayıt yeni sürüm yazar; eski sürümler silinmez (eski belgeler kendi sürümünü korur).
 // · Sayfa tipleri: sabit (yalnız görsel), kapak (görsel + firma adı ve tarih), hizmetler (görsel + seçilen hizmetler),
-//   kalemler (görsel + fiyat satırları). Değişken alanların yeri sayfanın "alanlar" bilgisinde (1654 × 2339 piksel ölçeğinde).
+//   kalemler (görsel + fiyat satırları), metin (antetli A4; sade biçimli metin, değişkenler doldurulur, taşan metin sonraki
+//   sayfaya akar; biçim kuralları src/scripts/yonetim/sablon-metin.js). Sayfanın "kosul" alanı (ör. ton=2, ek_1b=evet)
+//   sayfayı yalnız o seçimde belgeye katar.
+// · Durum: hazir (kullanılır), taslak (kullanılır ama PDF'in her sayfası "TASLAK" damgası taşır; ör. avukat incelemesi
+//   bekleyen sözleşme), onerilen (yalnız kart; içeriği yok). Sürüm kaydı durumu değiştirmez; taslak → hazır elle yapılır. Değişken alanların yeri sayfanın "alanlar" bilgisinde (1654 × 2339 piksel ölçeğinde).
 // · Varsayılan sayfa görselleri derlemeyle gelir (/yonetim/veri/sablon/…; yalnız yönetim oturumuyla açılır).
 //   Panelden değiştirilen görsel R2'de (YEDEK bağlaması) "sablon/<sablon_id>/<sürüm>/<sayfa>.jpg" anahtarıyla durur.
 //   Yedek temizliği (worker/yedek.js) yalnız "yedek/" önekine dokunur.
@@ -9,9 +13,15 @@
 // · Bu modül e-posta ya da bildirim GÖNDERMEZ.
 import { json, hata, simdi, kimlik, kirp, islemYaz, GUVENLIK_BASLIKLARI } from './ortak.js';
 import { tutarKurus } from './teklif-dosya.js';
+import { SABLON_ICERIK } from './sablon-icerik.js';
 
-export const SABLON_TUR = { teklif: 'Fiyat teklifi', sozlesme: 'Hizmet sözleşmesi', erisim: 'Başlangıç ve erişim talebi', odeme_hatirlatma: 'Ödeme hatırlatma yazısı', teslim: 'Teslim ve iş tamamlama tutanağı', fiyat_guncelleme: 'Fiyat güncelleme bildirimi' };
-export const SAYFA_TIP = { sabit: 'Sabit görsel', kapak: 'Kapak', hizmetler: 'Hizmet listesi', kalemler: 'Fiyat tablosu' };
+export const SABLON_TUR = { teklif: 'Fiyat teklifi', sozlesme: 'Hizmet sözleşmesi', erisim: 'Başlangıç ve erişim talebi', odeme_hatirlatma: 'Ödeme hatırlatma yazısı', teslim: 'Teslim ve iş tamamlama tutanağı', fiyat_guncelleme: 'Fiyat güncelleme bildirimi',
+  // Araştırmanın önerdiği ek şablonlar: yalnız "önerilen" kart, içerik yok (12 Kas 2026)
+  brief: 'İş emri ve brief formu', ek_is: 'Ek iş ve kapsam değişikliği talebi', icerik_onay: 'İçerik onay formu', hesap_devir: 'Hesap devir ve ayrılış tutanağı', gizlilik: 'Gizlilik sözleşmesi', rapor_kapagi: 'Aylık performans raporu kapağı' };
+export const SAYFA_TIP = { sabit: 'Sabit görsel', kapak: 'Kapak', hizmetler: 'Hizmet listesi', kalemler: 'Fiyat tablosu', metin: 'Metin sayfası' };
+export const SABLON_DURUM = { hazir: 'Hazır', taslak: 'Taslak', onerilen: 'Önerilen' };
+export const METIN_SINIR = 30000;
+const KOSUL_DESEN = /^[a-z0-9_]{1,40}(!=|=)[a-z0-9_,]{0,100}$/;
 export const HIZMET_TUR = { aylik: 'Aylık', tek_seferlik: 'Tek seferlik' };
 export const SIMGELER = ['google', 'meta', 'genel'];
 export const GORSEL_ONEK = 'sablon/';
@@ -55,8 +65,14 @@ export async function sablonTohumla(db) {
   if (tohumHazir) return;
   const z = '2026-11-11T00:00:00.000Z';
   const s = Object.entries(SABLON_TUR).map(([tur, ad]) => db.prepare('INSERT OR IGNORE INTO belge_sablonlari (id, tur, ad, durum, aktif_surum, olusturma, guncelleme) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(tur, tur, ad, tur === 'teklif' ? 'hazir' : 'onerilen', tur === 'teklif' ? 1 : null, z, z));
+    .bind(tur, tur, ad, tur === 'teklif' ? 'hazir' : 'onerilen', tur === 'teklif' ? 1 : null, SABLON_ICERIK[tur] || tur === 'teklif' ? z : '2026-11-12T00:00:00.000Z', z));
   s.push(db.prepare('INSERT OR IGNORE INTO belge_sablon_surumleri (sablon_id, surum, sayfalar, olusturan, olusturma) VALUES (?, 1, ?, ?, ?)').bind('teklif', JSON.stringify(TEKLIF_V1), 'sistem', z));
+  // Metin şablonları (12 Kas 2026): önerilen durumdaki ve sürümü olmayan şablona ilk sürüm yazılır; elle değiştirilmiş şablona dokunulmaz.
+  for (const [id, { durum, sayfalar }] of Object.entries(SABLON_ICERIK)) {
+    s.push(db.prepare("INSERT INTO belge_sablon_surumleri (sablon_id, surum, sayfalar, olusturan, olusturma) SELECT ?, 1, ?, 'sistem', ? WHERE NOT EXISTS (SELECT 1 FROM belge_sablon_surumleri WHERE sablon_id = ?)")
+      .bind(id, JSON.stringify(sayfalar), '2026-11-12T00:00:00.000Z', id));
+    s.push(db.prepare("UPDATE belge_sablonlari SET durum = ?, aktif_surum = 1, guncelleme = ? WHERE id = ? AND durum = 'onerilen' AND aktif_surum IS NULL").bind(durum, '2026-11-12T00:00:00.000Z', id));
+  }
   const say = await db.prepare('SELECT COUNT(*) AS n FROM hizmet_katalogu').first();
   if (!say || !say.n) TOHUM_HIZMET.forEach(([id, ad, tur, fiyat, simge], i) => s.push(db.prepare('INSERT OR IGNORE INTO hizmet_katalogu (id, ad, tur, varsayilan_fiyat_kurus, simge, sira, aktif, olusturma, guncelleme) VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)')
     .bind(id, ad, tur, fiyat, simge, (i + 1) * 10, z, z)));
@@ -101,9 +117,17 @@ export function sayfalariDenetle(sayfalar, sablonId) {
     if (!SAYFA_TIP[s.tip]) return { hata: `${no}. sayfanın tipi geçersiz` };
     const ad = kirp(s.ad, 80);
     if (!ad) return { hata: `${no}. sayfanın adı gerekli` };
-    const g = String(s.gorsel || '');
+    const g = s.tip === 'metin' ? '' : String(s.gorsel || '');
     const r2 = g.match(/^sablon\/([\w-]{1,40})\/(\d{1,4})\/(\d{1,2})\.jpg$/);
-    if (!VARSAYILAN_YOL.test(g) && !(r2 && r2[1] === sablonId)) return { hata: `${no}. sayfanın görseli geçersiz` };
+    if (s.tip !== 'metin' && !VARSAYILAN_YOL.test(g) && !(r2 && r2[1] === sablonId)) return { hata: `${no}. sayfanın görseli geçersiz` };
+    let metin;
+    if (s.tip === 'metin') {
+      if (typeof s.metin !== 'string' || s.metin.length > METIN_SINIR) return { hata: `${no}. sayfanın metni geçersiz (en çok ${METIN_SINIR} karakter)` };
+      // Metin hiçbir yerde HTML olarak yorumlanmaz (canvas'a düz yazı olarak çizilir); denetim karakterleri yine de atılır.
+      metin = s.metin.replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000b-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g, '');
+    }
+    const kosul = s.kosul === undefined || s.kosul === null || s.kosul === '' ? '' : String(s.kosul);
+    if (kosul && !KOSUL_DESEN.test(kosul)) return { hata: `${no}. sayfanın koşulu geçersiz (ör. ton=2)` };
     const metinler = {};
     const m = s.metinler && typeof s.metinler === 'object' && !Array.isArray(s.metinler) ? s.metinler : {};
     if (Object.keys(m).length > 10) return { hata: `${no}. sayfada en çok 10 metin olabilir` };
@@ -125,7 +149,7 @@ export function sayfalariDenetle(sayfalar, sablonId) {
       }
       alanlar[k] = o;
     }
-    temiz.push({ tip: s.tip, ad, gorsel: g, metinler, alanlar });
+    temiz.push({ tip: s.tip, ad, gorsel: g, metinler, alanlar, ...(metin !== undefined ? { metin } : {}), ...(kosul ? { kosul } : {}) });
   }
   return { sayfalar: temiz };
 }
@@ -249,7 +273,7 @@ export async function yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim) {
     const { sayfalar, hata: h } = sayfalariDenetle(govde.sayfalar, s.id);
     if (h) return hata(h, 422);
     const metin = JSON.stringify(sayfalar);
-    if (metin.length > 60000) return hata('Şablon çok büyük', 413);
+    if (metin.length > 200000) return hata('Şablon çok büyük', 413);
     // Yalnız bu sürümden önce yüklenmiş ve depoda bulunan görseller kabul edilir.
     for (const x of sayfalar) {
       if (!x.gorsel.startsWith(GORSEL_ONEK)) continue;
@@ -263,7 +287,7 @@ export async function yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim) {
     try {
       await db.batch([
         db.prepare('INSERT INTO belge_sablon_surumleri (sablon_id, surum, sayfalar, olusturan, olusturma) VALUES (?, ?, ?, ?, ?)').bind(s.id, yeni, metin, kim.eposta, z),
-        db.prepare("UPDATE belge_sablonlari SET aktif_surum = ?, durum = 'hazir', guncelleme = ? WHERE id = ?").bind(yeni, z, s.id)
+        db.prepare("UPDATE belge_sablonlari SET aktif_surum = ?, durum = CASE WHEN durum = 'taslak' THEN 'taslak' ELSE 'hazir' END, guncelleme = ? WHERE id = ?").bind(yeni, z, s.id)
       ]);
     } catch (e) {
       if (/UNIQUE|PRIMARY/i.test(String(e && e.message))) return hata('Şablon bu arada kaydedildi; sayfayı yenileyin', 409);
@@ -271,6 +295,18 @@ export async function yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim) {
     }
     await islemYaz(db, kim.eposta, 'sablon_surum_kaydet', s.id, `${s.ad} · sürüm ${yeni} · ${sayfalar.length} sayfa`);
     return json({ ok: true, surum: yeni });
+  }
+  // Durum: taslak ↔ hazır (ör. sözleşme avukat incelemesinden geçince). Önerilen şablonun durumu buradan değişmez.
+  m = yol.match(/^belge-sablonlari\/([\w-]{1,40})\/durum$/);
+  if (m && yontem === 'POST') {
+    const s = await db.prepare('SELECT id, ad, durum, aktif_surum FROM belge_sablonlari WHERE id = ?').bind(m[1]).first();
+    if (!s) return hata('Şablon bulunamadı', 404);
+    if (s.durum === 'onerilen' || !s.aktif_surum) return hata('Bu şablonun içeriği henüz yok', 409);
+    if (!['hazir', 'taslak'].includes(govde.durum)) return hata('Durum hazır ya da taslak olmalı', 422);
+    if (govde.durum === s.durum) return json({ ok: true, degisen: false });
+    await db.prepare('UPDATE belge_sablonlari SET durum = ?, guncelleme = ? WHERE id = ?').bind(govde.durum, z, s.id).run();
+    await islemYaz(db, kim.eposta, 'sablon_durum', s.id, `${s.ad} · ${SABLON_DURUM[s.durum]} → ${SABLON_DURUM[govde.durum]}`);
+    return json({ ok: true, degisen: true });
   }
   // Panelden yüklenen sayfa görseli (R2). Yalnız yönetim oturumuyla açılır.
   m = yol.match(/^belge-sablonlari\/([\w-]{1,40})\/gorsel\/(\d{1,4})\/(\d{1,2})$/);

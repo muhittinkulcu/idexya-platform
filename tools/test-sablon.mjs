@@ -82,7 +82,11 @@ for (const [t, sut] of [['belge_sablonlari', ['id', 'tur', 'ad', 'durum', 'aktif
   k(`şema: ${t} sütunları`, sut.every((x) => v.includes(x)));
 }
 k('şema: teklif_dosyalari.kaynak sütunu', db.ham.prepare('PRAGMA table_info(teklif_dosyalari)').all().some((x) => x.name === 'kaynak'));
-k('6 şablon: teklif hazır, 5 önerilen', r.sablonlar.length === 6 && r.sablonlar.filter((s) => s.durum === 'onerilen').length === 5 && r.sablonlar.find((s) => s.id === 'teklif').durum === 'hazir');
+const durumu = (id) => (r.sablonlar.find((s) => s.id === id) || {}).durum;
+k('12 şablon: teklif + 4 metin şablonu hazır, sözleşme taslak, 6 önerilen yeni kart', r.sablonlar.length === 12 && durumu('teklif') === 'hazir'
+  && ['erisim', 'odeme_hatirlatma', 'fiyat_guncelleme', 'teslim'].every((i) => durumu(i) === 'hazir') && durumu('sozlesme') === 'taslak'
+  && ['brief', 'ek_is', 'icerik_onay', 'hesap_devir', 'gizlilik', 'rapor_kapagi'].every((i) => durumu(i) === 'onerilen') && r.sablonlar.filter((s) => s.durum === 'onerilen').length === 6);
+k('hazır ve taslak şablonların sürüm 1 içeriği var', ['erisim', 'odeme_hatirlatma', 'fiyat_guncelleme', 'teslim', 'sozlesme'].every((i) => r.sablonlar.find((s) => s.id === i).aktif_surum === 1));
 const kat = (await jsn(await istek('hizmet-katalogu'))).hizmetler;
 const BEKLENEN = [['Google Reklam Yönetimi', 'aylik', 2000000], ['Meta Reklam Yönetimi', 'aylik', 2000000], ['SEO Yönetimi', 'aylik', null], ['Sosyal Medya İçerik Yönetimi', 'aylik', null],
   ['Online Pazaryeri Yönetimi', 'aylik', null], ['Kurumsal Website Tasarımı', 'tek_seferlik', null], ['E-Ticaret Website Tasarımı', 'tek_seferlik', null], ['Web Sitesi Programlama ve Yazılım Bedeli', 'tek_seferlik', null]];
@@ -120,7 +124,7 @@ k('aktif sürüm 2, 2 sürüm listede', s.sablon.aktif_surum === 2 && s.surumler
 k('sürüm kaydı işlem kaydında', db.ham.prepare("SELECT COUNT(*) AS n FROM islem_kaydi WHERE islem = 'sablon_surum_kaydet'").get().n === 1);
 k('olmayan sürüm 404', (await istek('belge-sablonlari/teklif/surum/99')).status === 404);
 k('olmayan şablon 404', (await istek('belge-sablonlari/yok')).status === 404);
-k('önerilen şablona sürüm kaydı 409', (await post('belge-sablonlari/sozlesme/surum', { sayfalar: v2 })).status === 409);
+k('önerilen şablona sürüm kaydı 409', (await post('belge-sablonlari/brief/surum', { sayfalar: v2 })).status === 409);
 const kotu = (deg) => { const x = structuredClone(v2); deg(x); return post('belge-sablonlari/teklif/surum', { sayfalar: x }); };
 k('dış adresli görsel reddedilir 422', (await kotu((x) => { x[1].gorsel = 'https://kotu.example/a.jpg'; })).status === 422);
 k('üst klasöre çıkan görsel yolu reddedilir 422', (await kotu((x) => { x[1].gorsel = '/yonetim/veri/sablon/../../gizli.jpg'; })).status === 422);
@@ -155,7 +159,7 @@ k('content-length 9 MB → 413 (gövde okunmadan)', (await gYukle(gform(jpeg(165
 k('sayfa numarası geçersiz → 422', (await gYukle(gform(jpeg(1654, 2339), 0))).status === 422 && (await gYukle(gform(jpeg(1654, 2339), 21))).status === 422);
 k('dosya yok → 422', (await gYukle(gform(null))).status === 422);
 k('JSON gövde → 415', (await post('belge-sablonlari/teklif/gorsel', { dosya: 'x' })).status === 415);
-k('önerilen şablona görsel → 409', (await gYukle(gform(jpeg(1654, 2339)), { id: 'sozlesme' })).status === 409);
+k('önerilen şablona görsel → 409', (await gYukle(gform(jpeg(1654, 2339)), { id: 'gizlilik' })).status === 409);
 k('R2 yokken görsel → 409', (await gYukle(gform(jpeg(1654, 2339)), { env: { DB: db, YEREL_GIRIS: 'evet' } })).status === 409);
 k('reddedilen görseller depoya yazılmadı', [...r2.m.keys()].filter((a) => a.startsWith(GORSEL_ONEK)).length === 2);
 const v3 = structuredClone(v2); v3[1].gorsel = 'sablon/teklif/3/2.jpg';
@@ -270,6 +274,8 @@ k('PDF: JPEG baytları değişmeden gömülür', metin.includes(new TextDecoder(
 let hataVar = false; try { pdfOlustur([png(1654, 2339)]); } catch (e) { hataVar = true; }
 k('PDF: JPEG olmayan sayfa reddedilir', hataVar);
 k('tohum listesi dışa açık ve 8 kayıt', TOHUM_HIZMET.length === 8);
+
+await (await import('./sablon-metin-kontrol.mjs')).calistir({ k, istek, post, jsn, db, r2, env, B, worker, pdfOlustur, jpeg });
 
 console.log(h.length ? `\n${h.length} KALDI:\n` + h.join('\n') : '\nTüm kontroller geçti.');
 process.exit(h.length ? 1 : 0);
