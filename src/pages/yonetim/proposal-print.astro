@@ -101,6 +101,7 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
 </main>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { teklifBloklari, toplamSatirlari, TUR_ADI } from '../../scripts/yonetim/teklif-toplam.js';
   const $ = (s) => document.querySelector(s);
   const id = new URLSearchParams(location.search).get('id') || '';
   const DURUM = { taslak: 'Taslak', gonderildi: 'Gönderildi', kabul: 'Kabul edildi', red: 'Reddedildi' };
@@ -134,11 +135,10 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
     $('[data-konu]').textContent = t.baslik;
     $('[data-kalemler]').replaceChildren(...t.kalemler.map((k, i) => el('tr', {},
       el('td', { class: 'sira' }, String(i + 1)),
-      el('td', { class: 'ad' }, el('strong', {}, k.ad), k.aciklama ? el('small', {}, k.aciklama) : ''),
+      el('td', { class: 'ad' }, el('strong', {}, k.ad), TUR_ADI[k.tur] ? el('small', {}, TUR_ADI[k.tur]) : '', k.aciklama ? el('small', {}, k.aciklama) : ''),
       el('td', { class: 'sag' }, sayiYaz(k.adet)), el('td', { class: 'sag' }, tutar(k.birim_fiyat)), el('td', { class: 'sag' }, tutar(k.tutar)))));
-    ciftler($('[data-toplam]'), [['Ara toplam', tutar(t.ara_toplam)], Number(t.indirim) > 0 ? ['İndirim', '−' + tutar(t.indirim)] : null,
-      Number(t.indirim) > 0 ? ['KDV matrahı', tutar(Math.round((t.ara_toplam - t.indirim) * 100) / 100)] : null,
-      [`KDV (%${sayiYaz(t.kdv_orani)})`, tutar(t.kdv)], ['Genel toplam', tutar(t.toplam), 'genel']]);
+    // Aylık ve tek seferlik tutarlar toplanmaz: iki türlü teklifte iki ayrı blok, "Genel toplam" yok.
+    ciftler($('[data-toplam]'), toplamSatirlari(teklifBloklari(t), t.kdv_orani, { matrah: true }).map(([a, b, g]) => [a, b, g ? 'genel' : '']));
     $('[data-notlar]').hidden = !t.notlar;
     $('[data-not-metin]').textContent = t.notlar || '';
     $('[data-alt]').textContent = `Fiyatlar Türk lirası (TL) cinsindendir.${t.gecerlilik ? ` Bu teklif ${gun(t.gecerlilik)} tarihine kadar geçerlidir.` : ''} Sorularınız için ${(a && a.eposta) || 'info@idexya.com'} adresine yazabilir ya da ${(a && a.telefon) || '0507 870 06 29'} numaralı telefonu arayabilirsiniz.${a && a.teklif_notu ? ' ' + a.teklif_notu : ''}`;

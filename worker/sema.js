@@ -214,7 +214,11 @@ export const EK_SUTUNLAR = [
   ['musteriler', 'arsiv', 'TEXT'],
   ['site_saglik_hedef', 'arsiv', 'TEXT'],
   // Teklif dosyasının kaynağı: 'yukleme' (Canva PDF'i yüklendi) | 'sablon' (panelde şablondan üretildi)
-  ['teklif_dosyalari', 'kaynak', "TEXT NOT NULL DEFAULT 'yukleme'"]
+  ['teklif_dosyalari', 'kaynak', "TEXT NOT NULL DEFAULT 'yukleme'"],
+  // Teklif tutarları türe göre (12 Kas 2026: aylık ve tek seferlik toplanmaz). Boşsa o türde kalem yok; eski teklifte hepsi boş.
+  // İki tür birlikteyken ara_toplam/kdv/toplam 0 yazılır ve tutarlar yalnız bu sütunlardadır (src/scripts/yonetim/teklif-toplam.js).
+  ['teklifler', 'ara_aylik', 'REAL'], ['teklifler', 'kdv_aylik', 'REAL'], ['teklifler', 'toplam_aylik', 'REAL'],
+  ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL']
 ];
 export const EK_DIZINLER = [
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,

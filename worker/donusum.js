@@ -24,11 +24,12 @@ export const talepReklamSorgu = (db, talepId, v) => db.prepare(`INSERT INTO tale
 
 // Kazanılan müşterilere bağlı, tıklama kimliği olan talepler. Dönüşüm zamanı: kabul edilen son teklifin kararı, yoksa
 // aşamanın "Kazanıldı" olduğu kayıt, yoksa müşterinin son güncellemesi. Değer: kabul edilen tekliflerin KDV hariç toplamı, yoksa CRM değeri.
+// Aylık ve tek seferlik kalemi birlikte olan teklif (12 Kas 2026) değere katılmaz: iki tür toplanmaz (değer kuralı Muhittin'den bekleniyor).
 async function adaylar(db) {
   const r = await db.prepare(`SELECT t.id AS talep_id, t.olusturma AS talep_zamani, t.kaynak, m.id AS musteri_id, m.firma, m.ad, m.deger, m.guncelleme,
       r.gclid, r.gbraid, r.wbraid, r.fbclid, r.utm_source, r.utm_medium, r.utm_campaign, r.tiklama_zamani,
       (SELECT MAX(karar_zamani) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul') AS kabul_zamani,
-      (SELECT SUM(ara_toplam - indirim) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul') AS teklif_degeri,
+      (SELECT SUM(ara_toplam - indirim) FROM teklifler x WHERE x.musteri_id = m.id AND x.durum = 'kabul' AND NOT (x.toplam_aylik IS NOT NULL AND x.toplam_tek IS NOT NULL)) AS teklif_degeri,
       (SELECT MAX(zaman) FROM kayitlar k WHERE k.musteri_id = m.id AND k.baslik = 'Aşama değişti' AND k.detay LIKE '%→ Kazanıldı%') AS asama_zamani,
       (SELECT zaman FROM donusum_aktarim a WHERE a.talep_id = t.id AND a.platform = 'google') AS google_aktarim,
       (SELECT zaman FROM donusum_aktarim a WHERE a.talep_id = t.id AND a.platform = 'meta') AS meta_aktarim

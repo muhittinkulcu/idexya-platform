@@ -120,5 +120,47 @@ r = await jsn(await post(`teklifler/${id}/kopyala`, {}));
 const kopya = (await jsn(await istek('teklifler/' + r.id))).teklif.kalemler[0];
 k('kopyalamada hizmet_id ve tur korunur', kopya.hizmet_id === 'google-reklam' && kopya.tur === 'aylik');
 
+// --- Aylık ve tek seferlik tutarlar toplanmaz ---
+const { teklifHesapla, teklifBloklari, bloklarMetni } = await import('../src/scripts/yonetim/teklif-toplam.js');
+const KARISIK = [
+  { ad: 'Google Reklam Yönetimi', adet: 1, birim_fiyat: 20000, hizmet_id: 'google-reklam', tur: 'aylik' },
+  { ad: 'Kurumsal Website Tasarımı', adet: 1, birim_fiyat: 5000, hizmet_id: 'kurumsal-web', tur: 'tek_seferlik' }
+];
+let on = teklifHesapla(KARISIK, 0, 20);
+k('önizleme: karışık teklif iki blok (aylık 24.000, tek seferlik 6.000)', on.karisik && on.bloklar.length === 2 && on.bloklar[0].tur === 'aylik' && on.bloklar[0].toplam === 2400000 && on.bloklar[1].toplam === 600000 && !on.hata);
+k('önizleme: karışıkta indirim reddedilir', !!teklifHesapla(KARISIK, 100, 20).hata);
+k('önizleme: karışıkta türü belirsiz kalem reddedilir', !!teklifHesapla([...KARISIK, { ad: 'X', adet: 1, birim_fiyat: 1 }], 0, 20).hata);
+on = teklifHesapla([KARISIK[0]], 1000, 20);
+k('önizleme: tek tür → tek blok, tür etiketi, indirim uygulanır', on.bloklar.length === 1 && on.bloklar[0].tur === 'aylik' && on.bloklar[0].toplam === 2280000);
+on = teklifHesapla([{ ad: 'Eski', adet: 2, birim_fiyat: 50 }], 0, 20);
+k('önizleme: türü bilinmeyen (eski) → tek blok, tür yok', on.bloklar.length === 1 && on.bloklar[0].tur === null && on.bloklar[0].toplam === 12000);
+
+r = await jsn(await post('teklifler', govde(KARISIK)));
+k('karışık teklif kaydedilir', r.d === 200);
+const kid = r.id;
+let kt = (await jsn(await istek('teklifler/' + kid))).teklif;
+const kb = teklifBloklari(kt);
+k('sunucu: iki ayrı toplam (aylık 24.000 / tek seferlik 6.000)', kb.length === 2 && kb[0].toplam === 24000 && kb[1].toplam === 6000 && kt.ara_aylik === 20000 && kt.kdv_tek === 1000);
+k('sunucu: ikisinin toplamı (30.000) hiçbir sütunda yok', !Object.values(kt).some((x) => x === 30000 || x === 25000) && !JSON.stringify(kt).includes('30000'));
+const onK = teklifHesapla(KARISIK, 0, 20);
+k('sunucu toplamları önizlemeyle aynı', kb.every((b, i) => Math.round(b.toplam * 100) === onK.bloklar[i].toplam && Math.round(b.kdv * 100) === onK.bloklar[i].kdv && Math.round(b.ara * 100) === onK.bloklar[i].ara));
+k('metin: "24.000,00 TL / ay (aylık) · 6.000,00 TL (tek seferlik)"', bloklarMetni(kb) === '24.000,00 TL / ay (aylık) · 6.000,00 TL (tek seferlik)');
+r = await jsn(await istek('teklifler'));
+const lk = r.teklifler.find((x) => x.id === kid);
+k('liste: karışık teklifte tür sütunları gelir', lk && lk.toplam_aylik === 24000 && lk.toplam_tek === 6000);
+k('sunucu: karışıkta indirim → 422', (await post('teklifler', { ...govde(KARISIK), indirim: 100 })).status === 422);
+k('sunucu: karışıkta türsüz kalem → 422', (await post('teklifler', govde([...KARISIK, { ad: 'X', adet: 1, birim_fiyat: 1 }]))).status === 422);
+r = await jsn(await post('teklifler', { ...govde([KARISIK[0]]), indirim: 1000 }));
+kt = (await jsn(await istek('teklifler/' + r.id))).teklif;
+k('sunucu: tek tür → tek blok, indirimli (22.800)', teklifBloklari(kt).length === 1 && teklifBloklari(kt)[0].tur === 'aylik' && kt.toplam === 22800 && kt.indirim === 1000);
+kt = (await jsn(await istek('teklifler/eski'))).teklif;
+k('eski teklif tek blok, tür yok, toplam korunur', teklifBloklari(kt).length === 1 && teklifBloklari(kt)[0].tur === null && kt.toplam === 120);
+// Kabul akışı: karışık teklifte müşteri günlüğü iki tutarı ayrı yazar; gelir kaydı tek tutarla açılmaz.
+await post(`teklifler/${kid}/gonderildi`, {});
+await post(`teklifler/${kid}/kabul`, {});
+const gunluk = db.ham.prepare("SELECT detay FROM kayitlar WHERE musteri_id = 'm1' AND tur = 'teklif' ORDER BY zaman DESC LIMIT 1").get();
+k('günlük: iki tutar ayrı, toplam yok', gunluk && gunluk.detay.includes('24.000,00 TL / ay') && gunluk.detay.includes('6.000,00 TL') && !gunluk.detay.includes('30.000'));
+k('karışık teklifte tek tutarlı gelir kaydı 409', (await post(`teklifler/${kid}/gelir`, {})).status === 409);
+
 if (h.length) { console.error(`\n${h.length} kontrol KALDI`); process.exit(1); }
 console.log('\nTüm kontroller geçti.');
