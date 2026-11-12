@@ -46,7 +46,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (h.musteri_id) {
       alt = el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
         el('span', { class: 'cip kazanildi' }, 'Eşleşti'),
-        h.musteri_ad ? el('a', { href: '/customer?id=' + encodeURIComponent(h.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, h.musteri_ad) : el('span', { style: 'color: var(--err)' }, 'Müşteri kartı silinmiş'),
+        h.musteri_ad ? el('a', { href: '/customer?id=' + encodeURIComponent(h.musteri_id), style: 'font-weight: 500; overflow-wrap: anywhere' }, h.musteri_ad) : el('span', { style: 'color: var(--err)' }, 'Müşteri kartı silinmiş'),
         el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${tarih(h.eslesme_zamani)} · ${h.eslestiren}`),
         h.eski ? el('span', { class: 'cip gorusme' }, 'Son 28 günde veri yok') : '',
         el('span', { style: 'flex: 1 1 0' }),

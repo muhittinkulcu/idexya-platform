@@ -8,7 +8,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <button type="button" class="dugme kucuk" data-arsiv aria-pressed="false">Arşivi göster</button>
 <button type="button" class="dugme ana" data-yeni-ac>+ Yeni müşteri</button>
 </div>
-<form data-yeni-form hidden class="kart" style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end">
+<form data-yeni-form hidden class="kart" style="padding: 20px 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: end">
 <label class="alan">Firma<input name="firma" autocomplete="off"></label>
 <label class="alan">Yetkili kişi<input name="ad" autocomplete="off"></label>
 <label class="alan">E-posta<input name="eposta" type="email" autocomplete="off"></label>
@@ -47,9 +47,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (gorunum === 'liste' || arsivMod) {
       const cip = (e) => el('span', { class: 'cip', style: 'font-size: 11px' }, e);
       alan.replaceChildren(el('div', { class: 'kart', style: 'overflow-x: auto' }, el('table', { style: 'width: 100%; min-width: 720px; border-collapse: collapse; font-size: 13px' },
-        el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 10px 14px; font-weight: 600${i === 3 ? '; text-align: right' : ''}` }, b)))),
+        el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 10px 14px; font-weight: 500${i === 3 ? '; text-align: right' : ''}` }, b)))),
         el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid rgb(var(--line))', 'data-id': m.id, 'data-ad': baslik(m) },
-          el('td', { style: 'padding: 10px 14px' }, el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null,
+          el('td', { style: 'padding: 10px 14px' }, el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null,
             (etiketler[m.id] || []).length ? el('div', { style: 'display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px' }, etiketler[m.id].map(cip)) : null),
           el('td', { style: 'padding: 10px 14px; color: var(--tx2)' }, [m.eposta, m.telefon].filter(Boolean).join(' · ') || '—'),
           el('td', { style: 'padding: 10px 14px' }, asamaSec(m)),
@@ -74,7 +74,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid rgb(var(--line)); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
           el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px' }, el('strong', { style: 'color: var(--head)' }, a.ad + ' · ' + ms.length), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ms.some((m) => m.deger) ? para(top) : '')),
           ms.length ? ms.map((m) => el('article', { class: 'kart', style: 'padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-radius: 12px' },
-            el('a', { href: bag(m), style: 'font-weight: 600; text-decoration: none' }, baslik(m)),
+            el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none' }, baslik(m)),
             el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.paket].filter(Boolean).join(' · ') || (m.eposta || m.telefon || '')),
             el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; align-items: center; flex-wrap: wrap' }, asamaSec(m), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, once(m.guncelleme)))))
             : el('span', { style: 'font-size: 12px; color: var(--tx2); padding: 6px 4px' }, 'Bu aşamada müşteri yok.'));

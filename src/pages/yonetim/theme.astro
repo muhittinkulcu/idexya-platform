@@ -39,7 +39,7 @@ const varsayilan = {
   .te{display:grid;grid-template-columns:minmax(380px,.9fr) minmax(0,1.1fr);gap:16px;align-items:start;padding-bottom:80px}
   .te-sol{display:flex;flex-direction:column;gap:12px;min-width:0}
   .te-sekme,.te-seg{display:flex;gap:4px;padding:4px;border-radius:12px;background:var(--track,var(--card2));align-self:flex-start}
-  .te-sekme button,.te-seg button{min-height:34px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+  .te-sekme button,.te-seg button{min-height:34px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:500;cursor:pointer}
   .te-sekme button[aria-selected=true],.te-seg button[aria-pressed=true]{background:rgb(var(--card));color:var(--head);box-shadow:0 1px 3px var(--shadow)}
   .te-bolum{padding:16px;display:flex;flex-direction:column;gap:12px}
   .te-bolum>h3{margin:0;font-size:15px;color:var(--head)}.te-bolum>p{margin:0;font-size:13px;color:var(--tx2);line-height:1.5}
@@ -57,10 +57,10 @@ const varsayilan = {
   .te-sutun input,.te-oge input[type=text],.te-oge input[type=url],.te-alan input,.te-alan textarea,.te-alan select,.te-sag-ust select{min-height:36px;padding:6px 10px;border:1px solid rgb(var(--line));border-radius:9px;background:var(--bg);color:var(--tx);font:inherit;font-size:13px;width:100%;box-sizing:border-box}
   .te-oge .te-ozel{grid-column:3/-1;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
   .te-sira{display:flex;flex-direction:column}.te-sira button{width:26px;height:18px;border:0;background:transparent;color:var(--tx2);cursor:pointer;font-size:11px;line-height:1}.te-sira button:hover{color:var(--acc)}
-  .te-anahtar{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--head);white-space:nowrap;cursor:pointer}
-  .te-mini{min-height:30px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--tx2);font:inherit;font-size:12px;font-weight:600;cursor:pointer}
+  .te-anahtar{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;color:var(--head);white-space:nowrap;cursor:pointer}
+  .te-mini{min-height:30px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--tx2);font:inherit;font-size:12px;font-weight:500;cursor:pointer}
   .te-mini:hover{border-color:var(--brand);color:var(--acc)}
-  .te-alan{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--head)}
+  .te-alan{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:500;color:var(--head)}
   .te-izgara{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .te-sutun{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid rgb(var(--line));border-radius:14px;background:var(--card2)}
   .te-sutun-ust{display:flex;gap:6px;align-items:center}
@@ -163,7 +163,7 @@ const varsayilan = {
         el('label', { class: 'te-alan' }, 'Alt satır (telif) metni', el('input', { value: a.telif, maxlength: '120', onchange: (e) => { a.telif = e.target.value.trim(); degis(); } }))),
       el('section', { class: 'kart te-bolum' }, el('h3', {}, 'Bağlantı sütunları'), el('p', {}, 'En çok 6 sütun, sütun başına en çok 12 bağlantı. Adres “/” ile başlayan site içi yol ya da https:// olmalı.'),
         el('div', { class: 'te-izgara' }, ...a.sutunlar.map((s, i) => el('div', { class: 'te-sutun' },
-          el('div', { class: 'te-sutun-ust' }, el('input', { value: s.baslik, maxlength: '40', 'aria-label': 'Sütun başlığı', style: 'font-weight:700', onchange: (e) => { s.baslik = e.target.value.trim(); degis(); } }),
+          el('div', { class: 'te-sutun-ust' }, el('input', { value: s.baslik, maxlength: '40', 'aria-label': 'Sütun başlığı', style: 'font-weight:500', onchange: (e) => { s.baslik = e.target.value.trim(); degis(); } }),
             el('button', { type: 'button', class: 'te-mini', 'aria-label': 'Sola taşı', onclick: () => tasi(i, -1) }, '◀'), el('button', { type: 'button', class: 'te-mini', 'aria-label': 'Sağa taşı', onclick: () => tasi(i, 1) }, '▶'),
             el('button', { type: 'button', class: 'te-mini', onclick: () => { if (confirm(`“${s.baslik}” sütunu silinsin mi?`)) { a.sutunlar.splice(i, 1); degis(); } } }, 'Sil')),
           ...s.baglantilar.map((b, j) => el('div', { class: 'te-bag' },

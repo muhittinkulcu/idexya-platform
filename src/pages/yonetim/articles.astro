@@ -10,7 +10,7 @@ import IcerikStil from '../../components/IcerikStil.astro';
 </div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="İçerik listesi" class="kart" data-liste style="flex: 1 1 300px; overflow: hidden"></section>
-<section aria-label="İçerik düzenle" class="kart" data-duzen style="flex: 3 1 560px; padding: 18px; display: flex; flex-direction: column; gap: 16px"></section>
+<section aria-label="İçerik düzenle" class="kart" data-duzen style="flex: 3 1 560px; padding: 20px 22px; display: flex; flex-direction: column; gap: 16px"></section>
 </div>
 <script>
   import { api, el, tarih, once, genelHata, sayacGuncelle } from '../../scripts/yonetim/ortak.js';
@@ -92,7 +92,7 @@ import IcerikStil from '../../components/IcerikStil.astro';
       ic.arsiv ? el('div', { class: 'uyari hata' }, 'Bu içerik arşivde: kimse göremez. Ayarları değiştirebilirsiniz; yayına dönmesi için “Arşivden çıkar”a basın.') : '',
       mesaj,
       el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px' }, el('label', { class: 'alan', style: 'grid-column: 1 / -1' }, 'Başlık', baslik), el('label', { class: 'alan' }, 'Kısa ad (adres)', kisa), el('label', { class: 'alan' }, 'Kategori', kategori), el('label', { class: 'alan', style: 'grid-column: 1 / -1' }, 'Özet', ozet)),
-      el('div', { style: 'display: flex; flex-direction: column; gap: 6px' }, el('span', { style: 'font-size: 13px; font-weight: 600; color: var(--head)' }, 'Metin'),
+      el('div', { style: 'display: flex; flex-direction: column; gap: 6px' }, el('span', { style: 'font-size: 13px; font-weight: 500; color: var(--head)' }, 'Metin'),
         el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Kısayollar: Ctrl+B kalın, Ctrl+I eğik, Ctrl+K bağlantı, Ctrl+Alt+2 ara başlık, Ctrl+F bul, Ctrl+S kaydet, F11 tam ekran. Word veya Google Dokümanlar’dan yapıştırdığınız metin sadeleştirilir.'), govde),
       bolum('Kim görsün?', ...Object.entries(adlar.gorunurluk).map(([k, a]) => secenek(a, k, a, ACIKLAMA[k], 'gor', gor, gorDegisti)), secAlan),
       bolum('Kim yorum yapabilsin?', ...Object.entries(adlar.etkilesim).map(([k, a]) => secenek(a, k, a, k === 'uyeler' ? '“Üyelere özel içerikler” bölümünde “kullan” yetkisi olanlar veya erişim listesindekiler. Üye yorumları hemen yayınlanır.' : k === 'herkes' ? 'Ziyaretçi yorumları sizin onayınızdan sonra yayınlanır.' : '', 'etk', etk, (d) => (etk = d)))),

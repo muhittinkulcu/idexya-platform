@@ -59,7 +59,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
             ...(u.moduller.length ? u.moduller.map((m) => el('span', { class: 'cip crm' }, `${katalog[m.modul] ? katalog[m.modul].ad : m.modul} · ${v.yetkiler[m.yetki] || m.yetki}`)) : [el('span', { style: 'color: var(--tx2)' }, 'yok')])),
           el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
             u.musteri_id
-              ? el('span', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1 1 100%; font-size: 13px' }, el('span', { class: 'cip kazanildi' }, 'Bağlı'), el('a', { href: '/customer?id=' + encodeURIComponent(u.musteri_id), style: 'font-weight: 600; overflow-wrap: anywhere' }, u.musteri_ad), el('span', { style: 'color: var(--tx2)' }, `${tarih(u.baglanma)} · ${u.baglayan}`))
+              ? el('span', { style: 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1 1 100%; font-size: 13px' }, el('span', { class: 'cip kazanildi' }, 'Bağlı'), el('a', { href: '/customer?id=' + encodeURIComponent(u.musteri_id), style: 'font-weight: 500; overflow-wrap: anywhere' }, u.musteri_ad), el('span', { style: 'color: var(--tx2)' }, `${tarih(u.baglanma)} · ${u.baglayan}`))
               : el('span', { style: 'flex: 1 1 100%; font-size: 13px; color: var(--tx2)' }, u.oneri_id ? `Müşteriye bağlı değil · öneri: aynı e-postalı “${musAd[u.oneri_id]}” kartı` : 'Müşteriye bağlı değil'),
             v.musteriler.length ? sec : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'CRM’de müşteri yok.'), v.musteriler.length ? bagla : '', coz));
       })));
@@ -76,7 +76,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       const s = el('select', { 'aria-label': md.ad + ' yetkisi', style: secStil }, el('option', { value: '' }, 'Kapalı'), Object.entries(v.yetkiler).map(([k, ad]) => el('option', { value: k }, ad)));
       secimler[md.k] = s;
       return el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; padding: 8px 0; border-top: 1px solid rgb(var(--line))' },
-        el('span', { style: 'display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px' }, el('strong', { style: 'color: var(--head); font-size: 14px' }, md.ad, md.hazir ? '' : el('span', { style: 'margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--tx2)' }, 'Yakında')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, md.aciklama)), s);
+        el('span', { style: 'display: flex; flex-direction: column; min-width: 0; flex: 1 1 220px' }, el('strong', { style: 'color: var(--head); font-size: 14px' }, md.ad, md.hazir ? '' : el('span', { style: 'margin-left: 8px; font-size: 11px; font-weight: 500; color: var(--tx2)' }, 'Yakında')), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, md.aciklama)), s);
     });
     const eposta = el('input', { type: 'email', name: 'eposta', required: true, autocomplete: 'off', maxlength: '160' });
     const musteri = el('select', { name: 'musteri_id' }, musteriSecenek(musteriler, prm('musteri'), 'Müşteriye bağlama (isteğe bağlı)'));

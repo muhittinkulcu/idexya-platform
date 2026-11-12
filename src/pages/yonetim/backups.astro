@@ -2,7 +2,7 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Yedekler" aktif="yedek" yol="Sistem" aciklama="Panel verisinin (talepler, CRM, teklifler, muhasebe, üyeler, içerikler…) sıkıştırılmış JSON yedeği. R2 deposu bağlıysa her gün kendiliğinden alınır.">
-<section class="kart" data-durum style="padding: 18px; display: flex; flex-direction: column; gap: 12px"><div class="bos">Yükleniyor…</div></section>
+<section class="kart" data-durum style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px"><div class="bos">Yükleniyor…</div></section>
 <div class="uyari bilgi">Yedek dosyası <b>kişisel veri</b> içerir (talep ve müşteri iletişim bilgileri, üye kayıtları). İndirdiğiniz dosyayı yalnız güvenli bir yerde saklayın ve paylaşmayın. Oturumlar, giriş denemeleri, şifre yenileme kayıtları ve erişim anahtarları yedeğe girmez. Geri yükleme panelden yapılmaz; gerekirse kontrollü olarak ayrıca yapılır.</div>
 <section class="kart" aria-label="Kayıtlı yedekler" data-liste style="overflow-x: auto"></section>
 <script>
@@ -34,7 +34,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('tbody', {}, ...r.yedekler.map((y) => {
         const g = y.anahtar.match(/(\d{4}-\d{2}-\d{2})/)?.[1];
         return el('tr', {},
-          el('td', { style: hucre + '; font-weight: 600' }, tarih(y.zaman)),
+          el('td', { style: hucre + '; font-weight: 500' }, tarih(y.zaman)),
           el('td', { style: hucre }, y.satir ? y.satir.toLocaleString('tr-TR') : '—'),
           el('td', { style: hucre }, kb(y.boyut)),
           el('td', { style: hucre + '; color: var(--tx2); font-size: 13px' }, y.tetikleyen || '—'),

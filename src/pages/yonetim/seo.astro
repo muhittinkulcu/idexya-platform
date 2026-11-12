@@ -117,7 +117,7 @@ import '../../scripts/yonetim/grafik.css';
         const sor = p.sorunlar.filter(ilgili);
         return el('tr', {},
           el('td', { style: hucre + '; min-width: 180px; overflow-wrap: anywhere' }, el('a', { href: p.yol, target: '_blank', rel: 'noopener' }, p.yol)),
-          el('td', { style: hucre + `; font-weight: 700; color: ${puanRenk(p.puan)}` }, String(p.puan)),
+          el('td', { style: hucre + `; font-weight: 500; color: ${puanRenk(p.puan)}` }, String(p.puan)),
           el('td', { style: hucre + '; min-width: 200px' }, p.baslik ? el('span', {}, p.baslik, el('span', { style: 'color: var(--tx2); font-size: 12px' }, ` · ${p.baslikUzunluk} karakter`)) : '—'),
           el('td', { style: hucre + '; color: var(--tx2); font-size: 13px' }, p.aciklama ? `${p.aciklamaUzunluk} karakter` : 'yok'),
           el('td', { style: hucre }, p.h1 === undefined ? '—' : String(p.h1)),

@@ -3,11 +3,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Müşteri kartı" aktif="crm" yol="Müşteri ilişkileri › CRM">
 <div data-ust style="display: flex; flex-direction: column; gap: 12px"></div>
-<section class="kart" aria-label="Ana kayıt (IDOS)" data-ana-kayit hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
-<section class="kart" aria-label="Hesaplar ve erişimler" data-hesaplar style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
-<section class="kart" aria-label="Reklam özeti (IDOS)" data-reklam hidden style="padding: 16px; display: flex; flex-direction: column; gap: 10px"></section>
+<section class="kart" aria-label="Ana kayıt (IDOS)" data-ana-kayit hidden style="padding: 20px 22px; display: flex; flex-direction: column; gap: 10px"></section>
+<section class="kart" aria-label="Hesaplar ve erişimler" data-hesaplar style="padding: 20px 22px; display: flex; flex-direction: column; gap: 10px"></section>
+<section class="kart" aria-label="Reklam özeti (IDOS)" data-reklam hidden style="padding: 20px 22px; display: flex; flex-direction: column; gap: 10px"></section>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
-<section class="kart" aria-label="Müşteri bilgileri" style="flex: 1 1 320px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<section class="kart" aria-label="Müşteri bilgileri" style="flex: 1 1 320px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
 <div data-kart-bas><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Bu kart Panel'deki satış kaydıdır; ana kayıttaki müşteri bilgisi yukarıdaki IDOS kutusundadır.">Kart bilgileri: Panel CRM</h2><small class="kart-alt"><span data-baslik></span> · elle girilen satış bilgileri</small></div>
 <form data-bilgi style="display: flex; flex-direction: column; gap: 10px">
 <label class="alan">Firma<input name="firma"></label>
@@ -21,7 +21,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <p data-bilgi-durum role="status" hidden class="uyari" style="margin: 0"></p>
 </form>
 </section>
-<section class="kart" aria-label="Günlük" style="flex: 2 1 460px; padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<section class="kart" aria-label="Günlük" style="flex: 2 1 460px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
 <div data-kart-bas><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Bu karta eklenen notlar, görüşmeler ve sistemin yazdığı kayıtlardır.">Günlük: notlar ve hareketler</h2><small class="kart-alt"><span data-baslik></span> · yeniden eskiye, en çok 300 kayıt</small></div>
 <form data-not style="display: flex; flex-direction: column; gap: 8px">
 <div role="group" aria-label="Kayıt türü" data-tur style="display: flex; gap: 6px; flex-wrap: wrap"></div>
@@ -31,11 +31,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <ol data-gunluk style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ol>
 </section>
 </div>
-<section class="kart" aria-label="Teklifler" data-teklif-bolum style="padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<section class="kart" aria-label="Teklifler" data-teklif-bolum style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
 <div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Panelde hazırlanan, şablondan oluşturulan ve dışarıda (Canva) hazırlanıp PDF olarak yüklenen tekliflerin tümü. Tutarlar KDV hariçtir. Panel hiçbir teklifi müşteriye göndermez.">Teklifler: bu müşteriye gönderilenler</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler · panelde hazırlanan ve yüklenen dosya</small></div><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme kucuk" data-teklif-yukle>⬆ Teklif dosyası yükle (PDF)</button><a class="dugme kucuk" data-teklif-sablon href="/templates?tab=create">Şablondan teklif oluştur</a><a class="dugme ana kucuk" data-teklif-yeni href="/proposals?new=1">+ Panelde teklif hazırla</a></div></div>
 <div role="group" aria-label="Teklif süzgeci" data-teklif-suzgec style="display: flex; gap: 6px; flex-wrap: wrap"></div>
 <div data-teklifler style="overflow-x: auto"></div>
-<div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center"><span data-teklif-ozet style="font-size: 13px; color: var(--tx2)"></span><a href="/proposals?tab=all" style="font-size: 13px; font-weight: 600">Tüm teklifler →</a></div>
+<div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center"><span data-teklif-ozet style="font-size: 13px; color: var(--tx2)"></span><a href="/proposals?tab=all" style="font-size: 13px; font-weight: 500">Tüm teklifler →</a></div>
 </section>
 <dialog class="tk-pencere" data-teklif-pencere aria-labelledby="tk-baslik">
 <form method="dialog" data-teklif-form novalidate style="display: flex; flex-direction: column; gap: 12px">
@@ -56,7 +56,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 .tk-birak b{color:var(--head)}.tk-birak[data-ustunde]{border-color:var(--brand);background:var(--tint)}.tk-birak:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .tk-iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
 .tk-tablo{width:100%;min-width:720px;border-collapse:collapse;font-size:13.5px}
-.tk-tablo th{text-align:left;color:var(--tx2);font-weight:600;font-size:12px;padding:8px 10px;border-bottom:1px solid rgb(var(--line))}
+.tk-tablo th{text-align:left;color:var(--tx2);font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid rgb(var(--line))}
 .tk-tablo td{padding:10px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
 .tk-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tk-kaynak{font-size:11.5px;color:var(--tx2);border:1px solid rgb(var(--line));border-radius:6px;padding:1px 6px;white-space:nowrap}
@@ -100,7 +100,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       m.arsiv ? el('div', { class: 'uyari', role: 'status', style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' },
         el('span', {}, `Bu kart ${tarih(m.arsiv)} tarihinde arşivlendi; CRM listesinde ve sayılarda görünmez. Kayıt silinmedi.`),
         el('button', { type: 'button', class: 'dugme kucuk', onclick: async (o) => { o.currentTarget.disabled = true; try { await api('musteriler/toplu', { ids: [id], islem: 'arsivden_cikar' }); yukle(); } catch (h) { genelHata('Arşivden çıkarılamadı: ' + h.message); } } }, 'Arşivden çıkar')) : '',
-      el('div', { class: 'kart', style: 'padding: 16px; display: flex; flex-direction: column; gap: 10px' },
+      el('div', { class: 'kart', style: 'padding: 20px 22px; display: flex; flex-direction: column; gap: 10px' },
         el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center' },
           el('span', { style: 'color: var(--tx2); font-size: 13px; overflow-wrap: anywhere' }, iletisim),
           el('span', { style: 'display: flex; gap: 8px; flex-wrap: wrap' }, m.eposta ? el('a', { class: 'dugme kucuk', href: 'mailto:' + m.eposta }, 'E-posta yaz') : '', m.telefon ? el('a', { class: 'dugme kucuk', href: 'tel:' + m.telefon.replace(/[^\d+]/g, '') }, 'Ara') : '', el('button', { type: 'button', class: 'dugme kucuk', onclick: () => window.print() }, 'Yazdır'))),
@@ -152,7 +152,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     kutu.replaceChildren(el('table', { class: 'tk-tablo' },
       el('thead', {}, el('tr', {}, ...['Teklif', 'Kaynak', 'Tarih', 'Geçerlilik', 'Tutar (KDV hariç)', 'Durum', ''].map((b, i) => el('th', { scope: 'col', class: i === 4 ? 'sayi' : '' }, b)))),
       el('tbody', {}, ...gor.map((t) => el('tr', { 'data-kaynak': t.kaynak },
-        el('td', {}, el('a', t.kaynak === 'pdf' ? { href: t.ac, target: '_blank', rel: 'noopener', style: 'font-weight: 600' } : { href: t.ac, style: 'font-weight: 600' }, t.ad), el('br'), el('small', { style: 'color: var(--tx2)' }, t.alt)),
+        el('td', {}, el('a', t.kaynak === 'pdf' ? { href: t.ac, target: '_blank', rel: 'noopener', style: 'font-weight: 500' } : { href: t.ac, style: 'font-weight: 500' }, t.ad), el('br'), el('small', { style: 'color: var(--tx2)' }, t.alt)),
         el('td', {}, el('span', { class: 'tk-kaynak' }, t.kaynak === 'pdf' ? (t.sablon ? 'Şablon' : 'Canva PDF') : 'Panel')),
         el('td', { style: 'white-space: nowrap' }, gunYaz(t.tarih)),
         el('td', { style: 'white-space: nowrap' }, gunYaz(t.gecerlilik)),

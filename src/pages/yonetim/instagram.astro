@@ -2,9 +2,9 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Instagram gönderileri" aktif="instagram" yol="İçerik" aciklama="Ana sayfadaki Instagram şeridi. Hesap bağlıysa son gönderiler kendiliğinden gelir; bağlı değilse aşağıdan elle seçtiğiniz gönderiler gösterilir.">
-<section class="kart" data-akis style="padding: 18px; display: flex; flex-direction: column; gap: 12px"></section>
+<section class="kart" data-akis style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px"></section>
 <details class="kart" style="padding: 14px 18px">
-<summary style="cursor: pointer; font-weight: 700">Otomatik akış nasıl bağlanır?</summary>
+<summary style="cursor: pointer; font-weight: 500">Otomatik akış nasıl bağlanır?</summary>
 <ol style="margin: 10px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; line-height: 1.55">
 <li>@idexya.goodthings hesabı Instagram uygulamasında <b>profesyonel hesap</b> (İşletme veya İçerik üreticisi) olmalı.</li>
 <li><a href="https://developers.facebook.com/apps" target="_blank" rel="noopener">Meta for Developers</a>’ta bir uygulama oluşturup <b>Instagram</b> ürününü ekleyin (“API setup with Instagram login”).</li>
@@ -16,14 +16,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <h2 style="margin: 8px 0 0; font-size: 18px">Elle seçilen gönderiler <small style="font-weight: 400; color: var(--tx2); font-size: 14px">(otomatik akış yokken gösterilir)</small></h2>
 <form class="kart" data-form style="padding: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 180px; gap: 16px; align-items: start">
 <div style="display: flex; flex-direction: column; gap: 12px">
-<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Gönderi bağlantısı<input name="baglanti" type="url" required placeholder="https://www.instagram.com/p/…" style="min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
-<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Kısa açıklama (isteğe bağlı)<input name="aciklama" maxlength="200" placeholder="Görselin ne anlattığı; ekran okuyucular için de kullanılır" style="min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
-<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 600">Görsel<input name="dosya" type="file" accept="image/jpeg,image/png,image/webp" required></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Gönderi bağlantısı<input name="baglanti" type="url" required placeholder="https://www.instagram.com/p/…" style="min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Kısa açıklama (isteğe bağlı)<input name="aciklama" maxlength="200" placeholder="Görselin ne anlattığı; ekran okuyucular için de kullanılır" style="min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-weight: 500">Görsel<input name="dosya" type="file" accept="image/jpeg,image/png,image/webp" required></label>
 <div style="display: flex; gap: 8px; align-items: center"><button type="submit" class="dugme ana">Gönderiyi ekle</button><span data-durum style="font-size: 14px; color: var(--tx2)"></span></div>
 </div>
 <div data-onizleme style="aspect-ratio: 1; border-radius: 12px; border: 1px dashed rgb(var(--line)); background: var(--card2) center/cover no-repeat; display: flex; align-items: center; justify-content: center; color: var(--tx2); font-size: 13px; text-align: center; padding: 8px">Görsel önizlemesi</div>
 </form>
-<section class="kart" aria-label="Eklenen gönderiler" data-liste style="padding: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px"></section>
+<section class="kart" aria-label="Eklenen gönderiler" data-liste style="padding: 20px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px"></section>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
   const form = document.querySelector('[data-form]'), liste = document.querySelector('[data-liste]'), onizleme = document.querySelector('[data-onizleme]'), durum = document.querySelector('[data-durum]');
