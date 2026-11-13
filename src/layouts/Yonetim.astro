@@ -82,12 +82,13 @@ import '../styles/cam.css';
 @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-ext-800-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-800-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 body{margin:0;background:#FBF8F4}
-html[data-tema=koyu] body{background:#171C24}
+html[data-tema=koyu] body{background:#15202B}
 [hidden]{display:none!important}
 /* Renkler idexya.com ana sayfasıyla aynı (src/layouts/Site.astro .acik/.koyu): krem zemin, lacivert başlık, kiremit turuncu vurgu.
    Muhittin, 10 Kas 2026. Site paletinde olmayan --side, --panel, --track, --btnline, --ustbg aynı tonlardan türetildi. */
 .acik{--bg:#FBF8F4;--side:#FFFFFF;--card:255 255 255;--panel:255 255 255;--card2:#F7F1EA;--line:239 230 220;--track:#F1E9DF;--tx:#3A352F;--tx2:#766D64;--head:#002559;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--err:#8A1F2E;--errb:#FCE4E6;--shadow:rgba(0,37,89,.12);--btnline:#F5C7A6;--ustbg:rgba(251,248,244,.9)}
-.koyu{--bg:#171C24;--side:#1B212A;--card:32 38 48;--panel:27 33 42;--card2:#262D38;--line:57 67 82;--track:#2A313C;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--err:#FF9AA6;--errb:rgba(255,122,138,.14);--shadow:rgba(0,0,0,.5);--btnline:rgba(247,137,74,.35);--ustbg:rgba(23,28,36,.9)}
+/* Koyu zemin Marketing'in laciverti (Muhittin, 13 Kas 2026: "Marketing'in dark rengi diğerlerinde de olsun, platform rengi korunarak"): yalnız zemin/yüzey/çizgi; turuncu vurgu, metin ve durum renkleri aynı. */
+.koyu{--bg:#15202B;--side:#192734;--card:28 39 51;--panel:25 39 52;--card2:#22303C;--line:47 61 74;--track:#22303C;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--err:#FF9AA6;--errb:rgba(255,122,138,.14);--shadow:rgba(0,0,0,.5);--btnline:rgba(247,137,74,.35);--ustbg:rgba(21,32,43,.9)}
 a{color:var(--acc)}a:hover{color:var(--tintx)}
 .kabuk{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,sans-serif;font-weight:300;font-size:14.5px;line-height:1.65;letter-spacing:.005em;min-height:100vh;display:flex;align-items:flex-start}
 .baslik-font,.sayfa h1,.sayfa h2{font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em}

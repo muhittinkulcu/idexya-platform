@@ -21,10 +21,12 @@
   --cam-bulaniklik: 22px;
   --cam-doygunluk: 1.4;
 }
+/* Koyu cam lacivert (Muhittin, 13 Kas 2026: Marketing'in koyu rengi tüm platformlarda; ürün vurgusu korunur).
+   Zemin ve yüzey Marketing koyu temasının lacivertinden (--bg 21 32 43, --card 28 39 51). Üç kopyada aynı. */
 .cam.dark {
-  --cam-zemin: 11 14 20;
+  --cam-zemin: 12 20 29;
   --cam-leke-1-a: .40; --cam-leke-2-a: .24; --cam-leke-3-a: .22;
-  --cam-yuzey: 30 36 48;     --cam-yuzey-a: .55;
+  --cam-yuzey: 28 39 51;     --cam-yuzey-a: .55;
   --cam-yogun-a: .88;
   --cam-kenar: 255 255 255;  --cam-kenar-a: .10;
   --cam-golge: 0 0 0;        --cam-golge-a: .35;
