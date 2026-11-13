@@ -19,6 +19,7 @@ import { yonetimTeklifDosyaApi, teklifDosyasiYukle } from './teklif-dosya.js';
 import { yonetimBelgeSablonApi, sablonGorselYukle } from './belge-sablon.js';
 import { yonetimBelgeDosyaApi, belgeDosyasiYukle } from './belge-dosya.js';
 import { yonetimCrmApi } from './crm.js';
+import { yonetimFirsatApi, crmHazir, musteriCrmEk, tekFirsatAsamaSorgusu, yeniMusteriCrmSorgulari } from './firsat.js';
 import { yonetimAnaKayitApi, anaKayitEsitle, anaKayitKurulu } from './ana-kayit.js';
 import { yonetimEtiketApi } from './etiket.js';
 import { yonetimPortalApi } from './portal.js';
@@ -127,7 +128,7 @@ async function yonetimApi(istek, env, yol, kim) {
   // Şablondan üretilen belge PDF'i (en fazla 20 MB)
   if (yol === 'belge-dosyalari' && yontem === 'POST') return await belgeDosyasiYukle(istek, env, kim);
   let govde = {};
-  if (yontem === 'POST') {
+  if (yontem === 'POST' || yontem === 'PATCH') {
     const ham = await istek.text();
     if (ham.length > 300000) return hata('İstek çok büyük', 413);
     try { govde = JSON.parse(ham || '{}'); } catch (e) { return hata('Geçersiz istek', 400); }
@@ -189,6 +190,7 @@ async function yonetimApi(istek, env, yol, kim) {
       sorgular.push(db.prepare(`INSERT INTO musteriler (id, olusturma, guncelleme, firma, ad, eposta, telefon, kaynak, asama, paket, sorumlu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'yeni', ?, ?)`)
         .bind(mid, z, z, t.firma || null, t.ad, t.eposta, t.telefon, t.kaynak, ek.paket || null, kim.eposta));
       sorgular.push(db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mid, z, 'sistem', 'Müşteri kartı oluşturuldu', null, kim.eposta));
+      sorgular.push(...yeniMusteriCrmSorgulari(db, { musteriId: mid, paket: ek.paket, kaynak: t.kaynak, sorumlu: kim.eposta, ad: t.ad, eposta: t.eposta, telefon: t.telefon, z }));
     }
     const detay = [t.konu, t.mesaj, ek.paket ? 'Paket: ' + ek.paket : '', ek.site ? 'Site: ' + ek.site : ''].filter(Boolean).join(' · ');
     sorgular.push(db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mid, t.olusturma, 'talep', 'Talep geldi · ' + t.kaynak, detay, 'Web sitesi'));
@@ -226,7 +228,8 @@ async function yonetimApi(istek, env, yol, kim) {
     const kp = islem === 'asama' ? [govde.asama] : [];
     const sonuc = await db.batch([
       db.prepare(`INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) SELECT lower(hex(randomblob(16))), id, ?, 'sistem', ?, ?, ? FROM musteriler WHERE id IN (SELECT value FROM json_each(?)) AND ${kosul}`).bind(z, baslik, detay, kim.eposta, liste, ...kp),
-      db.prepare(`UPDATE musteriler SET ${set[0]}, guncelleme = ? WHERE id IN (SELECT value FROM json_each(?)) AND ${kosul}`).bind(...set[1], z, liste, ...kp)
+      db.prepare(`UPDATE musteriler SET ${set[0]}, guncelleme = ? WHERE id IN (SELECT value FROM json_each(?)) AND ${kosul}`).bind(...set[1], z, liste, ...kp),
+      ...(islem === 'asama' ? [tekFirsatAsamaSorgusu(db, liste, govde.asama, z)] : [])
     ]);
     const n = sonuc[1].meta ? sonuc[1].meta.changes : null;
     await islemYaz(db, kim.eposta, 'musteri_toplu_' + islem, null, `${n} kart${detay ? ' · ' + detay : ''}`);
@@ -243,7 +246,8 @@ async function yonetimApi(istek, env, yol, kim) {
     const mid = kimlik(), z = simdi();
     await db.batch([
       db.prepare(`INSERT INTO musteriler (id, olusturma, guncelleme, firma, ad, eposta, telefon, kaynak, asama, sorumlu) VALUES (?, ?, ?, ?, ?, ?, ?, 'elle', 'yeni', ?)`).bind(mid, z, z, firma || null, ad || null, eposta || null, telefon || null, kim.eposta),
-      db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mid, z, 'sistem', 'Müşteri kartı elle oluşturuldu', null, kim.eposta)
+      db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mid, z, 'sistem', 'Müşteri kartı elle oluşturuldu', null, kim.eposta),
+      ...yeniMusteriCrmSorgulari(db, { musteriId: mid, kaynak: 'elle', sorumlu: kim.eposta, ad, eposta, telefon, z })
     ]);
     await islemYaz(db, kim.eposta, 'musteri_olustur', mid);
     return json({ ok: true, musteri_id: mid, mevcut: false });
@@ -253,7 +257,8 @@ async function yonetimApi(istek, env, yol, kim) {
     const mus = await db.prepare('SELECT * FROM musteriler WHERE id = ?').bind(m[1]).first();
     if (!mus) return hata('Müşteri bulunamadı', 404);
     const k = await db.prepare('SELECT * FROM kayitlar WHERE musteri_id = ? ORDER BY zaman DESC LIMIT 300').bind(m[1]).all();
-    return json({ ok: true, musteri: mus, kayitlar: k.results });
+    await crmHazir(db, env, kim);
+    return json({ ok: true, musteri: mus, kayitlar: k.results, ...(await musteriCrmEk(db, mus.id)) });
   }
   m = yol.match(/^musteriler\/([\w-]+)\/(not|asama|bilgi)$/);
   if (m && yontem === 'POST') {
@@ -273,6 +278,7 @@ async function yonetimApi(istek, env, yol, kim) {
       if (!ASAMALAR.includes(govde.asama)) return hata('Geçersiz aşama', 422);
       await db.batch([
         db.prepare('UPDATE musteriler SET asama = ?, guncelleme = ? WHERE id = ?').bind(govde.asama, z, mus.id),
+        tekFirsatAsamaSorgusu(db, JSON.stringify([mus.id]), govde.asama, z),
         db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mus.id, z, 'sistem', 'Aşama değişti', (ASAMA_ADI[mus.asama] || mus.asama) + ' → ' + ASAMA_ADI[govde.asama], kim.eposta)
       ]);
     }
@@ -297,7 +303,8 @@ async function yonetimApi(istek, env, yol, kim) {
     return json({ ok: true });
   }
   const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim))
+    || (await yonetimFirsatApi(db, env, yontem, yol, govde, kim, new URL(istek.url)));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }

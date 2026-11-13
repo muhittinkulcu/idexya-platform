@@ -93,5 +93,186 @@ const musteriEkle = (d, o) => d.ham.prepare(`INSERT INTO musteriler (id, olustur
   k('taşıma yeniden: yalnız eksik kart eklenir', s3.firsat === 1 && s3.kisi === 1 && say(d, 'firsatlar') === 4 && say(d, 'kisiler') === 2);
 }
 
+// ===================== Task 3: fırsat, kişi ve zaman çizelgesi uçları =====================
+const B = 'http://localhost';
+const db = sahteD1();
+const env = { DB: db, YEREL_GIRIS: 'evet', YONETICILER: 'muhittin@idexya.com, Ali@idexya.com' };
+const ben = 'yerel@gelistirme';
+const istek = (yol, o = {}) => worker.fetch(new Request(B + '/api/yonetim/' + yol, o), o.env || env, {});
+const gonder = (yontem, yol, govde, ek = {}) => istek(yol, { method: yontem, headers: { ...(ek.origin === null ? {} : { origin: ek.origin || B }), 'content-type': 'application/json' }, body: govde === undefined ? undefined : JSON.stringify(govde), env: ek.env });
+const post = (yol, g, ek) => gonder('POST', yol, g, ek), patch = (yol, g, ek) => gonder('PATCH', yol, g, ek), sil = (yol, ek) => gonder('DELETE', yol, undefined, ek);
+const jsn = async (r) => ({ d: r.status, ...(await r.json()) });
+const toplamAlaniVar = (o) => JSON.stringify(o).match(/"(toplam[a-z_]*|tutar_toplam|genel_toplam)"\s*:/);
+
+let r = await jsn(await istek('ozet')); // şemayı kurar
+musteriEkle(db, { id: 'eski1', firma: 'Eski Müşteri', ad: 'Can Er', eposta: 'can@eski.com', asama: 'gorusme', deger: 5000, sorumlu: 'ali@idexya.com' });
+r = await jsn(await istek('firsatlar'));
+k('ilk fırsat isteğinde taşıma kendiliğinden çalışır', r.d === 200 && r.firsatlar.some((x) => x.musteri_id === 'eski1' && x.asama === 'gorusme') && say(db, 'kisiler', "musteri_id='eski1'") === 1);
+
+// Ekip
+r = await jsn(await istek('ekip'));
+k('ekip: YONETICILER e-postaları (küçük harf) + oturumdaki kişi, ad e-posta başı', r.d === 200 && ['muhittin@idexya.com', 'ali@idexya.com', ben].every((e) => r.ekip.some((x) => x.eposta === e)) && r.ekip.find((x) => x.eposta === 'ali@idexya.com').ad === 'ali');
+db.ham.prepare("INSERT INTO ayarlar (anahtar, deger, guncelleme, guncelleyen) VALUES ('ekip_adlari', ?, 'x', 'x')").run(JSON.stringify({ 'ali@idexya.com': 'Ali Y.' }));
+r = await jsn(await istek('ekip'));
+k('ekip: ayarlar.ekip_adlari görünen adı', r.ekip.find((x) => x.eposta === 'ali@idexya.com').ad === 'Ali Y.');
+
+// Fırsat oluştur
+r = await jsn(await post('musteriler', { firma: 'Yeni Firma AŞ', ad: 'Deniz Ak', eposta: 'deniz@yeni.com' }));
+const M = r.musteri_id;
+k('yeni müşteri kartında fırsat ve birincil kişi kendiliğinden açılır', say(db, 'firsatlar', 'musteri_id = ?', M) === 1 && say(db, 'kisiler', 'musteri_id = ? AND birincil = 1', M) === 1);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'Google + Meta reklam yönetimi', sorumlu: 'ali@idexya.com', kaynak: 'tavsiye', tahmini_kapanis: '2026-12-15',
+  hizmetler: [{ hizmet_id: 'google-reklam', ad: 'Google Reklam Yönetimi', tur: 'aylik', fiyat_kurus: 2000000 }, { hizmet_id: 'meta-reklam', ad: 'Meta Reklam Yönetimi', tur: 'aylik', fiyat_kurus: 2000000 }] }));
+const F1 = r.id;
+let f1 = tek(db, 'SELECT * FROM firsatlar WHERE id = ?', F1);
+k('fırsat oluştur: 200, aylık 40.000 TL (4000000 kuruş), tek seferlik boş', r.d === 200 && f1.aylik_kurus === 4000000 && f1.tek_seferlik_kurus === null && f1.asama === 'yeni' && f1.sorumlu === 'ali@idexya.com');
+k('fırsat oluştur: işlem kaydında', say(db, 'islem_kaydi', "islem = 'firsat_olusturuldu' AND hedef = ?", F1) === 1);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'Site', hizmetler: [{ ad: 'Kurumsal site', tur: 'tek_seferlik', fiyat_kurus: 6000000 }, { ad: 'SEO', tur: 'aylik', fiyat_kurus: null }] }));
+const F2 = r.id;
+let f2 = tek(db, 'SELECT * FROM firsatlar WHERE id = ?', F2);
+k('fiyatı bilinmeyen aylık kalem → aylık tutar boş (uydurulmaz), tek seferlik 60.000 TL ayrı', f2.aylik_kurus === null && f2.tek_seferlik_kurus === 6000000 && f2.sorumlu === ben);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'X', sorumlu: 'yabanci@baska.com' }));
+k('sorumlu ekip listesinde değil → 422', r.d === 422);
+r = await jsn(await post('firsatlar', { musteri_id: 'yok', ad: 'X' }));
+k('olmayan müşteri → 404', r.d === 404);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: '' }));
+k('adsız fırsat → 422', r.d === 422);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'X', hizmetler: [{ ad: 'A', tur: 'yillik', fiyat_kurus: 1 }] }));
+k('geçersiz hizmet türü → 422', r.d === 422);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'X', hizmetler: [{ ad: 'A', tur: 'aylik', fiyat_kurus: -5 }] }));
+k('eksi tutar → 422', r.d === 422);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'X', asama: 'kaybedildi' }));
+k('kaybedildi olarak oluştururken neden yok → 422', r.d === 422);
+
+// Liste ve okuma
+r = await jsn(await istek('firsatlar?sorumlu=ali@idexya.com'));
+k('liste süzgeci: sorumlu', r.d === 200 && r.firsatlar.length >= 1 && r.firsatlar.every((x) => x.sorumlu === 'ali@idexya.com'));
+r = await jsn(await istek('firsatlar?hizmet=google-reklam'));
+k('liste süzgeci: hizmet', r.firsatlar.length === 1 && r.firsatlar[0].id === F1 && Array.isArray(r.firsatlar[0].hizmetler));
+r = await jsn(await istek('firsatlar?q=' + encodeURIComponent('yeni firma')));
+k('liste süzgeci: arama (firma adı)', r.firsatlar.length === 3 && r.firsatlar.every((x) => x.musteri_id === M));
+r = await jsn(await istek('firsatlar?kaynak=tavsiye&asama=yeni'));
+k('liste süzgeci: kaynak + aşama', r.firsatlar.length === 1 && r.firsatlar[0].id === F1);
+k('liste yanıtında aylık + tek seferlik toplam alanı yok', !toplamAlaniVar(r));
+r = await jsn(await istek('firsatlar/' + F1));
+k('fırsat oku: müşteri adı, hizmetler dizi', r.d === 200 && r.firsat.firma === 'Yeni Firma AŞ' && r.firsat.hizmetler.length === 2 && Array.isArray(r.kayitlar) && Array.isArray(r.gorevler));
+k('fırsat oku: toplam alanı yok', !toplamAlaniVar(r));
+
+// Aşama değişimi ve türetme
+r = await jsn(await patch('firsatlar/' + F1, { asama: 'kaybedildi' }));
+k('kaybedildi nedensiz → 422', r.d === 422 && tek(db, 'SELECT asama FROM firsatlar WHERE id = ?', F1).asama === 'yeni');
+r = await jsn(await patch('firsatlar/' + F1, { asama: 'kaybedildi', kayip_nedeni: 'uydurma' }));
+k('geçersiz kayıp nedeni → 422', r.d === 422);
+r = await jsn(await patch('firsatlar/' + F1, { asama: 'teklif' }));
+k('aşama teklif → 200, aşama kaydı zaman çizelgesinde', r.d === 200 && say(db, 'kayitlar', "firsat_id = ? AND tur = 'asama'", F1) === 1);
+r = await jsn(await patch('firsatlar/' + F2, { asama: 'gorusme' }));
+k('türetme: {teklif, gorusme, yeni} → musteriler.asama = teklif', tek(db, 'SELECT asama FROM musteriler WHERE id = ?', M).asama === 'teklif');
+r = await jsn(await patch('firsatlar/' + F1, { asama: 'kaybedildi', kayip_nedeni: 'fiyat', kayip_notu: 'Bütçe yetmedi' }));
+f1 = tek(db, 'SELECT * FROM firsatlar WHERE id = ?', F1);
+k('kaybedildi nedenle → 200, kapanış dolu, neden kaydedildi', r.d === 200 && f1.asama === 'kaybedildi' && f1.kayip_nedeni === 'fiyat' && !!f1.kapanis);
+k('kayıp nedeni aşama kaydının ayrıntısında', /Fiyat/.test(tek(db, "SELECT detay FROM kayitlar WHERE firsat_id = ? AND tur = 'asama' ORDER BY zaman DESC, rowid DESC LIMIT 1", F1).detay || ''));
+const F3 = tek(db, "SELECT id FROM firsatlar WHERE musteri_id = ? AND id NOT IN (?, ?)", M, F1, F2).id;
+await patch('firsatlar/' + F3, { asama: 'kaybedildi', kayip_nedeni: 'zamanlama' });
+await patch('firsatlar/' + F2, { asama: 'kaybedildi', kayip_nedeni: 'rakip' });
+k('türetme: tüm fırsatlar kaybedildi → kaybedildi', tek(db, 'SELECT asama FROM musteriler WHERE id = ?', M).asama === 'kaybedildi');
+await patch('firsatlar/' + F2, { asama: 'kazanildi' });
+f2 = tek(db, 'SELECT * FROM firsatlar WHERE id = ?', F2);
+k('türetme: {kazanildi, kaybedildi} → kazanildi', tek(db, 'SELECT asama FROM musteriler WHERE id = ?', M).asama === 'kazanildi');
+k('kaybedildiden çıkınca kayıp nedeni temizlenir', f2.kayip_nedeni === null && !!f2.kapanis);
+k('asamaTuret dışa açık: aynı sonucu verir', (await F.asamaTuret(db, M)) === 'kazanildi');
+// Eşzamanlı değişiklik: iki yönetici sırayla yazınca son durum fırsatlardan yeniden hesaplanır (eski değerde kalmaz)
+db.ham.prepare("UPDATE musteriler SET asama = 'yeni' WHERE id = ?").run(M);
+// (sahte D1 iç içe işlem açamadığı için iki yazım sırayla; araya eski değer yazılır)
+await patch('firsatlar/' + F3, { asama: 'gorusme' }); db.ham.prepare("UPDATE musteriler SET asama = 'yeni' WHERE id = ?").run(M); await patch('firsatlar/' + F1, { asama: 'teklif' });
+k('eşzamanlı aşama değişikliği sonrası türetme güncel', tek(db, 'SELECT asama FROM musteriler WHERE id = ?', M).asama === 'kazanildi');
+r = await jsn(await patch('firsatlar/' + F1, { sorumlu: 'yabanci@baska.com' }));
+k('PATCH: sorumlu listede değil → 422', r.d === 422);
+r = await jsn(await patch('firsatlar/' + F1, { ad: 'Yeni ad', tek_seferlik_kurus: 150000 }));
+f1 = tek(db, 'SELECT * FROM firsatlar WHERE id = ?', F1);
+k('PATCH kısmi: ad ve tek seferlik değişti, aylık korunur', r.d === 200 && f1.ad === 'Yeni ad' && f1.tek_seferlik_kurus === 150000 && f1.aylik_kurus === 4000000);
+r = await jsn(await patch('firsatlar/yok', { ad: 'x' }));
+k('olmayan fırsat → 404', r.d === 404);
+
+// "Müşteri yap" kazanılan fırsatla çalışmaya devam eder
+{
+  const eskiFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({ aday_id: 'aday-1', durum: 'bekliyor' }), { status: 200, headers: { 'content-type': 'application/json' } });
+  const envIdos = { ...env, IDOS_ORTAK_URL: 'https://idos.ornek.test', IDOS_ORTAK_JETON: 'test-jetonu' };
+  r = await jsn(await post(`musteriler/${M}/musteri-yap`, {}, { env: envIdos }));
+  globalThis.fetch = eskiFetch;
+  k('"Müşteri yap": kazanılan fırsatı olan müşteride 409 yok', r.d === 200 && r.ok);
+}
+
+// Kişiler
+r = await jsn(await post(`musteriler/${M}/kisiler`, { ad: 'Elif Su', unvan: 'Pazarlama müdürü', rol: 'pazarlama', eposta: 'elif@yeni.com', telefon: '0532 000 00 00', birincil: true, tckn: '12345678901', dogum_tarihi: '1990-01-01' }));
+const K1 = r.id;
+k('kişi ekle → 200, birincil', r.d === 200 && tek(db, 'SELECT birincil FROM kisiler WHERE id = ?', K1).birincil === 1);
+k('ikinci birincil → öncekinin birincil işareti kalkar', say(db, 'kisiler', 'musteri_id = ? AND birincil = 1', M) === 1);
+k('kişide TCKN / doğum tarihi saklanmaz', !JSON.stringify(hepsi(db, 'SELECT * FROM kisiler')).includes('12345678901'));
+r = await jsn(await post(`musteriler/${M}/kisiler`, { ad: 'X', rol: 'patron' }));
+k('geçersiz rol → 422', r.d === 422);
+r = await jsn(await post(`musteriler/${M}/kisiler`, { ad: 'X', eposta: 'gecersiz' }));
+k('geçersiz e-posta → 422', r.d === 422);
+r = await jsn(await istek(`musteriler/${M}/kisiler`));
+k('kişi listesi: birincil önce', r.d === 200 && r.kisiler.length === 2 && r.kisiler[0].id === K1);
+r = await jsn(await patch('kisiler/' + K1, { unvan: 'Genel müdür', rol: 'karar_verici' }));
+k('kişi güncelle', r.d === 200 && tek(db, 'SELECT unvan, rol FROM kisiler WHERE id = ?', K1).rol === 'karar_verici');
+r = await jsn(await istek('kisiler?q=elif'));
+k('tüm kişiler listesi + arama, firma adıyla', r.d === 200 && r.kisiler.length === 1 && r.kisiler[0].firma === 'Yeni Firma AŞ' && typeof r.kayit_sayisi === 'number');
+
+// Zaman çizelgesi kaydı
+r = await jsn(await post(`musteriler/${M}/kayitlar`, { tur: 'arama', sonuc: 'ulasildi', sure_dk: 8, metin: 'Teklifi konuştuk', kisi_id: K1, firsat_id: F1 }));
+const KY = r.id;
+let ky = tek(db, 'SELECT * FROM kayitlar WHERE id = ?', KY);
+k('arama kaydı: tür, sonuç, süre, kişi ve fırsat bağı', r.d === 200 && ky.tur === 'arama' && ky.sonuc === 'ulasildi' && ky.sure_dk === 8 && ky.kisi_id === K1 && ky.firsat_id === F1);
+r = await jsn(await post(`musteriler/${M}/kayitlar`, { tur: 'arama', sonuc: 'belki' }));
+k('geçersiz arama sonucu → 422', r.d === 422);
+r = await jsn(await post(`musteriler/${M}/kayitlar`, { tur: 'sistem', metin: 'x' }));
+k('elle "sistem" kaydı yazılamaz → 422', r.d === 422);
+r = await jsn(await post(`musteriler/${M}/kayitlar`, { tur: 'not', metin: 'x', firsat_id: 'baskasinin' }));
+k('başka müşterinin/olmayan fırsatı → 422', r.d === 422);
+r = await jsn(await post(`musteriler/${M}/kayitlar`, { tur: 'not', metin: '' }));
+k('boş not → 422', r.d === 422);
+
+// Kişi silme: zaman çizelgesindeki eski kayıt bozulmaz
+r = await jsn(await sil('kisiler/' + K1));
+ky = tek(db, 'SELECT * FROM kayitlar WHERE id = ?', KY);
+k('kişi silindi, bağlı kayıt kaldı ve kisi_id boşaldı, metin duruyor', r.d === 200 && say(db, 'kisiler', 'id = ?', K1) === 0 && ky && ky.kisi_id === null && ky.detay === 'Teklifi konuştuk');
+k('kişi silme günlüğe not olarak yazıldı (iletişim bilgisi olmadan)', (() => { const x = tek(db, "SELECT * FROM kayitlar WHERE musteri_id = ? AND baslik LIKE 'Kişi silindi%'", M); return x && /Elif Su/.test(x.detay) && !/elif@yeni\.com|0532/.test(x.detay); })());
+r = await jsn(await sil('kisiler/' + K1));
+k('silinmiş kişi → 404', r.d === 404);
+
+// Müşteri kartı yanıtı
+r = await jsn(await istek('musteriler/' + M));
+k('müşteri kartı yanıtında fırsatlar ve kişiler var, eski alanlar korunuyor', r.d === 200 && r.musteri.id === M && Array.isArray(r.kayitlar) && r.firsatlar.length === 3 && r.kisiler.length === 1);
+
+// Eski ekranlarla uyum: eski aşama ucu tek fırsatlı müşteride fırsatı da günceller
+r = await jsn(await post('musteriler', { firma: 'Tek Fırsatlı' }));
+const MT = r.musteri_id;
+r = await jsn(await post(`musteriler/${MT}/asama`, { asama: 'teklif' }));
+k('eski aşama ucu çalışır ve tek fırsatı eşitler', r.d === 200 && tek(db, 'SELECT asama FROM musteriler WHERE id = ?', MT).asama === 'teklif' && tek(db, 'SELECT asama FROM firsatlar WHERE musteri_id = ?', MT).asama === 'teklif');
+r = await jsn(await post('musteriler/toplu', { ids: [MT], islem: 'asama', asama: 'kazanildi' }));
+k('eski toplu aşama ucu tek fırsatı eşitler', r.d === 200 && tek(db, 'SELECT asama, kapanis FROM firsatlar WHERE musteri_id = ?', MT).asama === 'kazanildi' && !!tek(db, 'SELECT kapanis FROM firsatlar WHERE musteri_id = ?', MT).kapanis);
+const oncekiM = tek(db, 'SELECT asama FROM firsatlar WHERE id = ?', F1).asama;
+await post(`musteriler/${M}/asama`, { asama: 'yeni' });
+k('eski aşama ucu çok fırsatlı müşteride fırsatlara dokunmaz', tek(db, 'SELECT asama FROM firsatlar WHERE id = ?', F1).asama === oncekiM);
+// Talep → CRM'e al akışı fırsat açar
+db.ham.prepare("INSERT INTO talepler (id, olusturma, kaynak, ad, firma, eposta, dogrulama) VALUES ('t1', '2026-11-12T08:00:00.000Z', 'iletisim', 'Talep Kişi', 'Talep Firma', 'talep@firma.com', 'gecti')").run();
+r = await jsn(await post('talepler/t1/crm', {}));
+k('talep → CRM: müşteri, fırsat (kaynak iletisim) ve birincil kişi', r.d === 200 && tek(db, 'SELECT kaynak FROM firsatlar WHERE musteri_id = ?', r.musteri_id).kaynak === 'iletisim' && say(db, 'kisiler', 'musteri_id = ? AND birincil = 1', r.musteri_id) === 1);
+
+// Yetki ve kaynak denetimi
+r = await jsn(await istek('firsatlar', { env: { DB: db } }));
+k('oturumsuz → 401', r.d === 401);
+r = await jsn(await post('firsatlar', { musteri_id: M, ad: 'X' }, { origin: null }));
+k('Origin olmadan POST → 403', r.d === 403);
+r = await jsn(await patch('firsatlar/' + F1, { ad: 'X' }, { origin: 'https://kotu.example' }));
+k('başka kaynaktan PATCH → 403', r.d === 403);
+r = await jsn(await sil('kisiler/x', { origin: null }));
+k('Origin olmadan DELETE → 403', r.d === 403);
+
+// Gönderim kodu yok
+const kaynak = readFileSync(new URL('../worker/firsat.js', import.meta.url), 'utf8');
+k('firsat.js gönderim/bildirim çağrısı içermez', !/ekibeBildir|epostaGonder|fetch\(|resend|sendEmail|whatsapp|sms/i.test(kaynak));
+
 console.log(h.length ? `\n${h.length} KALDI` : '\nTümü GEÇTİ');
 process.exit(h.length ? 1 : 0);
