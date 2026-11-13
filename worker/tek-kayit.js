@@ -149,6 +149,8 @@ export async function tekKayitGonder(env, kartId, kim, { firsat = false } = {}) 
   if (!yazmaKurulu(env)) return bekliyor(db, kartId, kim, 'IDOS yazma bağlantısı kurulu değil (IDOS_ORTAK_URL, IDOS_ORTAK_JETON, ORTAK_YAZMA_JETON_PANEL)', ilk);
   if (!yoneticiMi(env, kim.eposta)) return bekliyor(db, kartId, kim, 'Yazan e-posta panel yönetici listesinde değil (YONETICILER); IDOS\'a gönderilmedi', ilk);
   const fg = firsat ? firsatGovdesi(m) : null;
+  const ft = fg ? [fg.ad, fg.not_metni].map(yasakliVeri).find(Boolean) : null;
+  if (ft) return bekliyor(db, kartId, kim, `Paket ya da değer alanında saklanamayacak kişisel veri var (${ft}); kartı düzeltip yeniden deneyin`, ilk);
   if (!anaId) {
     const { govde, hata: gh } = musteriGovdesi(m);
     if (gh) return bekliyor(db, kartId, kim, gh, ilk);
@@ -300,8 +302,9 @@ export async function tasimaUygula(env, govde, kim) {
       else {
         let o = null;
         try { o = yazmaKurulu(env) ? await idosOku(env, `${v2}/${encodeURIComponent(s.hedef)}`) : null; } catch (e) { o = { durum: 0 }; }
-        if (o && o.durum === 404) { durum = 'hata'; sonuc = 'Eşlenecek IDOS kaydı bulunamadı'; }
-        else if (o && o.durum !== 200) { durum = 'hata'; sonuc = 'IDOS kaydı doğrulanamadı'; }
+        if (!o) { durum = 'hata'; sonuc = 'IDOS yazma bağlantısı kurulu değil; eş doğrulanamadı'; }
+        else if (o.durum === 404) { durum = 'hata'; sonuc = 'Eşlenecek IDOS kaydı bulunamadı'; }
+        else if (o.durum !== 200) { durum = 'hata'; sonuc = 'IDOS kaydı doğrulanamadı'; }
         else {
           await db.batch([
             db.prepare('UPDATE musteriler SET ana_kayit_id = ?, guncelleme = ? WHERE id = ? AND ana_kayit_id IS NULL').bind(s.hedef, simdi(), s.kart_id),
