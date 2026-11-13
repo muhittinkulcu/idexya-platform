@@ -7,6 +7,7 @@
 // · Ayarlar (Cloudflare): IDOS_ORTAK_URL (değişken, https), IDOS_ORTAK_JETON (Secret; değeri hiçbir yere yazılmaz),
 //   IDOS_MUSTERI_ADRESI (isteğe bağlı; "Ana kayıtta düzenle" bağlantısı, `{id}` yer tutucusuyla). Ayar yoksa eşitleme atlanır.
 import { json, hata, simdi, islemYaz } from './ortak.js';
+import { tekKayitGonder, superMi, yazmaKurulu } from './tek-kayit.js';
 
 const TEK_TAZE_MS = 10 * 60 * 1000;
 const ZAMAN_ASIMI_MS = 20000;
@@ -24,7 +25,7 @@ export const hesapNormal = (platform, h) => { const v = String(h || '').trim(); 
 
 export const anaKayitKurulu = (env) => !!(env.IDOS_ORTAK_URL && env.IDOS_ORTAK_JETON);
 
-function taban(env) {
+export function taban(env) {
   let u;
   try { u = new URL(String(env.IDOS_ORTAK_URL).trim()); } catch { throw new Error('IDOS_ORTAK_URL geçerli bir adres değil'); }
   const yerel = ['localhost', '127.0.0.1'].includes(u.hostname);
@@ -173,27 +174,8 @@ export async function anaMusteriGetir(env, musteriId) {
   }
 }
 
-// --- "Müşteri yap" (4. adım): kazanılan fırsat IDOS onay kuyruğuna aday olarak gider; kaydı yalnız Muhittin onaylar.
-// Kişi bilgisi yalnız kullanıcı "kişinin izni var" derse gönderilir (KVKK, en az veri). Onaylanınca kart ana kayda bağlanır.
-const TELEFON = /^[0-9 +()-]{6,40}$/;
-const EPOSTA = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+// --- Eski onay kuyruğu: daha önce gönderilip bekleyen adaylar karara bağlanana dek yoklanır (yeni gönderim yok, tek kayıt K2).
 const ADAY_TAZE_MS = 2 * 60 * 1000;
-
-export function adayGovdesi(m, kisiIzin, webSitesi) {
-  const marka = yazi(m.firma, 200) || yazi(m.ad, 200);
-  if (!marka) return null;
-  const g = { kaynak_kimlik: m.id, marka };
-  if (yazi(m.sektor, 100)) g.sektor = yazi(m.sektor, 100);
-  if (EPOSTA.test(m.sorumlu || '') && String(m.sorumlu).length <= 200) g.sorumlu = m.sorumlu;
-  if (webSitesi) g.web_sitesi = webSitesi;
-  if (kisiIzin) {
-    g.kisi_izin = true;
-    if (yazi(m.ad, 120) && m.firma) g.kisi_ad = yazi(m.ad, 120);
-    if (EPOSTA.test(m.eposta || '') && String(m.eposta).length <= 200) g.kisi_eposta = m.eposta;
-    if (TELEFON.test(m.telefon || '')) g.kisi_telefon = m.telefon;
-  }
-  return g;
-}
 
 const ADAY_DURUM = new Set(['bekliyor', 'onaylandi', 'reddedildi']);
 // IDOS'tan gelen aday durumunu yazar; onaylandıysa kartı ana kayda bağlar (kart başka bir kayda bağlıysa dokunmaz).
@@ -228,42 +210,12 @@ export async function adaylariKontrolEt(env, kim) {
   return { yoklanan: r.results.length, hata };
 }
 
+// "Müşteri yap" (tek kayıt 2. adım, K2): onay kuyruğu kalktı. Kart IDOS v2'ye doğrudan aday olarak gider (worker/tek-kayit.js);
+// eski kuyruğa (POST /api/ortak/musteri-adayi) artık istek atılmaz. Kuyrukta bekleyen eski adaylar saatlik yoklamayla izlenmeye devam eder.
 async function musteriYap(db, env, musteriId, govde, kim) {
-  if (!anaKayitKurulu(env)) return hata('IDOS bağlantısı kurulu değil (IDOS_ORTAK_URL ve IDOS_ORTAK_JETON)', 409);
-  const m = await db.prepare('SELECT id, firma, ad, eposta, telefon, sektor, sorumlu, asama, ana_kayit_id FROM musteriler WHERE id = ?').bind(musteriId).first();
-  if (!m) return hata('Müşteri bulunamadı', 404);
-  if (m.ana_kayit_id) return hata('Bu kart zaten ana kayda bağlı', 409);
-  if (m.asama !== 'kazanildi') return hata('"Müşteri yap" yalnız kazanılan fırsatta kullanılabilir', 409);
-  const var_ = await db.prepare('SELECT durum FROM ana_kayit_aday WHERE musteri_id = ?').bind(musteriId).first();
-  if (var_ && var_.durum === 'bekliyor') return hata('Bu kart için onay bekleyen bir istek zaten var', 409);
-  const site = await db.prepare('SELECT adres FROM site_saglik_hedef WHERE musteri_id = ? AND aktif = 1 ORDER BY olusturma LIMIT 1').bind(musteriId).first();
-  const g = adayGovdesi(m, govde && govde.kisi_izin === true, site ? adres(site.adres) : null);
-  if (!g) return hata('Kartta firma ya da ad yok; önce kart bilgilerini doldurun', 422);
-  let r;
-  try {
-    r = await fetch(taban(env) + '/api/ortak/musteri-adayi', {
-      method: 'POST', body: JSON.stringify(g), signal: AbortSignal.timeout(ZAMAN_ASIMI_MS),
-      headers: { Authorization: 'Bearer ' + String(env.IDOS_ORTAK_JETON).trim(), 'Content-Type': 'application/json', Accept: 'application/json' }
-    });
-  } catch (e) { return hata('IDOS\'a ulaşılamadı; istek gönderilmedi. Biraz sonra yeniden deneyin.', 502); }
-  if (r.status === 429) return hata('IDOS onay kuyruğu dolu; önce bekleyen istekler karara bağlanmalı', 429);
-  if (r.status === 422) return hata('IDOS kart bilgilerini kabul etmedi (biçim hatası); firma, sektör ve iletişim alanlarını kontrol edin', 422);
-  if (!r.ok) return hata('IDOS isteği kabul etmedi (' + r.status + '); istek gönderilmedi', 502);
-  let v;
-  try { v = JSON.parse((await r.text()).slice(0, 100000)); } catch { return hata('IDOS yanıtı okunamadı', 502); }
-  if (!v || typeof v.aday_id !== 'string' || !KIMLIK.test(v.aday_id)) return hata('IDOS yanıtı beklenen biçimde değil', 502);
-  const z = simdi();
-  await db.batch([
-    db.prepare(`INSERT INTO ana_kayit_aday (musteri_id, aday_id, durum, gonderim, gonderen, kisi_gonderildi) VALUES (?, ?, 'bekliyor', ?, ?, ?)
-      ON CONFLICT(musteri_id) DO UPDATE SET aday_id = excluded.aday_id, durum = 'bekliyor', ana_kayit_id = NULL, red_gerekcesi = NULL, son_kontrol = NULL, gonderim = excluded.gonderim, gonderen = excluded.gonderen, kisi_gonderildi = excluded.kisi_gonderildi`)
-      .bind(musteriId, v.aday_id, z, kim.eposta, g.kisi_izin ? 1 : 0),
-    db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(crypto.randomUUID(), musteriId, z, 'sistem', 'Ana kayda onaya gönderildi',
-      g.kisi_izin ? 'İletişim kişisi izinle gönderildi.' : 'İletişim kişisi gönderilmedi.', kim.eposta)
-  ]);
-  // Aynı kart daha önce gönderildiyse IDOS var olan adayın durumunu döner (ör. zaten onaylanmış).
-  if (v.durum && v.durum !== 'bekliyor') await adayDurumYaz(db, musteriId, v, kim.eposta);
-  await islemYaz(db, kim.eposta, 'musteri_yap', musteriId, `aday ${v.aday_id}${g.kisi_izin ? ' · kişi izinli' : ''}`);
-  return json({ ok: true, aday_id: v.aday_id, durum: v.durum || 'bekliyor' });
+  const r = await tekKayitGonder(env, musteriId, kim, { firsat: true });
+  if (r.durum === 'yok') return hata('Müşteri bulunamadı', 404);
+  return json({ ok: true, idos: r });
 }
 
 function duzenleAdresi(env, musteriId) {
@@ -288,7 +240,8 @@ export async function yonetimAnaKayitApi(db, env, yontem, yol, kim, govde) {
       } catch (e) { console.error('aday', e && e.message); }
     }
     const ayar = await ayarlar(db);
-    const ortak = { kurulu: anaKayitKurulu(env), son_esitleme: ayar[A.esitleme] || null, asama: mus.asama, aday: aday || null };
+    const gonderim = await db.prepare('SELECT durum, ana_kayit_id, deneme, son_deneme, son_hata, gonderen, firsat_durum FROM idos_gonderim WHERE kart_id = ?').bind(m[1]).first();
+    const ortak = { kurulu: anaKayitKurulu(env), yazma_kurulu: yazmaKurulu(env), super: superMi(kim), gonderim: gonderim || null, son_esitleme: ayar[A.esitleme] || null, asama: mus.asama, aday: aday || null };
     if (!mus.ana_kayit_id) return json({ ok: true, bagli: false, ...ortak });
     const r = await anaMusteriGetir(env, mus.ana_kayit_id);
     return json({ ok: true, bagli: true, ana_kayit_id: mus.ana_kayit_id, ...ortak, ...r, duzenle: duzenleAdresi(env, mus.ana_kayit_id) });

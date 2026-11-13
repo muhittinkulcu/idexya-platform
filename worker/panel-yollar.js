@@ -5,7 +5,7 @@ export const PANEL_ALAN = 'panel.idexya.com';
 
 export const ESKI = {
   '': 'dashboard', asistan: 'assistant', ayarlar: 'settings', bannerlar: 'banners', belgeler: 'documents',
-  bildirimler: 'notifications', bulten: 'subscribers', 'crm-cakisma': 'crm-conflicts', 'crm-idos': 'crm-sync', crm: 'crm',
+  bildirimler: 'notifications', bulten: 'subscribers', 'crm-cakisma': 'crm-conflicts', 'crm-tasima': 'crm-migrate', 'crm-idos': 'crm-sync', crm: 'crm',
   destek: 'support', donusum: 'conversions', entegrasyonlar: 'integrations', gecmis: 'activity-log', gorevler: 'tasks',
   'haftalik-bulten': 'weekly-newsletter', hesaplar: 'accounts', hiz: 'performance', icerikler: 'articles', instagram: 'instagram',
   medya: 'media', muhasebe: 'accounting', musteri: 'customer', portal: 'client-portal', seo: 'seo', 'site-icerik': 'site-content',
