@@ -21,7 +21,7 @@ Son güncelleme: 2 Kasım 2026.
 | Özet | Bildirimler | Sizi bekleyen işler (yanıt bekleyen talep, onay bekleyen üye, geciken görev) ve sistem uyarıları |
 | Satış | Talepler | Siteden gelen formlar; "CRM'e al" ya da "Spam olarak ayır" |
 | Satış | Müşteriler (CRM) | Pano ve liste görünümü, aşama, not, görüşme kaydı; müşteri kartı |
-| Satış | IDOS eşitleme, Çakışmalar | Reklam hesabını CRM müşterisine bağlama; mükerrer kartları birleştirme |
+| Satış | Müşteriler (CRM) › Mükerrer kartlar | Mükerrer müşteri kartlarını birleştirme |
 | Satış | Hesap envanteri | Müşterinin Google Ads, Meta, GA4, GTM hesapları ve erişim durumu (şifre tutulmaz) |
 | Satış | Teklifler | Kalem kalem teklif, yazdır / PDF; gönderildi, kabul, red durumu |
 | Satış | Görevler ve takvim | Ekip görevleri, takvime aktarma |
@@ -30,13 +30,13 @@ Son güncelleme: 2 Kasım 2026.
 | Pazarlama | Instagram gönderileri | Sitedeki Instagram şeridi (elle ya da otomatik akış) |
 | Web sitesi | Site içeriği | Hizmetler, paketler, ürünler, referanslar, SSS, menü, yasal sayfalar |
 | Web sitesi | Yazılar ve kaynaklar | Blog ve üye içerikleri; görünürlük ve yorumlar |
-| Web sitesi | Tema düzenleyici, Haftalık Bülten, Banner stüdyosu, Medya | Menü/üst alan/altbilgi, haftalık bülten sayıları, duyuru bannerları, görseller |
+| Web sitesi | Tema düzenleyici, Haftalık bülten, Banner stüdyosu, Medya | Menü/üst alan/altbilgi, haftalık bülten sayıları, duyuru bannerları, görseller |
 | Analiz | Ziyaretçiler, SEO ve GEO, Hız ve güvenlik | Sitenin kendi ölçümü (çerezsiz), haftalık SEO denetimi, Core Web Vitals |
 | Analiz | Müşteri siteleri | Müşteri sitelerinin günlük sağlık kontrolü (açılıyor mu, etiketler yerinde mi, alan adı süresi) |
 | Analiz | Reklam dönüşümleri | Reklamdan gelip kazanılan müşterileri Google Ads ve Meta'ya yüklemek için CSV |
 | Üyelik | Üyeler ve yetkiler, Müşteri alanı, Destek talepleri | Üyelik onayı, müşteriye davet, müşterinin destek talepleri |
 | Finans | Muhasebe, Belgeler | Basit gelir-gider defteri (resmî değil), belge bağlantıları |
-| Sistem | Ayarlar, Entegrasyonlar, Veri eşitleme, Yedekler, İşlem geçmişi | Firma bilgileri, bağlı servisler, IDOS reklam çekimi, günlük yedek, kim ne yaptı |
+| Sistem | Ayarlar, Entegrasyonlar, Eşitleme (Reklam verisi çekimi, Reklam hesabı eşleştirme), Yedekler, İşlem geçmişi | Firma bilgileri, bağlı servisler, IDOS reklam çekimi ve reklam hesabını CRM müşterisine bağlama, günlük yedek, kim ne yaptı |
 
 ## Yakında ya da bağlantı bekleyenler
 
@@ -52,7 +52,7 @@ Son güncelleme: 2 Kasım 2026.
 3. **Müşteriler (CRM):** aktif müşterileri "+ Yeni müşteri" ile ekleyin; aşamalarını seçin.
 4. **Hesap envanteri:** her müşterinin reklam ve ölçüm hesaplarını ekleyin (yalnız ad, kimlik ve erişim; şifre yazmayın).
 5. **Müşteri siteleri:** müşteri sitelerinin adreslerini ekleyin; ilk kontrolü "Şimdi kontrol et" ile yapın.
-6. **IDOS eşitleme:** reklam hesaplarını müşterilere bağlayın; genel bakıştaki reklam tablosu müşteri adıyla görünür.
+6. **Eşitleme › Reklam hesabı eşleştirme:** reklam hesaplarını müşterilere bağlayın; genel bakıştaki reklam tablosu müşteri adıyla görünür.
 7. **Yedekler:** son yedeğin alındığını görün (her gün 10.00'da, İstanbul saati).
 8. **Site içeriği:** "Yayınlama kapalı" uyarısı görürseniz Cloudflare'de `GITHUB_TOKEN` tanımlanmalı.
 

@@ -68,7 +68,7 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS reklam_hesap (
     platform TEXT NOT NULL, hesap TEXT NOT NULL, hesap_adi TEXT, marka TEXT, musteri_id TEXT, etiket TEXT, guncelleme TEXT NOT NULL, guncelleyen TEXT,
     PRIMARY KEY (platform, hesap))`,
-  // Haftalık Bülten (worker/haftalik-bulten.js): kategori › konu › haftalık sayı › madde. Kaynaklar JSON [{ad, url}].
+  // Haftalık bülten (worker/haftalik-bulten.js): kategori › konu › haftalık sayı › madde. Kaynaklar JSON [{ad, url}].
   `CREATE TABLE IF NOT EXISTS bulten_kategori (id TEXT PRIMARY KEY, ad TEXT NOT NULL, aciklama TEXT, sira INTEGER NOT NULL DEFAULT 0)`,
   `CREATE TABLE IF NOT EXISTS bulten_konu (id TEXT PRIMARY KEY, kategori TEXT NOT NULL, ad TEXT NOT NULL, aciklama TEXT, renk TEXT, sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1)`,
   `CREATE TABLE IF NOT EXISTS bulten_sayi (id TEXT PRIMARY KEY, slug TEXT NOT NULL UNIQUE, no INTEGER NOT NULL, baslik TEXT NOT NULL, ozet TEXT, hafta_bas TEXT NOT NULL, hafta_bit TEXT NOT NULL,
@@ -113,12 +113,12 @@ export const SEMA = [
     durum TEXT NOT NULL DEFAULT 'gonderildi', dosya_anahtari TEXT NOT NULL UNIQUE, dosya_adi TEXT, boyut INTEGER NOT NULL,
     olusturan TEXT NOT NULL, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, karar_zamani TEXT)`,
   `CREATE INDEX IF NOT EXISTS teklif_dosya_musteri ON teklif_dosyalari (musteri_id, tarih)`,
-  // IDOS eşitleme (worker/crm.js): IDOS reklam hesabı (platform + hesap) ↔ IDP CRM müşterisi. Yönetici elle eşleştirir.
+  // Reklam hesabı eşleştirme (worker/crm.js): IDOS reklam hesabı (platform + hesap) ↔ IDP CRM müşterisi. Yönetici elle eşleştirir.
   `CREATE TABLE IF NOT EXISTS reklam_eslesme (
     platform TEXT NOT NULL, hesap TEXT NOT NULL, musteri_id TEXT NOT NULL, eslestiren TEXT NOT NULL, zaman TEXT NOT NULL,
     PRIMARY KEY (platform, hesap))`,
   `CREATE INDEX IF NOT EXISTS reklam_eslesme_musteri ON reklam_eslesme (musteri_id)`,
-  // Çakışmalar (worker/crm.js): "Bunlar farklı" denen müşteri çiftleri (a < b) bir daha önerilmez.
+  // Mükerrer kartlar (worker/crm.js): "Bunlar farklı" denen müşteri çiftleri (a < b) bir daha önerilmez.
   `CREATE TABLE IF NOT EXISTS cakisma_ayri (a TEXT NOT NULL, b TEXT NOT NULL, isaretleyen TEXT NOT NULL, zaman TEXT NOT NULL, PRIMARY KEY (a, b))`,
   // Müşteri alanı (worker/portal.js): üye ↔ CRM müşterisi bağlantısı ve davetle üyelik. Davet jetonunun yalnız özeti saklanır.
   `CREATE TABLE IF NOT EXISTS uye_musteri (uye_id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, baglayan TEXT NOT NULL, zaman TEXT NOT NULL)`,
