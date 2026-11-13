@@ -4,20 +4,38 @@
 // bilinmeyen tutar NULL kalır (uydurulmaz); sorumlu yalnız ekip listesinden (env.YONETICILER); günler İstanbul takvimine göre.
 // musteriler.asama alanı korunur ve fırsatlardan türetilir (dashboard ve "Müşteri yap" bu alanı okur).
 import { json, hata, simdi, kimlik, kirp, islemYaz, EPOSTA_DESEN } from './ortak.js';
-import { gecerliTarih } from './gorev.js';
+import { gecerliTarih, bugunIst, ADIM_TURLERI, SAAT_DESEN } from './gorev.js';
+export { ADIM_TURLERI };
 
 export const ASAMALAR = ['yeni', 'gorusme', 'teklif', 'goruldu', 'kazanildi', 'kaybedildi'];
 export const ACIK_ASAMALAR = ASAMALAR.slice(0, 4);
 export const KAYIP_NEDENLERI = ['fiyat', 'zamanlama', 'rakip', 'yanit_yok', 'ihtiyac_yok', 'diger'];
 export const KISI_ROLLERI = ['karar_verici', 'pazarlama', 'muhasebe', 'teknik', 'diger'];
 export const KAYNAKLAR = ['iletisim', 'analiz', 'paket', 'sihirbaz', 'asistan', 'form', 'elle', 'idos_sohbet', 'tavsiye'];
-export const ADIM_TURLERI = ['ara', 'eposta', 'toplanti', 'teklif', 'diger'];
 export const TASIMA_BAYRAK = 'crm_tasima_v1';
 
 export const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 export const KAYIP_ADI = { fiyat: 'Fiyat', zamanlama: 'Zamanlama', rakip: 'Rakip', yanit_yok: 'Yanıt yok', ihtiyac_yok: 'İhtiyaç yok', diger: 'Diğer' };
 const KAYIT_TURU = { not: 'Not', arama: 'Arama', toplanti: 'Toplantı', yazisma: 'Yazışma' };
 const SONUCLAR = ['ulasildi', 'ulasilamadi'];
+const ADIM_ADI = { ara: 'Ara', eposta: 'E-posta yaz', toplanti: 'Toplantı', teklif: 'Teklif hazırla', diger: 'Takip' };
+// Görev türü → zaman çizelgesi kaydı türü ("Yapıldı" kaydında)
+const ADIM_KAYIT = { ara: 'arama', toplanti: 'toplanti', eposta: 'yazisma', teklif: 'teklif' };
+// YYYY-AA-GG üzerinde takvim günü ekleme (saat dilimi kayması yok)
+const gunEkle = (t, n) => { const [y, a, g] = t.split('-').map(Number); return new Date(Date.UTC(y, a - 1, g + n)).toISOString().slice(0, 10); };
+const gunFarki = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
+// Bu haftanın pazarı (hafta pazartesi başlar); bugün pazarsa bugün.
+const haftaSonu = (t) => gunEkle(t, (7 - new Date(t + 'T00:00:00Z').getUTCDay()) % 7);
+// Tutar özeti: bilinen tutarların toplamı (yoksa NULL) ve tutarı girilmemiş fırsat sayısı. Aylık ve tek seferlik ayrı kalır.
+function tutarOzet(l) {
+  const o = { n: l.length };
+  for (const [a, b] of [['aylik_kurus', 'aylik_bilinmeyen'], ['tek_seferlik_kurus', 'tek_seferlik_bilinmeyen']]) {
+    const bilinen = l.filter((x) => x[a] !== null && x[a] !== undefined);
+    o[a] = bilinen.length ? bilinen.reduce((s, x) => s + x[a], 0) : null;
+    o[b] = l.length - bilinen.length;
+  }
+  return o;
+}
 const KAPALI = ['kazanildi', 'kaybedildi'];
 const sayiTr = (n) => new Intl.NumberFormat('tr-TR').format(n);
 
@@ -306,6 +324,82 @@ export async function yonetimFirsatApi(db, env, yontem, yol, govde, kim, url) {
     const turetilen = await asamaTuret(db, eski.musteri_id);
     await islemYaz(db, kim.eposta, 'firsat_guncellendi', eski.id, v.asama !== eski.asama ? `${eski.asama} → ${v.asama}` : v.ad);
     return json({ ok: true, musteri_asama: turetilen });
+  }
+
+  // --- Bugün: sonraki adımlar (gecikmiş / bugün / bu hafta), adımsız açık fırsatlar, yeni talepler, bu ay özeti ---
+  if (yol === 'bugun' && yontem === 'GET') {
+    const kimP = (p.get('kim') || 'ben').trim().toLowerCase();
+    let kisi = null;
+    if (kimP === 'ben') kisi = kim.eposta;
+    else if (kimP !== 'hepsi') { if (!ekip.includes(kimP)) return hata('Seçilen kişi ekip listesinde değil', 422); kisi = kimP; }
+    const t = bugunIst(), hs = haftaSonu(t), ay = t.slice(0, 7);
+    const ks = (a) => (kisi ? ` AND ${a} = ?` : ''), kb = kisi ? [kisi] : [];
+    const acikL = ACIK_ASAMALAR.map((x) => `'${x}'`).join(', ');
+    const [ad, ads, tl, kp, ac] = await db.batch([
+      db.prepare(`SELECT g.id, g.baslik, g.tarih, g.saat, g.tur, g.atanan, g.oncelik, g.firsat_id, COALESCE(g.musteri_id, f.musteri_id) AS musteri_id,
+          m.firma, m.ad AS musteri_ad, f.ad AS firsat_ad, f.asama AS firsat_asama
+        FROM gorevler g LEFT JOIN firsatlar f ON f.id = g.firsat_id JOIN musteriler m ON m.id = COALESCE(g.musteri_id, f.musteri_id)
+        WHERE g.durum = 'acik' AND m.arsiv IS NULL AND g.tarih <= ?${ks('g.atanan')}
+        ORDER BY g.tarih, COALESCE(g.saat, '99:99'), g.olusturma LIMIT 500`).bind(hs, ...kb),
+      // Adım: fırsata bağlı açık görev; müşterinin tek açık fırsatı varsa müşteriye bağlı (eski) açık görev de sayılır.
+      db.prepare(`SELECT f.*, m.firma, m.ad AS musteri_ad FROM firsatlar f JOIN musteriler m ON m.id = f.musteri_id
+        WHERE m.arsiv IS NULL AND f.asama IN (${acikL})${ks('f.sorumlu')}
+          AND NOT EXISTS (SELECT 1 FROM gorevler g WHERE g.durum = 'acik' AND (g.firsat_id = f.id OR (g.firsat_id IS NULL AND g.musteri_id = f.musteri_id
+            AND (SELECT COUNT(*) FROM firsatlar f2 WHERE f2.musteri_id = f.musteri_id AND f2.asama IN (${acikL})) = 1)))
+        ORDER BY f.guncelleme LIMIT 200`).bind(...kb),
+      db.prepare("SELECT id, olusturma, kaynak, ad, firma, konu FROM talepler WHERE durum = 'yeni' ORDER BY olusturma DESC LIMIT 20"),
+      db.prepare(`SELECT f.asama, f.aylik_kurus, f.tek_seferlik_kurus, f.kayip_nedeni FROM firsatlar f JOIN musteriler m ON m.id = f.musteri_id
+        WHERE m.arsiv IS NULL AND f.asama IN ('kazanildi', 'kaybedildi') AND f.kapanis IS NOT NULL AND substr(datetime(f.kapanis, '+3 hours'), 1, 7) = ?${ks('f.sorumlu')}`).bind(ay, ...kb),
+      db.prepare(`SELECT f.aylik_kurus, f.tek_seferlik_kurus FROM firsatlar f JOIN musteriler m ON m.id = f.musteri_id WHERE m.arsiv IS NULL AND f.asama IN (${acikL})${ks('f.sorumlu')}`).bind(...kb)
+    ]);
+    const adimlar = ad.results.map((x) => ({ ...x, gecikme_gun: x.tarih < t ? gunFarki(x.tarih, t) : 0 }));
+    const kaz = kp.results.filter((x) => x.asama === 'kazanildi'), kay = kp.results.filter((x) => x.asama === 'kaybedildi');
+    const sayac = {}; kay.forEach((x) => { if (x.kayip_nedeni) sayac[x.kayip_nedeni] = (sayac[x.kayip_nedeni] || 0) + 1; });
+    const enSik = Object.keys(sayac).sort((a, b) => sayac[b] - sayac[a] || KAYIP_NEDENLERI.indexOf(a) - KAYIP_NEDENLERI.indexOf(b))[0] || null;
+    const payda = kaz.length + kay.length;
+    return json({
+      ok: true, tarih: t, hafta_sonu: hs, kim: kisi || 'hepsi',
+      gecikmis: adimlar.filter((x) => x.tarih < t), bugun: adimlar.filter((x) => x.tarih === t), hafta: adimlar.filter((x) => x.tarih > t),
+      adimsiz: ads.results.map(firsatCikti), talepler: tl.results,
+      ay: { donem: ay, kazanilan: tutarOzet(kaz), kaybedilen: { n: kay.length, en_sik_neden: enSik }, acik: tutarOzet(ac.results), kazanma_orani: payda ? Math.round((kaz.length / payda) * 10000) / 10000 : null }
+    });
+  }
+  m = yol.match(/^gorevler\/([\w-]+)\/yapildi$/);
+  if (m && yontem === 'POST') {
+    const g = await db.prepare('SELECT * FROM gorevler WHERE id = ?').bind(m[1]).first();
+    if (!g) return hata('Görev bulunamadı', 404);
+    if (g.durum !== 'acik') return hata('Görev zaten tamamlanmış', 409);
+    let sonuc = null;
+    if (govde.sonuc !== undefined && govde.sonuc !== null && govde.sonuc !== '') { if (!SONUCLAR.includes(govde.sonuc)) return hata('Sonuç ulaşıldı ya da ulaşılamadı olmalı', 422); sonuc = govde.sonuc; }
+    const not = kirp(govde.not, 4000) || null;
+    let s = null;
+    if (govde.sonraki !== undefined && govde.sonraki !== null) {
+      const x = govde.sonraki;
+      if (typeof x !== 'object' || Array.isArray(x)) return hata('Sonraki adım geçersiz', 422);
+      if (!ADIM_TURLERI.includes(x.tur)) return hata('Sonraki adım türü geçersiz', 422);
+      const tarih = kirp(x.tarih, 10), saat = kirp(x.saat, 5);
+      if (!gecerliTarih(tarih)) return hata('Sonraki adım tarihi geçersiz (GG.AA.YYYY biçiminde bir gün seçin)', 422);
+      if (saat && !SAAT_DESEN.test(saat)) return hata('Saat geçersiz (SS.DD biçiminde, ör. 09.30)', 422);
+      const atanan = x.atanan === undefined || x.atanan === '' ? kim.eposta : kirp(x.atanan, 160).toLowerCase();
+      if (!ekip.includes(atanan)) return hata('Sonraki adımın sorumlusu ekip listesinde değil', 422);
+      s = { tur: x.tur, tarih, saat: saat || null, atanan, baslik: kirp(x.baslik, 160) || ADIM_ADI[x.tur] };
+    }
+    const f = g.firsat_id ? await db.prepare('SELECT * FROM firsatlar WHERE id = ?').bind(g.firsat_id).first() : null;
+    const musteriId = g.musteri_id || (f && f.musteri_id) || null;
+    const q = [db.prepare("UPDATE gorevler SET durum = 'tamam', tamamlanma = ? WHERE id = ? AND durum = 'acik'").bind(z, g.id)];
+    const kayitId = musteriId ? kimlik() : null, yeniId = s ? kimlik() : null;
+    if (musteriId) {
+      q.push(kayitSorgu(db, { id: kayitId, musteri_id: musteriId, zaman: z, tur: ADIM_KAYIT[g.tur] || 'not', baslik: 'Yapıldı · ' + g.baslik, detay: not, kim: kim.eposta, firsat_id: g.firsat_id, sonuc }));
+      q.push(db.prepare('UPDATE musteriler SET guncelleme = ? WHERE id = ?').bind(z, musteriId));
+    }
+    if (s) q.push(db.prepare(`INSERT INTO gorevler (id, baslik, aciklama, tarih, saat, musteri_id, atanan, oncelik, durum, olusturma, olusturan, firsat_id, tur)
+      VALUES (?, ?, NULL, ?, ?, ?, ?, 'normal', 'acik', ?, ?, ?, ?)`).bind(yeniId, s.baslik, s.tarih, s.saat, musteriId, s.atanan, z, kim.eposta, g.firsat_id || null, s.tur));
+    await db.batch(q);
+    await islemYaz(db, kim.eposta, 'gorev_yapildi', g.id, g.baslik + (s ? ` · sonraki: ${s.tur} ${s.tarih}` : ''));
+    // Adım verilmediyse ve iş sürüyorsa öneri: aynı tür (yoksa arama), üç gün sonra. Yalnız öneridir; görev açılmaz.
+    const suruyor = f ? ACIK_ASAMALAR.includes(f.asama) : !!musteriId;
+    const oneri = !s && suruyor ? { tur: ADIM_TURLERI.includes(g.tur) ? g.tur : 'ara', tarih: gunEkle(bugunIst(), 3) } : null;
+    return json({ ok: true, kayit_id: kayitId, yeni_gorev_id: yeniId, oneri });
   }
 
   // --- Kişiler ---

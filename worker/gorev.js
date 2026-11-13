@@ -4,6 +4,9 @@
 import { json, hata, simdi, kimlik, kirp, islemYaz, EPOSTA_DESEN } from './ortak.js';
 
 const ONCELIK = ['dusuk', 'normal', 'yuksek'];
+// Sonraki adım türleri (CRM): görev bir fırsata bağlanabilir ve türü olabilir; ikisi de isteğe bağlı.
+export const ADIM_TURLERI = ['ara', 'eposta', 'toplanti', 'teklif', 'diger'];
+export const SAAT_DESEN = /^([01]\d|2[0-3]):[0-5]\d$/;
 const TARIH = /^(\d{4})-(\d{2})-(\d{2})$/;
 const SAAT = /^([01]\d|2[0-3]):[0-5]\d$/;
 
@@ -20,7 +23,7 @@ export const bugunIst = () => new Date(Date.now() + 3 * 3600000).toISOString().s
 async function alanlar(db, govde, kim) {
   const baslik = kirp(govde.baslik, 160), aciklama = kirp(govde.aciklama, 4000), tarih = kirp(govde.tarih, 10), saat = kirp(govde.saat, 5);
   const oncelik = govde.oncelik === undefined || govde.oncelik === '' ? 'normal' : govde.oncelik;
-  const musteri = kirp(govde.musteri_id, 64);
+  let musteri = kirp(govde.musteri_id, 64);
   let atanan = kirp(govde.atanan, 160).toLowerCase();
   if (!baslik) return { h: 'Görev başlığı gerekli' };
   if (!gecerliTarih(tarih)) return { h: 'Tarih geçersiz (GG.AA.YYYY biçiminde bir gün seçin)' };
@@ -28,8 +31,24 @@ async function alanlar(db, govde, kim) {
   if (!ONCELIK.includes(oncelik)) return { h: 'Öncelik geçersiz' };
   if (!atanan) atanan = kim.eposta;
   else if (atanan !== kim.eposta && !EPOSTA_DESEN.test(atanan)) return { h: 'Sorumlu e-posta adresi geçersiz' };
+  // firsat_id ve tur gövdede yoksa (eski ekran) undefined kalır ve güncellemede değişmez.
+  let firsatId, tur;
+  if (govde.firsat_id !== undefined) {
+    firsatId = kirp(govde.firsat_id, 64) || null;
+    if (firsatId) {
+      const f = await db.prepare('SELECT musteri_id FROM firsatlar WHERE id = ?').bind(firsatId).first();
+      if (!f) return { h: 'Seçilen fırsat bulunamadı' };
+      if (musteri && musteri !== f.musteri_id) return { h: 'Fırsat seçilen müşteriye ait değil' };
+      musteri = f.musteri_id;
+    }
+  }
+  if (govde.tur !== undefined) {
+    if (govde.tur === null || govde.tur === '') tur = null;
+    else if (ADIM_TURLERI.includes(govde.tur)) tur = govde.tur;
+    else return { h: 'Görev türü geçersiz' };
+  }
   if (musteri && !(await db.prepare('SELECT id FROM musteriler WHERE id = ?').bind(musteri).first())) return { h: 'Seçilen müşteri bulunamadı' };
-  return { v: { baslik, aciklama: aciklama || null, tarih, saat: saat || null, oncelik, atanan, musteri_id: musteri || null } };
+  return { v: { baslik, aciklama: aciklama || null, tarih, saat: saat || null, oncelik, atanan, musteri_id: musteri || null, firsat_id: firsatId, tur } };
 }
 
 export async function yonetimGorevApi(db, yontem, yol, govde, kim) {
@@ -42,8 +61,8 @@ export async function yonetimGorevApi(db, yontem, yol, govde, kim) {
     const { v, h } = await alanlar(db, govde, kim);
     if (h) return hata(h, 422);
     const id = kimlik();
-    await db.prepare(`INSERT INTO gorevler (id, baslik, aciklama, tarih, saat, musteri_id, atanan, oncelik, durum, olusturma, olusturan)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'acik', ?, ?)`).bind(id, v.baslik, v.aciklama, v.tarih, v.saat, v.musteri_id, v.atanan, v.oncelik, simdi(), kim.eposta).run();
+    await db.prepare(`INSERT INTO gorevler (id, baslik, aciklama, tarih, saat, musteri_id, atanan, oncelik, durum, olusturma, olusturan, firsat_id, tur)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'acik', ?, ?, ?, ?)`).bind(id, v.baslik, v.aciklama, v.tarih, v.saat, v.musteri_id, v.atanan, v.oncelik, simdi(), kim.eposta, v.firsat_id ?? null, v.tur ?? null).run();
     await islemYaz(db, kim.eposta, 'gorev_olusturuldu', id, v.baslik);
     return json({ ok: true, id });
   }
@@ -53,8 +72,9 @@ export async function yonetimGorevApi(db, yontem, yol, govde, kim) {
     if (!k) return hata('Görev bulunamadı', 404);
     const { v, h } = await alanlar(db, govde, kim);
     if (h) return hata(h, 422);
-    await db.prepare('UPDATE gorevler SET baslik = ?, aciklama = ?, tarih = ?, saat = ?, musteri_id = ?, atanan = ?, oncelik = ? WHERE id = ?')
-      .bind(v.baslik, v.aciklama, v.tarih, v.saat, v.musteri_id, v.atanan, v.oncelik, k.id).run();
+    const ek = [v.firsat_id !== undefined ? ['firsat_id', v.firsat_id] : null, v.tur !== undefined ? ['tur', v.tur] : null].filter(Boolean);
+    await db.prepare(`UPDATE gorevler SET baslik = ?, aciklama = ?, tarih = ?, saat = ?, musteri_id = ?, atanan = ?, oncelik = ?${ek.map(([a]) => `, ${a} = ?`).join('')} WHERE id = ?`)
+      .bind(v.baslik, v.aciklama, v.tarih, v.saat, v.musteri_id, v.atanan, v.oncelik, ...ek.map(([, x]) => x), k.id).run();
     await islemYaz(db, kim.eposta, 'gorev_guncellendi', k.id, v.baslik);
     return json({ ok: true });
   }

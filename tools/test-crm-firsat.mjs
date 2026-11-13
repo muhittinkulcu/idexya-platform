@@ -274,5 +274,107 @@ k('Origin olmadan DELETE → 403', r.d === 403);
 const kaynak = readFileSync(new URL('../worker/firsat.js', import.meta.url), 'utf8');
 k('firsat.js gönderim/bildirim çağrısı içermez', !/ekibeBildir|epostaGonder|fetch\(|resend|sendEmail|whatsapp|sms/i.test(kaynak));
 
+// ===================== Task 4: Bugün ve sonraki adım =====================
+{
+  const d4 = semaliD1();
+  const env4 = { DB: d4, YEREL_GIRIS: 'evet', YONETICILER: 'muhittin@idexya.com,ali@idexya.com' };
+  const al = async (yol) => jsn(await istek(yol, { env: env4 }));
+  const yaz = async (yol, g) => jsn(await post(yol, g, { env: env4 }));
+  const gerçekNow = Date.now;
+  Date.now = () => Date.UTC(2026, 10, 12, 22, 30); // UTC 12.11.2026 22.30 = TR 13.11.2026 01.30 (cuma)
+  try {
+    musteriEkle(d4, { id: 'A', firma: 'Aktif AŞ' }); musteriEkle(d4, { id: 'Bx', firma: 'Arşivli', arsiv: '2026-11-01T00:00:00Z' }); musteriEkle(d4, { id: 'C', firma: 'Cadde' });
+    const fEkle = (id, mus, asama, o = {}) => d4.ham.prepare(`INSERT INTO firsatlar (id, musteri_id, ad, hizmetler, aylik_kurus, tek_seferlik_kurus, asama, sorumlu, kayip_nedeni, kapanis, olusturma, guncelleme, olusturan)
+      VALUES (?, ?, ?, '[]', ?, ?, ?, ?, ?, ?, '2026-10-01T00:00:00Z', '2026-10-01T00:00:00Z', 'x')`).run(id, mus, 'F ' + id, o.aylik ?? null, o.tek ?? null, asama, o.sorumlu || ben, o.neden ?? null, o.kapanis ?? null);
+    fEkle('FA', 'A', 'gorusme'); fEkle('FB', 'Bx', 'yeni'); fEkle('FC', 'C', 'teklif', { sorumlu: 'ali@idexya.com', aylik: 100000 });
+    fEkle('FK', 'A', 'kazanildi', { aylik: 4000000, kapanis: '2026-11-05T10:00:00Z' });
+    fEkle('FL1', 'A', 'kaybedildi', { neden: 'fiyat', kapanis: '2026-10-31T22:30:00Z' }); // TR 01.11.2026: kasımda sayılır
+    fEkle('FL2', 'C', 'kaybedildi', { neden: 'fiyat', kapanis: '2026-11-02T10:00:00Z', sorumlu: 'ali@idexya.com' });
+    fEkle('FL3', 'C', 'kaybedildi', { neden: 'rakip', kapanis: '2026-11-03T10:00:00Z' });
+    fEkle('FL4', 'C', 'kaybedildi', { neden: 'rakip', kapanis: '2026-10-31T20:00:00Z' }); // TR 31.10.2026 23.00: ekimde, sayılmaz
+    const gEkle = (id, tarih, o = {}) => d4.ham.prepare(`INSERT INTO gorevler (id, baslik, tarih, saat, musteri_id, firsat_id, tur, atanan, oncelik, durum, olusturma, olusturan)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'normal', 'acik', '2026-11-01T00:00:00Z', 'x')`).run(id, 'Görev ' + id, tarih, o.saat ?? null, o.musteri ?? null, o.firsat ?? null, o.tur ?? null, o.atanan || ben);
+    gEkle('g1', '2026-11-10', { musteri: 'A', firsat: 'FA', tur: 'ara' });
+    gEkle('g2', '2026-11-05', { musteri: 'A' });
+    gEkle('g3', '2026-11-13', { musteri: 'A', saat: '14:00' });
+    gEkle('g4', '2026-11-14', { musteri: 'A', atanan: 'ali@idexya.com' });
+    // Müşterinin tek açık fırsatı varsa müşteriye bağlı (eski) görev o fırsatın adımı sayılır
+    musteriEkle(d4, { id: 'D', firma: 'Dörtyol' }); fEkle('FD', 'D', 'yeni'); gEkle('gD', '2026-11-25', { musteri: 'D' });
+    gEkle('g5', '2026-11-20', { musteri: 'A' });
+    gEkle('g6', '2026-11-12', {}); // müşterisiz iç görev: sonraki adım sayılmaz
+    gEkle('gB', '2026-11-13', { musteri: 'Bx', firsat: 'FB' });
+    d4.ham.exec("INSERT INTO talepler (id, olusturma, kaynak, ad, firma, eposta, dogrulama, durum) VALUES ('ty', '2026-11-12T20:00:00Z', 'iletisim', 'Yeni Talep', 'Firma', 'a@b.co', 'gecti', 'yeni'), ('ts', '2026-11-12T20:00:00Z', 'form', 'Spam', NULL, NULL, 'gecti', 'spam')");
+
+    let b = await al('bugun?kim=hepsi');
+    const idler = (l) => (l || []).map((x) => x.id).join(',');
+    k('Bugün: TR günü (UTC 22.30 → ertesi gün)', b.d === 200 && b.tarih === '2026-11-13');
+    k('Bugün: gecikmiş en eski önce, müşterisiz iç görev yok', idler(b.gecikmis) === 'g2,g1');
+    k('Bugün: gecikme gün sayısı', b.gecikmis[0].gecikme_gun === 8 && b.gecikmis[1].gecikme_gun === 3);
+    k('Bugün: bugün listesi (arşivli müşterinin görevi yok)', idler(b.bugun) === 'g3');
+    k('Bugün: bu hafta (pazara kadar)', idler(b.hafta) === 'g4');
+    k('Bugün: adımı olmayan açık fırsat (arşivli yok, adımlı yok)', idler(b.adimsiz) === 'FC');
+    k('Bugün: adım satırında firma adı', b.gecikmis[0].firma === 'Aktif AŞ');
+    k('Bugün: yalnız yeni talepler', idler(b.talepler) === 'ty');
+    k('Bu ay: kazanılan 1, aylık 40.000 TL, tek seferlik boş', b.ay.kazanilan.n === 1 && b.ay.kazanilan.aylik_kurus === 4000000 && b.ay.kazanilan.tek_seferlik_kurus === null);
+    k('Bu ay: kaybedilen 3 (TR ay sınırı), en sık neden fiyat', b.ay.kaybedilen.n === 3 && b.ay.kaybedilen.en_sik_neden === 'fiyat');
+    k('Bu ay: kazanma oranı 1/4', b.ay.kazanma_orani === 0.25);
+    k('Bu ay: açık fırsat sayısı ve aylık ayrı (bilinmeyen sayısıyla)', b.ay.acik.n === 3 && b.ay.acik.aylik_kurus === 100000 && b.ay.acik.tek_seferlik_kurus === null && b.ay.acik.aylik_bilinmeyen === 2);
+    k('Bugün yanıtında toplam (aylık + tek) alanı yok', !toplamAlaniVar(b));
+    b = await al('bugun?kim=ben');
+    k('kim=ben: yalnız bana atananlar', idler(b.hafta) === '' && idler(b.gecikmis) === 'g2,g1' && idler(b.adimsiz) === '' && b.ay.kazanilan.n === 1 && b.ay.kaybedilen.n === 2);
+    b = await al('bugun');
+    k('kim verilmezse ben', idler(b.hafta) === '' && idler(b.bugun) === 'g3');
+    b = await al('bugun?kim=ali@idexya.com');
+    k('kim=<eposta>: o kişinin adımları ve fırsatları', idler(b.hafta) === 'g4' && idler(b.gecikmis) === '' && idler(b.adimsiz) === 'FC');
+    b = await al('bugun?kim=yabanci@baska.com');
+    k('kim ekip dışında → 422', b.d === 422);
+    {
+      const bos = semaliD1();
+      const r0 = await jsn(await istek('bugun', { env: { ...env4, DB: bos } }));
+      k('hiç kapanış yoksa kazanma oranı boş (null), 0 değil', r0.d === 200 && r0.ay.kazanma_orani === null && r0.ay.kazanilan.aylik_kurus === null);
+    }
+
+    // Yapıldı
+    let y = await yaz('gorevler/g1/yapildi', { sonuc: 'ulasildi', not: 'Konuştuk', sonraki: { tur: 'toplanti', tarih: '2026-11-18', saat: '14:00', atanan: 'ali@idexya.com' } });
+    const g1 = tek(d4, "SELECT * FROM gorevler WHERE id = 'g1'");
+    const kay = tek(d4, 'SELECT * FROM kayitlar WHERE id = ?', y.kayit_id || '');
+    const yeni = tek(d4, 'SELECT * FROM gorevler WHERE id = ?', y.yeni_gorev_id || '');
+    k('Yapıldı: görev tamam', y.d === 200 && g1.durum === 'tamam' && !!g1.tamamlanma);
+    k('Yapıldı: zaman çizelgesine arama kaydı (sonuç, not, fırsat)', kay && kay.tur === 'arama' && kay.sonuc === 'ulasildi' && kay.detay === 'Konuştuk' && kay.firsat_id === 'FA' && kay.musteri_id === 'A');
+    k('Yapıldı: sonraki adım yeni görev (fırsat, müşteri, tür, sorumlu)', yeni && yeni.firsat_id === 'FA' && yeni.musteri_id === 'A' && yeni.tur === 'toplanti' && yeni.atanan === 'ali@idexya.com' && yeni.tarih === '2026-11-18' && yeni.durum === 'acik');
+    y = await yaz('gorevler/g1/yapildi', {});
+    k('Yapıldı ikinci kez → 409', y.d === 409);
+    y = await yaz('gorevler/g3/yapildi', { sonraki: { tur: 'ara', tarih: '2026-11-18', atanan: 'yabanci@baska.com' } });
+    k('sonraki adım sorumlusu ekip dışında → 422, görev açık kalır', y.d === 422 && tek(d4, "SELECT durum FROM gorevler WHERE id = 'g3'").durum === 'acik');
+    y = await yaz('gorevler/g3/yapildi', { sonraki: { tur: 'ara', tarih: '2026-02-30' } });
+    k('sonraki adım tarihi geçersiz → 422', y.d === 422);
+    y = await yaz('gorevler/g3/yapildi', { sonraki: { tur: 'faks', tarih: '2026-11-18' } });
+    k('sonraki adım türü geçersiz → 422', y.d === 422);
+    y = await yaz('gorevler/g3/yapildi', { sonuc: 'ulasildi' });
+    k('Yapıldı adımsız: öneri döner, yeni görev açılmaz', y.d === 200 && y.yeni_gorev_id === null && y.oneri && ADIM_TURU_OK(y.oneri.tur) && /^\d{4}-\d{2}-\d{2}$/.test(y.oneri.tarih) && y.oneri.tarih > '2026-11-13');
+    y = await yaz('gorevler/yok/yapildi', {});
+    k('olmayan görev → 404', y.d === 404);
+    y = await jsn(await post('gorevler/g5/yapildi', {}, { env: env4, origin: null }));
+    k('Yapıldı Origin olmadan → 403', y.d === 403);
+
+    // gorev.js: firsat_id ve tur alanları
+    let gr = await yaz('gorevler', { baslik: 'Teklif hazırla', tarih: '2026-11-16', firsat_id: 'FC', tur: 'teklif' });
+    let gx = tek(d4, 'SELECT * FROM gorevler WHERE id = ?', gr.id || '');
+    k('görev oluştur: fırsat bağı, müşteri fırsattan, tür', gr.d === 200 && gx.firsat_id === 'FC' && gx.musteri_id === 'C' && gx.tur === 'teklif');
+    gr = await yaz('gorevler/' + gx.id, { baslik: 'Teklif hazırla (güncel)', tarih: '2026-11-17' });
+    gx = tek(d4, 'SELECT * FROM gorevler WHERE id = ?', gx.id);
+    k('eski ekrandan görev güncellemesi fırsat bağını ve türü korur', gr.d === 200 && gx.firsat_id === 'FC' && gx.tur === 'teklif' && gx.tarih === '2026-11-17');
+    gr = await yaz('gorevler', { baslik: 'X', tarih: '2026-11-16', firsat_id: 'FC', musteri_id: 'A' });
+    k('görev: fırsat başka müşterinin → 422', gr.d === 422);
+    gr = await yaz('gorevler', { baslik: 'X', tarih: '2026-11-16', tur: 'faks' });
+    k('görev: geçersiz tür → 422', gr.d === 422);
+    gr = await yaz('gorevler', { baslik: 'Eski ekran görevi', tarih: '2026-11-16' });
+    k('eski ekran görev oluşturma (fırsatsız) çalışır', gr.d === 200);
+    b = await al('bugun?kim=hepsi');
+    k('fırsata adım eklenince adımsız listeden çıkar', !idler(b.adimsiz).includes('FC'));
+  } finally { Date.now = gerçekNow; }
+}
+function ADIM_TURU_OK(t) { return ['ara', 'eposta', 'toplanti', 'teklif', 'diger'].includes(t); }
+
 console.log(h.length ? `\n${h.length} KALDI` : '\nTümü GEÇTİ');
 process.exit(h.length ? 1 : 0);
