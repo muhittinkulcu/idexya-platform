@@ -37,6 +37,10 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div data-teklifler style="overflow-x: auto"></div>
 <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center"><span data-teklif-ozet style="font-size: 13px; color: var(--tx2)"></span><a href="/proposals?tab=all" style="font-size: 13px; font-weight: 500">Tüm teklifler →</a></div>
 </section>
+<section class="kart" id="belgeler" aria-label="Belgeler" data-belge-bolum style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px">
+<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Belge şablonlarından bu müşteri için oluşturulan PDF’ler (erişim talebi, ödeme hatırlatma, fiyat güncelleme, teslim tutanağı, sözleşme) ve Belgeler sayfasında bu karta bağlanan dosyalar. Panel hiçbir belgeyi müşteriye göndermez.">Belgeler: bu müşteri için hazırlananlar</h2><small class="kart-alt"><span data-baslik></span> · şablondan oluşturulan PDF’ler ve bağlantılı belgeler</small></div><a class="dugme ana kucuk" data-belge-yeni href="/templates?tab=create">+ Şablondan belge oluştur</a></div>
+<div data-belgeler style="overflow-x: auto"></div>
+</section>
 <dialog class="tk-pencere" data-teklif-pencere aria-labelledby="tk-baslik">
 <form method="dialog" data-teklif-form novalidate style="display: flex; flex-direction: column; gap: 12px">
 <h2 id="tk-baslik" style="margin: 0; font-size: 18px; color: var(--head)">Teklif dosyası yükle</h2>
@@ -359,9 +363,33 @@ import Yonetim from '../../layouts/Yonetim.astro';
     kutu.replaceChildren(...satirlar);
   }
 
+  // Belgeler: şablondan üretilen PDF'ler (worker/belge-dosya.js) ve bağlantılı belgeler (worker/belge.js)
+  const BAG_TUR = { sozlesme: 'Sözleşme', teklif: 'Teklif', fatura: 'Fatura', rapor: 'Rapor', diger: 'Diğer' };
+  async function belgeleriYukle() {
+    const kutu = document.querySelector('[data-belgeler]');
+    document.querySelector('[data-belge-yeni]').href = '/templates?tab=create&customer=' + encodeURIComponent(id);
+    try {
+      const [u, b] = await Promise.all([api('belge-dosyalari/musteri/' + encodeURIComponent(id)), api('belgeler').catch(() => ({ belgeler: [] }))]);
+      const satir = [
+        ...u.belgeler.map((x) => ({ tur: x.tur_adi, taslak: !!x.taslak, ad: x.ad, no: x.belge_no, tarih: x.tarih, alt: `PDF · ${boyutYaz(x.boyut)}`, ac: `/api/yonetim/belge-dosyalari/${encodeURIComponent(x.id)}/dosya` })),
+        ...b.belgeler.filter((x) => x.musteri_id === id).map((x) => ({ tur: BAG_TUR[x.tur] || 'Belge', ad: x.ad, no: '', tarih: x.tarih, alt: 'Bağlantı', ac: x.baglanti, dis: true }))
+      ].sort((a, c) => (a.tarih < c.tarih ? 1 : a.tarih > c.tarih ? -1 : 0));
+      if (!satir.length) { kutu.replaceChildren(el('p', { class: 'bos', style: 'padding: 16px; margin: 0' }, 'Henüz belge yok. “Şablondan belge oluştur” ile erişim talebi, ödeme hatırlatma, fiyat güncelleme ya da teslim tutanağı hazırlayın.')); return; }
+      kutu.replaceChildren(el('table', { class: 'tk-tablo', 'data-sayfalama': 'yok' },
+        el('thead', {}, el('tr', {}, ...['Tür', 'Belge', 'Belge no', 'Tarih', ''].map((x) => el('th', { scope: 'col' }, x)))),
+        el('tbody', {}, ...satir.map((x) => el('tr', {},
+          el('td', {}, el('span', { class: 'cip' }, x.tur), x.taslak ? el('span', { class: 'cip teklif', style: 'margin-left: 6px' }, 'Taslak') : ''),
+          el('td', {}, el('span', { style: 'display: block; font-weight: 500; color: var(--head)' }, x.ad), el('small', { style: 'color: var(--tx2)' }, x.alt)),
+          el('td', {}, x.no || '—'),
+          el('td', { style: 'white-space: nowrap' }, x.tarih ? x.tarih.split('-').reverse().join('.') : '—'),
+          el('td', { style: 'text-align: right' }, el('a', { class: 'dugme kucuk', href: x.ac, target: '_blank', rel: 'noopener' }, x.dis ? 'Aç ↗' : 'PDF’i aç')))))));
+    } catch (h) { kutu.replaceChildren(el('p', { class: 'bos', style: 'padding: 16px; margin: 0' }, 'Belgeler yüklenemedi: ' + h.message)); }
+  }
+
   async function yukle() {
     anaKayitYukle();
     teklifleriYukle();
+    belgeleriYukle();
     reklamYukle();
     hesaplarYukle();
     try { ciz(await api('musteriler/' + encodeURIComponent(id))); }

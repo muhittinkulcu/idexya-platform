@@ -203,7 +203,12 @@ export const SEMA = [
   // Hizmet kataloğu: tur aylik | tek_seferlik; varsayılan fiyat kuruş, KDV hariç, bilinmiyorsa NULL. Silinmez, pasife alınır.
   `CREATE TABLE IF NOT EXISTS hizmet_katalogu (
     id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL DEFAULT 'aylik', varsayilan_fiyat_kurus INTEGER, simge TEXT NOT NULL DEFAULT 'genel',
-    sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`
+    sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`,
+  // Şablondan üretilen belgeler (worker/belge-dosya.js): PDF R2'de; taslak = şablon taslakken üretildi (damgalı)
+  `CREATE TABLE IF NOT EXISTS belge_dosyalari (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, sablon_id TEXT NOT NULL, sablon_surum INTEGER NOT NULL, ad TEXT NOT NULL, belge_no TEXT,
+    tarih TEXT NOT NULL, dosya_anahtari TEXT NOT NULL, dosya_adi TEXT, boyut INTEGER NOT NULL, taslak INTEGER NOT NULL DEFAULT 0, olusturan TEXT NOT NULL, olusturma TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS belge_dosya_musteri ON belge_dosyalari (musteri_id, tarih)`
 ];
 
 // Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.
@@ -221,6 +226,8 @@ export const EK_SUTUNLAR = [
   ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL']
 ];
 export const EK_DIZINLER = [
+  // Şablondan üretilen belgenin numarası tekil (boş numara serbest). Tablo yeni olduğundan mevcut veriyle çakışmaz.
+  `CREATE UNIQUE INDEX IF NOT EXISTS belge_dosya_no ON belge_dosyalari (belge_no)`,
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,
   `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`
 ];

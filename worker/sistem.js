@@ -20,7 +20,16 @@ export const AYARLAR = [
   { k: 'teklif_gecerlilik', ad: 'Teklif geçerlilik süresi (gün)', vars: '15', sinir: 4 },
   { k: 'bildirim_eposta', ad: 'Bildirim e-postası (yeni talep, destek, teklif kararı; boşsa gönderilmez)', vars: '', sinir: 160 },
   { k: 'eposta_uye_bildirim', ad: 'Destek yanıtında üyeye e-posta gönderilsin mi? (evet / hayır)', vars: 'hayır', sinir: 5 },
-  { k: 'teklif_notu', ad: 'Teklif alt notu', vars: 'Fiyatlara KDV dâhil değildir. Reklam bütçesi hizmet bedeline dâhil değildir.', sinir: 1000 }
+  { k: 'teklif_notu', ad: 'Teklif alt notu', vars: 'Fiyatlara KDV dâhil değildir. Reklam bütçesi hizmet bedeline dâhil değildir.', sinir: 1000 },
+  // Belge şablonlarında kullanılan ajans bilgileri (12 Kas 2026). Boş bırakılan bilgi belgede "—" görünür.
+  { k: 'ajans_yetkili', ad: 'Belgeleri imzalayan yetkili (ad soyad)', vars: '', sinir: 120 },
+  { k: 'ajans_yetkili_unvan', ad: 'Yetkilinin unvanı', vars: '', sinir: 80 },
+  { k: 'mersis', ad: 'MERSİS numarası', vars: '', sinir: 16 },
+  { k: 'iban', ad: 'Ödeme için IBAN (ajansın şirket hesabı)', vars: '', sinir: 40 },
+  { k: 'sehir', ad: 'Belgelerin düzenlendiği şehir', vars: 'Ankara', sinir: 40 },
+  { k: 'meta_isletme_id', ad: 'Meta işletme kimliği (erişim talebinde)', vars: '', sinir: 20 },
+  { k: 'google_ads_mcc', ad: 'Google Ads yönetici hesabı (erişim talebinde, ör. 123-456-7890)', vars: '', sinir: 12 },
+  { k: 'google_eposta', ad: 'Google ürünleri için ajans e-postası (erişim talebinde)', vars: '', sinir: 160 }
 ];
 
 export async function ayarlariOku(db) {
@@ -126,7 +135,11 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     for (const a of AYARLAR) {
       if (!(a.k in govde)) continue;
       const v = kirp(String(govde[a.k] ?? ''), a.sinir);
-      if ((a.k === 'eposta' || a.k === 'bildirim_eposta') && v && !EPOSTA_DESEN.test(v)) return hata(`${a.ad.split(' (')[0]} geçersiz`, 422);
+      if ((a.k === 'eposta' || a.k === 'bildirim_eposta' || a.k === 'google_eposta') && v && !EPOSTA_DESEN.test(v)) return hata(`${a.ad.split(' (')[0]} geçersiz`, 422);
+      if (a.k === 'meta_isletme_id' && v && !/^\d{5,20}$/.test(v)) return hata('Meta işletme kimliği yalnız rakamlardan oluşmalı', 422);
+      if (a.k === 'google_ads_mcc' && v && !/^\d{3}-\d{3}-\d{4}$/.test(v)) return hata('Google Ads yönetici hesabı 123-456-7890 biçiminde olmalı', 422);
+      if (a.k === 'mersis' && v && !/^\d{16}$/.test(v)) return hata('MERSİS numarası 16 haneli olmalı', 422);
+      if (a.k === 'iban' && v && !/^TR\d{2}( ?\d{4}){5} ?\d{2}$/.test(v.toUpperCase())) return hata('IBAN TR ile başlayan 26 karakter olmalı (ör. TR00 0000 0000 0000 0000 0000 00)', 422);
       if (a.k === 'eposta_uye_bildirim' && v && !['evet', 'hayır'].includes(v.toLocaleLowerCase('tr-TR'))) return hata('Üye e-postası ayarı “evet” ya da “hayır” olmalı', 422);
       if ((a.k === 'kdv' || a.k === 'teklif_gecerlilik') && v && !/^\d{1,3}$/.test(v)) return hata(`${a.ad} sayı olmalı`, 422);
       sorgular.push(db.prepare('INSERT INTO ayarlar (anahtar, deger, guncelleme, guncelleyen) VALUES (?, ?, ?, ?) ON CONFLICT(anahtar) DO UPDATE SET deger = excluded.deger, guncelleme = excluded.guncelleme, guncelleyen = excluded.guncelleyen').bind(a.k, v, z, kim.eposta));

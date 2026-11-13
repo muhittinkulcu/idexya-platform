@@ -53,7 +53,7 @@ const id = await s.evaluate(async () => (await (await fetch('/api/yonetim/muster
 await s.goto(B + '/customer?id=' + id);
 await s.waitForSelector('form[data-bilgi] [name=firma]');
 await s.waitForFunction(() => document.querySelector('form[data-bilgi] [name=firma]').value !== '');
-k('müşteri: kapsam satırlarında müşteri adı', (await s.$$eval('.kart-alt [data-baslik]', (x) => x.map((e) => e.textContent))).filter((x) => x.includes('Sayfalama Deneme')).length === 3);
+k('müşteri: kapsam satırlarında müşteri adı', (await s.$$eval('.kart-alt [data-baslik]', (x) => x.map((e) => e.textContent))).filter((x) => x.includes('Sayfalama Deneme')).length === 4); // bilgiler, günlük, teklifler, belgeler
 k('müşteri: formda i düğmesi yok', (await s.$$('form .kart-i')).length === 0);
 await s.fill('form[data-bilgi] [name=sektor]', 'Deneme sektörü ' + Date.now());
 await s.click('form[data-bilgi] button[type=submit]');
