@@ -211,7 +211,7 @@ export async function bultenSayfasi(istek, env, ctx, yoneticiMi) {
   Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => yanit.headers.set(k, v));
   if (acik) yanit.headers.delete('X-Robots-Tag');
   yanit.headers.set('Cache-Control', onizleme ? 'private, no-store' : 'public, max-age=300');
-  yanit.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+  yanit.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
   if (s && !onizleme) { const kopya = yanit.clone(); if (ctx) ctx.waitUntil(onbellek.put(anahtar, kopya)); else await onbellek.put(anahtar, kopya); }
   return yanit;
 }
