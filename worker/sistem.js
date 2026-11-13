@@ -1,4 +1,4 @@
-// Yönetim paneli sistem modülleri: İşlem geçmişi, Bildirimler, Ayarlar, Entegrasyonlar / Veri eşitleme ve Medya kütüphanesi.
+// Yönetim paneli sistem modülleri: İşlem geçmişi, Bildirimler, Ayarlar, Entegrasyonlar / Eşitleme (reklam verisi çekimi) ve Medya kütüphanesi.
 // Bildirimler ve entegrasyon durumları kayıtlı veriden ve ortam ayarlarından hesaplanır; gizli değerler asla döndürülmez.
 import { envanterUyarilari } from './envanter.js';
 import { yedekDurum } from './yedek.js';
@@ -119,7 +119,7 @@ export async function yonetimSistemApi(db, env, yontem, yol, govde, kim) {
     if (!yd.kurulu) uyari.push({ baslik: 'Otomatik veritabanı yedeği kapalı', detay: 'Cloudflare R2 deposu (YEDEK) bağlı değil. Şimdilik Yedekler sayfasından elle yedek indirebilirsiniz.', href: '/backups', onem: 'bilgi' });
     else if (!yd.son || Date.parse(yd.son.zaman) < Date.now() - 36 * 3600000) uyari.push({ baslik: 'Son 36 saatte veritabanı yedeği alınmadı', detay: yd.son ? `Son yedek: ${yd.son.anahtar}` : 'Henüz hiç yedek yok.', zaman: yd.son ? yd.son.zaman : null, href: '/backups', onem: 'uyari' });
     const c = cekim.results[0];
-    if (c && c.durum !== 'tamam') uyari.push({ baslik: 'Son IDOS veri çekimi başarısız', detay: c.mesaj || 'Ayrıntı için Veri eşitleme sayfasına bakın.', zaman: c.zaman, href: '/data-sync', onem: 'kritik' });
+    if (c && c.durum !== 'tamam') uyari.push({ baslik: 'Son IDOS veri çekimi başarısız', detay: c.mesaj || 'Ayrıntı için Reklam verisi çekimi sayfasına bakın.', zaman: c.zaman, href: '/data-sync', onem: 'kritik' });
     if (await tabloVar(db, 'denetimler')) {
       const d = await db.prepare('SELECT zaman, ozet FROM denetimler ORDER BY zaman DESC LIMIT 1').first();
       if (d) { try { const o = JSON.parse(d.ozet || '{}'); const kritik = (o.agirlik && o.agirlik.kritik) || 0; if (kritik) uyari.push({ baslik: 'Site denetiminde kritik sorunlar var', detay: `${kritik} kritik sorun · site puanı ${o.puan}`, zaman: d.zaman, href: '/seo', onem: 'uyari' }); } catch (e) { /* özet okunamadı */ } }

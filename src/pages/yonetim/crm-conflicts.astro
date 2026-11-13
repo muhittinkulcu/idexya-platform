@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Çakışmalar" aktif="crm" yol="Müşteri ilişkileri › CRM" aciklama="Aynı e-posta, aynı telefon (ülke kodu ve baştaki 0 yok sayılır) ya da aynı firma adına (Ltd. Şti., A.Ş. gibi ekler yok sayılır) sahip olası mükerrer müşteri kartları. Tutulacak kartı seçip birleştirin; günlük, talepler ve bağlı tüm kayıtlar tutulan karta taşınır, boş alanları öteki karttan doldurulur.">
+<Yonetim aktif="crm" aciklama="Aynı e-posta, aynı telefon (ülke kodu ve baştaki 0 yok sayılır) ya da aynı firma adına (Ltd. Şti., A.Ş. gibi ekler yok sayılır) sahip olası mükerrer müşteri kartları. Tutulacak kartı seçip birleştirin; günlük, talepler ve bağlı tüm kayıtlar tutulan karta taşınır, boş alanları öteki karttan doldurulur.">
 <div data-uyari></div>
 <div data-alan style="display: flex; flex-direction: column; gap: 14px"></div>
 <script>
@@ -62,7 +62,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   async function yukle() {
     let r;
     try { r = await api('crm/cakisma'); genelHata(''); }
-    catch (h) { genelHata('Çakışmalar yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); return; }
+    catch (h) { genelHata('Mükerrer kartlar yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); return; }
     alan.replaceChildren(...(r.gruplar.length ? r.gruplar.map(grupCiz)
       : [el('div', { class: 'kart bos' }, 'Olası mükerrer müşteri kartı yok.' + (r.ayriSayisi ? ` Daha önce “farklı” olarak işaretlenen ${r.ayriSayisi} kart çifti gösterilmiyor.` : ''))]));
   }

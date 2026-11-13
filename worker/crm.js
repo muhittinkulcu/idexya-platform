@@ -1,7 +1,7 @@
 // CRM yardımcı modülleri (23 Eki 2026):
-// · IDOS eşitleme: reklam_ozet'teki reklam hesapları (platform + hesap) IDP CRM müşterisiyle elle eşleştirilir (reklam_eslesme).
+// · Reklam hesabı eşleştirme: reklam_ozet'teki reklam hesapları (platform + hesap) IDP CRM müşterisiyle elle eşleştirilir (reklam_eslesme).
 //   IDOS'un müşteri tablosu (kişisel veri) hiçbir zaman okunmaz; yalnız D1'deki reklam özeti kullanılır.
-// · Çakışmalar: aynı e-posta, telefon veya firma adına sahip olası mükerrer müşteri kartları bulunur ve tek işlemde birleştirilir.
+// · Mükerrer kartlar: aynı e-posta, telefon veya firma adına sahip olası mükerrer müşteri kartları bulunur ve tek işlemde birleştirilir.
 import { json, hata, simdi, kimlik, kirp, islemYaz } from './ortak.js';
 import { reklamKurulu } from './reklam.js';
 
@@ -55,7 +55,7 @@ const bosMu = (v) => v === null || v === undefined || v === '';
 const ciftAnahtar = (a, b) => (a < b ? [a, b] : [b, a]);
 
 export async function yonetimCrmApi(db, env, yontem, yol, govde, kim) {
-  // --- IDOS eşitleme ---
+  // --- Reklam hesabı eşleştirme ---
   if (yol === 'crm/idos' && yontem === 'GET') {
     const [h, e, m] = await db.batch([
       db.prepare(`SELECT platform, hesap, para, MAX(marka) AS marka, SUM(harcama) AS harcama, MAX(gun) AS son_gun
@@ -132,7 +132,7 @@ export async function yonetimCrmApi(db, env, yontem, yol, govde, kim) {
     return json({ ok: true, gun: GUN, hesaplar: h.results, ozet: o.results });
   }
 
-  // --- Çakışmalar ---
+  // --- Mükerrer kartlar ---
   if (yol === 'crm/cakisma' && yontem === 'GET') {
     const [mr, ar] = await db.batch([
       db.prepare('SELECT id, firma, ad, eposta, telefon, asama, kaynak, deger, olusturma, guncelleme FROM musteriler'),

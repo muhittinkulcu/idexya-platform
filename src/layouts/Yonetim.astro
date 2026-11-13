@@ -1,8 +1,11 @@
 ---
 // Yönetim paneli yerleşimi (IDOS tasarım dili). Sayfa verisi tarayıcıda /api/yonetim/* uçlarından okunur;
 // sayfalar derlemede veri içermez. Menü, üst çubuk ve tema tercihleri yalnız bu tarayıcıda (localStorage) saklanır.
-interface Props { baslik: string; aktif: string; yol?: string; aciklama?: string; }
-const { baslik, aktif, yol = '', aciklama = '' } = Astro.props;
+import { MENU, menuAdi } from '../data/panel-menu.js';
+// baslik verilmezse sayfanın menüdeki adı kullanılır (menüyle aynı ad iki yerde elle yazılmaz).
+interface Props { baslik?: string; aktif: string; yol?: string; aciklama?: string; }
+const { aktif, yol = '', aciklama = '' } = Astro.props;
+const baslik = Astro.props.baslik || menuAdi('/' + Astro.url.pathname.replace(/^\/yonetim\/|\/$/g, ''));
 const I = {
   hedef: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle>',
   nabiz: '<path d="M3 12h4l3-8 4 16 3-8h4"></path>',
@@ -34,74 +37,6 @@ const I = {
   ayar: '<circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path>',
   gecmis: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>'
 };
-// Menü ağacı. href'i olmayan modül veya alt sayfa henüz yapılmadı ("Yakında" görünür, tıklanmaz).
-const MENU = [
-  { grup: 'ÖZET', ad: 'Özet', ogeler: [
-    { k: 'genel', ad: 'Genel bakış', href: '/dashboard', sabit: true },
-    { k: 'bildirim', ad: 'Bildirimler', href: '/notifications', i: 'bildirim', altlar: [{ ad: 'Onay bekleyenler', href: '/notifications#approvals' }, { ad: 'Sistem uyarıları', href: '/notifications#alerts' }] }
-  ] },
-  // Satış: talep gelir → müşteri olur → teklif verilir → işler planlanır
-  { grup: 'SATIŞ', ad: 'Satış', ogeler: [
-    { k: 'talepler', ad: 'Talepler', href: '/leads', i: 'talep', sayac: 'talep', altlar: [
-      { ad: 'Yeni', href: '/leads?tab=new' }, { ad: 'CRM’e alınan', href: '/leads?tab=crm' },
-      { ad: 'Spam', href: '/leads?tab=spam' }, { ad: 'Tümü', href: '/leads?tab=all' }] },
-    { k: 'crm', ad: 'Müşteriler (CRM)', href: '/crm', i: 'crm', altlar: [
-      { ad: 'Satış panosu', href: '/crm' }, { ad: 'IDOS eşitleme', href: '/crm-sync' }, { ad: 'Çakışmalar', href: '/crm-conflicts' }] },
-    { k: 'hesaplar', ad: 'Hesap envanteri', href: '/accounts', i: 'anahtar' },
-    { k: 'teklif', ad: 'Teklifler', href: '/proposals', i: 'teklif', altlar: [
-      { ad: 'Taslaklar', href: '/proposals?tab=draft' }, { ad: 'Gönderilenler', href: '/proposals?tab=sent' },
-      { ad: 'Kabul edilenler', href: '/proposals?tab=accepted' }] },
-    { k: 'sablonlar', ad: 'Belge şablonları', href: '/templates', i: 'belge', altlar: [
-      { ad: 'Şablonlar', href: '/templates' }, { ad: 'Müşteriye belge oluştur', href: '/templates?tab=create' },
-      { ad: 'Hizmet kataloğu', href: '/templates?tab=catalog' }] },
-    { k: 'gorev', ad: 'Görevler ve takvim', href: '/tasks', i: 'gorev' }
-  ] },
-  // Pazarlama ve iletişim: ziyaretçiyle ve abonelerle temas
-  { grup: 'PAZARLAMA VE İLETİŞİM', ad: 'Pazarlama ve iletişim', ogeler: [
-    { k: 'asistan', ad: 'Asistan sohbetleri', href: '/assistant', i: 'asistan' },
-    { k: 'eposta', ad: 'Bülten listesi', href: '/subscribers', i: 'eposta' },
-    { k: 'instagram', ad: 'Instagram gönderileri', href: '/instagram', i: 'medya' }
-  ] },
-  // Web sitesi: sitede görünen her şey
-  { grup: 'WEB SİTESİ', ad: 'Web sitesi', ogeler: [
-    { k: 'site', ad: 'Site içeriği', href: '/site-content', i: 'icerik', altlar: [
-      { ad: 'Hizmetler', href: '/site-content?file=services' }, { ad: 'Paketler', href: '/site-content?file=packages' },
-      { ad: 'Ürünler', href: '/site-content?file=products#products' }, { ad: 'Kategoriler', href: '/site-content?file=products#categories' },
-      { ad: 'Referanslar', href: '/site-content?file=references' }, { ad: 'Blog yazıları', href: '/site-content?file=posts' }, { ad: 'Menüler', href: '/site-content?file=site-menu' },
-      { ad: 'Sık sorulan sorular', href: '/site-content?file=faq' }, { ad: 'Yasal sayfalar', href: '/site-content?file=legal' }] },
-    { k: 'icerikler', ad: 'Yazılar ve kaynaklar', href: '/articles', i: 'belge', sayac: 'yorum' },
-    { k: 'tema', ad: 'Tema düzenleyici', href: '/theme', i: 'tema' },
-    { k: 'haftalik-bulten', ad: 'Haftalık Bülten', href: '/weekly-newsletter', i: 'radar' },
-    { k: 'bannerlar', ad: 'Banner stüdyosu', href: '/banners', i: 'banner' },
-    { k: 'medya', ad: 'Medya kütüphanesi', href: '/media', i: 'medya' }
-  ] },
-  // Analiz: sitenin nasıl performans gösterdiği
-  { grup: 'ANALİZ', ad: 'Analiz', ogeler: [
-    { k: 'ziyaret', ad: 'Ziyaretçiler', href: '/visitors', i: 'ziyaret' },
-    { k: 'seo', ad: 'SEO ve GEO', href: '/seo', i: 'seo' },
-    { k: 'hiz', ad: 'Hız ve güvenlik', href: '/performance', i: 'hiz' },
-    { k: 'siteler', ad: 'Müşteri siteleri', href: '/client-sites', i: 'nabiz' },
-    { k: 'donusum', ad: 'Reklam dönüşümleri', href: '/conversions', i: 'hedef' }
-  ] },
-  // Üyelik: kimin neye erişebildiği
-  { grup: 'ÜYELİK VE ERİŞİM', ad: 'Üyelik ve erişim', ogeler: [
-    { k: 'uyeler', ad: 'Üyeler ve yetkiler', href: '/members', i: 'uye', sayac: 'uye' },
-    { k: 'portal', ad: 'Müşteri alanı', href: '/client-portal', i: 'portal', altlar: [{ ad: 'Erişimler', href: '/client-portal?tab=access' }, { ad: 'Davetler', href: '/client-portal?tab=invites' }] },
-    { k: 'destek', ad: 'Destek talepleri', href: '/support', i: 'destek', sayac: 'destek' }
-  ] },
-  { grup: 'FİNANS', ad: 'Finans', ogeler: [
-    { k: 'muhasebe', ad: 'Muhasebe', href: '/accounting', i: 'muhasebe' },
-    { k: 'belge', ad: 'Belgeler', href: '/documents', i: 'belge' }
-  ] },
-  // Sistem: panelin kendisi ve bağlantıları
-  { grup: 'SİSTEM', ad: 'Sistem', ogeler: [
-    { k: 'ayar', ad: 'Ayarlar', href: '/settings', i: 'ayar' },
-    { k: 'entegre', ad: 'Entegrasyonlar', href: '/integrations', i: 'entegre' },
-    { k: 'esitle', ad: 'Veri eşitleme', href: '/data-sync', i: 'esitle' },
-    { k: 'yedek', ad: 'Yedekler', href: '/backups', i: 'yedek' },
-    { k: 'gecmis', ad: 'İşlem geçmişi', href: '/activity-log', i: 'gecmis' }
-  ] }
-];
 // Sayfa yolu (üst çubuk) her zaman menüdeki grup adından gelir; sayfaların kendi yol metni yalnız grubu olmayan sayfalarda kullanılır.
 const grup = MENU.find((g) => g.ogeler.some((o) => o.k === aktif));
 const grupAdi = (grup || {}).ad;
@@ -429,7 +364,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
     <div class="idos-kart" data-idos-kart>
       <span style="display: flex; justify-content: space-between; align-items: center"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 800">ID<span style="color: #F07A23">OS</span></b><small style="color: #B9BEC4; font-size: 11px" data-idos-durum>Reklam verisi</small></span>
       <span style="font-size: 12px; color: #B9BEC4; line-height: 1.5" data-idos-detay>Durum yükleniyor…</span>
-      <a href="/data-sync" style="font-size: 12px; font-weight: 500; color: #FFFFFF">Veri eşitleme</a>
+      <a href="/data-sync" style="font-size: 12px; font-weight: 500; color: #FFFFFF">{menuAdi('/data-sync')}</a>
     </div>
   </div>
   <div class="yan-alt">
@@ -463,7 +398,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
             <a role="menuitem" href="/articles?new=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
             <a role="menuitem" href="/site-content?file=packages&new=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
             <a role="menuitem" href="/site-content?file=services"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
-            <a role="menuitem" href="/weekly-newsletter?new=1"><strong>Haftalık Bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
+            <a role="menuitem" href="/weekly-newsletter?new=1"><strong>Haftalık bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
             <a role="menuitem" href="/banners?new=1"><strong>Banner, duyuru ya da açılır pencere</strong><span>Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu</span></a>
             <a role="menuitem" href="/site-content?file=faq&new=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
             <b>Satış ve iş</b>
