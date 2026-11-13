@@ -1,6 +1,7 @@
 // Şablondan belge üretimi (tarayıcıda): sayfa görseli + değişken metinler canvas'a çizilir, sayfalar JPEG olarak PDF'e konur.
 // Sabit sayfaların JPEG'i olduğu gibi gömülür (yeniden sıkıştırılmaz). Yazı tipleri: Comfortaa ve Abel (OFL, /fonts/).
 import { SAYFA_EN, SAYFA_BOY, tarihUzun, kapakBasligi, tlBelge, satirYerlesimi, HIZMET_DUZEN, KALEM_DUZEN, jpegBilgi, pdfOlustur } from './sablon-hesap.js';
+import { metinPlani, planSusle } from './sablon-metin.js';
 
 const YAZI = '#231f20', TURUNCU = '#eb7305';
 const ORTAK = '/yonetim/veri/sablon/ortak/';
@@ -69,12 +70,63 @@ async function simgeCiz(ctx, simge, x, y) {
   ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(x + 75, y + 75, 12, 0, Math.PI * 2); ctx.fill();
 }
 
+// --- Metin sayfası (antetli A4) ---
+const yaziTipi = (o) => `${o.kalin ? 700 : 400} ${o.boyut}px IdxComfortaa`;
+let olcuCtx = null;
+// Ölçme işlevi (sablon-metin.js satır kırma): canvas measureText
+export function olcucu() {
+  if (!olcuCtx) olcuCtx = document.createElement('canvas').getContext('2d');
+  const onb = new Map();
+  return (metin, f) => {
+    const k = f.boyut + (f.kalin ? 'k' : 'n') + metin;
+    if (!onb.has(k)) { olcuCtx.font = yaziTipi(f); onb.set(k, olcuCtx.measureText(metin).width); }
+    return onb.get(k);
+  };
+}
+// Çizim listesi: metin her zaman fillText ile düz yazı olarak çizilir (HTML olarak yorumlanmaz).
+async function opsCiz(ctx, ops) {
+  for (const o of ops || []) {
+    if (o.t === 'yazi') {
+      ctx.font = yaziTipi(o); ctx.fillStyle = o.renk; ctx.textBaseline = 'top';
+      ctx.textAlign = o.hiza === 'sag' ? 'right' : o.hiza === 'orta' ? 'center' : 'left';
+      ctx.fillText(o.metin, o.x, o.y);
+      ctx.textAlign = 'left';
+    } else if (o.t === 'cizgi') {
+      ctx.strokeStyle = o.renk; ctx.lineWidth = o.kalinlik; ctx.beginPath(); ctx.moveTo(o.x1, o.y1); ctx.lineTo(o.x2, o.y2); ctx.stroke();
+    } else if (o.t === 'kutu') {
+      ctx.fillStyle = o.dolgu; ctx.fillRect(o.x, o.y, o.w, o.h);
+    } else if (o.t === 'nokta') {
+      ctx.fillStyle = o.renk; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2); ctx.fill();
+    } else if (o.t === 'onay') {
+      ctx.strokeStyle = YAZI; ctx.lineWidth = 2; ctx.strokeRect(o.x, o.y, o.boyut, o.boyut);
+      if (o.dolu) { ctx.strokeStyle = TURUNCU; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(o.x + 4, o.y + o.boyut * 0.55); ctx.lineTo(o.x + o.boyut * 0.42, o.y + o.boyut - 4); ctx.lineTo(o.x + o.boyut - 3, o.y + 3); ctx.stroke(); }
+    } else if (o.t === 'gorsel' && o.ad === 'logo') {
+      ctx.drawImage(await gorselYukle(ORTAK + 'logo.png'), o.x, o.y, o.w, o.h);
+    }
+  }
+}
+
+// Tüm şablon türleri için belge planı: metin sayfaları ölçülüp sayfalara bölünür, hizmet/fiyat listeleri gerekirse tekrarlanır,
+// koşulu tutmayan sayfa atlanır; her sayfaya antet/alt bilgi ve (taslak şablonda) damga eklenir.
+// veri: { firma, tarih, kalemler?, degerler?, taslak?, belgeNo?, altSatir? }
+export async function planHazirla(sayfalar, veri) {
+  await fontlarHazir();
+  const ara = metinPlani(sayfalar, veri.degerler || {}, olcucu());
+  const plan = ara.flatMap((p) => (!p.ops && (p.sayfa.tip === 'hizmetler' || p.sayfa.tip === 'kalemler') ? sayfaPlani([p.sayfa], veri).map((x) => ({ ...x, no: p.no })) : [p]));
+  return planSusle(plan, veri);
+}
+
 // Tek sayfayı 1654 × 2339 canvas'a çizer.
 export async function sayfaCiz(canvas, p, veri) {
   canvas.width = SAYFA_EN; canvas.height = SAYFA_BOY;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, SAYFA_EN, SAYFA_BOY);
+  if (p.sayfa.tip === 'metin') { await fontlarHazir(); await opsCiz(ctx, p.ops); await opsCiz(ctx, p.ek); return; }
   ctx.drawImage(await gorselYukle(gorselAdresi(p.sayfa.gorsel)), 0, 0, SAYFA_EN, SAYFA_BOY);
+  await sayfaIcerik(ctx, p, veri);
+  if (p.ek && p.ek.length) { await fontlarHazir(); await opsCiz(ctx, p.ek); }
+}
+async function sayfaIcerik(ctx, p, veri) {
   const s = p.sayfa, a = s.alanlar || {}, m = s.metinler || {};
   if (s.tip === 'sabit') return;
   await fontlarHazir();
@@ -122,12 +174,11 @@ const jpegAl = (canvas) => new Promise((tamam, red) => canvas.toBlob((b) => (b ?
 
 // PDF üretir: { pdf: Uint8Array, sayfaSayisi }. ilerleme(i, n) isteğe bağlı.
 export async function belgePdf(sayfalar, veri, { baslik = '', yazar = 'Idexya', ilerleme } = {}) {
-  await fontlarHazir();
-  const plan = sayfaPlani(sayfalar, veri), jpgler = [];
+  const plan = await planHazirla(sayfalar, veri), jpgler = [];
   const canvas = document.createElement('canvas');
   for (const [i, p] of plan.entries()) {
     if (ilerleme) ilerleme(i + 1, plan.length);
-    if (p.sayfa.tip === 'sabit') {
+    if (p.sayfa.tip === 'sabit' && !(p.ek && p.ek.length)) {
       // Sabit sayfa: JPEG baytları doğrudan (RGB ya da gri değilse yeniden çizilir)
       const r = await fetch(gorselAdresi(p.sayfa.gorsel), { credentials: 'same-origin' });
       if (!r.ok) throw new Error(`${p.no}. sayfanın görseli alınamadı`);

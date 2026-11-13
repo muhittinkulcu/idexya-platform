@@ -1,6 +1,6 @@
 // Panel adres seçenekleri İngilizce (Muhittin, 30 Eki 2026): panel.idexya.com/leads?tab=new gibi. Sayfaların içi Türkçe
 // adlarla çalışır; adres okunurken ve yazılırken bu tabloyla çevrilir. Worker eski Türkçe bağlantıları yeni adrese taşır.
-export const AD = { sekme: 'tab', yeni: 'new', musteri: 'customer', mevcut: 'existing', dosya: 'file', t: 'ticket', sayi: 'issue' };
+export const AD = { sekme: 'tab', yeni: 'new', musteri: 'customer', mevcut: 'existing', dosya: 'file', t: 'ticket', sayi: 'issue', sablon: 'template' };
 // Değeri çevrilen seçenekler: sekme ve dosya (öteki seçeneklerin değeri kimlik ya da 1'dir)
 export const DEGER = {
   yeni: 'new', hepsi: 'all', taslak: 'draft', gonderildi: 'sent', kabul: 'accepted', red: 'rejected',

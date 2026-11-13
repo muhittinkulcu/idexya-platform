@@ -204,6 +204,11 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS hizmet_katalogu (
     id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL DEFAULT 'aylik', varsayilan_fiyat_kurus INTEGER, simge TEXT NOT NULL DEFAULT 'genel',
     sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`,
+  // Şablondan üretilen belgeler (worker/belge-dosya.js): PDF R2'de; taslak = şablon taslakken üretildi (damgalı)
+  `CREATE TABLE IF NOT EXISTS belge_dosyalari (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, sablon_id TEXT NOT NULL, sablon_surum INTEGER NOT NULL, ad TEXT NOT NULL, belge_no TEXT,
+    tarih TEXT NOT NULL, dosya_anahtari TEXT NOT NULL, dosya_adi TEXT, boyut INTEGER NOT NULL, taslak INTEGER NOT NULL DEFAULT 0, olusturan TEXT NOT NULL, olusturma TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS belge_dosya_musteri ON belge_dosyalari (musteri_id, tarih)`,
   // CRM satış çekirdeği (worker/firsat.js; tasarım docs/superpowers/specs/2026-11-12-crm-satis-cekirdegi-design.md):
   // bir müşteride birden çok fırsat. Tutarlar kuruş, KDV hariç; aylık ve tek seferlik ayrı tutulur ve toplanmaz, bilinmiyorsa NULL.
   `CREATE TABLE IF NOT EXISTS firsatlar (
@@ -239,6 +244,8 @@ export const EK_SUTUNLAR = [
   ['kayitlar', 'firsat_id', 'TEXT'], ['kayitlar', 'kisi_id', 'TEXT'], ['kayitlar', 'sonuc', 'TEXT'], ['kayitlar', 'sure_dk', 'INTEGER']
 ];
 export const EK_DIZINLER = [
+  // Şablondan üretilen belgenin numarası tekil (boş numara serbest). Tablo yeni olduğundan mevcut veriyle çakışmaz.
+  `CREATE UNIQUE INDEX IF NOT EXISTS belge_dosya_no ON belge_dosyalari (belge_no)`,
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,
   `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`,
   `CREATE INDEX IF NOT EXISTS gorev_firsat ON gorevler (firsat_id, durum)`,
