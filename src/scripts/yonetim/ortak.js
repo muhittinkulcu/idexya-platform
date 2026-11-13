@@ -157,8 +157,8 @@ export function kabuk() {
 
   // Dar menü: modülün üzerine gelince (veya klavyeyle odaklanınca) adı ve alt sayfaları yanda açılır.
   // Fare menüden listeye geçerken kapanmasın diye kapanış kısa bir gecikmeyle yapılır.
-  let ucanZaman;
-  function ucanKapat() { clearTimeout(ucanZaman); if (ucan) ucan.hidden = true; }
+  let ucanZaman, ucanModul = null;
+  function ucanKapat() { clearTimeout(ucanZaman); ucanModul = null; if (ucan) ucan.hidden = true; }
   const ucanPlanla = () => { clearTimeout(ucanZaman); ucanZaman = setTimeout(ucanKapat, 180); };
   function ucanAc(m) {
     if (!ucan || !yan.classList.contains('dar') || matchMedia('(max-width: 860px)').matches) return;
@@ -173,10 +173,17 @@ export function kabuk() {
       ...altlar.map((a) => a.tagName === 'A'
         ? el('a', { class: 'alt-ln', href: a.getAttribute('href'), 'aria-current': a.getAttribute('aria-current') || undefined }, a.dataset.ad)
         : el('span', { class: 'alt-ln' }, a.dataset.ad, el('small', {}, 'Yakında'))));
+    // Geçiş (Muhittin, 13 Kas 2026): modül değişince içerik soldan kayarak belirir, liste yeni hizaya kayar.
+    // İlk açılışta konum atlamaz (geçiş kapalı); aynı modüle yeniden gelince efekt tekrarlanmaz.
+    const ilk = ucan.hidden;
     ucan.hidden = false;
     const r = m.getBoundingClientRect();
+    if (ilk) ucan.style.transition = 'none';
     ucan.style.left = Math.round(yan.getBoundingClientRect().right + 8) + 'px';
     ucan.style.top = Math.round(Math.max(8, Math.min(r.top, innerHeight - ucan.offsetHeight - 8))) + 'px';
+    if (ilk) { void ucan.offsetHeight; ucan.style.transition = ''; }
+    if (ilk || m !== ucanModul) { ucan.classList.remove('gecis'); void ucan.offsetWidth; ucan.classList.add('gecis'); }
+    ucanModul = m;
   }
   const ucan = $('[data-ucan]');
   if (ucan) {
