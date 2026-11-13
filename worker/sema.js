@@ -203,7 +203,21 @@ export const SEMA = [
   // Hizmet kataloğu: tur aylik | tek_seferlik; varsayılan fiyat kuruş, KDV hariç, bilinmiyorsa NULL. Silinmez, pasife alınır.
   `CREATE TABLE IF NOT EXISTS hizmet_katalogu (
     id TEXT PRIMARY KEY, ad TEXT NOT NULL, tur TEXT NOT NULL DEFAULT 'aylik', varsayilan_fiyat_kurus INTEGER, simge TEXT NOT NULL DEFAULT 'genel',
-    sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`
+    sira INTEGER NOT NULL DEFAULT 0, aktif INTEGER NOT NULL DEFAULT 1, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`,
+  // CRM satış çekirdeği (worker/firsat.js; tasarım docs/superpowers/specs/2026-11-12-crm-satis-cekirdegi-design.md):
+  // bir müşteride birden çok fırsat. Tutarlar kuruş, KDV hariç; aylık ve tek seferlik ayrı tutulur ve toplanmaz, bilinmiyorsa NULL.
+  `CREATE TABLE IF NOT EXISTS firsatlar (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, ad TEXT NOT NULL, hizmetler TEXT, aylik_kurus INTEGER, tek_seferlik_kurus INTEGER,
+    asama TEXT NOT NULL DEFAULT 'yeni', sorumlu TEXT NOT NULL, kaynak TEXT, tahmini_kapanis TEXT, kayip_nedeni TEXT, kayip_notu TEXT,
+    kapanis TEXT, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL, olusturan TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS firsat_musteri ON firsatlar (musteri_id)`,
+  `CREATE INDEX IF NOT EXISTS firsat_asama ON firsatlar (asama, guncelleme)`,
+  `CREATE INDEX IF NOT EXISTS firsat_sorumlu ON firsatlar (sorumlu, asama)`,
+  // Müşterideki kişiler. Veri asgarisi: TCKN, doğum tarihi, kişisel adres alanı yoktur. Müşteri başına en çok bir birincil.
+  `CREATE TABLE IF NOT EXISTS kisiler (
+    id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, ad TEXT NOT NULL, unvan TEXT, rol TEXT, eposta TEXT, telefon TEXT,
+    birincil INTEGER NOT NULL DEFAULT 0, olusturma TEXT NOT NULL, guncelleme TEXT NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS kisi_musteri ON kisiler (musteri_id)`
 ];
 
 // Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.
@@ -218,9 +232,16 @@ export const EK_SUTUNLAR = [
   // Teklif tutarları türe göre (12 Kas 2026: aylık ve tek seferlik toplanmaz). Boşsa o türde kalem yok; eski teklifte hepsi boş.
   // İki tür birlikteyken ara_toplam/kdv/toplam 0 yazılır ve tutarlar yalnız bu sütunlardadır (src/scripts/yonetim/teklif-toplam.js).
   ['teklifler', 'ara_aylik', 'REAL'], ['teklifler', 'kdv_aylik', 'REAL'], ['teklifler', 'toplam_aylik', 'REAL'],
-  ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL']
+  ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL'],
+  // CRM satış çekirdeği: sonraki adım = fırsata ya da müşteriye bağlı açık görev (tur: ara | eposta | toplanti | teklif | diger).
+  ['gorevler', 'firsat_id', 'TEXT'], ['gorevler', 'tur', 'TEXT'],
+  // Zaman çizelgesi: kayıt hangi fırsat/kişiyle ilgili, arama sonucu (ulasildi | ulasilamadi) ve süresi (dakika).
+  ['kayitlar', 'firsat_id', 'TEXT'], ['kayitlar', 'kisi_id', 'TEXT'], ['kayitlar', 'sonuc', 'TEXT'], ['kayitlar', 'sure_dk', 'INTEGER']
 ];
 export const EK_DIZINLER = [
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,
-  `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`
+  `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`,
+  `CREATE INDEX IF NOT EXISTS gorev_firsat ON gorevler (firsat_id, durum)`,
+  `CREATE INDEX IF NOT EXISTS kayit_firsat ON kayitlar (firsat_id)`,
+  `CREATE INDEX IF NOT EXISTS kayit_kisi ON kayitlar (kisi_id)`
 ];
