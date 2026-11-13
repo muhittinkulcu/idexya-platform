@@ -75,7 +75,7 @@ export async function envanterUyarilari(db) {
   return [
     ...kayip.results.map((x) => ({ tur: 'kayip', id: x.id, musteri_id: x.musteri_id, onem: 'kritik', baslik: `${ad(x)}: çalışma bitti ama erişim açık`, detay: `${etiket(x)} — erişimi kaldırıp kaydı güncelleyin.` })),
     ...bekleyen.results.map((x) => ({ tur: 'bekleyen', id: x.id, musteri_id: x.musteri_id, onem: 'normal', baslik: `${ad(x)}: erişim isteği 7 günden uzun süredir bekliyor`, detay: etiket(x) })),
-    ...idos.results.map((x) => ({ tur: 'idos', id: x.id, musteri_id: x.musteri_id, onem: 'kritik', baslik: `${etiket(x)}: IDOS eşleşmesiyle çelişiyor`, detay: `Envanterde “${ad(x)}”, IDOS eşitlemede “${x.idos_firma || x.idos_ad || 'başka müşteri'}”. Hangisinin doğru olduğunu kontrol edin.` }))
+    ...idos.results.map((x) => ({ tur: 'idos', id: x.id, musteri_id: x.musteri_id, onem: 'kritik', baslik: `${etiket(x)}: IDOS eşleşmesiyle çelişiyor`, detay: `Envanterde “${ad(x)}”, reklam hesabı eşleştirmesinde “${x.idos_firma || x.idos_ad || 'başka müşteri'}”. Hangisinin doğru olduğunu kontrol edin.` }))
   ];
 }
 

@@ -250,7 +250,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     finally { dugme.disabled = false; dugme.textContent = 'Yükle ve kaydet'; }
   });
 
-  // Reklam özeti (IDOS): yalnız IDOS eşitleme sayfasında bu müşteriye eşleştirilmiş hesap varsa görünür.
+  // Reklam özeti (IDOS): yalnız Reklam hesabı eşleştirme sayfasında bu müşteriye eşleştirilmiş hesap varsa görünür.
   // Para birimleri birbirine eklenmez; her platform + para birimi ayrı satırdır.
   const PLATFORM = { meta: 'Meta', google: 'Google Ads' };
   const paraYaz = (n, kod) => { try { return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: kod, maximumFractionDigits: 0 }).format(n || 0); } catch (e) { return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(n || 0) + ' ' + kod; } };
@@ -263,7 +263,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     kutu.hidden = false;
     kutu.replaceChildren(
       el('div', { 'data-kart-bas': '', style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
-        el('div', {}, el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)', 'data-kart-bilgi': 'IDOS eşitleme sayfasında bu müşteriye eşleştirilen reklam hesaplarının harcama ve sonuçlarıdır.' }, 'Reklam özeti: eşleşen hesaplar'),
+        el('div', {}, el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)', 'data-kart-bilgi': 'Reklam hesabı eşleştirme sayfasında bu müşteriye eşleştirilen reklam hesaplarının harcama ve sonuçlarıdır.' }, 'Reklam özeti: eşleşen hesaplar'),
           el('small', { class: 'kart-alt' }, `Bu müşteri · son ${r.gun} gün, bugün hariç · para birimleri ayrı`)),
         el('a', { href: '/crm-sync', style: 'font-size: 13px' }, 'Eşleşmeleri yönet')),
       r.ozet.length

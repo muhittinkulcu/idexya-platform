@@ -78,6 +78,25 @@ for (const [g, ad] of [[390, 'mobil'], [768, 'tablet']]) {
     kontrol(`${ad} ${y} yatay taşma yok (${tas})`, tas <= 0);
   }
 }
+// Menü: Sistem › Eşitleme iki alt öğeyle; sayfa açılınca doğru grup açık, doğru alt öğe seçili; CRM altında eşitleme yok
+await s.setViewportSize({ width: 1440, height: 900 });
+for (const [yol, alt, baslik] of [['data-sync', 'Reklam verisi çekimi', 'Reklam verisi çekimi'], ['crm-sync', 'Reklam hesabı eşleştirme', 'Reklam hesabı eşleştirme']]) {
+  await s.goto(B + '/yonetim/' + yol + '/'); await s.waitForTimeout(300);
+  const m = await s.evaluate(() => ({
+    altlar: [...document.querySelectorAll('[data-alt="esitle"] a')].map((a) => a.textContent.trim()),
+    acik: !document.querySelector('[data-alt="esitle"]').hidden,
+    secili: (document.querySelector('[data-alt="esitle"] a[aria-current=page]') || {}).textContent,
+    crmAlt: [...document.querySelectorAll('[data-alt="crm"] a')].map((a) => a.textContent.trim()),
+    yol: [...document.querySelectorAll('[data-yol] li')].filter((l) => !l.hidden).map((l) => l.textContent.trim()).join(' › '),
+    h1: document.querySelector('h1[data-baslik]').textContent.replace(/\.$/, '')
+  }));
+  kontrol(`${yol}: Eşitleme altında iki öğe`, m.altlar.join('|') === 'Reklam verisi çekimi|Reklam hesabı eşleştirme');
+  kontrol(`${yol}: Eşitleme açık, "${alt}" seçili`, m.acik && m.secili === alt);
+  kontrol(`${yol}: başlık "${baslik}", yol Sistem › Eşitleme (${m.yol})`, m.h1 === baslik && m.yol.startsWith('Sistem › Eşitleme'));
+  kontrol(`${yol}: CRM altında eşitleme yok`, m.crmAlt.join('|') === 'Satış panosu|Mükerrer kartlar');
+}
+await s.goto(B + '/yonetim/crm-conflicts/'); await s.waitForTimeout(300);
+kontrol('crm-conflicts: CRM açık, "Mükerrer kartlar" seçili', await s.evaluate(() => !document.querySelector('[data-alt="crm"]').hidden && (document.querySelector('[data-alt="crm"] a[aria-current=page]') || {}).textContent === 'Mükerrer kartlar'));
 await s.setViewportSize({ width: 390, height: 900 }); await s.goto(B + '/yonetim/crm/'); await s.waitForTimeout(500);
 await s.screenshot({ path: SS + '/y-crm-390.png', fullPage: true });
 console.log(h.length ? 'SORUNLAR:\n' + h.join('\n') : 'Tüm kontroller geçti, JS hatası yok.');

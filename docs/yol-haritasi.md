@@ -33,7 +33,7 @@ Arama ve hızlı işlemler üç katmanda da ortak çalışır (komut paleti mant
    - Kapsam: blog yazıları, sayfalar, modüller, dosyalar, eğitimler; ileride ürünler
    - Her değişiklik işlem kaydına yazılır (kim, ne zaman, eski → yeni)~~ (bitti; dosya ve eğitim türleri modüllerle gelecek)
 3. Teklif ve belge akışı (seçiciler, önizle/gönder, onay/revize, günlük), değişkenler sayfası
-4. Görevler ve takvim, e-posta pazarlama (İYS), muhasebe (BizimHesap), entegrasyonlar ve IDOS eşitleme
+4. Görevler ve takvim, e-posta pazarlama (İYS), muhasebe (BizimHesap), entegrasyonlar ve reklam hesabı eşleştirme
 
 ## İleride
 - **Ücretli üyelik ve yazılımlar** (19 Eki 2026): sitede insanların üye olup ücretli plan alarak kullanabileceği
