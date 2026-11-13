@@ -63,9 +63,10 @@ export const MENU = [
   { grup: 'SİSTEM', ad: 'Sistem', ogeler: [
     { k: 'ayar', ad: 'Ayarlar', href: '/settings', i: 'ayar' },
     { k: 'entegre', ad: 'Entegrasyonlar', href: '/integrations', i: 'entegre' },
-    // Eşitleme (Muhittin, 13 Kas 2026): IDOS'la iki yönlü bağ tek başlıkta; reklam verisi çekimi ve reklam hesabı ↔ CRM müşterisi eşleştirmesi.
+    // Eşitleme (Muhittin, 13 Kas 2026): IDOS'la iki yönlü bağ tek başlıkta; reklam verisi çekimi ve reklam hesabı ↔ CRM müşterisi eşleştirmesi ve eski kartların IDOS'a tek seferlik taşınması.
     { k: 'esitle', ad: 'Eşitleme', href: '/data-sync', i: 'esitle', altlar: [
-      { ad: 'Reklam verisi çekimi', href: '/data-sync' }, { ad: 'Reklam hesabı eşleştirme', href: '/crm-sync' }] },
+      { ad: 'Reklam verisi çekimi', href: '/data-sync' }, { ad: 'Reklam hesabı eşleştirme', href: '/crm-sync' },
+      { ad: 'IDOS’a müşteri taşıma', href: '/crm-migrate' }] },
     { k: 'yedek', ad: 'Yedekler', href: '/backups', i: 'yedek' },
     { k: 'gecmis', ad: 'İşlem geçmişi', href: '/activity-log', i: 'gecmis' }
   ] }

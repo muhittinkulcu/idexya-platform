@@ -190,6 +190,13 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS ana_kayit_aday (
     musteri_id TEXT PRIMARY KEY, aday_id TEXT NOT NULL, durum TEXT NOT NULL, ana_kayit_id TEXT, red_gerekcesi TEXT,
     gonderim TEXT NOT NULL, gonderen TEXT NOT NULL, son_kontrol TEXT, kisi_gonderildi INTEGER NOT NULL DEFAULT 0)`,
+  // Müşteri tek kayıt (worker/tek-kayit.js): kartın IDOS'a aday gönderim durumu (bekliyor | gonderildi) ve tek seferlik taşıma kararları.
+  // Sütun adı bilerek `kart_id`: birleştirme (crm.js) musteri_id sütunlu tabloları taşır; bu kayıtlar karta özeldir.
+  `CREATE TABLE IF NOT EXISTS idos_gonderim (
+    kart_id TEXT PRIMARY KEY, anahtar TEXT NOT NULL, durum TEXT NOT NULL, ana_kayit_id TEXT, deneme INTEGER NOT NULL DEFAULT 0,
+    son_deneme TEXT, son_hata TEXT, gonderen TEXT, firsat_durum TEXT)`,
+  `CREATE TABLE IF NOT EXISTS idos_tasima (
+    kart_id TEXT PRIMARY KEY, karar TEXT NOT NULL, hedef TEXT, durum TEXT NOT NULL, sonuc TEXT, karar_veren TEXT NOT NULL, zaman TEXT NOT NULL)`,
   // Toplu seçim etiketleri (worker/etiket.js): tur = musteri | site | reklam_hesap; hedef = kaydın kimliği.
   `CREATE TABLE IF NOT EXISTS etiketler (tur TEXT NOT NULL, hedef TEXT NOT NULL, etiket TEXT NOT NULL, zaman TEXT NOT NULL, kim TEXT NOT NULL, PRIMARY KEY (tur, hedef, etiket))`,
   // Belge şablonları (worker/belge-sablon.js): şablon, sürümleri (sayfalar JSON; eski sürümler silinmez) ve hizmet kataloğu.

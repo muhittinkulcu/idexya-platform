@@ -65,9 +65,16 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
   - Ayar yoksa eşitleme atlanır, blok gizlenir. Elle eşitleme: `POST /api/yonetim/ana-kayit/esitle` (`{"tam": true}` ile tam liste)
   - **Hesap eşleme:** her eşitlemede IDOS `hesap-esleme` listesi `ana_hesap_esleme` tablosuna bütün olarak yazılır (belirsiz
     hesaplar gelmez). Reklam tablosunda müşteri adı önce ana kayıttan, sonra CRM elle eşleşmesinden, sonra görünümdeki markadan okunur.
-  - **Müşteri yap:** "Kazanıldı" aşamasındaki bağsız kartta düğme çıkar; kart IDOS onay kuyruğuna aday olarak gider (marka, sektör,
-    sorumlu, varsa site adresi). İletişim kişisi yalnız "kişinin izni var" kutusu işaretlenirse gönderilir. Aday durumu saatlik
-    eşitlemede ve kart açılınca (2 dakikada bir) yoklanır; onaylanınca kart ana kayda bağlanır, reddedilirse gerekçe görünür.
+  - **Tek kayıt (2. adım, `worker/tek-kayit.js`; IDOS `docs/tasarim/musteri-tek-kayit.md`):** panelde açılan her yeni kart
+    anında IDOS'ta "aday" olur (`POST /api/ortak/v2/musteriler`, HMAC imzalı; yazanın e-postası `YONETICILER`'de olmalı) ve
+    `ana_kayit_id` ile bağlanır. Eski onay kuyruğuna istek gitmez; "Müşteri yap" da aynı yolu kullanır. Sır yoksa ya da IDOS
+    reddederse (403 anahtar kapalı, 401, 429, 5xx, ağ) kart yerelde açılır, kartta "IDOS'a gönderilemedi — bekliyor" ve
+    "Yeniden dene" görünür (kendiliğinden yeniden gönderilmez). Her kartın `Idempotency-Key`'i sabittir; çift aday açılmaz.
+    Aday → aktif ("Müşteriye çevir") yalnız süper yöneticide (`info@idexya.com`, IDOS `SÜPER_ADMİNLER` ile aynı) görünür.
+    TC kimlik, kart ve IBAN numarası gönderilmez. Gizli: `ORTAK_YAZMA_JETON_PANEL` (IDOS'taki aynı adlı değişkenle aynı değer).
+  - **Taşıma (`/crm-migrate`):** IDOS karşılığı olmayan kartların önizlemesi (kesin / olası / zayıf eş, eşsiz, hatalı;
+    kaybedildi kartlar aday + "kaybedildi" fırsatı; paket ve değer fırsat notu, tutar "—"). Gönderimi yalnız süper yönetici
+    onaylar; 10'arlı parçalar, yarıda kalırsa kaldığı yerden, tamamlanan satır yeniden gönderilmez. Test: `node tools/test-tek-kayit.mjs`.
   - Test: `node tools/sahte/idos-ortak.mjs 8799 <deneme-jetonu>` + `wrangler dev --var IDOS_ORTAK_URL:http://127.0.0.1:8799 --var IDOS_ORTAK_JETON:<deneme-jetonu>`,
     sonra `node tools/test-ana-kayit.mjs <panel adresi> http://127.0.0.1:8799 <ekran klasörü> <persist klasörü>`
 - Asistan testi: `node tools/sahte/anthropic.mjs 8999` (sahte API) + `wrangler dev --var ANTHROPIC_API_KEY:sahte --var ASISTAN_API_URL:http://127.0.0.1:8999/`,

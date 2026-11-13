@@ -12,10 +12,10 @@ const { MENU } = await import(yolu);
 const ogeler = MENU.flatMap((g) => g.ogeler.map((o) => ({ ...o, grup: g.grup })));
 const oge = (k) => ogeler.find((o) => o.k === k);
 
-// 1. Sistem › Eşitleme iki alt öğeyle; CRM altında eşitleme yok
+// 1. Sistem › Eşitleme üç alt öğeyle; CRM altında eşitleme yok
 const es = oge('esitle');
 kontrol('Sistem grubunda "Eşitleme"', es && es.grup === 'SİSTEM' && es.ad === 'Eşitleme' && es.href === '/data-sync' && es.i === 'esitle');
-kontrol('Eşitleme altları: Reklam verisi çekimi, Reklam hesabı eşleştirme', JSON.stringify((es?.altlar || []).map((a) => [a.ad, a.href])) === JSON.stringify([['Reklam verisi çekimi', '/data-sync'], ['Reklam hesabı eşleştirme', '/crm-sync']]));
+kontrol('Eşitleme altları: Reklam verisi çekimi, Reklam hesabı eşleştirme, IDOS’a müşteri taşıma', JSON.stringify((es?.altlar || []).map((a) => [a.ad, a.href])) === JSON.stringify([['Reklam verisi çekimi', '/data-sync'], ['Reklam hesabı eşleştirme', '/crm-sync'], ['IDOS’a müşteri taşıma', '/crm-migrate']]));
 const crm = oge('crm');
 kontrol('CRM altları: Satış panosu, Mükerrer kartlar', JSON.stringify((crm?.altlar || []).map((a) => [a.ad, a.href])) === JSON.stringify([['Satış panosu', '/crm'], ['Mükerrer kartlar', '/crm-conflicts']]));
 kontrol('Haftalık bülten (TDK)', oge('haftalik-bulten')?.ad === 'Haftalık bülten');
@@ -32,7 +32,7 @@ kontrol('menü anahtarları tekil', new Set(anahtar).size === anahtar.length);
 const aktifler = [...sayfalar].map((s) => [s, readFileSync(join(kok, 'src/pages/yonetim', s + '.astro'), 'utf8')]);
 const bilinmeyen = aktifler.filter(([, m]) => /<Yonetim /.test(m)).map(([s, m]) => [s, (m.match(/<Yonetim[^>]*aktif="([^"]*)"/) || [])[1]]).filter(([, a]) => a && !oge(a));
 kontrol('her sayfanın aktif= değeri menüde var' + (bilinmeyen.length ? ': ' + bilinmeyen.map((x) => x.join('=')).join(', ') : ''), bilinmeyen.length === 0);
-for (const [s, k] of [['data-sync', 'esitle'], ['crm-sync', 'esitle'], ['crm-conflicts', 'crm'], ['weekly-newsletter', 'haftalik-bulten']]) {
+for (const [s, k] of [['data-sync', 'esitle'], ['crm-sync', 'esitle'], ['crm-migrate', 'esitle'], ['crm-conflicts', 'crm'], ['weekly-newsletter', 'haftalik-bulten']]) {
   const m = aktifler.find(([x]) => x === s)[1];
   kontrol(`${s}: aktif="${k}", başlık menüden (elle baslik= yok)`, new RegExp(`<Yonetim[^>]*aktif="${k}"`).test(m) && !/<Yonetim[^>]*\sbaslik=/.test(m));
 }

@@ -78,43 +78,22 @@ kontrol('reklam: Meta hesabı ana kayıt markasıyla', hs['meta:101'] && hs['met
 kontrol('reklam: Google hesabı eşleşir', hs['google:1112223333'] && hs['google:1112223333'].ana_kayit_id === 'm-1');
 kontrol('reklam: eşleşmeyen hesap atanmamış kalır', hs['meta:555'] && hs['meta:555'].musteri === null && hs['meta:555'].crm_id === null);
 
-// "Müşteri yap": yalnız kazanılan fırsatta; kişi bilgisi yalnız izinle; red → yeniden gönderim; onay → kart bağlanır.
+// Tek kayıt (2. adım): yeni kart anında IDOS v2'ye gider; yazma sırrı (ORTAK_YAZMA_JETON_PANEL) yokken kart yerelde açılır,
+// "IDOS'a gönderilemedi — bekliyor" görünür, eski onay kuyruğuna istek gitmez. Uçtan uca imzalı gönderim: tools/test-tek-kayit.mjs.
 const dd = await api('musteriler', { firma: 'Yeni Kazanılan', ad: 'Ayşe Deneme', eposta: 'ayse@yeni.example', telefon: '0555 111 22 33' });
 const D = dd.veri.musteri_id;
-let my = await api(`musteriler/${D}/musteri-yap`, {});
-kontrol('kazanılmamış fırsatta Müşteri yap reddedilir (409)', my.durum === 409);
-await api(`musteriler/${D}/asama`, { asama: 'kazanildi' });
+kontrol('yeni kart yerelde açılır, IDOS durumu bekliyor', dd.durum === 200 && dd.veri.idos && dd.veri.idos.durum === 'bekliyor');
 await s.goto(B + '/customer?id=' + D);
-await s.waitForSelector('[data-musteri-yap]');
-kontrol('kazanılan fırsatta Müşteri yap düğmesi ve izin kutusu', await s.isVisible('[data-kisi-izin]'));
-await s.screenshot({ path: SS + '/musteri-yap.png', fullPage: false });
-await s.click('[data-musteri-yap]');
-await s.waitForFunction(() => document.querySelector('[data-ana-kayit]').textContent.includes('onayı bekleniyor'), null, { timeout: 8000 }).catch(() => {});
-kontrol('gönderince "onay bekleniyor" görünür', (await s.textContent('[data-ana-kayit]')).includes('onayı bekleniyor'));
-const adayId = () => JSON.parse(sql(`SELECT aday_id FROM ana_kayit_aday WHERE musteri_id = '${D}'`))[0].results[0].aday_id;
-let g1 = await (await idos('/__aday/' + adayId())).json();
-kontrol('izinsiz gönderimde kişi alanı yok', g1.marka === 'Yeni Kazanılan' && !Object.keys(g1).some((a) => a.startsWith('kisi_')) && g1.kaynak_kimlik === D);
-my = await api(`musteriler/${D}/musteri-yap`, {});
-kontrol('bekleyen varken ikinci gönderim reddedilir (409)', my.durum === 409);
-await idos('/__karar/' + adayId() + '?durum=reddedildi&gerekce=' + encodeURIComponent('Kopya kayıt'), { method: 'POST' });
-await api('ana-kayit/esitle', {});
-await s.goto(B + '/customer?id=' + D);
-await s.waitForSelector('[data-musteri-yap]');
-const red = await s.textContent('[data-ana-kayit]');
-kontrol('red gerekçesi ve yeniden gönder', red.includes('Ana kayda alınmadı: Kopya kayıt') && red.includes('Yeniden onaya gönder'));
-await s.check('[data-kisi-izin]');
-await s.click('[data-musteri-yap]');
-await s.waitForFunction(() => document.querySelector('[data-ana-kayit]').textContent.includes('onayı bekleniyor'), null, { timeout: 8000 }).catch(() => {});
-const g2 = await (await idos('/__aday/' + adayId())).json();
-kontrol('izinli gönderimde kişi alanları var', g2.kisi_izin === true && g2.kisi_ad === 'Ayşe Deneme' && g2.kisi_eposta === 'ayse@yeni.example' && g2.kisi_telefon === '0555 111 22 33');
-await idos('/__karar/' + adayId() + '?durum=onaylandi', { method: 'POST' });
-await api('ana-kayit/esitle', {});
+await s.waitForSelector('[data-idos-bekliyor]');
+kontrol('kartta "gönderilemedi — bekliyor" ve yeniden dene', (await s.textContent('[data-ana-kayit]')).includes("IDOS'a gönderilemedi — bekliyor") && await s.isVisible('[data-idos-gonder]'));
+kontrol('süper yönetici olmayan için aday→aktif düğmesi yok', (await s.$$('[data-kazanildi]')).length === 0);
+await s.screenshot({ path: SS + '/idos-bekliyor.png', fullPage: false });
+const my = await api(`musteriler/${D}/musteri-yap`, {});
+kontrol('Müşteri yap artık kuyruğa değil IDOS v2 akışına: bekliyor', my.durum === 200 && my.veri.idos && my.veri.idos.durum === 'bekliyor');
+const kz = await api(`musteriler/${D}/kazanildi`, {});
+kontrol('süper yönetici olmayan aday→aktif 403', kz.durum === 403);
 k = await api(`musteriler/${D}/ana-kayit`);
-kontrol('onaylanınca kart ana kayda bağlanır', k.veri.bagli === true && /^m-\d+$/.test(k.veri.ana_kayit_id) && k.veri.kayit && k.veri.kayit.marka === 'Yeni Kazanılan');
-const gk = await api('musteriler/' + D);
-kontrol('günlükte gönderim, red ve onay kaydı', ['Ana kayda onaya gönderildi', 'Ana kayda alınmadı', 'Ana kayda alındı'].every((b) => gk.veri.kayitlar.some((x) => x.baslik === b)));
-my = await api(`musteriler/${D}/musteri-yap`, {});
-kontrol('bağlı kartta Müşteri yap reddedilir (409)', my.durum === 409);
+kontrol('kart bağsız kalır, gönderim durumu görünür', k.veri.bagli === false && k.veri.gonderim && k.veri.gonderim.durum === 'bekliyor' && k.veri.gonderim.deneme >= 2);
 
 // Birleştirme koruması: farklı ana kayda bağlı kartlar birleştirilmez.
 sql(`UPDATE musteriler SET ana_kayit_id = 'm-2' WHERE id = '${Bk}'`);

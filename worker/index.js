@@ -20,6 +20,7 @@ import { yonetimBelgeSablonApi, sablonGorselYukle } from './belge-sablon.js';
 import { yonetimBelgeDosyaApi, belgeDosyasiYukle } from './belge-dosya.js';
 import { yonetimCrmApi } from './crm.js';
 import { yonetimAnaKayitApi, anaKayitEsitle, anaKayitKurulu } from './ana-kayit.js';
+import { yonetimTekKayitApi, tekKayitGonder } from './tek-kayit.js';
 import { yonetimEtiketApi } from './etiket.js';
 import { yonetimPortalApi } from './portal.js';
 import { denetimCalistir, yonetimDenetimApi } from './denetim.js';
@@ -198,7 +199,9 @@ async function yonetimApi(istek, env, yol, kim) {
     sorgular.push(db.prepare('UPDATE musteriler SET guncelleme = ?, arsiv = NULL WHERE id = ?').bind(z, mid));
     await db.batch(sorgular);
     await islemYaz(db, kim.eposta, 'talep_crm', t.id, mid);
-    return json({ ok: true, musteri_id: mid, mevcut: !!mus });
+    // Yeni kart anında IDOS'ta aday olur (tek kayıt K2); gönderilemezse kart yerelde "bekliyor" kalır.
+    const idos = mus ? null : await tekKayitGonder(env, mid, kim);
+    return json({ ok: true, musteri_id: mid, mevcut: !!mus, idos });
   }
   if (yol === 'musteriler' && yontem === 'GET') {
     const arsiv = new URL(istek.url).searchParams.get('arsiv') === '1';
@@ -246,7 +249,8 @@ async function yonetimApi(istek, env, yol, kim) {
       db.prepare('INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, detay, kim) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), mid, z, 'sistem', 'Müşteri kartı elle oluşturuldu', null, kim.eposta)
     ]);
     await islemYaz(db, kim.eposta, 'musteri_olustur', mid);
-    return json({ ok: true, musteri_id: mid, mevcut: false });
+    const idos = await tekKayitGonder(env, mid, kim);
+    return json({ ok: true, musteri_id: mid, mevcut: false, idos });
   }
   m = yol.match(/^musteriler\/([\w-]+)$/);
   if (m && yontem === 'GET') {
@@ -296,7 +300,7 @@ async function yonetimApi(istek, env, yol, kim) {
     await islemYaz(db, kim.eposta, 'musteri_' + m[2], mus.id);
     return json({ ok: true });
   }
-  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
+  const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimTekKayitApi(db, env, yontem, yol, govde, kim)) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
     || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
