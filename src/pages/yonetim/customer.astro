@@ -301,14 +301,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const kutu = document.querySelector('[data-ana-kayit]');
     let r;
     try { r = await api(`musteriler/${encodeURIComponent(id)}/ana-kayit`); } catch (h) { kutu.hidden = true; return; }
-    // IDOS bağlantısı yokken blok yalnız kazanılan fırsatta, "Müşteri yap"ın neden görünmediğini söylemek için çıkar.
-    if (!r.bagli && !r.kurulu) {
-      if (r.asama !== 'kazanildi') { kutu.hidden = true; return; }
-      kutu.hidden = false;
-      kutu.replaceChildren(el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Ana kayıt (IDOS): bağlı değil'),
-        el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu fırsat kazanıldı. IDOS müşteri ana kaydı bağlantısı kurulunca “Müşteri yap” ile müşteriyi buradan ana kayda gönderebilirsiniz. ', el('a', { href: '/integrations' }, 'Entegrasyonlar')));
-      return;
-    }
+    // Tek kayıt (K2): kart IDOS'ta aday olarak açılır. Gönderilemediyse "bekliyor" durumu her zaman görünür (sessiz kayıp yok).
+    const g = r.gonderim;
+    if (!r.bagli && !r.kurulu && !r.yazma_kurulu && !g) { kutu.hidden = true; return; }
     kutu.hidden = false;
     const k = r.kayit;
     const baslik = el('div', { style: 'display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline' },
@@ -317,27 +312,27 @@ import Yonetim from '../../layouts/Yonetim.astro';
         el('small', { class: 'kart-alt' }, 'Bu müşteri · salt okuma · son eşitleme aşağıda')),
       r.duzenle ? el('a', { href: r.duzenle, target: '_blank', rel: 'noopener noreferrer', class: 'dugme kucuk' }, 'Ana kayıtta düzenle ↗') : '');
     const satirlar = [baslik];
+    const idosGonder = (etiket) => {
+      const durum = el('span', { role: 'status', style: 'font-size: 13px; color: var(--err)' });
+      const dugme = el('button', { type: 'button', class: 'dugme ana kucuk', 'data-idos-gonder': '', onclick: async () => {
+        dugme.disabled = true; durum.textContent = '';
+        try { const y = await api(`musteriler/${encodeURIComponent(id)}/idos-gonder`, {}); if (y.idos && y.idos.hata) durum.textContent = y.idos.hata; yukle(); }
+        catch (h) { durum.textContent = 'Gönderilemedi: ' + h.message; dugme.disabled = false; }
+      } }, etiket);
+      return el('div', { style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' }, dugme, durum);
+    };
     if (!r.bagli) {
       const a = r.aday;
-      satirlar.push(el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu kart ana kayda bağlı değil. Müşteri bilgileri IDOS\'tan okunmuyor.'));
-      if (a && a.durum === 'bekliyor') {
-        satirlar.push(el('div', { class: 'uyari bilgi', role: 'status' }, `Ana kayıt onayı bekleniyor. ${tarih(a.gonderim)} tarihinde ${a.gonderen} gönderdi; kararı IDOS'ta yönetici verir.`));
-      } else if (r.asama !== 'kazanildi') {
-        satirlar.push(el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Fırsat "Kazanıldı" aşamasına gelince "Müşteri yap" ile ana kayda onaya gönderilebilir.'));
-      } else if (r.kurulu) {
-        if (a && a.durum === 'reddedildi') satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Ana kayda alınmadı: ' + (a.red_gerekcesi || 'gerekçe yazılmadı') + '. Kartı düzeltip yeniden gönderebilirsiniz.'));
-        const izin = el('input', { type: 'checkbox', 'data-kisi-izin': '' });
-        const durum = el('span', { role: 'status', style: 'font-size: 13px; color: var(--err)' });
-        const dugme = el('button', { type: 'button', class: 'dugme ana kucuk', 'data-musteri-yap': '', onclick: async () => {
-          dugme.disabled = true; durum.textContent = '';
-          try { await api(`musteriler/${encodeURIComponent(id)}/musteri-yap`, { kisi_izin: izin.checked }); yukle(); }
-          catch (h) { durum.textContent = 'Gönderilemedi: ' + h.message; dugme.disabled = false; }
-        } }, a && a.durum === 'reddedildi' ? 'Yeniden onaya gönder' : 'Müşteri yap');
-        satirlar.push(el('div', { style: 'display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--card2)' },
-          el('span', { style: 'font-size: 13px' }, 'Kart, IDOS\'taki onay kuyruğuna gider. Marka, sektör ve sorumlu gönderilir. Müşteri kaydı yalnız yönetici onaylarsa açılır.'),
-          el('label', { style: 'display: flex; gap: 8px; align-items: flex-start; font-size: 13px' }, izin, el('span', {}, 'İletişim kişisinin adı, e-postası ve telefonu da gönderilsin. Kişinin bu bilgilerin paylaşılmasına izni var (KVKK).')),
-          el('div', { style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' }, dugme, durum)));
+      satirlar.push(el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu kart IDOS ana kaydına bağlı değil. Müşteri bilgileri IDOS\'tan okunmuyor.'));
+      if (a && a.durum === 'bekliyor') satirlar.push(el('div', { class: 'uyari bilgi', role: 'status' }, `Eski onay kuyruğunda bekleyen istek var (${tarih(a.gonderim)}, ${a.gonderen}). Karar IDOS'ta verilir.`));
+      if (g && g.durum === 'bekliyor') {
+        satirlar.push(el('div', { class: 'uyari hata', role: 'status', 'data-idos-bekliyor': '' }, `IDOS'a gönderilemedi — bekliyor. ${g.son_hata || ''} Son deneme: ${tarih(g.son_deneme)} · ${g.deneme} deneme. Kart panelde duruyor; sorun giderilince yeniden deneyin.`));
       }
+      satirlar.push(el('div', { style: 'display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--card2)' },
+        el('span', { style: 'font-size: 13px' }, 'Kart IDOS\'ta “aday” olarak açılır; aday reklam raporlarına ve portföye girmez. Marka, sektör, sorumlu, kaynak ve iletişim kişisi gönderilir. TC kimlik, kart ve IBAN numarası gönderilmez.'),
+        idosGonder(g ? 'Yeniden dene' : 'IDOS\'a aday olarak gönder')));
+    } else if (r.yok && g && g.durum === 'gonderildi') {
+      satirlar.push(el('div', { class: 'uyari bilgi', role: 'status' }, `IDOS'ta aday olarak açıldı (ana kayıt ${r.ana_kayit_id}). Aday kayıtların ayrıntısı müşteri olunca burada görünür.`));
     } else if (r.yok) {
       satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Bağlı ana kayıt IDOS\'ta bulunamadı. Müşteri silinmiş ya da paylaşımdan çıkarılmış olabilir. IDOS\'ta kontrol edin.'));
     } else if (!k) {
@@ -358,6 +353,18 @@ import Yonetim from '../../layouts/Yonetim.astro';
           'Meta reklam hesabı: ' + say(h.meta_ads), 'Google Ads hesabı: ' + say(h.google_ads), 'GA4: ' + var_(h.ga4),
           'Search Console: ' + var_(h.search_console), 'GTM: ' + var_(h.gtm_web), 'Merchant Center: ' + var_(h.merchant)].join(' · ')));
       if (r.eski) satirlar.push(el('div', { class: 'uyari', role: 'status' }, 'IDOS\'a şu an ulaşılamadı' + (r.hata ? ' (' + r.hata + ')' : '') + '; son önbellek gösteriliyor. Bilgiler güncel olmayabilir.'));
+    }
+    if (r.bagli && g && g.firsat_durum === 'bekliyor') satirlar.push(el('div', { class: 'uyari hata', role: 'status' }, 'Fırsat IDOS\'a gönderilemedi — bekliyor. ' + (g.son_hata || '')), idosGonder('Fırsatı yeniden gönder'));
+    // K7: aday → aktif yalnız süper yönetici; düğme yalnız ona görünür, sunucu ve IDOS ayrıca denetler.
+    if (r.bagli && r.super && !(k && k.durum === 'aktif')) {
+      const durum = el('span', { role: 'status', style: 'font-size: 13px; color: var(--err)' });
+      const dugme = el('button', { type: 'button', class: 'dugme kucuk', 'data-kazanildi': '', onclick: async () => {
+        if (!confirm('Bu aday IDOS\'ta aktif müşteri olacak; rapor işlerine ve senkronlara girer. Devam edilsin mi?')) return;
+        dugme.disabled = true; durum.textContent = '';
+        try { await api(`musteriler/${encodeURIComponent(id)}/kazanildi`, {}); yukle(); }
+        catch (h) { durum.textContent = 'Yapılamadı: ' + h.message; dugme.disabled = false; }
+      } }, 'Müşteriye çevir (aktif)');
+      satirlar.push(el('div', { style: 'display: flex; gap: 10px; align-items: center; flex-wrap: wrap' }, dugme, durum));
     }
     satirlar.push(el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Son eşitleme: ' + (r.son_esitleme ? tarih(r.son_esitleme) : '—') + (k && r.cekim ? ' · bu kayıt alındı: ' + tarih(r.cekim) : '')));
     kutu.replaceChildren(...satirlar);

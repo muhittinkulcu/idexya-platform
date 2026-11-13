@@ -1,0 +1,113 @@
+---
+import Yonetim from '../../layouts/Yonetim.astro';
+---
+<Yonetim baslik="IDOS'a taşıma" aktif="crm" yol="Müşteri ilişkileri › CRM" aciklama="Tek seferlik taşıma: IDOS ana kaydına bağlı olmayan kartlar için önizleme. Önizleme hiçbir şey yazmaz. Her satırda eşle, yeni aday ya da atla seçilir; gönderimi yalnız süper yönetici onaylar. Yarıda kalırsa kaldığı yerden sürer, aynı kart iki kez gönderilmez.">
+<div data-uyari></div>
+<section class="kart" aria-label="Taşıma özeti" data-ozet style="padding: 18px 20px; display: flex; flex-direction: column; gap: 12px"></section>
+<section class="kart" aria-label="Kartlar" data-liste style="padding: 0; overflow-x: auto"></section>
+<section class="kart" aria-label="Gönderim sonuçları" data-sonuc hidden style="padding: 18px 20px; display: flex; flex-direction: column; gap: 10px"></section>
+<script>
+  import { api, el, tarih, asamaAdi, genelHata } from '../../scripts/yonetim/ortak.js';
+  const ozetK = document.querySelector('[data-ozet]'), listeK = document.querySelector('[data-liste]'), sonucK = document.querySelector('[data-sonuc]'), uyari = document.querySelector('[data-uyari]');
+  const bildir = (metin, tur = 'ok') => uyari.replaceChildren(metin ? el('div', { class: 'uyari ' + tur, role: 'status' }, metin) : '');
+  const SINIF = { kesin: ['Kesin eş', 'kazanildi'], olasi: ['Olası eş', 'teklif'], zayif: ['Zayıf eş', 'gorusme'], eslesmesiz: ['Eşsiz', ''], hatali: ['Hatalı', 'kaybedildi'] };
+  const NEDEN = { eposta: 'aynı e-posta', telefon: 'aynı telefon', ad: 'ad benzerliği' };
+  const DURUM = { tamam: 'Tamamlandı', bekliyor: 'Bekliyor', hata: 'Hata', atlandi: 'Atlandı' };
+  const KAYNAK = { idos: 'IDOS müşteri listesi (canlı)', onbellek: 'Paneldeki IDOS önbelleği (yalnız marka adı)', yok: 'IDOS listesi yok' };
+  const ad = (m) => m.firma || m.ad || m.eposta || m.telefon || 'Adsız kart';
+  const virgul = (n) => String(n).replace('.', ',');
+  let veri = null;
+  const kararlar = new Map();
+
+  function ozetCiz() {
+    const s = veri.sayilar;
+    const kutu = (etiket, sayi, aciklama) => el('div', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 120px; padding: 10px 12px; border-radius: 12px; background: var(--card2)' },
+      el('strong', { style: 'font-size: 20px; color: var(--head)' }, String(sayi)), el('span', { style: 'font-size: 13px' }, etiket), aciklama ? el('small', { style: 'color: var(--tx2)' }, aciklama) : '');
+    const secili = [...kararlar.values()];
+    const gidecek = { esle: secili.filter((k) => k.karar === 'esle').length, yeni: secili.filter((k) => k.karar === 'yeni').length, atla: secili.filter((k) => k.karar === 'atla').length };
+    const onay = veri.super
+      ? el('button', { type: 'button', class: 'dugme ana', 'data-tasima-onayla': '', onclick: uygula }, `Onayla ve gönder (${gidecek.esle} eşle · ${gidecek.yeni} yeni aday)`)
+      : el('span', { class: 'uyari bilgi', role: 'status' }, 'Gönderimi yalnız süper yönetici onaylar. Önizlemeyi inceleyip ona iletin.');
+    ozetK.replaceChildren(
+      el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap' },
+        kutu('Toplam kart', s.toplam, 'arşivdekiler hariç'), kutu('Zaten bağlı', s.bagli), kutu('Kesin eş', s.kesin, 'e-posta, telefon ya da aynı ad'),
+        kutu('Olası eş', s.olasi, 'ad benzerliği ≥ 0,85'), kutu('Zayıf eş', s.zayif, '0,70–0,85; yalnız gösterilir'), kutu('Eşsiz', s.eslesmesiz, 'yeni aday açılır'),
+        kutu('Hatalı', s.hatali, 'marka yok ya da yasaklı veri'), kutu('Kaybedildi', s.kaybedildi, 'aday + kaybedildi etiketi'), kutu('Fırsat notu', s.firsat, 'paket ve değer; tutar —')),
+      el('span', { style: 'font-size: 13px; color: var(--tx2)' }, `Eş kaynağı: ${KAYNAK[veri.kaynak] || veri.kaynak}${veri.kaynak_hata ? ' · ' + veri.kaynak_hata : ''} · önizleme zamanı ${tarih(veri.zaman)}`),
+      !veri.yazma_kurulu ? el('div', { class: 'uyari', role: 'status' }, 'IDOS yazma bağlantısı kurulu değil (ORTAK_YAZMA_JETON_PANEL). Önizleme görülebilir; gönderim yapılırsa kartlar “bekliyor” kalır.') : '',
+      el('div', { style: 'display: flex; gap: 10px; flex-wrap: wrap; align-items: center' }, onay, el('button', { type: 'button', class: 'dugme', onclick: yukle }, 'Önizlemeyi yenile'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, `${gidecek.atla} kart atlanacak`)));
+  }
+
+  function kararSecici(m) {
+    const k = kararlar.get(m.id);
+    const deger = k.karar === 'esle' ? 'esle:' + k.hedef : k.karar;
+    const sec = el('select', { 'aria-label': `${ad(m)} için karar`, 'data-karar': m.id, disabled: m.tasima && m.tasima.durum === 'tamam', onchange: (o) => {
+      const v = o.currentTarget.value;
+      kararlar.set(m.id, v.startsWith('esle:') ? { id: m.id, karar: 'esle', hedef: v.slice(5) } : { id: m.id, karar: v, hedef: null });
+      ozetCiz();
+    } },
+      ...m.esler.map((e) => el('option', { value: 'esle:' + e.musteri_id }, `Eşle: ${e.marka || e.musteri_id}`)),
+      m.sinif === 'hatali' ? '' : el('option', { value: 'yeni' }, 'Yeni aday aç'),
+      el('option', { value: 'atla' }, 'Atla'));
+    sec.value = deger;
+    return sec;
+  }
+
+  function listeCiz() {
+    if (!veri.satirlar.length) { listeK.replaceChildren(el('p', { class: 'bos', style: 'padding: 16px; margin: 0' }, 'IDOS karşılığı olmayan kart yok; taşınacak bir şey kalmadı.')); return; }
+    listeK.replaceChildren(el('table', { class: 'tk-tablo', 'data-sayfalama': 'yok' },
+      el('thead', {}, el('tr', {}, ...['Kart', 'Aşama', 'Durum', 'IDOS\'taki olası eşler', 'Fırsat (K11)', 'Karar', 'Taşıma'].map((x) => el('th', { scope: 'col' }, x)))),
+      el('tbody', {}, ...veri.satirlar.map((m) => el('tr', { 'data-satir': m.id },
+        el('td', {}, el('a', { href: '/customer?id=' + encodeURIComponent(m.id), style: 'display: block; font-weight: 500' }, ad(m)),
+          el('small', { style: 'color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.eposta, m.telefon].filter(Boolean).join(' · ') || '—')),
+        el('td', {}, asamaAdi(m.asama), m.kaybedildi ? el('span', { class: 'cip kaybedildi', style: 'margin-left: 6px' }, 'Kaybedildi etiketi') : ''),
+        el('td', {}, el('span', { class: 'cip ' + (SINIF[m.sinif] || ['', ''])[1] }, (SINIF[m.sinif] || [m.sinif])[0]), m.hata ? el('small', { style: 'display: block; color: var(--err)' }, m.hata) : ''),
+        el('td', {}, m.esler.length ? el('ul', { style: 'margin: 0; padding-left: 16px; font-size: 13px' }, ...m.esler.map((e) => el('li', {}, `${e.marka || '—'} · ${NEDEN[e.neden] || e.neden} · ${virgul(e.puan)}${e.durum ? ' · ' + e.durum : ''}`))) : '—'),
+        el('td', { style: 'font-size: 13px; max-width: 260px' }, m.firsat ? [el('strong', {}, m.firsat.ad), el('small', { style: 'display: block; color: var(--tx2)' }, `Aşama: ${m.firsat.asama} · tutar ${m.firsat.tutar}`), el('small', { style: 'display: block' }, m.firsat.not_metni)] : '—'),
+        el('td', {}, kararSecici(m)),
+        el('td', { style: 'font-size: 13px' }, m.tasima ? [DURUM[m.tasima.durum] || m.tasima.durum, m.tasima.sonuc ? el('small', { style: 'display: block; color: var(--tx2)' }, m.tasima.sonuc) : ''] : '—'))))));
+  }
+
+  function sonucCiz(r) {
+    sonucK.hidden = false;
+    const o = r.ozet || {};
+    sonucK.replaceChildren(el('h2', { style: 'margin: 0; font-size: 16px; color: var(--head)' }, 'Gönderim sonuçları'),
+      el('span', { style: 'font-size: 13px' }, `Tamamlandı: ${o.tamam || 0} · bekliyor: ${o.bekliyor || 0} · hata: ${o.hata || 0} · atlandı: ${o.atlandi || 0}`),
+      el('ul', { 'data-sonuclar': '', style: 'margin: 0; padding-left: 18px; font-size: 13px; display: flex; flex-direction: column; gap: 4px' },
+        ...(r.sonuclar || []).map((x) => el('li', {}, `${x.firma || x.ad || x.id}: ${DURUM[x.durum] || x.durum}${x.sonuc ? ' — ' + x.sonuc : ''}`))));
+  }
+
+  const bekle = (ms) => new Promise((ok) => setTimeout(ok, ms));
+  async function uygula(o) {
+    const secili = [...kararlar.values()];
+    const n = secili.filter((k) => k.karar !== 'atla').length;
+    if (!n) { bildir('Gönderilecek kart seçilmedi.', 'hata'); return; }
+    if (!confirm(`${n} kart IDOS'a gönderilecek (eşleme ya da yeni aday). Yeni kayıtlar IDOS'ta “aday” olarak açılır, raporlara girmez. Devam edilsin mi?`)) return;
+    const dugme = o.currentTarget;
+    dugme.disabled = true;
+    try {
+      let r = await api('tek-kayit/tasima/uygula', { kararlar: secili, parca: 10 });
+      sonucCiz(r);
+      while (r.kalan > 0) {
+        if (r.bekle) { bildir(`IDOS yazma sınırına gelindi; ${r.bekle} saniye sonra kaldığı yerden sürecek. Sayfayı kapatırsanız sonra yeniden onaylayın, tamamlananlar tekrar gönderilmez.`, 'bilgi'); await bekle(r.bekle * 1000); }
+        else bildir(`Gönderiliyor… kalan ${r.kalan} kart.`, 'bilgi');
+        r = await api('tek-kayit/tasima/uygula', { parca: 10 });
+        sonucCiz(r);
+      }
+      bildir('Taşıma bitti. Hatalı satırları düzeltip yeniden onaylayabilirsiniz.');
+      await yukle(false);
+    } catch (h) { bildir('Taşıma durdu: ' + h.message + '. Yeniden onaylayınca kaldığı yerden sürer.', 'hata'); }
+    finally { dugme.disabled = false; }
+  }
+
+  async function yukle(uyariSil = true) {
+    try { veri = await api('tek-kayit/tasima/onizleme'); genelHata(''); if (uyariSil !== false) bildir(''); }
+    catch (h) { genelHata('Önizleme yüklenemedi: ' + h.message); listeK.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); return; }
+    kararlar.clear();
+    for (const m of veri.satirlar) kararlar.set(m.id, { id: m.id, karar: m.karar, hedef: m.karar === 'esle' && m.esler[0] ? m.esler[0].musteri_id : null });
+    ozetCiz();
+    listeCiz();
+  }
+  yukle();
+</script>
+</Yonetim>
