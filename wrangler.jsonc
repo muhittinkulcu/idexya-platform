@@ -16,7 +16,9 @@
     "html_handling": "auto-trailing-slash"
   },
   // Veritabanı: ilk yayında Cloudflare kendiliğinden oluşturur (otomatik kaynak oluşturma).
-  "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform" }],
+  // Veritabanı Batı Avrupa'da (13 Kas 2026; önceki "idexya-platform" APAC'taydı ve Türkiye'den her sorgu Asya'ya gidiyordu).
+  // Eski veritabanı geri dönüş için silinmeden duruyor.
+  "d1_databases": [{ "binding": "DB", "database_name": "idexya-platform-eu", "database_id": "795071ea-7db6-4e21-b4d6-be65ef5aee73" }],
   // E-posta bildirimleri (worker/eposta.js): Cloudflare Email Service. Gönderim için idexya.com, Cloudflare panelinde Email Sending'e eklenmelidir.
   "send_email": [{ "name": "EPOSTA", "allowed_sender_addresses": ["bildirim@idexya.com"] }],
   // Günlük veritabanı yedeği (worker/yedek.js): her gün 07.00 UTC zamanlayıcısıyla yedek/<gün>.json.gz yazılır, 30 gün saklanır.
