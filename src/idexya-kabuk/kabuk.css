@@ -80,7 +80,9 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-mega-kare{width:12px;height:12px;border-radius:3px;background:var(--ik-mr);box-shadow:0 0 14px var(--ik-mr)}
 .ik-mega-bas p{margin:0;font-weight:var(--w-ince);color:#B8C3CE}
 .ik-mega-ana{align-self:flex-start;display:inline-flex;align-items:center;height:36px;margin-top:6px;padding:0 16px;border-radius:999px;background:var(--ik-mr);color:#0E161E!important;font-weight:var(--w-orta)}
-.ik-mega-gruplar{flex:1 1 520px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px 28px}
+/* Gruplar sütunlara akar (masonry gibi): bir grup bölünmez, sütunlar arasında satır boşluğu kalmaz. */
+.ik-mega-gruplar{flex:1 1 520px;min-width:0;columns:auto 210px;column-gap:28px}
+.ik-mega-gruplar>.ik-mega-sutun{break-inside:avoid;margin-bottom:22px}
 .ik-mega .ik-oge-ad{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ik-mega-grup{padding:0 10px 6px;font-size:12px;letter-spacing:.02em;color:#8FA1B5}
 .ik-mega-oge{position:relative;width:100%;box-sizing:border-box;display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:#E7ECF1;text-align:left;font-size:14px;font-weight:var(--w-ince);transition:background .2s,padding .25s cubic-bezier(.2,.85,.2,1),color .2s}
@@ -91,9 +93,7 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-rozet{flex:none;min-width:18px;height:18px;margin-left:auto;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#F07A23;color:#15202B;font-size:11px;line-height:18px;text-align:center;font-weight:var(--w-vurgu);font-variant-numeric:tabular-nums}
 .ik-sayfalar a{display:flex;align-items:center;gap:8px}
 .ik-oge-nokta{width:5px;height:5px;border-radius:50%;background:var(--ik-mr,var(--ik-vurgu));transition:transform .25s,box-shadow .25s}
-.ik-mega-oge:hover .ik-rozet{flex:none;min-width:18px;height:18px;margin-left:auto;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#F07A23;color:#15202B;font-size:11px;line-height:18px;text-align:center;font-weight:var(--w-vurgu);font-variant-numeric:tabular-nums}
-.ik-sayfalar a{display:flex;align-items:center;gap:8px}
-.ik-oge-nokta{transform:scale(1.6);box-shadow:0 0 10px var(--ik-mr)}
+.ik-mega-oge:hover .ik-oge-nokta{transform:scale(1.6);box-shadow:0 0 10px var(--ik-mr)}
 .ik-oge-don{color:var(--ik-mr);transition:transform .25s cubic-bezier(.2,.85,.2,1)}[aria-expanded=true]>.ik-oge-don{transform:rotate(180deg)}
 .ik-oge-ok{color:var(--ik-mr,var(--ik-vurgu));opacity:0;transform:translateX(-6px);transition:opacity .2s,transform .25s cubic-bezier(.2,.85,.2,1)}
 :is(.ik-mega-oge,.ik-ucan-modul):is(:hover,:focus-visible) .ik-oge-ok{opacity:1;transform:none}
@@ -191,9 +191,7 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-ucan-modul{display:flex;align-items:center;gap:10px;padding:7px 8px;border-radius:8px;transition:background .2s,padding .25s cubic-bezier(.2,.85,.2,1)}
 .ik-ucan-modul:hover,.ik-ucan-modul:focus-visible{background:rgba(127,127,127,.1);padding-left:12px}
 .ik-ucan-modul[aria-current=page]{background:var(--ik-yumusak);color:var(--ik-vurgu);font-weight:var(--w-vurgu)}
-.ik-ucan-modul .ik-rozet{flex:none;min-width:18px;height:18px;margin-left:auto;padding:0 5px;box-sizing:border-box;border-radius:999px;background:#F07A23;color:#15202B;font-size:11px;line-height:18px;text-align:center;font-weight:var(--w-vurgu);font-variant-numeric:tabular-nums}
-.ik-sayfalar a{display:flex;align-items:center;gap:8px}
-.ik-oge-nokta{width:6px;height:6px;background:var(--ik-vurgu)}
+.ik-ucan-modul .ik-oge-nokta{width:6px;height:6px;background:var(--ik-vurgu)}
 .ik-ucan-sayfalar{display:flex;flex-wrap:wrap;gap:4px;padding:2px 8px 0 24px}
 .ik-ucan-sayfa{padding:3px 9px;border:1px solid var(--ik-cizgi);border-radius:999px;color:var(--ik-ikincil);font-size:12px;transition:border-color .2s,color .2s}
 .ik-ucan-sayfa:hover,.ik-ucan-sayfa:focus-visible,.ik-ucan-sayfa[aria-current=page]{border-color:var(--ik-vurgu);color:var(--ik-vurgu)}
