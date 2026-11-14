@@ -6,7 +6,7 @@ import { writeFileSync } from 'fs';
 import { SAYFALAR } from '../worker/panel-yollar.js';
 const { chromium } = createRequire(import.meta.url)('playwright');
 const SS = process.argv[2] || '.', B = process.argv[3] || 'http://panel.localhost:8795';
-const t = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium', args: ['--host-resolver-rules=MAP panel.localhost 127.0.0.1'] });
+const t = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium', args: ['--host-resolver-rules=MAP panel.localhost 127.0.0.1'] });
 const s = await t.newPage({ viewport: { width: 1366, height: 900 } });
 const YER_TUTUCU = /yakında|hazırlanıyor|yapım aşamasında|lorem|todo|henüz hazır değil|coming soon/i;
 const rapor = [];

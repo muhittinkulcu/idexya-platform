@@ -1,12 +1,19 @@
 # Website Yönetim kullanım rehberi
 
 Adres: **panel.idexya.com**. Giriş Cloudflare Access ile yapılır; yalnız yönetici listesindeki e-postalar girer.
-Son güncelleme: 2 Kasım 2026.
+Son güncelleme: 14 Kasım 2026.
 
 ## Ekranın düzeni
 
-- **Sol menü:** modüller sekiz grupta durur (Özet, Satış, Pazarlama ve iletişim, Web sitesi, Analiz, Üyelik ve erişim, Finans, Sistem).
-- **Üst çubuk:** panelde arama (⌘K), "+ Yeni oluştur", tema seçici (açık, koyu, sistem, saate göre), sayfayı özelleştirme.
+- **Ortak kabuk:** Marketing, Website ve CRM ve Creative aynı iskeleti kullanır (idexya-ortak `<idexya-kabuk>`).
+  - **Paket çubuğu (en üst):** Idexya, katmanlar (IDOS, Marketing, Website ve CRM, Creative); katman adının yanındaki ok o
+    katmanın bütün modüllerini mega menüde açar. Tüm katmanlarda arama (⌘K): sayfa, modül ve "Yeni …" eylemleri.
+    Sağda bağlantı ve son eşitleme, bildirimler, Görünüm (tema: açık, koyu, otomatik; yazı kalınlığı; yazı tipi) ve hesap (Çıkış yap).
+  - **Sol menü:** modüller sekiz grupta durur (Özet, Satış, Pazarlama ve iletişim, Web sitesi, Analiz, Üyelik ve erişim, Finans,
+    Sistem). Daraltılınca grup simgeleri kalır; üzerine gelince grubun modülleri ve sayfaları yanda açılır. Talep, yorum, üye
+    ve destek sayıları rozet olarak görünür.
+  - **Sayfa sekmeleri:** açılan sayfalar sekme olur (en çok 8); Genel bakış ilk sırada ve kapatılamaz.
+  - **Sayfa başlığı:** konum, başlık ve eylemler (Yenile, Yazdır, Siteyi aç, "+ Yeni oluştur").
 - **Tablolar:** her tabloda "Satır sayısı" seçimi var (varsayılan 5). Müşteriler, Siteler ve Reklam tablolarında satırları seçince
   üstte işlem çubuğu açılır: durum değiştir, etiket, CSV indir, arşivle.
 - **Silme yok:** müşteri ve site kayıtları silinmez, **arşivlenir**. Arşivlenen kayıt "Arşivi göster" ile görülür ve geri alınır.
