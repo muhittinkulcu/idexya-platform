@@ -5,10 +5,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <nav class="kart" aria-label="İçerik dosyaları" data-dosyalar style="padding: 8px; display: flex; flex-wrap: wrap; gap: 4px"></nav>
 <div data-durum-kutu></div>
 <p data-aciklama style="margin: 0; color: var(--tx2)"></p>
-<section class="kart" data-referans-kodu hidden aria-labelledby="referans-kodu-baslik" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
-<b id="referans-kodu-baslik" style="font-size: 15px">Referans sayfası bağlantısı</b>
-<p style="margin: 0; font-size: 14px; color: var(--tx2)">Bu sayfa sitede hiçbir menüde, site haritasında ya da aramada yer almaz; yalnız bağlantıyı bilen açabilir. Tekliflerin çıktısında bu bağlantı QR kod olarak yer alır.</p>
-<div data-referans-icerik style="display: flex; flex-direction: column; gap: 10px"><div class="bos">Yükleniyor…</div></div>
+<section class="kart" data-referans-sayfa hidden aria-labelledby="referans-sayfa-baslik" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+<b id="referans-sayfa-baslik" style="font-size: 15px">Referans sayfası</b>
+<p style="margin: 0; font-size: 14px; color: var(--tx2)">Bu sayfa sitede bağlantı olarak görünmez; adresi bilen açabilir. Teklif çıktılarında QR kod olarak yer alır. Listede marka yokken sayfa açılmaz.</p>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<code data-referans-adres style="padding: 8px 12px; border-radius: 10px; background: var(--card2); border: 1px solid rgb(var(--line)); font-size: 14px; overflow-wrap: anywhere">https://idexya.com/referans</code>
+<button type="button" class="dugme ana" data-referans-kopyala>Bağlantıyı kopyala</button>
+<span role="status" data-referans-durum style="font-size: 14px; color: var(--tx2)"></span>
+</div>
 </section>
 <section class="kart" data-duzenleyici style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px" aria-live="polite"><div class="bos">Yükleniyor…</div></section>
 <div class="kart si-cubuk" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: sticky; bottom: 12px; z-index: 5; box-shadow: 0 10px 30px var(--shadow)">
@@ -147,7 +151,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     history.replaceState(null, '', adresMetni({ dosya: ad }) + location.hash);
     q('[data-dosyalar]').replaceChildren(...Object.entries(DOSYALAR).map(([k, d]) => el('button', { type: 'button', class: 'dugme kucuk', 'aria-pressed': String(k === ad), style: k === ad ? 'background: var(--tint); color: var(--tintx); border-color: transparent' : 'border-color: transparent; background: transparent', onclick: () => ac(k) }, d.ad)));
     q('[data-aciklama]').textContent = DOSYALAR[ad].aciklama;
-    referansKoduCiz();
+    q('[data-referans-sayfa]').hidden = ad !== 'referanslar';
     const ed = q('[data-duzenleyici]'); ed.replaceChildren(el('div', { class: 'bos' }, 'Yükleniyor…'));
     try {
       const r = await api('icerik-dosya/' + ad);
@@ -186,35 +190,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
         : el('div', { class: 'uyari hata' }, 'Yayınlama kapalı. İçeriği görüp düzenleyebilirsiniz ama yayınlamak için Cloudflare’de GITHUB_TOKEN gizli değeri tanımlanmalı (yalnız bu depoya “Contents: Read and write” izni olan ince ayarlı GitHub anahtarı). Gösterilen içerik yayındaki sürümdür.'));
     } catch (h) { genelHata(h.message); }
   }
-  // --- Referans sayfası kodu (yalnız Referanslar dosyasında) ---
-  async function referansKoduCiz() {
-    const kutu = q('[data-referans-kodu]'), ic = q('[data-referans-icerik]');
-    kutu.hidden = ad !== 'referanslar';
-    if (kutu.hidden) return;
-    let r;
-    try { r = await api('referans-kodu'); } catch (h) { ic.replaceChildren(el('div', { class: 'uyari hata' }, 'Kod okunamadı: ' + h.message)); return; }
-    const durum = el('span', { role: 'status', style: 'font-size: 14px; color: var(--tx2)' });
-    const yeni = el('button', { type: 'button', class: 'dugme' + (r.kod ? '' : ' ana'), onclick: async () => {
-      const metin = r.kod
-        ? 'Yeni referans kodu üretilsin mi?\n\nEski bağlantı ve daha önce gönderilen tekliflerdeki QR kodlar hemen geçersiz olur; açan kişi “Sayfa bulunamadı” görür. Bu işlem geri alınamaz.'
-        : 'Referans sayfası için ilk kod üretilsin mi? Kod üretildikten sonra teklif çıktılarında QR kod görünür.';
-      if (!confirm(metin)) return;
-      yeni.disabled = true;
-      try { await api('referans-kodu/yeni', {}); await referansKoduCiz(); q('[data-referans-icerik] [role=status]').textContent = 'Yeni kod üretildi.'; }
-      catch (h) { durum.textContent = h.message; yeni.disabled = false; }
-    } }, r.kod ? 'Yeni kod üret' : 'Kod üret');
-    if (!r.kod) { ic.replaceChildren(el('p', { style: 'margin: 0; font-size: 14px' }, 'Henüz kod üretilmedi; referans sayfası kapalı ve tekliflerde QR kod görünmüyor.'), el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, yeni, durum)); return; }
-    const kopyala = el('button', { type: 'button', class: 'dugme ana', onclick: async () => {
-      try { await navigator.clipboard.writeText(r.baglanti); durum.textContent = 'Bağlantı kopyalandı.'; }
-      catch (e) { durum.textContent = 'Kopyalanamadı; bağlantıyı seçip elle kopyalayın.'; }
-    } }, 'Bağlantıyı kopyala');
-    ic.replaceChildren(
-      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
-        el('code', { style: 'padding: 8px 12px; border-radius: 10px; background: var(--card2); border: 1px solid rgb(var(--line)); font-size: 14px; overflow-wrap: anywhere' }, r.baglanti),
-        el('a', { class: 'dugme kucuk', href: r.baglanti, target: '_blank', rel: 'noopener noreferrer' }, 'Sayfayı aç ↗')),
-      el('small', { style: 'color: var(--tx2)' }, `Kod: ${r.kod} · son değişiklik ${tarih(r.guncelleme)}. Teklif çıktılarındaki bağlantıya teklife özel bir ek (?t=…) eklenir; müşteri açtığında müşteri kartına günde bir kez “Müşteri referansları açtı” yazılır.`),
-      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, kopyala, yeni, durum));
-  }
+  // --- Referans sayfası bağlantısı (yalnız Referanslar dosyasında görünür) ---
+  q('[data-referans-kopyala]').addEventListener('click', async () => {
+    const d = q('[data-referans-durum]');
+    try { await navigator.clipboard.writeText(q('[data-referans-adres]').textContent.trim()); d.textContent = 'Bağlantı kopyalandı.'; }
+    catch (e) { d.textContent = 'Kopyalanamadı; bağlantıyı seçip elle kopyalayın.'; }
+  });
   durumCiz(); ac(ad);
 </script>
 </Yonetim>

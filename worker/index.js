@@ -4,7 +4,7 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
 import { asistanApi, yonetimAsistanApi } from './asistan.js';
-import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz, sayfaMaskele } from './ortak.js';
+import { GUVENLIK_BASLIKLARI, json, hata, simdi, kimlik, kirp, semaKur, ozet, islemYaz } from './ortak.js';
 import { yonetimReklamApi, reklamCek, reklamKurulu } from './reklam.js';
 import { saklamaUygula } from './saklama.js';
 import { bultenApi, yonetimBultenApi } from './bulten.js';
@@ -34,7 +34,7 @@ import { yonetimSiteSaglikApi, siteSaglikCron } from './site-saglik.js';
 import { yonetimDonusumApi, reklamTemizle, talepReklamSorgu } from './donusum.js';
 import { ekibeBildir, yonetimEpostaApi } from './eposta.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
-import { referansSayfasi, yonetimReferansApi } from './referans.js';
+import { referansSayfasi } from './referans.js';
 import { panelAlani, panelKoku, eskiYol, SAYFALAR } from './panel-yollar.js';
 import { eskiAramayiCevir } from '../src/data/panel-parametre.js';
 
@@ -99,17 +99,15 @@ async function talepAl(istek, env) {
   ['site', 'alan', 'paket', 'sihirbaz', 'not', 'sohbet'].forEach((k) => { if (g[k]) ek[k] = typeof g[k] === 'string' ? kirp(g[k], 1000) : JSON.stringify(g[k]).slice(0, 2000); });
   const kaynak = ['iletisim', 'analiz', 'paket', 'sihirbaz', 'asistan'].includes(g.kaynak) ? g.kaynak : 'form';
   const talepId = kimlik();
-  // Gizli referans sayfasının kodu talebe, bildirime ve panele yazılmaz (worker/ortak.js sayfaMaskele).
-  const sayfaYolu = sayfaMaskele(kirp(g.sayfa, 200));
   // Reklam tıklama kimlikleri yalnız istemci pazarlama çerezi iznini bildirdiyse gelir (src/scripts/reklam-iz.js).
   const reklam = g.pazarlama_izni === true ? reklamTemizle(g.reklam) : null;
   await env.DB.batch([env.DB.prepare(`INSERT INTO talepler (id, olusturma, kaynak, sayfa, ad, firma, eposta, telefon, konu, mesaj, ek, iys_izni, ip_ozet, dogrulama)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(talepId, simdi(), kaynak, sayfaYolu, ad, kirp(g.firma, 160), eposta || null, telefon || null,
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(talepId, simdi(), kaynak, kirp(g.sayfa, 200), ad, kirp(g.firma, 160), eposta || null, telefon || null,
     kirp(g.konu, 120), kirp(g.mesaj, 4000), JSON.stringify(ek), g.iys === true ? 1 : 0, ipOzet, dogrulama),
     ...(reklam ? [talepReklamSorgu(env.DB, talepId, reklam)] : [])]);
   const KAYNAK_ADI = { iletisim: 'İletişim formu', analiz: 'Ücretsiz analiz formu', paket: 'Paket teklif formu', sihirbaz: 'Paket sihirbazı', asistan: 'Yapay zekâ asistanı', form: 'Site formu' };
   await ekibeBildir(env, `Yeni talep: ${ad}${kirp(g.firma, 160) ? ' · ' + kirp(g.firma, 160) : ''}`, [['Kaynak', KAYNAK_ADI[kaynak] || kaynak], ['Ad', ad], ['Firma', kirp(g.firma, 160) || '—'],
-    ['E-posta', eposta || '—'], ['Telefon', telefon || '—'], ['Konu', kirp(g.konu, 120) || '—'], ['Mesaj', kirp(g.mesaj, 1500) || '—'], ['Sayfa', sayfaYolu || '—']],
+    ['E-posta', eposta || '—'], ['Telefon', telefon || '—'], ['Konu', kirp(g.konu, 120) || '—'], ['Mesaj', kirp(g.mesaj, 1500) || '—'], ['Sayfa', kirp(g.sayfa, 200) || '—']],
     { metin: 'Panelde aç', yol: '/leads?tab=new' }, eposta || undefined);
   return json({ ok: true });
 }
@@ -304,7 +302,7 @@ async function yonetimApi(istek, env, yol, kim) {
     return json({ ok: true });
   }
   const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimTekKayitApi(db, env, yontem, yol, govde, kim)) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim)) || (await yonetimReferansApi(db, yontem, yol, kim));
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -346,9 +344,8 @@ export default {
       if (yol === '/tr/bulten' || yol.startsWith('/tr/bulten/')) { await semaKur(env.DB); return await bultenSayfasi(istek, env, ctx, async () => !!(await yonetici(istek, env))); }
       if (yol === '/api/tema') { await semaKur(env.DB); return await temaApi(istek, env, ctx); }
       if (yol === '/sitemap-bulten.xml') { await semaKur(env.DB); return await bultenSitemap(env); }
-      // Gizli referans sayfası (worker/referans.js): yalnız kod doğruysa açılır, değilse sıradan 404.
-      const referansEslesme = !panel && yol.match(/^\/r\/([a-z0-9]{6,12})\/?$/);
-      if (referansEslesme) { await semaKur(env.DB); return await referansSayfasi(istek, env, ctx, referansEslesme[1]); }
+      // Referans sayfası (worker/referans.js): sabit adres, sitede bağlantısı yok, noindex; liste boşken 404.
+      if (!panel && (yol === '/referans' || yol === '/referans/')) { await semaKur(env.DB); return await referansSayfasi(istek, env, ctx); }
       if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
       if (/^\/uye\/uye-icerik\/?$/.test(yol)) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
       if (yol.startsWith('/uye/')) return env.ASSETS.fetch(istek);

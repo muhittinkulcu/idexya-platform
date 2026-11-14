@@ -77,7 +77,7 @@ export const DOSYALAR = {
   },
   referanslar: {
     ad: 'Referanslar', yol: 'src/data/referanslar.json',
-    aciklama: 'Ana sayfadaki “Birlikte büyüdüğümüz markalar” bölümü ve yalnız bağlantıyla açılan kategorili referans sayfası (tekliflerdeki QR kod). Liste boşsa ana sayfadaki bölüm görünmez. Yalnız izin aldığınız markaları ekleyin.',
+    aciklama: 'Ana sayfadaki “Birlikte büyüdüğümüz markalar” bölümü ve sitede bağlantısı olmayan kategorili referans sayfası (idexya.com/referans, tekliflerdeki QR kod). Liste boşsa ana sayfadaki bölüm görünmez, referans sayfası açılmaz. Yalnız izin aldığınız markaları ekleyin.',
     sema: { tur: 'liste', etiket: 'Markalar', oge: 'marka', enCok: 60, ogeSema: { tur: 'nesne', baslikAlan: 'ad', alanlar: {
       ad: m('Marka adı', 80, { zorunlu: true }),
       kategori: m('Kategori', 40, { zorunlu: true, oneriler: REFERANS_KATEGORILERI }),

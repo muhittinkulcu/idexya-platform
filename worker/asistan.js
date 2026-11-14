@@ -4,7 +4,7 @@
 // - Her sohbet panelde okunabilir; IP yalnız tuzlu özet olarak saklanır.
 // - Sohbet, ziyaretçi KVKK aydınlatma metnini onaylamadan başlamaz (asistan_onay). Ziyaretçi yazışmanın dökümünü kendi
 //   e-postasına isteyebilir (/api/asistan/dokum); kötüye kullanıma karşı IP başına günde 3, sohbet başına 2 gönderim.
-import { json, hata, simdi, kimlik, kirp, ozet, ayniKaynak, govdeOku, ipAl, robotDogrula, EPOSTA_DESEN, sayfaMaskele } from './ortak.js';
+import { json, hata, simdi, kimlik, kirp, ozet, ayniKaynak, govdeOku, ipAl, robotDogrula, EPOSTA_DESEN } from './ortak.js';
 import { epostaGonder } from './eposta.js';
 import gruplar from '../src/data/hizmetler.json';
 
@@ -85,9 +85,9 @@ export async function asistanApi(istek, env, yol) {
   ]);
   if (ipSay.results[0].n >= 20) return hata('Çok hızlı mesaj gönderdiniz. Birkaç dakika sonra tekrar deneyin.', 429);
   const sinir = Number(env.ASISTAN_AYLIK_SINIR || 3000);
-  const kayit = async (rol, metin, ek) => db.prepare('INSERT INTO asistan_mesajlari (id, sohbet_id, zaman, rol, metin, ek, ip_ozet, sayfa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), sohbetId, simdi(), rol, metin, ek ? JSON.stringify(ek) : null, ipOzet, sayfaMaskele(kirp(g.sayfa, 200)) || null).run();
+  const kayit = async (rol, metin, ek) => db.prepare('INSERT INTO asistan_mesajlari (id, sohbet_id, zaman, rol, metin, ek, ip_ozet, sayfa) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(kimlik(), sohbetId, simdi(), rol, metin, ek ? JSON.stringify(ek) : null, ipOzet, kirp(g.sayfa, 200) || null).run();
   await kayit('ziyaretci', temiz[temiz.length - 1].content);
-  await db.prepare('INSERT INTO asistan_onay (sohbet_id, zaman, ip_ozet, sayfa) VALUES (?, ?, ?, ?) ON CONFLICT(sohbet_id) DO NOTHING').bind(sohbetId, simdi(), ipOzet, sayfaMaskele(kirp(g.sayfa, 200)) || null).run();
+  await db.prepare('INSERT INTO asistan_onay (sohbet_id, zaman, ip_ozet, sayfa) VALUES (?, ?, ?, ?) ON CONFLICT(sohbet_id) DO NOTHING').bind(sohbetId, simdi(), ipOzet, kirp(g.sayfa, 200) || null).run();
 
   const yedek = (sebep) => ({ ok: true, sohbet: sohbetId, yapayZeka: false, metin: 'Şu anda sorularınızı otomatik yanıtlayamıyorum. Ekibimiz size hızla dönebilir: aşağıdan ücretsiz analiz isteyebilir ya da WhatsApp’tan yazabilirsiniz.', eylemler: ['analiz', 'whatsapp'], sebep });
   if (!env.ANTHROPIC_API_KEY) return json(yedek('kapali'));
