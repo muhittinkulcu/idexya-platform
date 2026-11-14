@@ -41,6 +41,9 @@ function oku() {
 function yaz(l) { try { localStorage.setItem(SEKME_ANAHTAR, JSON.stringify(l)); } catch (e) {} }
 
 export function sayfaSekmeleri() {
+  // Dar ekranda paket çubuğundaki modül sekmeleri kayar; bu modülün sekmesi görünür kalsın
+  const modul = document.querySelector('.paket-sekme[aria-current=page]');
+  if (modul && modul.parentElement.scrollWidth > modul.parentElement.clientWidth) modul.parentElement.scrollLeft = modul.offsetLeft - 8;
   const kutu = document.querySelector('[data-sayfa-sekmeleri]');
   if (!kutu) return;
   const burasi = () => yolAl(location.pathname);

@@ -274,11 +274,11 @@ export function kabuk() {
       if (o.key === 'Escape') { pa.value = ''; sonuc.hidden = true; }
     });
     pa.addEventListener('blur', () => setTimeout(() => { sonuc.hidden = true; }, 150));
-    document.addEventListener('keydown', (o) => { if ((o.metaKey || o.ctrlKey) && o.key.toLowerCase() === 'k') { o.preventDefault(); if (!t.ustAcik) { t.ustAcik = true; kaydet(); } pa.focus(); } });
+    document.addEventListener('keydown', (o) => { if ((o.metaKey || o.ctrlKey) && o.key.toLowerCase() === 'k') { o.preventDefault(); pa.focus(); } });
   }
 
   // Üst ve yan menü düğmeleri
-  $('[data-ust-kapat]').addEventListener('click', () => { t.ustAcik = false; kaydet(); });
+  // Üst çubuğu gizleme ve sabitleme Özelleştir çekmecesinde (ortak kabuk: üst çubuk tek satır, düğme yok)
   ustAc.addEventListener('click', () => { t.ustAcik = true; kaydet(); });
   const us = $('[data-ust-sabitle]'); if (us) us.addEventListener('click', () => { t.ustSabit = !t.ustSabit; kaydet(); });
   $('[data-yan-daralt]').addEventListener('click', () => { t.yanMod = t.yanMod === 'genis' ? 'dar' : 'genis'; kaydet(); });
@@ -323,6 +323,7 @@ export function kabuk() {
       h.dataset.tema = tema;
       h.classList.toggle('dark', koyu);
       const kabuk = document.getElementById('kabuk'); if (kabuk) kabuk.className = 'kabuk ' + tema;
+      const paket = document.getElementById('paket'); if (paket) paket.className = 'paket ' + tema;
     }
     document.querySelectorAll('[data-tema-sec]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.temaSec === secim)));
     // Saate göre: sayfa açıkken bir sonraki 07.00 ya da 19.00 geçişinde kendiliğinden değişir.
