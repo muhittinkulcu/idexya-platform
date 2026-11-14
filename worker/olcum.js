@@ -2,7 +2,7 @@
 // IP adresi, tarayıcı bilgisi (user agent), çerez ya da kimlik saklanmaz; yalnız günlük toplam sayaç
 // (gün, sayfa, yönlendiren alan adı, cihaz sınıfı) ve sayfa başına günde en çok 500 hız örneği yazılır.
 // Saklama: günlük sayaçlar 2 yıl, hız örnekleri 90 gün (worker/saklama.js).
-import { json, hata } from './ortak.js';
+import { json, hata, sayfaMaskele } from './ortak.js';
 
 const SINIR = 2048;
 const ORNEK_SINIRI = 500;
@@ -19,8 +19,7 @@ function yolTemizle(p) {
   if (!/^\/[\w\-./%~]*$/.test(yol) || yol.includes('//')) return null;
   if (/^\/(yonetim|api|kabuk|cdn-cgi)(\/|$)/.test(yol)) return null;
   // Gizli referans sayfasının kodu ziyaret istatistiğine yazılmaz (worker/referans.js).
-  if (/^\/r\//.test(yol)) return '/r/…';
-  return yol;
+  return sayfaMaskele(yol);
 }
 
 export async function olcumAl(istek, env) {

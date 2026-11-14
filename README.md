@@ -91,4 +91,6 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
 - Teklif çıktısında QR kod (sunucuda SVG, `qrcode-generator` MIT, hata düzeltme M, 4 modül sessiz alan): `/r/<kod>?t=<teklif anahtarı>`.
   Anahtar `teklifler.referans_anahtari` (teklif ilk okunduğunda üretilir). Geçerli `t` ile açılışta müşteri kartına günde en çok bir
   "Müşteri referansları açtı" kaydı düşer (`referans_acilis`: yalnız teklif, gün, zaman). Bağlantı önizleyicileri sayılmaz.
+- Kod hiçbir kayda yazılmaz: talep, asistan, bülten ve ziyaret sayacına gelen `/r/<kod>` yolu `worker/ortak.js` `sayfaMaskele` ile `/r/…` olur.
+  `referans_acilis` satırları 12 ay sonra silinir (`worker/saklama.js`).
 - Test: `node tools/test-referans.mjs` (sunucu gerekmez).

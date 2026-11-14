@@ -9,6 +9,8 @@ import { join } from 'node:path';
 import jsQR from 'jsqr';
 import { qrSvg, rastgeleKod, KOD_DESEN, ANAHTAR_DESEN } from '../worker/referans.js';
 import { DOSYALAR, dogrula } from '../src/data/icerik-sema.js';
+import { saklamaUygula } from '../worker/saklama.js';
+import { sayfaMaskele } from '../worker/ortak.js';
 
 const paket = await build({ entryPoints: [new URL('../worker/index.js', import.meta.url).pathname], bundle: true, format: 'esm', platform: 'neutral', mainFields: ['module', 'main'], write: false, logLevel: 'silent' });
 const gecici = join(mkdtempSync(join(tmpdir(), 'referans-')), 'worker.mjs');
@@ -193,6 +195,38 @@ await bitir();
 const sayfalar = db.ham.prepare('SELECT sayfa FROM ziyaret_gunluk').all().map((x) => x.sayfa);
 k('ziyaret istatistiğinde kod yok', !sayfalar.some((x) => x.includes(kod2)));
 
+// --- Kod kayıtlara sızmaz: talep formu, ekip e-postası, panel listesi, asistan, bülten ---
+k('sayfaMaskele: /r/<kod> → /r/…, diğer yollar aynı', sayfaMaskele('/r/' + kod2) === '/r/…' && sayfaMaskele('/r/' + kod2 + '/') === '/r/…' && sayfaMaskele('/r') === '/r/…' && sayfaMaskele('/tr/iletisim') === '/tr/iletisim' && sayfaMaskele('/rehber') === '/rehber' && sayfaMaskele(undefined) === undefined);
+const gidenler = [];
+const envE = { ...env, EPOSTA: { async send(m) { gidenler.push(m); return { messageId: 'x' }; } } };
+db.ham.prepare("INSERT INTO ayarlar (anahtar, deger, guncelleme, guncelleyen) VALUES ('bildirim_eposta', 'ekip@ornek.example', ?, 'test')").run(z);
+const kamu = (yol, govde, ek = {}) => worker.fetch(new Request(B + yol, { method: 'POST', headers: { origin: B, 'content-type': 'application/json', 'cf-connecting-ip': '203.0.113.9' }, body: JSON.stringify(govde) }), ek.env || envE, ctx);
+r = await kamu('/api/talep', { ad: 'Deneme Kişi', eposta: 'deneme@ornek.example', kvkk: true, kaynak: 'analiz', sayfa: '/r/' + kod2, mesaj: 'Merhaba' });
+await bitir();
+k('referans sayfasından talep kabul edildi', r.status === 200);
+const talepSayfa = db.ham.prepare("SELECT sayfa FROM talepler WHERE ad = 'Deneme Kişi'").get();
+k('talep kaydında kod yok (/r/…)', talepSayfa && talepSayfa.sayfa === '/r/…');
+k('ekip bildirim e-postası gitti ve kodu içermiyor', gidenler.length === 1 && !JSON.stringify(gidenler[0]).includes(kod2) && JSON.stringify(gidenler[0]).includes('/r/…'));
+k('panel talep listesinde kod yok', !JSON.stringify(await (await api('talepler')).json()).includes(kod2));
+r = await kamu('/api/asistan/mesaj', { kvkk: true, sayfa: '/r/' + kod2 + '?t=' + anahtar, mesajlar: [{ rol: 'ziyaretci', metin: 'Referanslarınız hangi sektörlerde?' }] });
+k('referans sayfasından asistan mesajı kabul edildi', r.status === 200);
+const asSayfa = db.ham.prepare('SELECT sayfa FROM asistan_mesajlari').all().map((x) => x.sayfa).concat(db.ham.prepare('SELECT sayfa FROM asistan_onay').all().map((x) => x.sayfa));
+k('asistan_mesajlari ve asistan_onay kaydında kod yok', asSayfa.length >= 2 && asSayfa.every((x) => x === '/r/…'));
+r = await kamu('/api/bulten', { eposta: 'bulten@ornek.example', kvkk: true, onay: true, iys: true, sayfa: '/r/' + kod2 });
+const bSayfa = db.ham.prepare("SELECT sayfa FROM bulten WHERE eposta = 'bulten@ornek.example'").get();
+k('bülten kaydında kod yok (/r/…)', !!bSayfa && bSayfa.sayfa === '/r/…');
+const tumDb = JSON.stringify(['talepler', 'asistan_mesajlari', 'asistan_onay', 'bulten', 'ziyaret_gunluk', 'kayitlar', 'islem_kaydi'].map((t) => db.ham.prepare(`SELECT * FROM ${t}`).all()));
+k('hiçbir kayıt tablosunda referans kodu geçmiyor', !tumDb.includes(kod2) && !tumDb.includes(kod1));
+
+// --- Saklama: referans_acilis 12 ay ---
+db.ham.prepare('DELETE FROM referans_acilis').run();
+const gunOnce = (g) => new Date(Date.now() - g * 86400000).toISOString();
+db.ham.prepare("INSERT INTO referans_acilis (teklif_id, gun, zaman) VALUES ('eski', '2025-01-01', ?), ('yeni', '2026-01-01', ?)").run(gunOnce(366), gunOnce(300));
+const sk = await saklamaUygula(db);
+const kalan = db.ham.prepare('SELECT teklif_id FROM referans_acilis').all().map((x) => x.teklif_id);
+k('saklama: 12 aydan eski açılış silindi, yenisi kaldı', kalan.length === 1 && kalan[0] === 'yeni');
+k('saklama: özet satırında referans açılışları', sk.some((x) => /Referans sayfası açılışları/.test(x.ad) && x.silinen === 1));
+
 // --- Şema ---
 const sema = DOSYALAR.referanslar.sema;
 let d = dogrula(sema, [{ ad: 'Örnek Marka A', kategori: 'E-ticaret', hizmet: 'Google Ads', aciklama: 'Kısa açıklama', site: 'https://ornek.example', logo: '/api/medya/abc12345' }]);
@@ -223,7 +257,7 @@ k('site haritası /kabuk/ sayfalarını dışlıyor', /kabuk/.test(harita));
 const kabukKaynak = readFileSync(new URL('../src/pages/kabuk/referanslar.astro', import.meta.url), 'utf8');
 k('kabuk: aramaya kapalı (noindex)', /<Site [^>]*aramayaKapali/.test(kabukKaynak));
 k('kabuk: site bağlantıları rel="noopener nofollow"', /rel="noopener nofollow"/.test(kabukKaynak));
-k('kabuk: satır içi betik yok (yalnız dış dosya)', !/<script(?![^>]*\bsrc=)[^>]*>/.test(kabukKaynak.replace(/<!--[\s\S]*?-->/g, '')));
+k('referans sayfası satır içi betik eklemedi (yalnız dış dosya; Site.astro düzeninin betikleri ayrı)', !/<script(?![^>]*\bsrc=)[^>]*>/.test(kabukKaynak.replace(/<!--[\s\S]*?-->/g, '')));
 k('kabuk: hareketi azalt tercihi destekleniyor', /prefers-reduced-motion:reduce/.test(kabukKaynak));
 
 console.log(h.length ? `\n${h.length} KALDI:\n` + h.join('\n') : '\nTüm kontroller geçti.');

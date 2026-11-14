@@ -17,6 +17,9 @@ const AYAR = 'referans_kodu';
 const ABECE = 'abcdefghijklmnopqrstuvwxyz0123456789';
 // Bağlantı önizleyicileri (WhatsApp, Slack…) ve tarayıcı robotları "müşteri açtı" sayılmaz.
 const ROBOT = /bot|crawl|spider|headless|slurp|lighthouse|pagespeed|preview|monitor|whatsapp|facebookexternalhit|telegram|slack|discord|skype|linkedin|embedly|curl|wget/i;
+// CSP, sitenin diğer sunucu sayfalarıyla (worker/icerik.js, worker/haftalik-bulten.js) aynıdır. 'unsafe-inline' bu sayfa için değil,
+// ortak yerleşimin (src/layouts/Site.astro) tema/menü için satır içi betikleri ve Astro'nun küçük betikleri satır içine alması
+// yüzünden gerekir; referans sayfası kendisi satır içi betik eklemez (süzgeç public/js/referans-suzgec.js). Kaldırmak ayrı iştir.
 const CSP = "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; frame-src https://challenges.cloudflare.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
 
 // Rastgele [a-z0-9] metni (ret örneklemesiyle eşit dağılımlı).
