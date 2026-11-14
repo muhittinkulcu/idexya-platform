@@ -208,6 +208,11 @@ export function sayiBicim(m, oran) {
 
 export function saatKisa(x) {
   const s = String(x || '').trim();
+  // Saat dilimi taşıyan ISO metni (Z ya da +03:00) yerel saate çevrilir: API'ler UTC yazar ("…T08:05:00Z" Türkiye'de 11.05).
+  if (/T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})$/i.test(s)) {
+    const t = new Date(s);
+    if (!Number.isNaN(t.getTime())) return String(t.getHours()).padStart(2, '0') + '.' + String(t.getMinutes()).padStart(2, '0');
+  }
   const m = /T(\d{2}):(\d{2})/.exec(s) || /(?:^|\s)(\d{1,2})[:.](\d{2})$/.exec(s);
   return m ? m[1].padStart(2, '0') + '.' + m[2] : '—';
 }
