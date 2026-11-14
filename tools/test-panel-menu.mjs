@@ -14,10 +14,11 @@ const oge = (k) => ogeler.find((o) => o.k === k);
 
 // 1. Sistem › Eşitleme üç alt öğeyle; CRM altında eşitleme yok
 const es = oge('esitle');
-kontrol('Sistem grubunda "Eşitleme"', es && es.grup === 'SİSTEM' && es.ad === 'Eşitleme' && es.href === '/data-sync' && es.i === 'esitle');
+kontrol('Sistem grubunda "Eşitleme"', es && es.grup === 'Sistem' && es.ad === 'Eşitleme' && es.href === '/data-sync' && es.i === 'esitle');
 kontrol('Eşitleme altları: Reklam verisi çekimi, Reklam hesabı eşleştirme, IDOS’a müşteri taşıma', JSON.stringify((es?.altlar || []).map((a) => [a.ad, a.href])) === JSON.stringify([['Reklam verisi çekimi', '/data-sync'], ['Reklam hesabı eşleştirme', '/crm-sync'], ['IDOS’a müşteri taşıma', '/crm-migrate']]));
 const crm = oge('crm');
 kontrol('CRM altları: Satış panosu, Mükerrer kartlar', JSON.stringify((crm?.altlar || []).map((a) => [a.ad, a.href])) === JSON.stringify([['Satış panosu', '/crm'], ['Mükerrer kartlar', '/crm-conflicts']]));
+kontrol('grup başlıkları yalnız ilk harf büyük ve adla aynı (SATIŞ değil Satış)', MENU.every((g) => g.grup === g.ad && g.ad !== g.ad.toLocaleUpperCase('tr') && g.ad[0] === g.ad[0].toLocaleUpperCase('tr')));
 kontrol('Haftalık bülten (TDK)', oge('haftalik-bulten')?.ad === 'Haftalık bülten');
 
 // 2. Her menü adresi gerçek bir sayfaya gider; anahtarlar tekil

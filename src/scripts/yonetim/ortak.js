@@ -370,6 +370,11 @@ export function kabuk() {
     profil.addEventListener('keydown', (o) => { if (o.key === 'Escape' && !menu.hidden) kapat(true); });
   }
 
+  function durumYaz(d, metin) {
+    const n = $('[data-durum-nokta]'), b = $('[data-durum-baglanti]');
+    if (n) n.dataset.d = d;
+    if (b) b.textContent = metin;
+  }
   api('ozet').then((o) => {
     sayacGuncelle(o);
     const say = (liste, d) => (liste.find((x) => x.durum === d) || { n: 0 }).n;
@@ -378,6 +383,9 @@ export function kabuk() {
     const k = $('[data-kim]'); if (k && o.kim) k.textContent = o.kim;
     const av = $('[data-kim-avatar]'); if (av && o.kim) av.title = o.kim;
     const ke = $('[data-kim-eposta]'); if (ke && o.kim) ke.textContent = o.kim;
+    // Durum çubuğu (ortak kabuk): bağlantı, oturumdaki e-posta ve IDOS reklam verisi durumu
+    durumYaz('bagli', 'Bağlı');
+    const de = $('[data-durum-eposta]'); if (de && o.kim) de.textContent = o.kim;
     // Yan menüdeki IDOS kartı: reklam verisi bağlantısının gerçek durumu (worker/reklam.js günlük çekim)
     const idosDurum = $('[data-idos-durum]'), idosDetay = $('[data-idos-detay]'), r = o.reklam;
     if (idosDurum && idosDetay && r) {
@@ -385,8 +393,11 @@ export function kabuk() {
       else if (!r.son) { idosDurum.textContent = 'Bağlı'; idosDetay.textContent = 'Henüz veri çekilmedi. Çekim her sabah kendiliğinden yapılır.'; }
       else { idosDurum.textContent = r.son.durum === 'tamam' ? '● Bağlı' : '● Son çekim başarısız'; idosDurum.style.color = r.son.durum === 'tamam' ? '#4CC38A' : '#FF8A7E'; idosDetay.textContent = 'Son reklam verisi çekimi: ' + tarih(r.son.zaman); }
     }
+    const di = $('[data-durum-idos]');
+    if (di && idosDetay && r) { di.textContent = 'IDOS: ' + idosDetay.textContent; di.title = di.textContent; di.hidden = false; }
   }).catch((h) => {
     sayacGuncelle(null);
+    durumYaz('sorun', h.durum === 401 ? 'Oturum kapalı' : 'Bağlantı sorunu');
     if (h.durum === 401) genelHata('Oturumunuz kapanmış. Sayfayı yenileyip yeniden giriş yapın.');
   });
 }
