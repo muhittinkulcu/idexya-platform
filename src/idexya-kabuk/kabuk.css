@@ -291,6 +291,13 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 @media (max-width:1280px){.ik-kapsul{display:none}}
 /* Masaüstünde paket çubuğu tek satır kalır: kapsül metni ("Bağlantı bilinmiyor" → "Bağlı") değişince satır kırılıp sayfa kaymasın (CLS). */
 @media (min-width:861px){.ik-ust{flex-wrap:nowrap}.ik-ara-kap{min-width:0}}
+/* Yan menü ekrana sabit: sayfa uzun olunca altında boş sütun kalmaz; ağaç kendi içinde kayar. Uçan panel kırpılmasın diye
+   kaydırma .ik-yan'da değil .ik-agac ve .ik-ray'de. Üst çubuk sabitse menü onun altından başlar. */
+@media (min-width:861px){
+.ik-yan{position:sticky;top:0;align-self:flex-start;height:100vh;height:100dvh}
+.ik-ust.ik-sabit~.ik-govde .ik-yan{top:48px;height:calc(100vh - 48px);height:calc(100dvh - 48px)}
+.ik-agac,.ik-ray{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+}
 @media (max-width:860px){
   .ik-masa{display:none!important}.ik-tel{display:inline-flex}
   .ik-ust{gap:6px 8px;padding:0 8px}
