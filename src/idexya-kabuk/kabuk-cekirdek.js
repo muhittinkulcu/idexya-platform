@@ -57,6 +57,22 @@ export function guvenliUrl(u, kokenler = []) {
 }
 const koken = (u) => (guvenliUrl(u, true) ? new URL(u.trim(), TABAN + '/').origin : null);
 
+// Tek adres (tek-adres-plani.md): kabuk os.idexya.com'da açılınca açılmış modüllerin eski kökeni yol önekine çevrilir
+// (https://panel.idexya.com/x → /website/x). Yalnız yönlendiricide AÇIK modül yazılır; Creative açılınca eklenir.
+export const OS_ALANLARI = ['os.idexya.com'];
+export const OS_ONEKLERI = { 'https://marketing.idexya.com': '/marketing', 'https://panel.idexya.com': '/website' };
+const BU_ALAN = typeof location !== 'undefined' ? location.host : '';
+export function osAdresi(u, alan = BU_ALAN) {
+  if (typeof u !== 'string' || !OS_ALANLARI.includes(alan)) return u;
+  const t = u.trim();
+  if (!/^https:\/\//i.test(t)) return u;
+  let r;
+  try { r = new URL(t); } catch (e) { return u; }
+  const onek = has(OS_ONEKLERI, r.origin) ? OS_ONEKLERI[r.origin] : null;
+  if (!onek || r.username || r.password) return u;
+  return onek + r.pathname + r.search + r.hash;
+}
+
 export const metinListesi = (x) => (Array.isArray(x) ? x.filter((s) => typeof s === 'string') : []);
 
 export const renkGecerli = (r) => typeof r === 'string' && /^#[0-9a-f]{6}$/i.test(r);
@@ -65,12 +81,13 @@ export const rozetSay = (n) => (Number.isFinite(n) && n > 0 ? Math.floor(n) : 0)
 
 const metin = (x, sinir = 120) => (typeof x === 'string' ? x.trim().slice(0, sinir) : '');
 
-export function ayarDogrula(ham) {
+export function ayarDogrula(ham, alan = BU_ALAN) {
   const hatalar = [];
   const a = ham && typeof ham === 'object' ? ham : (hatalar.push('ayar nesne değil'), {});
   const katmanlar = [], ham2 = Array.isArray(a.katmanlar) ? a.katmanlar : [];
-  const kokenler = ham2.map((k) => k && koken(k.url)).filter(Boolean);
-  const U = (x) => guvenliUrl(x, kokenler);
+  const O = (x) => osAdresi(x, alan);
+  const kokenler = ham2.map((k) => k && koken(O(k.url))).filter(Boolean);
+  const U = (x) => guvenliUrl(O(x), kokenler);
   ham2.forEach((k, ki) => {
     if (!k || !KATMAN_ANAHTARLARI.includes(k.anahtar)) { hatalar.push('katman ' + ki + ': bilinmeyen anahtar'); return; }
     const url = U(k.url);

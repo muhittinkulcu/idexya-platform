@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, KALINLIK, YAZI_TIPI, TEMA, aile, ayarDogrula, etkinBul, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir, kaynakDurumu,
-  sekmeListesi, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi
+  sekmeListesi, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -176,7 +176,7 @@ class IdexyaKabuk extends HTMLElement {
     const url = guvenliUrl(l.getAttribute('href'), this.a.kokenler);
     if (!url || !olay(this, 'git', { url }, true)) e.preventDefault();
   }
-  git(url) { this.kapat(false); url = guvenliUrl(url, this.a.kokenler); if (url && olay(this, 'git', { url }, true)) location.assign(url); }
+  git(url) { this.kapat(false); url = guvenliUrl(osAdresi(url), this.a.kokenler); if (url && olay(this, 'git', { url }, true)) location.assign(url); }
 
   tus(e) {
     if (e.key !== 'Escape') return;
@@ -404,7 +404,7 @@ class IdexyaKabuk extends HTMLElement {
   }
 
   etkinYap(etkin) {
-    const U = (x) => guvenliUrl(x, this.a.kokenler);
+    const U = (x) => guvenliUrl(osAdresi(x), this.a.kokenler);
     if (this._ilk) this._sakin = 0;
     etkin = etkin || {};
     this.a.etkin = { modulUrl: U(etkin.modulUrl), sayfaUrl: U(etkin.sayfaUrl), ad: String(etkin.ad || '').slice(0, 120) };
