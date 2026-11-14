@@ -11,7 +11,10 @@
     "binding": "ASSETS",
     "run_worker_first": ["/", "/api/*", "/yonetim*", "/icerik/*", "/kabuk/*", "/referans", "/referans/", "/uye/*", "/tr/bulten", "/tr/bulten/*", "/sitemap-bulten.xml",
       // Yönetim paneli (panel.idexya.com) İngilizce adresleri: worker/panel-yollar.js ("/leads*" hem /leads hem /leads/… için; liste en çok 100 kural)
-      "/accounting*", "/accounts*", "/activity-log*", "/articles*", "/assistant*", "/backups*", "/banners*", "/client-portal*", "/client-sites*", "/conversions*", "/crm*", "/customer*", "/dashboard*", "/data-sync*", "/documents*", "/instagram*", "/integrations*", "/leads*", "/media*", "/members*", "/notifications*", "/performance*", "/proposal-print*", "/proposals*", "/seo*", "/settings*", "/site-content*", "/subscribers*", "/support*", "/tasks*", "/templates*", "/theme*", "/visitors*", "/weekly-newsletter*"],
+      "/accounting*", "/accounts*", "/activity-log*", "/articles*", "/assistant*", "/backups*", "/banners*", "/client-portal*", "/client-sites*", "/conversions*", "/crm*", "/customer*", "/dashboard*", "/data-sync*", "/documents*", "/instagram*", "/integrations*", "/leads*", "/media*", "/members*", "/notifications*", "/performance*", "/proposal-print*", "/proposals*", "/seo*", "/settings*", "/site-content*", "/subscribers*", "/support*", "/tasks*", "/templates*", "/theme*", "/visitors*", "/weekly-newsletter*",
+      // Tek adres (os.idexya.com/website/...): PANEL_TEMEL_YOL ve PANEL_OS_ALAN ayarlıysa önek Worker'da ayrılır (worker/temel-yol.js).
+      // Ayar yoksa bu yollar bugünkü gibi varlıklara düşer (Worker isteği değiştirmeden env.ASSETS'e verir).
+      "/website", "/website/*"],
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
   },
@@ -28,6 +31,8 @@
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
   // Panelden eklenen değişkenler (ör. IDOS_BQ_GORUNUM) dağıtımda silinmesin diye; gizli değerler zaten etkilenmez.
+  // Tek adres geçişi (isteğe bağlı, boşken kapalı): PANEL_TEMEL_YOL ("/website"), PANEL_OS_ALAN ("os.idexya.com"),
+  // IZINLI_KOKENLER (virgüllü tam kökenler). POLICY_AUD geçişte virgülle iki değer alabilir (eski panel + os uygulaması).
   "keep_vars": true,
   "observability": { "enabled": true },
   // Her saat başı (UTC): müşteri ana kaydı önbelleği eşitlenir (worker/ana-kayit.js; IDOS_ORTAK_* yoksa atlanır).

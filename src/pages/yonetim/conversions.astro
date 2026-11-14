@@ -30,7 +30,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 <section class="kart" aria-label="Tıklama kimliği olan talepler" data-liste style="overflow-x: auto"></section>
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, git } from '../../scripts/yonetim/ortak.js';
   const liste = document.querySelector('[data-liste]'), kpi = document.querySelector('[data-kpi]');
   let v = null;
   const tl = (n) => (n || n === 0 ? new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(n) + ' TL' : '—');
@@ -38,7 +38,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   document.querySelectorAll('[data-indir]').forEach((a) => a.addEventListener('click', (o) => {
     o.preventDefault();
     const p = a.dataset.indir, ad = document.querySelector(`[data-ad-${p}]`).value.trim();
-    location.href = `/api/yonetim/donusum/csv/${p}?ad=${encodeURIComponent(ad)}`;
+    git(`/api/yonetim/donusum/csv/${p}?ad=${encodeURIComponent(ad)}`);
   }));
   document.querySelectorAll('[data-isaretle]').forEach((d) => d.addEventListener('click', async () => {
     const p = d.dataset.isaretle, b = bekleyen(p);

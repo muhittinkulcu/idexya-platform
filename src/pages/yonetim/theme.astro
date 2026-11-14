@@ -75,7 +75,7 @@ const varsayilan = {
   @media (max-width:1200px){.te{grid-template-columns:1fr}.te-sag{position:static}}
 </style>
 <script>
-  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, genelHata, yol } from '../../scripts/yonetim/ortak.js';
   const VARS = JSON.parse(document.getElementById('tema-varsayilan').textContent);
   const kopya = (x) => JSON.parse(JSON.stringify(x));
   let kayitli = null, taslak = null, sekme = 'menu', cihaz = 'masa', degisti = false;
@@ -188,7 +188,7 @@ const varsayilan = {
     if (cihaz === 'tel') { iframe.style.left = Math.max(0, (kap.clientWidth - g * olcek) / 2) + 'px'; } else iframe.style.left = '0';
     void h;
   }
-  function yukleIframe() { const s = $('[data-sayfa]').value; iframe.src = `${s}${s.includes('?') ? '&' : '?'}tema=onizleme`; cerceve(); }
+  function yukleIframe() { const s = $('[data-sayfa]').value; iframe.src = yol(`${s}${s.includes('?') ? '&' : '?'}tema=onizleme`); cerceve(); }
   document.querySelectorAll('[data-cihaz]').forEach((d) => d.addEventListener('click', () => { cihaz = d.dataset.cihaz; document.querySelectorAll('[data-cihaz]').forEach((x) => x.setAttribute('aria-pressed', String(x === d))); cerceve(); }));
   $('[data-sayfa]').addEventListener('change', yukleIframe);
   addEventListener('resize', cerceve);

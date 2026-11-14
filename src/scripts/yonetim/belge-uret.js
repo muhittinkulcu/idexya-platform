@@ -2,6 +2,7 @@
 // Sabit sayfaların JPEG'i olduğu gibi gömülür (yeniden sıkıştırılmaz). Yazı tipleri: Comfortaa ve Abel (OFL, /fonts/).
 import { SAYFA_EN, SAYFA_BOY, tarihUzun, kapakBasligi, tlBelge, satirYerlesimi, HIZMET_DUZEN, KALEM_DUZEN, jpegBilgi, pdfOlustur } from './sablon-hesap.js';
 import { metinPlani, planSusle } from './sablon-metin.js';
+import { yol } from './temel-yol.js';
 
 const YAZI = '#231f20', TURUNCU = '#eb7305';
 const ORTAK = '/yonetim/veri/sablon/ortak/';
@@ -9,13 +10,13 @@ const ORTAK = '/yonetim/veri/sablon/ortak/';
 // Şablondaki görsel: varsayılan yol (derlemeyle gelir) ya da R2 anahtarı (sablon/<id>/<sürüm>/<sayfa>.jpg)
 export function gorselAdresi(g) {
   const m = /^sablon\/([\w-]+)\/(\d+)\/(\d+)\.jpg$/.exec(String(g || ''));
-  return m ? `/api/yonetim/belge-sablonlari/${m[1]}/gorsel/${m[2]}/${m[3]}` : String(g || '');
+  return yol(m ? `/api/yonetim/belge-sablonlari/${m[1]}/gorsel/${m[2]}/${m[3]}` : String(g || ''));
 }
 
 let fontSoz = null;
 export function fontlarHazir() {
   if (!fontSoz) {
-    const f = [new FontFace('IdxComfortaa', 'url(/fonts/comfortaa.ttf)', { weight: '300 700' }), new FontFace('IdxAbel', 'url(/fonts/abel.ttf)')];
+    const f = [new FontFace('IdxComfortaa', `url(${yol('/fonts/comfortaa.ttf')})`, { weight: '300 700' }), new FontFace('IdxAbel', `url(${yol('/fonts/abel.ttf')})`)];
     fontSoz = Promise.all(f.map((x) => x.load())).then((l) => { l.forEach((x) => document.fonts.add(x)); });
   }
   return fontSoz;
@@ -28,7 +29,7 @@ export function gorselYukle(adres) {
       const i = new Image();
       i.onload = () => tamam(i);
       i.onerror = () => { gorselOnbellek.delete(adres); red(new Error('Sayfa görseli açılamadı: ' + adres)); };
-      i.src = adres;
+      i.src = yol(adres);
     }));
   }
   return gorselOnbellek.get(adres);

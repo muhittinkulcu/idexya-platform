@@ -18,7 +18,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </form>
 <div data-alan></div>
 <script>
-  import { api, el, ASAMALAR, asamaAdi, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, ASAMALAR, asamaAdi, once, para, genelHata, git } from '../../scripts/yonetim/ortak.js';
   import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
   const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
   let tum = [], gorunum = 'pano', arsivMod = false, etiketler = {}, tumEtiket = [], arsivde = 0;
@@ -88,7 +88,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   form.addEventListener('submit', async (o) => {
     o.preventDefault();
     const v = Object.fromEntries(new FormData(form));
-    try { const s = await api('musteriler', v); location.href = '/customer?id=' + encodeURIComponent(s.musteri_id) + (s.mevcut ? '&existing=1' : ''); }
+    try { const s = await api('musteriler', v); git('/customer?id=' + encodeURIComponent(s.musteri_id) + (s.mevcut ? '&existing=1' : '')); }
     catch (h) { fdurum.hidden = false; fdurum.textContent = h.message; }
   });
   async function yukle() {

@@ -1,7 +1,7 @@
 // Haftalık Bülten kreatif stüdyosu: bir sayının maddelerinden Instagram karusel (1080×1350), hikâye (1080×1920)
 // ve LinkedIn PDF karusel üretir. Görseller tarayıcıda çizilir (html-to-image); yazı tipi /fonts altından gömülür.
 import { toPng, toJpeg } from 'html-to-image';
-import { el, genelHata } from './ortak.js';
+import { el, genelHata, yol } from './ortak.js';
 
 const BOYUT = { karusel: [1080, 1350], hikaye: [1080, 1920], linkedin: [1080, 1350] };
 const ETKI_SIRA = { yuksek: 0, orta: 1, dusuk: 2 };
@@ -32,7 +32,7 @@ async function fontlar() {
   if (fontCss) return fontCss;
   const LATIN = 'U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD';
   const EXT = 'U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF';
-  const b64 = async (u) => { const buf = new Uint8Array(await (await fetch(u)).arrayBuffer()); let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000)); return btoa(s); };
+  const b64 = async (u) => { const buf = new Uint8Array(await (await fetch(yol(u))).arrayBuffer()); let s = ''; for (let i = 0; i < buf.length; i += 0x8000) s += String.fromCharCode(...buf.subarray(i, i + 0x8000)); return btoa(s); };
   const parcalar = [];
   for (const w of [400, 600, 700]) for (const [ad, aralik_] of [['latin', LATIN], ['latin-ext', EXT]]) {
     parcalar.push(`@font-face{font-family:'Kreatif Plex';font-style:normal;font-weight:${w};font-display:block;src:url(data:font/woff2;base64,${await b64(`/fonts/ibm-plex-sans-${ad}-${w}-normal.woff2`)}) format('woff2');unicode-range:${aralik_}}`);

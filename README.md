@@ -29,6 +29,19 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
 - Denetim: `PW_KOK=<playwright klasörü> node tools/test-cati.mjs http://127.0.0.1:8795 <ekran klasörü>`.
 - Canlı değişmedi kanıtı: main'de ve dalda bayraksız `npm run build`, sonra `node tools/cati-kanit.mjs <main dist> dist`.
 
+## Tek adres: panel `os.idexya.com/website` arkasında (isteğe bağlı, varsayılan kapalı)
+
+Plan: idexya-ortak `tek-adres-plani.md`. Önek Astro derlemesine konmaz (site aynı derlemede); Worker isteği ayırır, yanıtı
+öneklendirir (`worker/temel-yol.js`, kural `src/data/temel-yol.js`).
+
+- Değişkenler: `PANEL_TEMEL_YOL` (boş ya da `/website`), `PANEL_OS_ALAN` (ör. `os.idexya.com`), `IZINLI_KOKENLER` (virgüllü
+  tam kökenler; yalnız os alanındaki yazma isteğinde, isteğin kendi kökenine ek). İkisi birden geçerli değilse hiçbir şey değişmez.
+- os alanında yalnız `/website/*` panele girer, gerisi 404; `panel.idexya.com` bugünkü gibi çalışır.
+- Yönlendirici isteği **adresini değiştirmeden** iletmelidir (Host = os alanı; `Origin`, `Cookie`, `Cf-Access-Jwt-Assertion` korunur).
+- Test: `node tools/test-temel-yol.mjs` (sunucusuz). Uçtan uca: `npx wrangler dev --local --port 8791 --var YEREL_GIRIS:evet
+  --var PANEL_TEMEL_YOL:/website --var PANEL_OS_ALAN:os.localhost --var IZINLI_KOKENLER:http://os.localhost:8791 --persist-to <boş klasör>`,
+  sonra `PW_KANAL=chrome PW_KOK=<playwright klasörü> node tools/test-temel-yol-sunucu.mjs 8791 <ekran klasörü>`.
+
 ## Yönetim paneli (`/yonetim`)
 
 - Sunucu kodu `worker/index.js`; veritabanı Cloudflare D1 (`DB`), şema `worker/sema.js` ilk istekte kendiliğinden kurulur.
@@ -36,7 +49,8 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
 - `/yonetim/*` ve `/api/yonetim/*` yalnız Cloudflare Access girişiyle açılır; sunucu Access jetonunu ayrıca doğrular.
   Değişkenler tanımlanmadan panel **kapalıdır** (401):
   - `TEAM_DOMAIN` — ör. `https://<ekip>.cloudflareaccess.com`
-  - `POLICY_AUD` — Access uygulamasının "Application Audience (AUD) Tag" değeri
+  - `POLICY_AUD` — Access uygulamasının "Application Audience (AUD) Tag" değeri; tek adrese geçişte virgülle birden çok
+    değer alabilir (eski panel + os uygulaması), jeton bunlardan biriyle eşleşmelidir
   - `YONETICILER` — izinli e-postalar, virgülle (ör. `info@idexya.com`)
   - Gizli: `IP_TUZ` (uzun rastgele metin; IP adresleri yalnız bununla özetlenerek saklanır, KVKK)
   - Gizli: `TURNSTILE_SECRET` ve derleme değişkeni `PUBLIC_TURNSTILE_SITE_KEY` — **ikisi birlikte** girilir; yalnız biri

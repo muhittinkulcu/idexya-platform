@@ -71,7 +71,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 .cip.taslak{background:var(--card2);color:var(--tx2)}.cip.gonderildi{background:var(--infob);color:var(--info)}
 </style>
 <script>
-  import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata, prm } from '../../scripts/yonetim/ortak.js';
+  import { api, el, ASAMALAR, tarih, para, KAYNAK, genelHata, prm, yol } from '../../scripts/yonetim/ortak.js';
   import { teklifBloklari } from '../../scripts/yonetim/teklif-toplam.js';
   const id = new URLSearchParams(location.search).get('id') || '';
   const ust = document.querySelector('[data-ust]'), bilgi = document.querySelector('[data-bilgi]'), gunluk = document.querySelector('[data-gunluk]');
@@ -186,8 +186,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   async function teklifleriYukle() {
     const kutu = document.querySelector('[data-teklifler]');
-    document.querySelector('[data-teklif-yeni]').href = '/proposals?new=1&customer=' + encodeURIComponent(id);
-    document.querySelector('[data-teklif-sablon]').href = '/templates?tab=create&customer=' + encodeURIComponent(id);
+    document.querySelector('[data-teklif-yeni]').href = yol('/proposals?new=1&customer=' + encodeURIComponent(id));
+    document.querySelector('[data-teklif-sablon]').href = yol('/templates?tab=create&customer=' + encodeURIComponent(id));
     try {
       const [p, d] = await Promise.all([api('teklifler/musteri/' + encodeURIComponent(id)), api('teklif-dosyalari/musteri/' + encodeURIComponent(id))]);
       depoVar = d.depo !== false;
@@ -242,7 +242,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const dugme = document.querySelector('[data-teklif-kaydet]');
     dugme.disabled = true; dugme.textContent = 'Yükleniyor…';
     try {
-      const r = await fetch('/api/yonetim/teklif-dosyalari', { method: 'POST', credentials: 'same-origin', body: fd });
+      const r = await fetch(yol('/api/yonetim/teklif-dosyalari'), { method: 'POST', credentials: 'same-origin', body: fd });
       const s = await r.json().catch(() => ({ ok: false, hata: `Sunucudan geçersiz yanıt geldi (${r.status})` }));
       if (!r.ok || !s.ok) throw new Error(s.hata || `İstek başarısız (${r.status})`);
       pencere.close(); yukle();
@@ -374,7 +374,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const BAG_TUR = { sozlesme: 'Sözleşme', teklif: 'Teklif', fatura: 'Fatura', rapor: 'Rapor', diger: 'Diğer' };
   async function belgeleriYukle() {
     const kutu = document.querySelector('[data-belgeler]');
-    document.querySelector('[data-belge-yeni]').href = '/templates?tab=create&customer=' + encodeURIComponent(id);
+    document.querySelector('[data-belge-yeni]').href = yol('/templates?tab=create&customer=' + encodeURIComponent(id));
     try {
       const [u, b] = await Promise.all([api('belge-dosyalari/musteri/' + encodeURIComponent(id)), api('belgeler').catch(() => ({ belgeler: [] }))]);
       const satir = [
