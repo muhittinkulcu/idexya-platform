@@ -4,7 +4,7 @@ import { yol as onekle } from './temel-yol.js';
 import { adresMetni, adrestenOku, capaTr } from '../../data/panel-parametre.js';
 import { MENU } from '../../data/panel-menu.js';
 export { adresMetni, capaTr };
-export { yol, git, panelYolu, TEMEL } from './temel-yol.js';
+export { yol, git, panelYolu, TEMEL, SITE_KOKU } from './temel-yol.js';
 // Adres seçeneğini Türkçe adıyla okur (adres İngilizce: ?tab=new → prm('sekme') === 'yeni')
 export const prm = (ad) => adrestenOku(ad, location.search);
 export const ASAMALAR = [

@@ -1,20 +1,23 @@
 // Temel yol uçtan uca: panel os alanında /website önekiyle, panel alanında öneksiz (bugünkü gibi). Yerel sunucu:
 //   npx wrangler dev --local --port 8791 --var YEREL_GIRIS:evet --var PANEL_TEMEL_YOL:/website --var PANEL_OS_ALAN:os.localhost \
-//     --var IZINLI_KOKENLER:http://os.localhost:8791
-//   PW_KOK=<playwright klasörü> node tools/test-temel-yol-sunucu.mjs 8791 <ekran klasörü>
+//     --var KAPI_ANAHTARI_WEBSITE:yerel-deneme --persist-to <boş klasör>
+//   KAPI=yerel-deneme PW_KANAL=chrome PW_KOK=<playwright klasörü> node tools/test-temel-yol-sunucu.mjs 8791 <ekran klasörü>
 // Tarayıcı *.localhost adlarını yerel makineye çözer: os.localhost = os alanı, panel.localhost = bugünkü panel.
 import { createRequire } from 'module';
 import http from 'http';
 const { chromium } = createRequire(process.env.PW_KOK ? `${process.env.PW_KOK}/` : import.meta.url)('playwright');
 const PORT = process.argv[2] || '8791';
 const SS = process.argv[3] || '.';
+const KAPI = process.env.KAPI || 'yerel-deneme';
 const OS = `http://os.localhost:${PORT}`, PANEL = `http://panel.localhost:${PORT}`;
 let kalan = 0, gecen = 0;
 const kontrol = (ad, kosul) => { console.log((kosul ? 'GEÇTİ ' : 'KALDI ') + ad); if (kosul) gecen++; else kalan++; };
 
 // Host başlığıyla doğrudan istek (fetch Host başlığını değiştirmeye izin vermez).
-const iste = (host, yol, { method = 'GET', headers = {}, body } = {}) => new Promise((tamam, red) => {
-  const r = http.request({ host: '127.0.0.1', port: PORT, path: yol, method, headers: { host: `${host}:${PORT}`, ...headers } }, (y) => {
+// os alanına giden isteğe yönlendiricinin kapı anahtarı eklenir (kapi: false ise eklenmez).
+const iste = (host, yol, { method = 'GET', headers = {}, body, kapi = true } = {}) => new Promise((tamam, red) => {
+  const ek = kapi && host.startsWith('os.') ? { 'x-idexya-kapi': typeof kapi === 'string' ? kapi : KAPI } : {};
+  const r = http.request({ host: '127.0.0.1', port: PORT, path: yol, method, headers: { host: `${host}:${PORT}`, ...ek, ...headers } }, (y) => {
     let g = ''; y.on('data', (p) => { g += p; }); y.on('end', () => tamam({ durum: y.statusCode, konum: y.headers.location || '', govde: g, basliklar: y.headers }));
   });
   r.on('error', red); if (body) r.write(body); r.end();
@@ -30,6 +33,16 @@ for (const yol of ['/dashboard', '/api/yonetim/ozet', '/', '/websitex', '/leads'
   const y = await iste('os.localhost', yol);
   kontrol(`os ${yol} → 404 (yalnız /website)`, y.durum === 404);
 }
+// Site ve herkese açık uçlar os alanında sunulmaz
+for (const [yol, yontem] of [['/website/tr/', 'GET'], ['/website/tr/iletisim', 'GET'], ['/website/api/talep', 'POST'], ['/website/api/talep', 'GET'], ['/website/uye/', 'GET'], ['/website/uye/hesap', 'GET'],
+  ['/website/api/uye/giris', 'POST'], ['/website/?tema=onizleme', 'GET'], ['/website/api/icerik', 'GET'], ['/website/arama.json', 'GET'], ['/website/icerik/x', 'GET'], ['/website/referans', 'GET']]) {
+  const y = await iste('os.localhost', yol, { method: yontem, headers: yontem === 'POST' ? { 'content-type': 'application/json', origin: OS } : {}, body: yontem === 'POST' ? '{}' : undefined });
+  kontrol(`os ${yontem} ${yol} → 404 (yalnız panel)`, y.durum === 404);
+}
+// Yönlendirici kapısı
+kontrol('os: kapı başlığı yok → 404', (await iste('os.localhost', '/website/dashboard', { kapi: false })).durum === 404);
+kontrol('os: yanlış kapı anahtarı → 404', (await iste('os.localhost', '/website/dashboard', { kapi: KAPI + 'x' })).durum === 404);
+kontrol('panel alanında kapı aranmaz', (await iste('panel.localhost', '/dashboard')).durum === 200);
 const pk = await iste('panel.localhost', '/');
 kontrol('panel / → 302 /dashboard (bugünkü gibi, öneksiz)', pk.durum === 302 && pk.konum === `${PANEL}/dashboard`);
 const pd = await iste('panel.localhost', '/dashboard');
@@ -42,10 +55,12 @@ kontrol('os sayfasında öneksiz kök adres yok' + (kokGoreli.length ? ': ' + ko
 // Önek yalnız veri olarak (meta) eklenir: satır içi betik gövdesi yok (JSON veri bloğu hariç); panel alanıyla aynı sayıda <script>.
 const satirIci = (h) => [...h.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)].filter((m) => !/application\/json/.test(m[1]) && m[2].trim()).length;
 kontrol('os HTML\'inde satır içi betik yok (dashboard)', satirIci(od.govde) === 0);
-const ot = await iste('os.localhost', '/website/theme'), oo = await iste('os.localhost', '/website/?tema=onizleme');
-kontrol('os HTML\'inde satır içi betik yok (tema, site önizlemesi)', ot.durum === 200 && satirIci(ot.govde) === 0 && oo.durum === 200 && satirIci(oo.govde) === satirIci((await iste('panel.localhost', '/?tema=onizleme')).govde));
+const ot = await iste('os.localhost', '/website/theme');
+kontrol('os HTML\'inde satır içi betik yok (tema)', ot.durum === 200 && satirIci(ot.govde) === 0);
 kontrol('os ve panel HTML\'inde <script> sayısı aynı', (od.govde.match(/<script/g) || []).length === (pd.govde.match(/<script/g) || []).length);
 console.log('  os CSP: ' + od.basliklar['content-security-policy']);
+const betikKurali = (h) => ((h || '').match(/script-src ([^;]*)/) || [])[1] || '';
+kontrol('CSP script-src yalnız \'self\' (os ve panel)', betikKurali(od.basliklar['content-security-policy']) === "'self'" && betikKurali(pd.basliklar['content-security-policy']) === "'self'");
 kontrol('os sayfasında güvenlik başlıkları', /frame-ancestors 'none'/.test(od.basliklar['content-security-policy'] || '') && od.basliklar['x-frame-options'] === 'DENY');
 const cssYol = (od.govde.match(/href="(\/website\/_astro\/Yonetim[^"]+\.css)"/) || [])[1];
 const css = cssYol ? await iste('os.localhost', cssYol) : { govde: '' };
@@ -64,7 +79,8 @@ await iste('panel.localhost', '/api/talep', { method: 'POST', headers: { 'conten
 
 // 3. Tarayıcı
 const t = await chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : { channel: process.env.PW_KANAL || undefined });
-const s = await t.newPage({ viewport: { width: 1440, height: 900 } });
+const bag = await t.newContext({ viewport: { width: 1440, height: 900 }, extraHTTPHeaders: { 'x-idexya-kapi': KAPI } });
+const s = await bag.newPage();
 const hatalar = [], istekler = [], kotu = [];
 s.on('pageerror', (e) => hatalar.push('JS: ' + e.message));
 s.on('console', (m) => { if (m.type() === 'error') hatalar.push('konsol: ' + m.text()); });
@@ -107,14 +123,14 @@ const kart = await s.$eval('[data-alan] article a', (a) => a.getAttribute('href'
 kontrol('CRM kart bağlantısı önekli: ' + kart, kart.startsWith('/website/customer?id='));
 await s.screenshot({ path: SS + '/os-crm.png' });
 
-// Tema düzenleyici: site önizlemesi iframe'de önekli açılır; sitenin kendi istekleri de önekli gider (ortak yardımcı).
+// Tema düzenleyici: os alanında canlı önizleme kapalı (site sayfası panelle aynı kökende açılmaz), panel.idexya.com'a yönlendirir.
 await s.goto(OS + '/website/theme');
-await s.waitForTimeout(2500);
-const cerceve = await s.$eval('[data-iframe]', (f) => f.getAttribute('src')).catch(() => '');
-kontrol('tema önizlemesi önekli: ' + cerceve, cerceve.startsWith('/website/'));
-const oneksiz2 = istekler.filter((u) => !u.startsWith('/website/') && !u.startsWith('/cdn-cgi/'));
-kontrol('tema önizlemesi dahil tüm istekler önekli' + (oneksiz2.length ? ': ' + [...new Set(oneksiz2)].slice(0, 6).join(', ') : ''), oneksiz2.length === 0);
-kontrol('site önizlemesinin kendi istekleri önekli (bannerlar, olcum)', istekler.some((u) => u.startsWith('/website/api/bannerlar')) && istekler.some((u) => u.startsWith('/website/api/olcum')));
+await s.waitForTimeout(1500);
+kontrol('tema: os alanında önizleme çerçevesi yok', (await s.$('[data-iframe]')) === null);
+const not = await s.$eval('[data-onizleme-kapali]', (e) => ({ metin: e.textContent, href: (e.querySelector('a') || {}).href || '' })).catch(() => null);
+kontrol('tema: "önizleme panel.idexya.com’da" notu ve bağlantısı', !!not && not.metin.includes('panel.idexya.com') && not.href === PANEL + '/theme');
+kontrol('tema: site önizlemesi isteği yok', !istekler.some((u) => u.includes('tema=onizleme')));
+await s.screenshot({ path: SS + '/os-theme.png' });
 
 kontrol('os sayfalarında 4xx/5xx yok' + (kotu.length ? ': ' + [...new Set(kotu)].slice(0, 6).join(', ') : ''), kotu.length === 0);
 kontrol('os sayfalarında konsol hatası yok' + (hatalar.length ? ': ' + hatalar.slice(0, 4).join(' | ') : ''), hatalar.length === 0);
@@ -128,7 +144,10 @@ await s.waitForFunction(() => document.querySelector('idexya-kabuk .ik-yan a'), 
 await s.waitForTimeout(800);
 kontrol('panel: API öneksiz /api/yonetim/ozet', pIstek.includes('/api/yonetim/ozet') && !pIstek.some((u) => u.startsWith('/website')));
 kontrol('panel: menü bağlantıları öneksiz', (await s.$$eval('.ik-yan a[href]', (l) => l.map((a) => a.getAttribute('href')))).every((h) => !h.startsWith('/website')));
-kontrol('panel: konsol hatası yok' + (hatalar.length ? ': ' + hatalar.slice(0, 4).join(' | ') : ''), hatalar.length === 0);
+await s.goto(PANEL + '/theme');
+await s.waitForTimeout(3000);
+kontrol('panel: tema önizlemesi çalışıyor (çerçeve açık, öneksiz)', ((await s.$eval('[data-iframe]', (f) => f.getAttribute('src')).catch(() => '')) || '').startsWith('/?tema=onizleme'));
+kontrol('panel: konsol hatası yok (CSP ihlali dahil)' + (hatalar.length ? ': ' + hatalar.slice(0, 4).join(' | ') : ''), hatalar.length === 0);
 await s.screenshot({ path: SS + '/panel-dashboard.png' });
 await t.close();
 

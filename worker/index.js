@@ -1,8 +1,8 @@
 // Idexya Platform sunucu tarafı: talep formu ve yönetim paneli API'si.
 // Statik sayfalar Workers Static Assets'ten gelir; bu dosya yalnız /api/* ve /yonetim* için çalışır.
 import { createRemoteJWKSet } from 'jose';
-import { jetonDogrula, kaynakIzinli, izinliKokenler } from './erisim.js';
-import { temelAyar, osAlaniMi, istekAyir, yanitOnekle } from './temel-yol.js';
+import { jetonDogrula, kaynakIzinli, yerelGiris } from './erisim.js';
+import { temelAyar, osAlaniMi, istekAyir, yanitOnekle, osYoluIzinli, kapiDenetle, siteKoku } from './temel-yol.js';
 import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
 import { asistanApi, yonetimAsistanApi } from './asistan.js';
@@ -50,7 +50,7 @@ let jwks = null;
 // POLICY_AUD virgülle birden çok değer alabilir (geçişte eski panel + yeni os uygulaması); doğrulama worker/erisim.js.
 async function yonetici(istek, env) {
   const url = new URL(istek.url);
-  if (env.YEREL_GIRIS === 'evet' && (['localhost', '127.0.0.1', 'panel.localhost', 'os.localhost'].includes(url.hostname))) return { eposta: 'yerel@gelistirme' };
+  if (yerelGiris(url, env)) return { eposta: 'yerel@gelistirme' };
   if (!env.TEAM_DOMAIN || !env.POLICY_AUD) return null;
   const jeton = istek.headers.get('cf-access-jwt-assertion');
   if (!jeton) return null;
@@ -111,7 +111,7 @@ async function talepAl(istek, env) {
 }
 
 // --- Yönetim API'si ---
-// izinli: yalnız os alanındaki istekte IZINLI_KOKENLER (worker/erisim.js); diğer alanlarda boş, yalnız aynı köken.
+// izinli: yalnız os alanındaki istekte [https://<os alanı>] (worker/erisim.js); diğer alanlarda boş, yalnız aynı köken.
 async function yonetimApi(istek, env, yol, kim, izinli = []) {
   const db = env.DB;
   await semaKur(db);
@@ -363,7 +363,8 @@ async function isle(istek, env, ctx, os) {
       const yanit = await env.ASSETS.fetch(panelSayfa ? new Request(new URL(`/yonetim/${panelSayfa}/`, url), istek) : istek);
       const y = new Response(yanit.body, yanit);
       Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => y.headers.set(k, v));
-      y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+      // Satır içi betik yok (script-src 'self'); yalnız satır içi stil izinli. Denetim: tools/test-temel-yol-sunucu.mjs.
+      y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
       return y;
     }
     if (yol.startsWith('/api/')) return hata('Bulunamadı', 404);
@@ -374,13 +375,20 @@ async function isle(istek, env, ctx, os) {
   }
 }
 
-// os alanı (PANEL_OS_ALAN) ve temel yol (PANEL_TEMEL_YOL) ayarlıysa: yalnız /website/* panele girer, gerisi 404.
-// Önek ayrılır, istek bugünkü panel yönlendirmesine girer, yanıt (HTML, CSS, yönlendirme, çerez) önekli döner (worker/temel-yol.js).
+// os alanı (PANEL_OS_ALAN) ve temel yol (PANEL_TEMEL_YOL) ayarlıysa: yönlendirici kapısı (X-Idexya-Kapi), sonra yalnız
+// /website/* altındaki panel yolları (osYoluIzinli) bugünkü panel yönlendirmesine girer; gerisi 404. Yanıt (HTML, CSS,
+// yönlendirme, çerez) önekli döner (worker/temel-yol.js).
+const BULUNAMADI = () => new Response('Bulunamadı', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
 async function osIstegi(istek, env, ctx, ayar) {
+  const kapi = await kapiDenetle(istek, env);
+  if (kapi === 503) return new Response('Hizmet kapalı', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
+  if (kapi) return BULUNAMADI();
   const ic = istekAyir(istek, ayar);
-  if (!ic) return new Response('Bulunamadı', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
-  const yanit = await isle(ic, env, ctx, { os: true, izinli: izinliKokenler(env) });
-  return await yanitOnekle(yanit, ic.url, ayar.temel);
+  if (!ic) return BULUNAMADI();
+  const icUrl = new URL(ic.url);
+  if (!osYoluIzinli(icUrl.pathname, icUrl.search)) return BULUNAMADI();
+  const yanit = await isle(ic, env, ctx, { os: true, izinli: [`https://${icUrl.hostname}`] });
+  return await yanitOnekle(yanit, ic.url, ayar.temel, siteKoku(icUrl, env));
 }
 
 export default {

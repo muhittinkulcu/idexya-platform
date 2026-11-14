@@ -3,9 +3,9 @@
 // HTMLRewriter Node'da yok: HTML çıktısı tools/test-temel-yol-sunucu.mjs ile yerel `wrangler dev` üzerinde denetlenir.
 import { readFileSync } from 'fs';
 import { generateKeyPair, exportJWK, SignJWT, createLocalJWKSet } from 'jose';
-import { onekGecerli, yolEkle, yolCikar, srcsetEkle, cssEkle, konumEkle, onekli } from '../src/data/temel-yol.js';
-import { temelAyar, osAlaniMi, istekAyir, cerezOnekle, yanitOnekle } from '../worker/temel-yol.js';
-import { audListesi, jetonDogrula, kaynakIzinli, izinliKokenler } from '../worker/erisim.js';
+import { onekGecerli, yolEkle, yolCikar, srcsetEkle, cssEkle, konumEkle, onekli, siteAdresi } from '../src/data/temel-yol.js';
+import { temelAyar, osAlaniMi, istekAyir, cerezOnekle, yanitOnekle, osYoluIzinli, kapiDenetle, sabitSureliEsit, siteKoku } from '../worker/temel-yol.js';
+import { audListesi, jetonDogrula, kaynakIzinli, yerelGiris } from '../worker/erisim.js';
 
 let kalan = 0, gecen = 0;
 const kontrol = (ad, kosul) => { console.log((kosul ? 'GEÇTİ ' : 'KALDI ') + ad); if (kosul) gecen++; else kalan++; };
@@ -39,16 +39,47 @@ kontrol('Location başka köken aynen', konumEkle('https://idexya.com/tr/', 'htt
 kontrol('ayar boşken kapalı', temelAyar({}) === null && temelAyar({ PANEL_TEMEL_YOL: '/website' }) === null && temelAyar({ PANEL_OS_ALAN: 'os.idexya.com' }) === null);
 kontrol('geçersiz önekle kapalı', temelAyar({ PANEL_TEMEL_YOL: 'website', PANEL_OS_ALAN: 'os.idexya.com' }) === null);
 const A = temelAyar({ PANEL_TEMEL_YOL: ' /website ', PANEL_OS_ALAN: 'OS.idexya.com' });
-kontrol('ayar açık', A && A.temel === '/website' && A.alan === 'os.idexya.com');
+kontrol('ayar açık', A && A.temel === '/website' && JSON.stringify(A.alanlar) === '["os.idexya.com"]');
+const A2 = temelAyar({ PANEL_TEMEL_YOL: '/website', PANEL_OS_ALAN: 'os.idexya.com, os-onizleme.idexya.com' });
+kontrol('PANEL_OS_ALAN virgüllü liste', A2 && osAlaniMi(new URL('https://os-onizleme.idexya.com/website/'), A2) && osAlaniMi(new URL('https://os.idexya.com/website/'), A2) && !osAlaniMi(new URL('https://idexya.com/'), A2));
+kontrol('listede geçersiz alan → kapalı', temelAyar({ PANEL_TEMEL_YOL: '/website', PANEL_OS_ALAN: 'os.idexya.com, *.idexya.com' }) === null && temelAyar({ PANEL_TEMEL_YOL: '/website', PANEL_OS_ALAN: ' , ' }) === null);
 kontrol('os alanı yalnız tam ad', osAlaniMi(new URL('https://os.idexya.com/website/x'), A) && !osAlaniMi(new URL('https://panel.idexya.com/website/x'), A) && !osAlaniMi(new URL('https://os.idexya.com.evil.com/'), A));
 kontrol('ayar kapalıyken os alanı yok', !osAlaniMi(new URL('https://os.idexya.com/website/x'), null));
 const ic = istekAyir(new Request('https://os.idexya.com/website/api/yonetim/musteriler?arsiv=1', { method: 'POST', headers: { origin: 'https://os.idexya.com', 'cf-access-jwt-assertion': 'j', 'content-type': 'application/json' }, body: '{"a":1}' }), A);
 kontrol('önek ayrılır, sorgu kalır', ic && ic.url === 'https://os.idexya.com/api/yonetim/musteriler?arsiv=1');
+kontrol('kapı anahtarı başlığı içeri geçmez', !istekAyir(new Request('https://os.idexya.com/website/dashboard', { headers: { 'x-idexya-kapi': 'gizli' } }), A).headers.has('x-idexya-kapi'));
 kontrol('yöntem ve başlıklar korunur', ic && ic.method === 'POST' && ic.headers.get('origin') === 'https://os.idexya.com' && ic.headers.get('cf-access-jwt-assertion') === 'j');
 kontrol('gövde korunur', ic && (await ic.text()) === '{"a":1}');
 kontrol('/website → /', istekAyir(new Request('https://os.idexya.com/website'), A).url === 'https://os.idexya.com/');
 for (const y of ['/', '/dashboard', '/api/yonetim/ozet', '/_astro/x.js', '/websitex', '/tr/'])
   kontrol(`önek dışı ${y} → yok (404)`, istekAyir(new Request('https://os.idexya.com' + y), A) === null);
+
+// os alanında yalnız panel yolları (önek ayrılmış hali)
+for (const y of ['/', '/dashboard', '/leads', '/leads/', '/customer', '/api/yonetim/ozet', '/api/yonetim/musteriler/toplu', '/yonetim', '/yonetim/talepler/', '/yonetim/veri/sablon/ortak/logo.png',
+  '/api/medya/abc', '/api/instagram/123/gorsel', '/api/instagram/akis/123/gorsel', '/_astro/x.js', '/fonts/inter.woff2', '/kapak/cizim/arama.webp', '/favicon-panel.svg', '/favicon-panel-32.png', '/panel-ikon-192.png', '/panel.webmanifest', '/panel-gorunum.js'])
+  kontrol(`os izinli: ${y}`, osYoluIzinli(y, ''));
+for (const [y, a] of [['/', '?tema=onizleme'], ['/tr/', ''], ['/tr/iletisim', ''], ['/en/', ''], ['/icerik/x', ''], ['/api/talep', ''], ['/api/uye/giris', ''], ['/uye/', ''], ['/uye/hesap', ''],
+  ['/api/icerik', ''], ['/api/tema', ''], ['/api/bannerlar', ''], ['/api/olcum', ''], ['/api/asistan/mesaj', ''], ['/api/bulten', ''], ['/api/instagram', ''], ['/arama.json', ''], ['/referans', ''], ['/sitemap.xml', ''], ['/robots.txt', ''], ['/tr/bulten/x/', ''], ['/kabuk/icerik/', ''], ['/maskot/idos-kedi.webp', ''], ['/favicon.svg', ''], ['/panel-sw.js', ''], ['/bilinmeyen', '']])
+  kontrol(`os 404: ${y}${a}`, !osYoluIzinli(y, a));
+
+// Yönlendirici kapısı (X-Idexya-Kapi)
+const kapi = (anahtar, baslik) => kapiDenetle(new Request('https://os.idexya.com/website/', { headers: baslik === undefined ? {} : { 'x-idexya-kapi': baslik } }), { KAPI_ANAHTARI_WEBSITE: anahtar });
+kontrol('kapı: anahtar tanımsız → 503', (await kapi('', 'x')) === 503 && (await kapiDenetle(new Request('https://os.idexya.com/'), {})) === 503);
+kontrol('kapı: başlık yok → 404', (await kapi('gizli-anahtar')) === 404);
+kontrol('kapı: yanlış anahtar → 404', (await kapi('gizli-anahtar', 'gizli-anahtaR')) === 404 && (await kapi('gizli-anahtar', 'gizli')) === 404 && (await kapi('gizli-anahtar', '')) === 404);
+kontrol('kapı: doğru anahtar → geçer', (await kapi('gizli-anahtar', 'gizli-anahtar')) === 0);
+kontrol('sabit süreli karşılaştırma', (await sabitSureliEsit('a', 'a')) && !(await sabitSureliEsit('a', 'b')) && !(await sabitSureliEsit('a', 'aa')));
+const kapiKod = readFileSync(new URL('../worker/temel-yol.js', import.meta.url), 'utf8');
+kontrol('kapı karşılaştırması erken çıkışsız (=== ile metin karşılaştırması yok)', !/gelen\s*[!=]==/.test(kapiKod) && /fark \|= x\[i\] \^ y\[i\]/.test(kapiKod));
+
+// Site bağlantıları os alanında panel.idexya.com'da
+kontrol('site yolu panel köküne', siteAdresi('/tr/bulten/x/?onizleme=1', T, 'https://panel.idexya.com') === 'https://panel.idexya.com/tr/bulten/x/?onizleme=1' && siteAdresi('/icerik/y', T, 'https://panel.idexya.com') === 'https://panel.idexya.com/icerik/y');
+kontrol('panel yolu site köküne gitmez', siteAdresi('/leads', T, 'https://panel.idexya.com') === null && siteAdresi('/trx', T, 'https://panel.idexya.com') === null && siteAdresi('/tr/x', '', 'https://panel.idexya.com') === null);
+kontrol('site kökü: canlıda panel.idexya.com, yerelde panel.localhost', siteKoku(new URL('https://os.idexya.com/x'), { YEREL_GIRIS: 'evet' }) === 'https://panel.idexya.com' && siteKoku(new URL('http://os.localhost:8791/x'), { YEREL_GIRIS: 'evet' }) === 'http://panel.localhost:8791');
+
+// YEREL_GIRIS yalnız yerel adlarda
+kontrol('YEREL_GIRIS os.idexya.com\'da etkin değil', !yerelGiris(new URL('https://os.idexya.com/website/'), { YEREL_GIRIS: 'evet' }) && !yerelGiris(new URL('https://os-onizleme.idexya.com/'), { YEREL_GIRIS: 'evet' }) && !yerelGiris(new URL('https://panel.idexya.com/'), { YEREL_GIRIS: 'evet' }));
+kontrol('YEREL_GIRIS yerel adlarda etkin, kapalıyken değil', yerelGiris(new URL('http://os.localhost:8791/'), { YEREL_GIRIS: 'evet' }) && yerelGiris(new URL('http://panel.localhost/'), { YEREL_GIRIS: 'evet' }) && !yerelGiris(new URL('http://os.localhost/'), {}) && !yerelGiris(new URL('http://kotu.localhost/'), { YEREL_GIRIS: 'evet' }));
 
 // 3. Yanıt: yönlendirme, çerez, CSS, uygulama bildirimi
 const y302 = await yanitOnekle(Response.redirect('https://os.idexya.com/dashboard', 302), 'https://os.idexya.com/', T);
@@ -88,30 +119,36 @@ kontrol('süresi dolmuş → ret', (await jetonDogrula(await jeton({}, 'AUD_YENI
 kontrol('yönetici listesi boş → ret', (await jetonDogrula(await jeton(), { ...env, YONETICILER: '' }, anahtarlar)) === null);
 kontrol('listede olmayan e-posta → ret', (await jetonDogrula(await jeton({ email: 'baska@idexya.com' }), env, anahtarlar)) === null);
 kontrol('e-postasız jeton → ret', (await jetonDogrula(await jeton({ email: '' }), env, anahtarlar)) === null);
+const ham = (talep, alg = 'RS256', anahtar = privateKey) => { let j = new SignJWT({ email: 'muhittin@idexya.com', ...talep }).setProtectedHeader({ alg, kid: 'k1' }).setIssuer(TD).setAudience('AUD_YENI'); return j; };
+kontrol('exp olmayan jeton → ret', (await jetonDogrula(await ham().setIssuedAt().sign(privateKey), env, anahtarlar)) === null);
+kontrol('iat olmayan jeton → ret', (await jetonDogrula(await ham().setExpirationTime('5m').sign(privateKey), env, anahtarlar)) === null);
+const { privateKey: psAnahtar } = await generateKeyPair('PS256');
+kontrol('RS256 dışı algoritma (PS256) → ret', (await jetonDogrula(await ham({}, 'PS256').setIssuedAt().setExpirationTime('5m').sign(psAnahtar), env, anahtarlar)) === null);
+const imzasiz = Buffer.from(JSON.stringify({ alg: 'none', typ: 'JWT' })).toString('base64url') + '.' + Buffer.from(JSON.stringify({ email: 'muhittin@idexya.com', iss: TD, aud: 'AUD_YENI', iat: Math.floor(Date.now() / 1000), exp: Math.floor(Date.now() / 1000) + 300 })).toString('base64url') + '.';
+kontrol('alg none → ret', (await jetonDogrula(imzasiz, env, anahtarlar)) === null);
 const { privateKey: yabanci } = await generateKeyPair('RS256');
 const sahte = await new SignJWT({ email: 'muhittin@idexya.com' }).setProtectedHeader({ alg: 'RS256', kid: 'k1' }).setIssuer(TD).setAudience('AUD_YENI').setIssuedAt().setExpirationTime('5m').sign(yabanci);
 kontrol('başka anahtarla imzalı → ret', (await jetonDogrula(sahte, env, anahtarlar)) === null);
 kontrol('bozuk jeton → ret', (await jetonDogrula('a.b.c', env, anahtarlar)) === null && (await jetonDogrula('', env, anahtarlar)) === null);
 
-// 5. Yazma kaynağı (CSRF): IZINLI_KOKENLER yalnız os isteğinde ve yalnız tam köken
+// 5. Yazma kaynağı (CSRF): aynı köken; os isteğinde yalnız https://<os alanı>
 const istek = (url, origin) => new Request(url, { method: 'POST', headers: origin === undefined ? {} : { origin } });
 kontrol('aynı köken → kabul', kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'https://panel.idexya.com')));
 kontrol('Origin yok → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x')));
 kontrol('Origin "null" → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'null')));
 kontrol('bozuk Origin → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'bozuk')));
 kontrol('başka köken, liste boş → ret (bugünkü davranış)', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'https://os.idexya.com')));
-const IZ = izinliKokenler({ IZINLI_KOKENLER: 'https://os.idexya.com, *, null, http://os.idexya.com, https://os.idexya.com/website, HTTPS://OS.IDEXYA.COM, https://u:p@x.com, http://os.localhost:8787, bozuk' });
-kontrol('izinli liste yalnız tam https köken (+ yerel http *.localhost)', JSON.stringify(IZ) === '["https://os.idexya.com","http://os.localhost:8787"]');
-kontrol('izinli köken (os isteği) → kabul', kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'https://os.idexya.com'), IZ));
-kontrol('izinli köken ama http → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'http://os.idexya.com'), IZ));
-kontrol('izinli köken benzeri alan → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'https://os.idexya.com.evil.com'), IZ));
-kontrol('izinli köken farklı bağlantı noktası → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'https://os.idexya.com:8443'), IZ));
-kontrol('listede olmayan köken → ret', !kaynakIzinli(istek('https://panel.idexya.com/api/yonetim/x', 'https://marketing.idexya.com'), IZ));
-kontrol('izinli liste boşsa → yalnız aynı köken', izinliKokenler({}).length === 0 && izinliKokenler({ IZINLI_KOKENLER: ' , ' }).length === 0);
+kontrol('os isteği: https://<os alanı> kabul', kaynakIzinli(istek('https://os.idexya.com/api/yonetim/x', 'https://os.idexya.com'), ['https://os.idexya.com']));
+kontrol('os isteği: http os kökeni → ret', !kaynakIzinli(istek('https://os.idexya.com/api/yonetim/x', 'http://os.idexya.com'), ['https://os.idexya.com']));
+kontrol('os isteği: benzer alan → ret', !kaynakIzinli(istek('https://os.idexya.com/api/yonetim/x', 'https://os.idexya.com.evil.com'), ['https://os.idexya.com']));
+kontrol('os isteği: başka Idexya alanı → ret', !kaynakIzinli(istek('https://os.idexya.com/api/yonetim/x', 'https://marketing.idexya.com'), ['https://os.idexya.com']));
 
 // 6. Worker: os isteği yalnız os alanında izinli listeyi alır (kod yapısı)
 const kod = readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
-kontrol('yonetimApi izinli listeyi yalnız os isteğinde alır', /kim, os \? os\.izinli : \[\]\)/.test(kod) && /izinli: izinliKokenler\(env\)/.test(kod) && (kod.match(/izinliKokenler\(env\)/g) || []).length === 1);
+kontrol('yonetimApi izinli listeyi yalnız os isteğinde alır', /kim, os \? os\.izinli : \[\]\)/.test(kod) && /izinli: \[`https:\/\/\$\{icUrl\.hostname\}`\]/.test(kod) && !/IZINLI_KOKENLER/.test(kod));
+kontrol('os isteğinde sıra: kapı → önek → izin listesi', /kapiDenetle\(istek, env\)[\s\S]*istekAyir\(istek, ayar\)[\s\S]*osYoluIzinli\(/.test(kod));
+kontrol('panel CSP: script-src \'self\' (unsafe-inline yok)', /script-src 'self'; connect-src/.test(kod) && !/script-src 'self' 'unsafe-inline'/.test(kod));
+kontrol('yonetici yerel girişi yerelGiris ile', /if \(yerelGiris\(url, env\)\) return/.test(kod));
 kontrol('yazma isteği kaynak denetimi kaynakIzinli ile', /yontem !== 'GET' && !kaynakIzinli\(istek, izinli\)/.test(kod));
 kontrol('ayar kapalıyken isle(…, null)', /return await isle\(istek, env, ctx, null\)/.test(kod));
 const wr = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');

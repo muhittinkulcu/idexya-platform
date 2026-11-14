@@ -57,14 +57,27 @@ export function konumEkle(konum, istekAdresi, temel) {
   return hedef.origin + yol + hedef.search + hedef.hash;
 }
 
-// Tarayıcıda sayfanın öneki: Worker os alanında her HTML'e <meta name="idexya-temel-yol" content="/website"> koyar
-// (veri; betik değil). Meta yoksa (idexya.com, panel.idexya.com) boş döner ve adresler aynen kalır.
-export function sayfaOneki() {
+// Site sayfası yolları (/tr/…, /en/…, /icerik/…): os alanında sunulmaz. Paneldeki bu bağlantılar (bülten önizlemesi,
+// yazı sayfası) os alanında panel.idexya.com kökünde açılır (Access orada da var; site orada da sunuluyor).
+export const SITE_YOLU = /^\/(tr|en|icerik)(\/|$|\?|#)/;
+export function siteAdresi(u, temel, siteKoku) {
+  if (!onekGecerli(temel) || typeof u !== 'string' || !siteKoku || !SITE_YOLU.test(u)) return null;
+  return siteKoku + u;
+}
+
+// Tarayıcıda meta değeri: Worker os alanında her panel sayfasına <meta name="idexya-temel-yol" content="/website"> ve
+// <meta name="idexya-site-koku" content="https://panel.idexya.com"> koyar (veri; betik değil). Meta yoksa boş döner.
+export function metaOku(ad) {
   try {
-    const m = document.querySelector('meta[name="idexya-temel-yol"]');
-    const v = m ? String(m.getAttribute('content') || '').trim() : '';
-    return onekGecerli(v) ? v : '';
+    const m = document.querySelector(`meta[name="${ad}"]`);
+    return m ? String(m.getAttribute('content') || '').trim() : '';
   } catch (e) { return ''; }
 }
-// Site ve panel betiklerindeki kök göreli istek adresi: sayfaYolu('/api/tema') → os'ta '/website/api/tema', sitede aynen.
-export const sayfaYolu = (u) => yolEkle(u, sayfaOneki());
+export function sayfaOneki() {
+  const v = metaOku('idexya-temel-yol');
+  return onekGecerli(v) ? v : '';
+}
+export function sayfaSiteKoku() {
+  const v = metaOku('idexya-site-koku');
+  return /^https?:\/\/[a-z0-9.-]+(:\d+)?$/.test(v) ? v : '';
+}

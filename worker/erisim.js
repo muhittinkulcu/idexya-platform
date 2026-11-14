@@ -13,7 +13,8 @@ export async function jetonDogrula(jeton, env, anahtarlar) {
   const aud = audListesi(env);
   if (!env || !env.TEAM_DOMAIN || !aud.length || !jeton || !anahtarlar) return null;
   try {
-    const { payload } = await jwtVerify(jeton, anahtarlar, { issuer: env.TEAM_DOMAIN, audience: aud });
+    // Yalnız RS256 (Access imzası); süresi (exp) ve veriliş zamanı (iat) olmayan jeton kabul edilmez.
+    const { payload } = await jwtVerify(jeton, anahtarlar, { issuer: env.TEAM_DOMAIN, audience: aud, algorithms: ['RS256'], requiredClaims: ['exp', 'iat'] });
     const izinli = liste(env.YONETICILER).map((x) => x.toLowerCase());
     const e = String(payload.email || '').toLowerCase();
     // İzinli yönetici listesi boşsa panel kapalıdır (Access politikası geniş olsa bile).
@@ -24,29 +25,18 @@ export async function jetonDogrula(jeton, env, anahtarlar) {
   }
 }
 
-// IZINLI_KOKENLER: yalnız os alanından gelen panel isteğinde, isteğin kendi kökenine ek olarak kabul edilen tam kökenler
-// ("https://os.idexya.com"). Yalnız https (yerel geliştirmede http://*.localhost) ve yolsuz köken; joker, "null" yok.
-export function izinliKokenler(env) {
-  const sonuc = [];
-  for (const x of liste(env && env.IZINLI_KOKENLER)) {
-    let u;
-    try { u = new URL(x); } catch (e) { continue; }
-    const yerel = u.protocol === 'http:' && /(^|\.)localhost$/.test(u.hostname);
-    if (u.protocol !== 'https:' && !yerel) continue;
-    if (u.username || u.password || (u.pathname !== '/' && u.pathname !== '') || u.search || u.hash) continue;
-    if (x.replace(/\/$/, '') !== u.origin) continue; // yazım tam köken olmalı (büyük harf, yol, boşluk yok)
-    sonuc.push(u.origin);
-  }
-  return sonuc;
-}
+// Yerel geliştirme girişi (YEREL_GIRIS=evet): yalnız yerel makine adları. os.idexya.com, panel.idexya.com ya da başka
+// gerçek alan adında ayar açık kalsa bile etkin olmaz.
+const YEREL_ADLAR = ['localhost', '127.0.0.1', 'panel.localhost', 'os.localhost'];
+export const yerelGiris = (url, env) => !!env && env.YEREL_GIRIS === 'evet' && YEREL_ADLAR.includes(url.hostname);
 
-// Yazma isteğinin Origin başlığı isteğin kendi kökeniyle aynı olmalı; os isteğinde ayrıca izinli listeden biri olabilir.
+// Yazma isteğinin Origin başlığı isteğin kendi kökeniyle aynı olmalı; os isteğinde ayrıca yalnız https://<os alanı>.
 // Origin yoksa, bozuksa ya da "null" ise reddedilir.
 export function kaynakIzinli(istek, izinli = []) {
   const k = istek.headers.get('origin');
   if (!k || k === 'null') return false;
   let ko, iu;
   try { ko = new URL(k); iu = new URL(istek.url); } catch (e) { return false; }
-  if (ko.host === iu.host) return true;
+  if (ko.origin === iu.origin && k.replace(/\/$/, '') === ko.origin) return true; // şema da aynı olmalı (http → https ret)
   return Array.isArray(izinli) && izinli.length > 0 && ko.origin === k.replace(/\/$/, '') && izinli.includes(ko.origin);
 }

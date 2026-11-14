@@ -2,14 +2,13 @@
 // konum bu tarayıcıda hatırlanır. Pencere düğmenin bulunduğu kenara ve yüksekliğe göre açılır. Metinler güvenli biçimde (textContent) yazılır; yalnız site içi ve https bağlantıları tıklanır olur.
 import { reklamBilgisi } from './reklam-iz.js';
 import { robotBagla } from './form.js';
-import { sayfaYolu } from '../data/temel-yol.js';
 const ANAHTAR = 'idx-asistan';
 const oku = () => { try { return JSON.parse(sessionStorage.getItem(ANAHTAR) || 'null'); } catch (e) { return null; } };
 const yaz = (v) => { try { sessionStorage.setItem(ANAHTAR, JSON.stringify(v)); } catch (e) {} };
 const el = (t, o = {}, ...c) => { const e = document.createElement(t); for (const [k, v] of Object.entries(o)) { if (v == null || v === false) continue; if (k === 'class') e.className = v; else if (k.startsWith('on')) e.addEventListener(k.slice(2), v); else e.setAttribute(k, v === true ? '' : v); } c.flat().forEach((x) => x != null && x !== false && e.append(x)); return e; };
 const KONUM = 'idx-asistan-konum';
 let BASLIKLAR = {};
-fetch(sayfaYolu('/arama.json')).then((r) => r.json()).then((d) => { BASLIKLAR = Object.fromEntries(d.map((x) => [x.u, x.t])); }).catch(() => {});
+fetch('/arama.json').then((r) => r.json()).then((d) => { BASLIKLAR = Object.fromEntries(d.map((x) => [x.u, x.t])); }).catch(() => {});
 const ONERILER = ['Hangi paket bana uygun?', 'Google Ads yönetimi nasıl çalışıyor?', 'E-ticaret sitem için ne yapabilirsiniz?', 'Ücretsiz analiz istiyorum'];
 
 function satirIci(metin) {
@@ -43,7 +42,7 @@ export function asistan() {
   let durum = oku() || { sohbet: null, mesajlar: [], acik: false };
   let yapayZeka = null, bekliyor = false;
   const dugme = el('button', { type: 'button', class: 'as-dugme', 'aria-label': 'IDOS’a sor: asistanı aç (sürükleyerek yerini değiştirebilirsiniz)', 'aria-expanded': 'false', 'aria-controls': 'asistan' });
-  dugme.innerHTML = '<img class="as-maskot" src="' + sayfaYolu('/maskot/idos-kedi.webp') + '" alt="" width="50" height="50" draggable="false"><span class="as-ipucu">IDOS’a sor</span>';
+  dugme.innerHTML = '<img class="as-maskot" src="/maskot/idos-kedi.webp" alt="" width="50" height="50" draggable="false"><span class="as-ipucu">IDOS’a sor</span>';
   const liste = el('div', { class: 'as-liste', role: 'log', 'aria-live': 'polite' });
   const girdi = el('textarea', { rows: '1', placeholder: 'Sorunuzu yazın…', 'aria-label': 'Mesajınız', maxlength: '1500' });
   const gonder = el('button', { type: 'submit', class: 'as-gonder', 'aria-label': 'Gönder' });
@@ -52,7 +51,7 @@ export function asistan() {
   const durumYazi = el('span', { class: 'as-durum' }, 'Genelde birkaç saniyede yanıt verir');
   const panel = el('section', { id: 'asistan', class: 'as-panel', role: 'dialog', 'aria-label': 'IDOS asistan', hidden: true },
     el('header', { class: 'as-bas' },
-      el('img', { class: 'as-avatar', src: sayfaYolu('/maskot/idos-kedi.webp'), alt: '', width: '38', height: '38' }),
+      el('img', { class: 'as-avatar', src: '/maskot/idos-kedi.webp', alt: '', width: '38', height: '38' }),
       el('span', { class: 'as-baslik' }, el('strong', {}, 'IDOS asistan'), durumYazi),
       el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Seçenekler', 'aria-haspopup': 'menu', 'aria-expanded': 'false', onclick: (o) => menuAc(o.currentTarget) }, '⋯'),
       el('button', { type: 'button', class: 'as-kucult', 'aria-label': 'Pencereyi kapat', onclick: () => ac(false) }, '×')),
@@ -93,7 +92,7 @@ export function asistan() {
       if (sorun) return yazDurum(sorun);
       const b = k.querySelector('.as-kart-gonder'); b.disabled = true; b.textContent = 'Gönderiliyor…';
       try {
-        const r = await fetch(sayfaYolu('/api/talep'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, ...(reklamBilgisi() ? { reklam: reklamBilgisi(), pazarlama_izni: true } : {}), kvkk: true, kaynak: 'asistan', sayfa: location.pathname, sohbet: durum.sohbet || '', turnstile: robot.jeton() }) });
+        const r = await fetch('/api/talep', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...f, ...(reklamBilgisi() ? { reklam: reklamBilgisi(), pazarlama_izni: true } : {}), kvkk: true, kaynak: 'asistan', sayfa: location.pathname, sohbet: durum.sohbet || '', turnstile: robot.jeton() }) });
         const s = await r.json().catch(() => ({}));
         if (!r.ok || !s.ok) throw new Error(s.hata || 'Gönderilemedi');
         k.replaceWith(balon('asistan', 'Teşekkürler, talebiniz ekibimize ulaştı. En geç bir iş günü içinde size dönüyoruz.'));
@@ -123,7 +122,7 @@ export function asistan() {
       if (robot.gerekli && !robot.jeton()) return yazD('Robot doğrulamasını bekleyin.');
       const b = k.querySelector('.as-kart-gonder'); b.disabled = true;
       try {
-        const r = await fetch(sayfaYolu('/api/asistan/dokum'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, eposta: k.eposta.value, turnstile: robot.jeton() }) });
+        const r = await fetch('/api/asistan/dokum', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, eposta: k.eposta.value, turnstile: robot.jeton() }) });
         const s = await r.json().catch(() => ({}));
         if (!r.ok || !s.ok) throw new Error(s.hata || 'Gönderilemedi.');
         k.replaceWith(balon('asistan', 'Yazışmanın bir kopyasını ' + k.eposta.value + ' adresine gönderdim.')); kaydir();
@@ -138,7 +137,7 @@ export function asistan() {
     const bas = el('button', { type: 'button', class: 'as-kart-gonder', disabled: true, onclick: () => { durum.onay = new Date().toISOString(); yaz(durum); form.hidden = false; ciz(); setTimeout(() => girdi.focus(), 50); } }, 'Sohbete başla');
     kutu.addEventListener('change', () => { bas.disabled = !kutu.checked; });
     liste.replaceChildren(el('div', { class: 'as-kart as-onay-ekran' },
-      el('img', { class: 'as-onay-maskot', src: sayfaYolu('/maskot/idos-kedi.webp'), alt: 'IDOS, Idexya’nın asistanı', width: '72', height: '72' }),
+      el('img', { class: 'as-onay-maskot', src: '/maskot/idos-kedi.webp', alt: 'IDOS, Idexya’nın asistanı', width: '72', height: '72' }),
       el('strong', {}, 'Sohbete başlamadan önce'),
       el('p', {}, 'IDOS, Idexya’nın yapay zekâ asistanıdır. Yanıtlar otomatik üretilir ve hata içerebilir. Yazışmanız hizmet kalitesi için kaydedilir ve 1 yıl saklanır. Şifre, kart bilgisi gibi gizli bilgileri paylaşmayın.'),
       el('label', { class: 'as-onay', for: 'as-kvkk' }, kutu, el('span', {}, el('a', { href: '/tr/sayfa/kvkk-aydinlatma-metni', target: '_blank', rel: 'noopener' }, 'KVKK aydınlatma metnini'), ' okudum; yazışmamın bu amaçla kaydedilmesini kabul ediyorum.')),
@@ -171,7 +170,7 @@ export function asistan() {
     liste.append(yaziyor); kaydir();
     bekliyor = true; gonder.disabled = true;
     try {
-      const r = await fetch(sayfaYolu('/api/asistan/mesaj'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, sayfa: location.pathname, mesajlar: durum.mesajlar, kvkk: !!durum.onay }) });
+      const r = await fetch('/api/asistan/mesaj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sohbet: durum.sohbet, sayfa: location.pathname, mesajlar: durum.mesajlar, kvkk: !!durum.onay }) });
       const s = await r.json().catch(() => ({}));
       yaziyor.remove();
       if (!r.ok || !s.ok) throw new Error(s.hata || 'Yanıt alınamadı.');
@@ -193,7 +192,7 @@ export function asistan() {
     document.body.classList.toggle('as-gorunur', acik);
     if (acik) {
       ciz(); if (durum.onay) setTimeout(() => girdi.focus(), 60);
-      if (yapayZeka === null) fetch(sayfaYolu('/api/asistan/durum')).then((r) => r.json()).then((s) => { yapayZeka = !!s.yapayZeka; if (!yapayZeka) durumYazi.textContent = 'Şu an ekibimize yönlendiriyor'; }).catch(() => {});
+      if (yapayZeka === null) fetch('/api/asistan/durum').then((r) => r.json()).then((s) => { yapayZeka = !!s.yapayZeka; if (!yapayZeka) durumYazi.textContent = 'Şu an ekibimize yönlendiriyor'; }).catch(() => {});
     } else dugme.focus();
   }
   // Sürükle-bırak: 6 pikselden fazla hareket sürükleme sayılır (tıklama açmaz). Bırakınca en yakın sol/sağ kenara yapışır.

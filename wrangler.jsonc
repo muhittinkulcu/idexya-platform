@@ -31,8 +31,9 @@
   // TEAM_DOMAIN, POLICY_AUD ve YONETICILER tanımlanmadan panel AÇILMAZ (varsayılan kapalı).
   // Panelden girilen değişkenler her yayında korunur (yoksa Git yayını onları siler).
   // Panelden eklenen değişkenler (ör. IDOS_BQ_GORUNUM) dağıtımda silinmesin diye; gizli değerler zaten etkilenmez.
-  // Tek adres geçişi (isteğe bağlı, boşken kapalı): PANEL_TEMEL_YOL ("/website"), PANEL_OS_ALAN ("os.idexya.com"),
-  // IZINLI_KOKENLER (virgüllü tam kökenler). POLICY_AUD geçişte virgülle iki değer alabilir (eski panel + os uygulaması).
+  // Tek adres geçişi (isteğe bağlı, boşken kapalı): PANEL_TEMEL_YOL ("/website"), PANEL_OS_ALAN (virgüllü: "os.idexya.com,
+  // os-onizleme.idexya.com"), gizli KAPI_ANAHTARI_WEBSITE (yönlendiricinin X-Idexya-Kapi anahtarı; boşsa os alanı 503).
+  // POLICY_AUD geçişte virgülle iki değer alabilir (eski panel + os uygulaması).
   "keep_vars": true,
   "observability": { "enabled": true },
   // Her saat başı (UTC): müşteri ana kaydı önbelleği eşitlenir (worker/ana-kayit.js; IDOS_ORTAK_* yoksa atlanır).
