@@ -58,9 +58,11 @@ export function guvenliUrl(u, kokenler = []) {
 const koken = (u) => (guvenliUrl(u, true) ? new URL(u.trim(), TABAN + '/').origin : null);
 
 // Tek adres (tek-adres-plani.md): kabuk os.idexya.com'da açılınca açılmış modüllerin eski kökeni yol önekine çevrilir
-// (https://panel.idexya.com/x → /website/x). Yalnız yönlendiricide AÇIK modül yazılır; Creative açılınca eklenir.
+// (https://panel.idexya.com/x → /website/x). Yalnız yönlendiricide AÇIK modül yazılır.
 export const OS_ALANLARI = ['os.idexya.com'];
-export const OS_ONEKLERI = { 'https://marketing.idexya.com': '/marketing', 'https://panel.idexya.com': '/website' };
+export const OS_ONEKLERI = {
+  'https://marketing.idexya.com': '/marketing', 'https://panel.idexya.com': '/website', 'https://creative.idexya.com': '/creative'
+};
 const BU_ALAN = typeof location !== 'undefined' ? location.host : '';
 export function osAdresi(u, alan = BU_ALAN) {
   if (typeof u !== 'string' || !OS_ALANLARI.includes(alan)) return u;
