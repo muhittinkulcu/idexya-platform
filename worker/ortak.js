@@ -41,13 +41,6 @@ export async function islemYaz(db, kim, islem, hedef, detay) {
 }
 
 
-// Ziyaretçinin gönderdiği sayfa yolu (talep, asistan, bülten, ölçüm) kayda girmeden önce: gizli referans sayfasının kodu
-// (/r/<kod>, worker/referans.js) hiçbir kayda, bildirime ya da panele yazılmaz; yol "/r/…" olarak saklanır.
-export function sayfaMaskele(yol) {
-  if (typeof yol !== 'string') return yol;
-  return /^\/r(\/|$)/.test(yol.trim()) ? '/r/…' : yol;
-}
-
 export const EPOSTA_DESEN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // Aynı kaynaktan gelmeyen yazma isteklerini reddeder (CSRF'e karşı; çerezler ayrıca SameSite=Lax).

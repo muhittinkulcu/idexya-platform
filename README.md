@@ -82,15 +82,14 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
   sonra boş veritabanıyla `node tools/test-yonetim.mjs http://127.0.0.1:8787 <ekran-klasörü>` (uçtan uca: form → talep → CRM → kart).
 
-## Gizli referans sayfası (`/r/<kod>`)
+## Referans sayfası (`/referans`)
 
-- Menüde, site haritasında ve site içi aramada yer almayan, yalnız bağlantıyla açılan kategorili referans listesi (`worker/referans.js`,
-  kabuk `src/pages/kabuk/referanslar.astro`, veri `src/data/referanslar.json`, panelde Site içeriği › Referanslar).
-- Kod D1 `ayarlar` tablosunda (`referans_kodu`); panelde "Kod üret / Yeni kod üret" ile değişir, eski bağlantılar o an geçersiz olur.
-  Kod yoksa ya da yanlışsa sitenin sıradan 404 sayfası döner. Yanıt başlıkları: `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`.
-- Teklif çıktısında QR kod (sunucuda SVG, `qrcode-generator` MIT, hata düzeltme M, 4 modül sessiz alan): `/r/<kod>?t=<teklif anahtarı>`.
-  Anahtar `teklifler.referans_anahtari` (teklif ilk okunduğunda üretilir). Geçerli `t` ile açılışta müşteri kartına günde en çok bir
-  "Müşteri referansları açtı" kaydı düşer (`referans_acilis`: yalnız teklif, gün, zaman). Bağlantı önizleyicileri sayılmaz.
-- Kod hiçbir kayda yazılmaz: talep, asistan, bülten ve ziyaret sayacına gelen `/r/<kod>` yolu `worker/ortak.js` `sayfaMaskele` ile `/r/…` olur.
-  `referans_acilis` satırları 12 ay sonra silinir (`worker/saklama.js`).
-- Test: `node tools/test-referans.mjs` (sunucu gerekmez).
+- Kategorili referans listesi: https://idexya.com/referans (`worker/referans.js`, kabuk `src/pages/kabuk/referanslar.astro`,
+  veri `src/data/referanslar.json`, panelde Site içeriği › Referanslar; orada sabit bağlantı ve "Bağlantıyı kopyala").
+- Sitede hiçbir bağlantısı yok (menü, alt bilgi, site haritası, site içi arama); `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`.
+  Adresi bilen ya da tahmin eden açabilir (kabul edilmiş durum). Liste boşken 404. `/r/*` ve `/referanslar` sıradan 404, yönlendirme yok.
+- Teklif çıktısında QR kod (sunucuda SVG, `qrcode-generator` MIT, hata düzeltme M, 4 modül sessiz alan): `/referans?t=<teklif anahtarı>`.
+  Anahtar `teklifler.referans_anahtari` (teklif ilk okunduğunda üretilir). Liste boşken QR basılmaz. Geçerli `t` ile açılışta müşteri kartına
+  günde en çok bir "Müşteri referansları açtı" kaydı düşer (`referans_acilis`: yalnız teklif, gün, zaman; 12 ay saklanır). Bağlantı önizleyicileri sayılmaz.
+  `t` sorgu dizgesinde kalır; talep, asistan, bülten ve ölçüm yalnız `location.pathname` kaydeder.
+- Test: `node tools/test-referans.mjs` (sunucu gerekmez; `npm run build` sonrası derlenmiş site haritası ve sayfalar da denetlenir).
