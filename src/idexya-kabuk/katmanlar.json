@@ -1137,7 +1137,13 @@
          "url": "https://creative.idexya.com/analytics/posts"
         }
        ]
-      },
+      }
+     ]
+    },
+    {
+     "baslik": "Markalar",
+     "simge": "kisiler",
+     "moduller": [
       {
        "ad": "Markalar",
        "url": "https://creative.idexya.com/brands",

@@ -1,8 +1,9 @@
-// Kabuğun saf işlevleri (DOM yok). Kaynak idexya-ortak; projede elle düzenlenmez. Ayrıntı: README.md.
+// Kabuğun saf işlevleri (DOM yok). Ayrıntı: README.md.
 
 export const KATMAN_ANAHTARLARI = ['idos', 'marketing', 'website', 'creative'];
 export const SEKME_SINIRI = 8;
 export const ARAMA_SINIRI = 14;
+export const KAYNAK_SINIRI = 8, KAYNAK_GECIKME = 150;
 
 // Grup simgeleri; bilinmeyen ad `izgara` olur.
 export const SIMGE = {
@@ -161,8 +162,22 @@ export function aramaSuz(havuz, sorgu, sikUrller = [], sinir = ARAMA_SINIRI) {
   return bulunan.slice(0, sinir);
 }
 
-// Sekmeler: ilk Genel bakış (kapatılamaz), en çok `sinir`, taşarsa en eski düşer.
-// Saklanan sekme yalnız aynı kökende ve (verilmişse) `izinli` adreslerden biriyse kabul edilir.
+// Arama kaynağı (README): ≥2 karakter, 150 ms sonra; dönen işlev iptal eder.
+export function kaynakAra(kaynaklar, sorgu, kokenler, bitti) {
+  const q = String(sorgu || '').trim(), ac = new AbortController(), s = ac.signal;
+  if (q.length < 2 || !kaynaklar.length) return null;
+  const t = setTimeout(() => kaynaklar.forEach((k) => Promise.resolve().then(() => k.ara(q, s))
+    .then((r) => kaynakSonuc(r, k.ad, kokenler)).catch(() => null).then((r) => s.aborted || bitti(k, r))), KAYNAK_GECIKME);
+  return () => { clearTimeout(t); ac.abort(); };
+}
+export const kaynakSonuc = (l, tur, kokenler) => (Array.isArray(l) ? l : []).map((x) => x && {
+  tur, ad: metin(x.ad), yol: metin(x.yol), url: guvenliUrl(x.url, kokenler), simge: metin(x.simge || x.ad).charAt(0)
+}).filter((x) => x && x.ad && x.url).slice(0, KAYNAK_SINIRI);
+export const aramaBirlestir = (menu, kaynaklar, durum) => menu.concat(...kaynaklar.map((k) => durum.get(k.ad) || []));
+export const kaynakDurumu = (kaynaklar, durum) => kaynaklar.map((k) => (durum.get(k.ad) === 0 ? k.ad + ' aranıyor…'
+  : durum.get(k.ad) === null ? k.ad + ' alınamadı' : '')).filter(Boolean).join('. ');
+
+// Sekmeler: Genel bakış ilk ve kapatılamaz, taşan en eski düşer; saklanan sekme yalnız aynı köken ve `izinli`.
 export function sekmeListesi(liste, genel, izinli) {
   const temiz = [{ ad: genel.ad, url: genel.url }];
   (Array.isArray(liste) ? liste : []).forEach((s) => {
@@ -208,7 +223,7 @@ export function sayiBicim(m, oran) {
 
 export function saatKisa(x) {
   const s = String(x || '').trim();
-  // Saat dilimi taşıyan ISO metni (Z ya da +03:00) yerel saate çevrilir: API'ler UTC yazar ("…T08:05:00Z" Türkiye'de 11.05).
+  // Saat dilimli ISO metni (Z, +03:00) yerel saate çevrilir.
   if (/T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:?\d{2})$/i.test(s)) {
     const t = new Date(s);
     if (!Number.isNaN(t.getTime())) return String(t.getHours()).padStart(2, '0') + '.' + String(t.getMinutes()).padStart(2, '0');

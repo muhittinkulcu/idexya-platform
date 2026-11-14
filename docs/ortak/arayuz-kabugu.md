@@ -75,7 +75,8 @@ performans en önemli hususlar."
    betik ya da görsel yüklenmez: Inter ve görseller her projede kendi sunucusundan gelir. Kullanıcıya görünen her veri
    metin olarak basılır (`innerHTML` yok). Kabuk yetki kararı vermez; menüde ne görüneceğini sunucunun döndürdüğü yetki
    belirler.
-3. **Hız bütçesi.** Kabuğun JS'i sıkıştırılmış hâlde 15 kB'ı, CSS'i 10 kB'ı geçmez. Ana ekran telefonda
+3. **Hız bütçesi.** Kabuğun JS'i küçültülmüş ve sıkıştırılmış (minify + gzip; ürünlerin sunduğu boyut) hâlde 15 kB'ı,
+   CSS'i 10 kB'ı geçmez. Kaynaktaki yorumlar bütçeye sayılmaz (karar 14 Kas 2026). Ana ekran telefonda
    Lighthouse performans puanı en az 90; ilk boyama 1,5 sn altında. Galaksi arka planı sayfa içeriği çizildikten
    sonra, boşta kalan zamanda bir kez çizilir; ekran dışındayken çizim ve animasyon durur.
 4. **Hareket.** Animasyonlar yalnız `transform` ve `opacity` ile yapılır (ekran kartında çalışır, sayfayı yeniden
