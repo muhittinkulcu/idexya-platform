@@ -59,18 +59,17 @@ const olay = (el, ad, detail, iptal) => el.dispatchEvent(new CustomEvent('idexya
 class IdexyaKabuk extends HTMLElement {
   connectedCallback() {
     if (this._kuruldu) return;
-    // Kabuk <head>'de klasik betikle tanımlıysa ayrıştırıcı öğenin içini yazarken buraya gelinir: kurulum kapanış etiketinden
-    // hemen sonra (sonraki kardeş eklenince, ilk boyamadan önce) yapılır; içerik kabuksuz çizilmez.
+    // Ayrıştırılırken: öğe kapanınca, ilk boyamadan önce kurulur (README).
     if (D.readyState === 'loading' && !this.nextSibling) {
-      const g = new MutationObserver(() => { if (this.nextSibling) { g.disconnect(); this.connectedCallback(); } });
+      const g = new MutationObserver(() => this.nextSibling && this.connectedCallback());
       g.observe(this.parentNode, { childList: true });
-      D.addEventListener('DOMContentLoaded', () => { g.disconnect(); this.connectedCallback(); }, { once: true });
-      return;
+      D.addEventListener('DOMContentLoaded', () => this.connectedCallback(), { once: true });
+      return this._g = g;
     }
+    if (this._g) this._g.disconnect();
     this._kuruldu = true;
-    olay(this, 'kur', {}); // ürün ayar bloğunu son kez değiştirebilir (ör. etkin adres)
-    // Oturumdaki ilk açılış değilse giriş hareketleri ve sayaçlar oynamaz; kabuk son hâliyle çizilir.
-    try { this._sakin = sessionStorage.getItem('idx-acildi') === '1'; sessionStorage.setItem('idx-acildi', '1'); } catch (e) { /* gizli kip */ }
+    olay(this, 'kur', {});
+    try { this._sakin = sessionStorage.getItem('idx-acildi'); sessionStorage.setItem('idx-acildi', 1); } catch (e) { /* gizli kip */ }
     let ham = null;
     try { ham = JSON.parse((D.querySelector('script#idexya-kabuk-ayar[type="application/json"]') || {}).textContent || 'null'); } catch (e) { ham = null; }
     const { ayar, hatalar } = ayarDogrula(ham);

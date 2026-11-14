@@ -56,7 +56,8 @@ const SURUYOR = globalThis[Symbol.for('idx-okuma')] || (globalThis[Symbol.for('i
 function oku(adres) {
   let p = SURUYOR.get(adres);
   if (!p) {
-    p = fetch(adres, { credentials: 'same-origin' }).then(async (r) => ({ status: r.status, ok: r.ok, metin: await r.text() }));
+    // 15 sn'de yanıt yoksa hata: sayfa eski değeri kaldırır (taze gibi bırakılmaz).
+    p = fetch(adres, { credentials: 'same-origin', signal: AbortSignal.timeout(15000) }).then(async (r) => ({ status: r.status, ok: r.ok, metin: await r.text() }));
     SURUYOR.set(adres, p);
     const sil = () => { if (SURUYOR.get(adres) === p) SURUYOR.delete(adres); };
     p.then(sil, sil);
@@ -100,7 +101,7 @@ const SAKLA = {
   }),
   grafik: (s) => ({
     ok: true, bugun: metin(s.bugun), gunluk: satirlar(s.gunluk, [['gun'], ['kaynak'], ['n', 'n']]), isi: satirlar(s.isi, [['hg', 'n'], ['saat', 'n'], ['n', 'n']]),
-    sayfalar: satirlar(s.sayfalar, [['sayfa'], ['n', 'n']]), donem: satirlar(s.donem, [['donem'], ['durum'], ['n', 'n']]),
+    sayfalar: satirlar(s.sayfalar, [['sayfa'], ['n', 'n']]).map((x) => ({ ...x, sayfa: x.sayfa && x.sayfa.split(/[?#]/)[0] })), // sorgu metni saklanmaz donem: satirlar(s.donem, [['donem'], ['durum'], ['n', 'n']]),
     musteriGunluk: satirlar(s.musteriGunluk, [['gun'], ['n', 'n']]), asamalar: satirlar(s.asamalar, [['asama'], ['n', 'n'], ['deger', 'n']]),
     bekleyen24: { n: say(s.bekleyen24 && s.bekleyen24.n), en_eski: metin(s.bekleyen24 && s.bekleyen24.en_eski) }
   })
