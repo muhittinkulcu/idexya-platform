@@ -47,6 +47,23 @@ değiştirilmez (yapım kuralı 1).
 - Yazı tipi dosyalarını kabuk getirmez. Ürün kendi sunucusundan `@font-face` ile verir (Inter zorunlu,
   diğerleri isteğe bağlı). Seçilen aile yüklü değilse tarayıcı Inter'e, o da yoksa sistem yazısına düşer.
 
+### Çok sayfalı ürün: kabuk ilk boyamadan önce (önerilen)
+
+Modül betikleri (`type="module"`) ayrıştırma bittikten sonra çalışır; tarayıcı ilk kareyi (ve sayfa geçişinin yeni
+görüntüsünü) çoğu zaman ondan önce çizer, içerik bir kare kabuksuz görünür. `blocking="render"` ve
+`<link rel="expect">` bunu önlemez (14 Kas 2026, Chrome 157 ölçümü). Çok sayfalı üründe kabuk, `kabuk.js` ve ürünün
+bağlantı kodu birlikte **klasik** tek dosyaya paketlenip (ör. esbuild `format: 'iife'`) `<head>`'de harici betik olarak
+yüklenir (`<script src="/…/kabuk.js?v=<özet>">`, satır içi değil; uzun önbellek). Kabuk, `<head>`'de tanımlıysa
+ayrıştırıcı öğeyi kapatır kapatmaz (sonraki kardeş eklenince, ilk boyamadan önce) kurulur; `DOMContentLoaded`
+beklenmez. Örnek: idexya-platform `tools/panel-kabuk.mjs`. Tek sayfa uygulama (IDOS `web/`) bunu gerektirmez.
+
+### Sayfalar arası geçiş (çapraz belge View Transitions)
+
+`kabuk.css` çok sayfalı üründe aynı kökendeki geçişleri `@view-transition { navigation: auto }` ile açar: paket
+çubuğu (`ik-ust`), yan menü (`ik-yan`) ve sekme satırı (`ik-sekmeler`) adlandırılmış öğedir ve yerinde kalır, yalnız
+içerik alanı (`ik-icerik`) 150 ms çapraz geçişle değişir. "Hareketi azalt" açıksa geçiş yoktur. Tek sayfa uygulamada
+etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boyamadan önce kurulmalıdır (yukarıdaki bölüm).
+
 ## Ayar şeması
 
 ```jsonc
@@ -105,13 +122,16 @@ görünür. Dosya `{ "surum": 1, "katmanlar": [...] }` biçimindedir; `katmanlar
 
 Liste elle güncellenir; kaynaklar: Marketing `idexya-agency-os/web/src/lib/moduller.ts` (`MODÜLLER`: modül → grup,
 bölüm → modül, öğe → sayfa; `yok` ve `süperAdmin` öğeleri konmaz), Website ve CRM `idexya-platform/src/data/panel-menu.js`
-(adressiz "Yakında" öğeleri konmaz), Creative `idexya-creative-os/web/src/lib/rotalar.ts` (`ANA_MENÜ` ve sekme listeleri).
+(adressiz "Yakında" öğeleri konmaz), Creative `idexya-creative-os/web/src/lib/rotalar.ts` (`ANA_MENÜ` ve sekme listeleri;
+gruplar `web/src/lib/kabuk.ts` `KABUK_GRUPLARI`, hesap sahibine özel "Doğrula" sayfası konmaz; Creative'in testi bu listeyle
+kendi menüsünü karşılaştırır).
 Bir ürünün menüsü değişince bu dosya da güncellenir; `test/katmanlar.test.mjs` dosyanın doğrulamadan kayıpsız geçtiğini denetler.
 
 ## Olaylar ve yöntemler
 
 | Olay (öğeden kabarcıklanır) | Ne zaman | `detail` |
 |---|---|---|
+| `idexya-kabuk:kur` | Kurulumdan hemen önce, ayar okunmadan | `{}` — ürün ayar bloğunu son kez değiştirebilir (ör. etkin adres, oturumdaki kullanıcı) |
 | `idexya-kabuk:hazir` | Kabuk kuruldu | `{ ayar }` (doğrulanmış) |
 | `idexya-kabuk:git` | Kabuktaki bir bağlantıya tıklandı ya da aramada Enter | `{ url }` — **iptal edilebilir** |
 | `idexya-kabuk:asistan` | Asistan düğmesine tıklandı | `{}` — paneli ürün açar |
@@ -137,7 +157,36 @@ orta tık tarayıcıya bırakılır (yeni sekme).
 | `rozetYap(url, sayi)` | Modül ya da sayfa rozetini günceller (0 gizler) |
 | `kullaniciYap({ ad, rol })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
 | `kapat()` | Açık açılırı (mega, arama, görünüm, profil) kapatır |
+| `aramaKaynagiEkle({ ad, ara })` | ⌘K aramasına ürünün kendi sonuçlarını ekler (aşağıda "Arama kaynağı"); kaldıran işlevi döndürür |
 | `konum` | `{ katman, grup, ad }` — ürünün konum yolu ve başlığı için |
+
+## Arama kaynağı (`aramaKaynagiEkle`)
+
+Menü sonuçlarının yanında ürünün kendi verisi de aranabilir (ilk kullanım: Marketing müşterileri; Muhittin, 14 Kas 2026).
+
+```js
+const kaldir = kabuk.aramaKaynagiEkle({
+  ad: 'Müşteriler',                                  // grup başlığı; "Sayfalar" ve "Eylemler" kullanılmaz
+  ara: async (sorgu, sinyal) => {                    // sinyal: AbortSignal, fetch'e verilir
+    const liste = await (await fetch('/api/...', { signal: sinyal })).json();
+    return liste.map((x) => ({ ad: x.ad, url: '/clients/' + x.id }));  // { ad, url, yol?, simge? }
+  }
+});
+// React: useEffect(() => kabuk.aramaKaynagiEkle({...}), []);  (dönen işlev temizlikte kaynağı kaldırır)
+```
+
+- Kabuk kaynağı yalnız sorgu **en az 2 karakter** iken, yazma durduktan **150 ms** sonra çağırır. Yeni tuş, Esc ya da
+  aramanın kapanması önceki isteği `AbortController` ile iptal eder; iptal edilen isteğin yanıtı çizilmez.
+- Sonuçlar menü sonuçlarının **altında**, kaynağın adıyla kendi grubunda, kaynağın verdiği sırayla, **en çok 8** satır.
+  Klavye (↑ ↓ Enter) menü ve kaynak sonuçlarını tek liste olarak gezer; tıklama ve Enter `idexya-kabuk:git` olayını yayar.
+- Her sonuç doğrulanır: `ad` ve `yol` metindir (textContent, 120 karakter), `url` `guvenliUrl`'den geçer (aynı köken ya da
+  katman kökenleri); adı ya da geçerli adresi olmayan satır atılır. `simge` verilmezse adın ilk harfi.
+- Durum sessizdir: yüklenirken ve hata olunca sonuç listesinin altında küçük bir satır ("Müşteriler aranıyor…",
+  "Müşteriler alınamadı"); satır `role="status"` (aria-live) olduğundan ekran okuyucu duyurur. Kaynak ararken
+  "sonuç yok" yazılmaz.
+- Aynı adla ikinci kez eklenen kaynak öncekinin yerini alır; "Sayfalar" ve "Eylemler" adları reddedilir. Kaldırma süren isteği iptal eder.
+- **Yetki ve kişisel veri ürünündür:** `ara` yalnız oturumdaki kullanıcının görebileceği kayıtları döndürür (sunucu
+  süzgeci); sonuçta yalnız gereken ad bulunur (müşteri adı gibi), kişi adı, e-posta ya da telefon konmaz.
 
 ## Sayfa parçaları ve hareketler
 
@@ -154,17 +203,23 @@ sırayla süzülür, `[data-ik-satir]` tablo satırı akar, `[data-ik-sayac]` me
 (bir kez, `requestAnimationFrame` biter). Uyarı ve hata etiketinin noktası yavaşça atar.
 "Hareketi azalt" açıksa bütün hareket kapanır, sayaçlar hemen son değeri gösterir.
 
+**Yalnız oturumdaki ilk açılışta** (Muhittin, 14 Kas 2026): kabuk `sessionStorage` `idx-acildi` işaretine bakar. Sekmede
+daha önce bir kabuklu sayfa açıldıysa sayfa yüklenirken giriş hareketleri (sahne, sayaç, yan menüdeki alt sayfa listesinin
+açılışı) oynamaz, kabuk ve içerik hemen son hâliyle çizilir. Sonraki `etkinYap` çağrısından (uygulama içi gezinme) itibaren
+hareketler yine oynar.
+
 Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuzey`, `--ik-gomuk`,
 `--ik-cizgi`, `--ik-metin`, `--ik-ikincil`, `--ik-paket`, `--ik-izgara`; katman vurgusu `--ik-vurgu`,
 `--ik-vurgu-yazi`, `--ik-yumusak`. Yazı: `--ik-yazi` (aile), `--w-ince`, `--w-govde`, `--w-orta`,
 `--w-vurgu`. Bileşenlerde sabit kalınlık sayısı yazılmaz.
 
-## Tarayıcıda saklananlar (`localStorage`)
+## Tarayıcıda saklananlar (`localStorage`, `sessionStorage`)
 
 **Kural:** sekme adına ya da adresine ve menü adına müşteri ya da kişi adı konmaz (sekme adı menüdeki
 sayfa adından gelir; müşteri kartı gibi sayfalarda `etkin.ad` genel tutulur, ör. "Müşteri kartı"). Saklanan
 sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adresse geri yüklenir. Profil menüsündeki
-"Çıkış yap" `idx-sekme-*` ve `idx-yan-kapali-*` anahtarlarını siler.
+"Çıkış yap" `idx-sekme-*` ve `idx-yan-kapali-*` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
+anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
 |---|---|
@@ -173,6 +228,7 @@ sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adress
 | `idx-yan-dar` | Yan menü daraltılmış mı |
 | `idx-yan-kapali-<katman>` | Kapalı grup başlıkları |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
+| `idx-acildi` (`sessionStorage`) | Bu sekmede kabuk daha önce açıldı mı (giriş hareketleri yalnız ilk açılışta) |
 
 `<html>` üzerine `data-tema` (`acik`/`koyu`) ve `data-tema-secim` yazılır. localStorage alan adına bağlıdır:
 katmanlar ayrı alan adlarındayken seçim her birinde ayrı saklanır; tek adres (`os.idexya.com`, aşama 2)
@@ -201,12 +257,16 @@ panel açılır, → ile panele girilir.
 
 ## Bütçe (yapım kuralı 3)
 
+Ürünlerin gerçekte sunduğu boyutla ölçülür: **küçültülmüş + gzip** (karar 14 Kas 2026). Ürünler (Vite/Astro,
+esbuild) kabuğu zaten küçülterek sunar; kaynaktaki yorumlar ve okunaklı yazım bütçeye sayılmaz, korunur.
+
 ```bash
 cd kabuk
-for f in kabuk.js kabuk-cekirdek.js kabuk.css; do echo "$f $(gzip -c $f | wc -c)"; done
+for f in kabuk.js kabuk-cekirdek.js kabuk.css; do echo "$f $(npx --yes esbuild@0.28.2 $f --minify --log-level=error | gzip -c | wc -c) (ham gzip $(gzip -c $f | wc -c))"; done
 ```
 
-Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 15 kB, `kabuk.css` ≤ 10 kB (gzip). Test bu sınırı da denetler.
+Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 15 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
+denetler ve ham gzip boyutunu bilgi olarak yazar (esbuild sürümü testte sabittir; ilk koşuda `npx` ağdan indirir).
 
 ## Deneme
 

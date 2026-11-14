@@ -33,7 +33,7 @@ export function istekAyir(istek, ayar) {
 }
 
 // os alanında sunulan yollar (önek ayrılmış hali). Gerisi 404: site sayfaları, /api/talep, /api/uye, /uye, /tr …
-const VARLIK = /^\/(favicon-panel[\w-]*\.(svg|png)|panel-ikon-[\w-]+\.png|panel\.webmanifest|panel-gorunum\.js)$/;
+const VARLIK = /^\/(favicon-panel[\w-]*\.(svg|png)|panel-ikon-[\w-]+\.png|panel\.webmanifest|panel-gorunum\.js|panel-kabuk\.js|panel-onyukleme\.json)$/;
 export function osYoluIzinli(yol, arama = '') {
   if (yol === '/') return !new URLSearchParams(arama).has('tema'); // panel ana sayfasına yönlendirme; site önizlemesi yok
   const m = yol.match(/^\/([a-z-]+)\/?$/);

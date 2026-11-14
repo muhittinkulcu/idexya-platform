@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Genel bakış" aktif="genel">
+<Yonetim baslik="Genel bakış" aktif="genel" veri={['grafik', 'reklam']}>
 <style is:global>
   /* Talep kaynağı renkleri: sabit sıra, iki tema ayrı doğrulandı (dataviz validate_palette). Açık temada 3. ve 5. renk 3:1 altında; tablo görünümü bunun için var. */
   :root{--s1:#eb6834;--s2:#2a78d6;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4}
@@ -209,7 +209,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div class="ipucu" data-ipucu hidden></div>
 
 <script>
-  import { api, el, ASAMALAR, once, para, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, ASAMALAR, once, para, genelHata, saklananVeri } from '../../scripts/yonetim/ortak.js';
   import { kpiKart, trendCiz, isiCiz, yatayCiz, ipucuKur, gunler, KAYNAK_GRUP } from '../../scripts/yonetim/grafik.js';
   import { reklamBolumu } from '../../scripts/yonetim/reklam.js';
   const $ = (s, k = document) => k.querySelector(s);
@@ -268,8 +268,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
   $$('[data-donem] button').forEach((b) => b.addEventListener('click', () => { d.donem = Number(b.dataset.g); kaydet(); trend(); }));
   $$('[data-gorunum] button').forEach((b) => b.addEventListener('click', () => { d.gorunum = b.dataset.v; kaydet(); trend(); }));
 
-  (async () => { try {
-    const [o, gr] = await Promise.all([api('ozet'), api('grafik')]);
+  // Çizim tekrar çağrılabilir: önce bu oturumda son alınan sayısal özet (varsa, ortak.js saklananVeri), sonra taze yanıt.
+  // Saklanan özette son hareketler (müşteri adları) yoktur; o bölüm taze yanıtı bekler.
+  function ciz(o, gr) {
     g = gr;
     const t = Object.fromEntries(o.talepler.map((x) => [x.durum, x.n]));
     const acik = o.asamalar.filter((a) => !['kazanildi', 'kaybedildi'].includes(a.asama)).reduce((s, a) => s + a.n, 0);
@@ -287,8 +288,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
       const d = $('[data-bk-durum]'); d.dataset.tur = !bekleyen ? 'iyi' : gec ? 'gec' : 'normal';
       d.querySelector('span').textContent = !bekleyen ? 'Yanıt bekleyen talep yok, her şey yolunda.' : gec ? `${gec} talep 24 saati geçti; önce bunlara dönün.` : 'Hepsi son 24 saat içinde geldi.'; }
     const us = $('[data-uyari]');
+    us.hidden = !(b24.n > 0);
     if (b24.n > 0) {
-      us.hidden = false;
       us.replaceChildren(el('span', { class: 'simge', 'aria-hidden': 'true' }, '!'),
         el('span', { style: 'flex: 1; min-width: 200px' }, el('b', {}, `Uyarı: ${b24.n} talep 24 saattir yanıtlanmadı.`), ' En eskisi ', once(b24.en_eski), ' geldi.'),
         el('a', { class: 'dugme kucuk', href: '/leads?tab=new' }, 'Talepleri aç →'));
@@ -328,7 +329,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     }));
     if (!toplam) $('[data-huni]').append(el('li', { class: 'hn-bos' }, 'Henüz CRM’de müşteri yok. Talepler CRM’e alındıkça huni dolar.'));
     const kapanan = (say.kazanildi || 0) + (say.kaybedildi || 0);
-    $('[data-huni-alt]').append(
+    $('[data-huni-alt]').replaceChildren(
       el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Kazanma oranı'), el('b', { style: 'font-size: 22px' }, kapanan ? '%' + Math.round((say.kazanildi || 0) / kapanan * 100) : '—'), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `Kapanan ${kapanan} fırsattan kazanılan`)),
       el('div', { class: 'kpi' }, el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Açık fırsat'), el('b', { style: 'font-size: 22px' }, String(acik)), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, 'Henüz kapanmamış müşteri')));
 
@@ -337,16 +338,37 @@ import Yonetim from '../../layouts/Yonetim.astro';
     yatayCiz($('[data-kaynaklar]'), Object.values(kayToplam).sort((a, b) => b.n - a.n), 'Son 30 günde talep yok.');
     yatayCiz($('[data-sayfalar]'), gr.sayfalar.map((s) => ({ ad: s.sayfa, n: s.n, renk: 'var(--brand)' })), 'Son 30 günde sayfa bilgisi olan talep yok.');
 
+    if (!o.sonKayitlar) return;
     const har = $('[data-hareket]');
+    har.replaceChildren();
     if (!o.sonKayitlar.length) har.append(el('div', { class: 'bos' }, 'Henüz hareket yok. Siteden gelen ilk talep CRM’e alındığında burada görünür.'));
     o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/customer?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid rgb(var(--line)); text-decoration: none; color: inherit' },
       el('span', { style: 'width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; background: ' + (k.tur === 'talep' ? '#F07A23' : k.tur === 'sistem' ? 'var(--ok)' : 'var(--info)') }),
       el('span', { style: 'flex: 1; display: flex; flex-direction: column; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, k.firma || k.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, k.baslik + ' · ' + k.kim)),
       el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(k.zaman)))));
+  }
+
+  const eskiO = saklananVeri('ozet'), eskiG = saklananVeri('grafik');
+  let eskiCizildi = false;
+  if (eskiO && eskiG) try { ciz(eskiO, eskiG); eskiCizildi = true; } catch (h) { /* eski kayıt bozuksa taze yanıt beklenir */ }
+  (async () => { try {
+    const [o, gr] = await Promise.all([api('ozet'), api('grafik')]);
+    ciz(o, gr);
   } catch (h) {
+    // Taze veri alınamadı: bu oturumdan kalan değerler taze gibi bırakılmaz (ürün ilkesi 3).
     genelHata('Özet yüklenemedi: ' + h.message);
     selamYaz('Veriler şu an alınamadı.');
+    const yok = (s) => { const e = $(s); if (e) e.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); };
     $('[data-kpi]').replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı; rakamlar gösterilmiyor.'));
+    if (eskiCizildi) {
+      ['[data-huni]', '[data-huni-alt]', '[data-isi]', '[data-kaynaklar]', '[data-sayfalar]', '[data-cubuk-alan]', '[data-x-eksen]', '[data-lejant]', '[data-trend-tablo]'].forEach(yok);
+      ['[data-isi-not]', '[data-trend-not]'].forEach((k) => { const e = $(k); if (e) e.textContent = ''; });
+      ['bekleyen', 'firsat', 'musteri', 'acikFirsat'].forEach((k) => v(k, '—'));
+      $('[data-uyari]').hidden = true;
+      ['[data-bk-taze]', '[data-bk-gec]'].forEach((k) => { const e = $(k); if (e) e.style.opacity = '0'; });
+      const bd = $('[data-bk-durum]'); if (bd) { bd.dataset.tur = 'normal'; bd.querySelector('span').textContent = 'Veri alınamadı.'; }
+      g = null;
+    }
   } })();
 </script>
 </Yonetim>

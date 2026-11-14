@@ -1,7 +1,6 @@
-// <idexya-kabuk>: üç ürünün ortak kabuğu. Sözleşme arayuz-kabugu.md, kullanım README.md.
-// innerHTML, satır içi betik ve dış istek yok; veri textContent ile, stil CSSOM ile.
+// <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
-  SIMGE, KALINLIK, YAZI_TIPI, TEMA, aile, ayarDogrula, etkinBul, aramaHavuzu, aramaSuz,
+  SIMGE, KALINLIK, YAZI_TIPI, TEMA, aile, ayarDogrula, etkinBul, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir, kaynakDurumu,
   sekmeListesi, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi
 } from './kabuk-cekirdek.js';
 
@@ -24,7 +23,6 @@ gorunumUygula();
 MQ.addEventListener('change', gorunumUygula);
 addEventListener('storage', (e) => { if (e.key === 'idx-gorunum') { GOR = gorunumCoz(oku('idx-gorunum', null)); gorunumUygula(); } });
 
-// Öğe kurucu: metin her zaman metin düğümü.
 function h(tag, a, ...c) {
   const e = D.createElement(tag);
   for (const k in a) {
@@ -57,10 +55,20 @@ const I = {
 const olay = (el, ad, detail, iptal) => el.dispatchEvent(new CustomEvent('idexya-kabuk:' + ad, { detail, bubbles: true, cancelable: !!iptal }));
 
 class IdexyaKabuk extends HTMLElement {
+  kaynaklar = []; kd = new Map();
   connectedCallback() {
     if (this._kuruldu) return;
-    if (D.readyState === 'loading') { D.addEventListener('DOMContentLoaded', () => this.connectedCallback(), { once: true }); return; }
+    // Ayrıştırılırken: öğe kapanınca, ilk boyamadan önce kurulur (README).
+    if (D.readyState === 'loading' && !this.nextSibling) {
+      const g = new MutationObserver(() => this.nextSibling && this.connectedCallback());
+      g.observe(this.parentNode, { childList: true });
+      D.addEventListener('DOMContentLoaded', () => this.connectedCallback(), { once: true });
+      return this._g = g;
+    }
+    if (this._g) this._g.disconnect();
     this._kuruldu = true;
+    olay(this, 'kur', {});
+    try { this._sakin = sessionStorage.getItem('idx-acildi'); sessionStorage.setItem('idx-acildi', 1); } catch (e) { /* gizli kip */ }
     let ham = null;
     try { ham = JSON.parse((D.querySelector('script#idexya-kabuk-ayar[type="application/json"]') || {}).textContent || 'null'); } catch (e) { ham = null; }
     const { ayar, hatalar } = ayarDogrula(ham);
@@ -72,10 +80,11 @@ class IdexyaKabuk extends HTMLElement {
     this.kapali = metinListesi(oku('idx-yan-kapali-' + ayar.katman, []));
     this.havuz = aramaHavuzu(ayar);
     this.rozet = {};
-      this.gorulen = new Set(this.havuz.map((x) => x.url));
+    this.gorulen = new Set(this.havuz.map((x) => x.url));
     ayar.katmanlar.forEach((k) => k.gruplar.forEach((g) => g.moduller.forEach((m) => [m].concat(m.sayfalar).forEach((x) => { if (x.rozet) this.rozet[x.url] = x.rozet; }))));
     this.kur();
     this.etkinYap(ayar.etkin);
+    this._ilk = 1;
     D.addEventListener('keydown', (e) => {
       const t = e.target;
       if (e.defaultPrevented || e.isComposing || !(e.metaKey || e.ctrlKey) || e.altKey || e.key.toLowerCase() !== 'k') return;
@@ -97,10 +106,11 @@ class IdexyaKabuk extends HTMLElement {
       type: 'search', role: 'combobox', 'aria-expanded': 'false', 'aria-controls': 'ik-ara-sonuc', 'aria-autocomplete': 'list',
       'aria-label': 'Tüm katmanlarda ara', placeholder: 'Tüm katmanlarda ara: sayfa, modül, eylem', autocomplete: 'off', spellcheck: 'false',
       onfocus: () => this.aramaAc(), onclick: () => this.aramaAc(),
-      oninput: () => { this.secim = 0; this.aramaAc(); this.aramaCiz(); },
+      oninput: () => { this.secim = 0; this.aramaAc(); this.kaynakBaslat(); this.aramaCiz(); },
       onkeydown: (e) => this.aramaTus(e)
     });
     this.sonuc = h('div', { id: 'ik-ara-sonuc', class: 'ik-ara-sonuc', role: 'listbox', 'aria-label': 'Arama sonuçları', hidden: true });
+    this.kDurum = h('div', { class: 'ik-ara-durum', role: 'status' });
     this.kapsul = h('div', { class: 'ik-kapsul' });
     this.sabitDugme = h('button', { type: 'button', class: 'ik-ikon ik-masa', onclick: () => this.sabitle(!this.sabit) }, svg(I.raptiye, 16, 1.9));
     this.gorDugme = h('button', { type: 'button', class: 'ik-ikon', 'aria-haspopup': 'dialog', 'aria-expanded': 'false', 'aria-controls': 'ik-gorunum', onclick: (e) => this.degistir('gorunum', e.currentTarget) }, svg(I.ay, 17));
@@ -162,7 +172,7 @@ class IdexyaKabuk extends HTMLElement {
     if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (this.sonuc.contains(l)) this.giris.value = '';
     this.kapat(false); this.cekmece(false); this.ucanKapat();
-    if (l.classList.contains('ik-profil-cikis')) try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-kapali)-/.test(k) && localStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
+    if (l.classList.contains('ik-profil-cikis')) try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-kapali)-/.test(k) && localStorage.removeItem(k)); Object.keys(sessionStorage).forEach((k) => /^idx-/.test(k) && sessionStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
     const url = guvenliUrl(l.getAttribute('href'), this.a.kokenler);
     if (!url || !olay(this, 'git', { url }, true)) e.preventDefault();
   }
@@ -201,7 +211,7 @@ class IdexyaKabuk extends HTMLElement {
     if (!t) return;
     this.acik = null; this.perde.hidden = true;
     if (t === 'mega') { this.mega.hidden = true; this.megaKey = null; this.katmanGuncelle(); }
-    if (t === 'arama') { this.sonuc.hidden = true; this.giris.setAttribute('aria-expanded', 'false'); this.giris.removeAttribute('aria-activedescendant'); this.ust.classList.remove('ik-arama-acik'); }
+    if (t === 'arama') { this.sonuc.hidden = true; this.giris.setAttribute('aria-expanded', 'false'); this.giris.removeAttribute('aria-activedescendant'); this.ust.classList.remove('ik-arama-acik'); if (this.kIptal) this.kIptal(); this.kd.clear(); }
     if (t === 'gorunum') { this.gorunum.hidden = true; this.gorDugme.setAttribute('aria-expanded', 'false'); }
     if (t === 'profil') { this.profil.hidden = true; this.profilDugme.setAttribute('aria-expanded', 'false'); }
     const d = this._donus; this._donus = null;
@@ -316,14 +326,28 @@ class IdexyaKabuk extends HTMLElement {
     this.ac('arama', null);
     this.ust.classList.add('ik-arama-acik');
     this.secim = 0; this.sonuc.hidden = false; this.giris.setAttribute('aria-expanded', 'true');
-    this.aramaCiz();
+    this.kaynakBaslat(); this.aramaCiz();
   }
-  aramaCiz() {
-    const q = this.giris.value;
+  aramaKaynagiEkle(k) {
+    const ad = k && typeof k.ara === 'function' && String(k.ad || '').trim();
+    if (!ad || ad === 'Sayfalar' || ad === 'Eylemler') return () => {};
+    const y = { ad, ara: k.ara };
+    this.kaynaklar = this.kaynaklar.filter((x) => x.ad !== ad).concat(y);
+    return () => { this.kaynaklar = this.kaynaklar.filter((x) => x !== y); if (this.kIptal) this.kIptal(); };
+  }
+  kaynakBaslat() {
+    if (this.kIptal) this.kIptal();
+    this.kd.clear();
+    this.kIptal = kaynakAra(this.kaynaklar, this.giris.value, this.a.kokenler, (k, r) => { this.kd.set(k.ad, r); this.aramaCiz(1); });
+    if (this.kIptal) this.kaynaklar.forEach((k) => this.kd.set(k.ad, 0));
+  }
+  aramaCiz(sakin) {
+    const q = this.giris.value, kd = this.kDurum.textContent = kaynakDurumu(this.kaynaklar, this.kd);
     const sik = this.sekmeler.map((s) => s.url).concat(this.a.katmanlar.map((k) => (k.gruplar[0] && k.gruplar[0].moduller[0] || {}).url));
-    const b = this.bulunan = aramaSuz(this.havuz, q, sik);
+    const b = this.bulunan = aramaBirlestir(aramaSuz(this.havuz, q, sik), this.kaynaklar, this.kd);
     this.secim = Math.min(this.secim || 0, Math.max(0, b.length - 1));
-    const grup = ['Sayfalar', 'Eylemler'].map((tur) => {
+    this.sonuc.classList.toggle('ik-ara-sakin', !!sakin);
+    const grup = ['Sayfalar', 'Eylemler', ...this.kaynaklar.map((k) => k.ad)].map((tur) => {
       const s = b.filter((x) => x.tur === tur);
       if (!s.length) return null;
       return [h('div', { class: 'ik-ara-grup', role: 'presentation' }, q.trim() ? tur : tur === 'Sayfalar' ? 'Sık kullanılan sayfalar' : tur),
@@ -332,7 +356,7 @@ class IdexyaKabuk extends HTMLElement {
           'aria-selected': String(i === this.secim), css: { '--j': i }, onmousedown: (e) => e.preventDefault()
         }, h('span', { class: 'ik-ara-simge', css: { color: x.renk } }, x.simge), h('span', { class: 'ik-oge-ad' }, x.ad), h('span', { class: 'ik-ara-yol' }, x.yol)); })];
     });
-    this.sonuc.replaceChildren(...[grup, b.length ? null : h('div', { class: 'ik-ara-bos' }, '“' + q.trim() + '” için sonuç yok. Sayfa ya da modül adını dene.'),
+    this.sonuc.replaceChildren(...[grup, b.length || kd ? null : h('div', { class: 'ik-ara-bos' }, '“' + q.trim() + '” için sonuç yok. Sayfa ya da modül adını dene.'), this.kDurum,
       h('div', { class: 'ik-ara-ipucu', 'aria-hidden': 'true' }, h('span', null, '↑ ↓ seç'), h('span', null, 'Enter git'), h('span', null, 'Esc kapat'))].flat(3).filter(Boolean));
     if (b.length) this.giris.setAttribute('aria-activedescendant', 'ik-ara-' + this.secim); else this.giris.removeAttribute('aria-activedescendant');
   }
@@ -381,6 +405,7 @@ class IdexyaKabuk extends HTMLElement {
 
   etkinYap(etkin) {
     const U = (x) => guvenliUrl(x, this.a.kokenler);
+    if (this._ilk) this._sakin = 0;
     etkin = etkin || {};
     this.a.etkin = { modulUrl: U(etkin.modulUrl), sayfaUrl: U(etkin.sayfaUrl), ad: String(etkin.ad || '').slice(0, 120) };
     this.e = etkinBul(this.k, this.a.etkin);
@@ -420,8 +445,9 @@ class IdexyaKabuk extends HTMLElement {
     const k = this.k, e = this.e;
     const dar = this.dar && !TEL.matches;
     this.yan.classList.toggle('ik-dar', dar);
+    const dt = this.dar ? 'Menüyü genişlet' : 'Menüyü daralt';
     const daralt = h('button', {
-      type: 'button', class: 'ik-ikon ik-cerceve ik-masa', 'aria-label': this.dar ? 'Menüyü genişlet' : 'Menüyü daralt', title: this.dar ? 'Menüyü genişlet' : 'Menüyü daralt',
+      type: 'button', class: 'ik-ikon ik-cerceve ik-masa', 'aria-label': dt, title: dt,
       onclick: () => { this.dar = !this.dar; yaz('idx-yan-dar', this.dar); this.ucanKapat(); this.yanCiz(); this.yan.querySelector('.ik-yan-bas button').focus(); }
     }, svg(I.daralt, 16));
     const bas = h('div', { class: 'ik-yan-bas' }, dar ? null : h('div', null, h('div', { class: 'ik-soluk ik-kucuk' }, 'Katman'), h('div', { class: 'ik-yan-ad' }, k.ad)), daralt);
@@ -431,15 +457,12 @@ class IdexyaKabuk extends HTMLElement {
     if (dar) {
       this.ucan = h('div', { id: 'ik-ucan', class: 'ik-ucan', role: 'dialog', hidden: true, onmouseenter: () => clearTimeout(this._ucanZ), onmouseleave: () => this.ucanBirak() });
       this.ucan.addEventListener('focusout', (ev) => { const r = ev.relatedTarget; if (r && !this.ucan.contains(r) && !(this.rayDugmeleri || []).includes(r)) this.ucanKapat(); });
-      this.rayDugmeleri = k.gruplar.map((g, gi) => {
-        const b = h('button', {
+      this.rayDugmeleri = k.gruplar.map((g, gi) => h('button', {
           type: 'button', class: 'ik-ray-dugme' + (gi === e.grup ? ' ik-icinde' : ''), 'aria-expanded': 'false', 'aria-controls': 'ik-ucan', 'aria-label': g.baslik + ': modülleri göster',
           onmouseenter: () => this.ucanAc(gi), onfocus: () => { if (!this._sessiz) this.ucanAc(gi); }, onmouseleave: () => this.ucanBirak(),
           onclick: (ev) => { this.ucanAc(gi); if (!ev.detail) this.ucanOdak(); },
           onkeydown: (ev) => { if (ev.key === 'ArrowRight') { ev.preventDefault(); this.ucanOdak(); } }
-        }, svg(SIMGE[g.simge], 20, 1.7), h('span', { class: 'ik-ray-isaret' }));
-        return b;
-      });
+        }, svg(SIMGE[g.simge], 20, 1.7), h('span', { class: 'ik-ray-isaret' })));
       govde = [h('nav', { class: 'ik-ray', 'aria-label': k.ad + ' grupları' }, this.rayDugmeleri), this.ucan];
     } else {
       this.rayDugmeleri = null; this.ucan = null;
@@ -460,7 +483,7 @@ class IdexyaKabuk extends HTMLElement {
                   type: 'button', class: 'ik-modul-ac', 'aria-expanded': String(acik), 'aria-label': m.ad + ' sayfalarını ' + (acik ? 'gizle' : 'göster'),
                   onclick: () => { this.acikMod[m.url] = !acik; this.yanCiz(); this.odakBul('.ik-modul-ac', m.ad); }
                 }, svg(SAG, 12, 2)) : null),
-              acik ? h('div', { class: 'ik-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad, this.rz(s)))) : null);
+              acik ? h('div', { class: this._sakin ? 'ik-sayfalar ik-sakin' : 'ik-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad, this.rz(s)))) : null);
           })));
       }));
     }
@@ -510,19 +533,17 @@ class IdexyaKabuk extends HTMLElement {
     if (v) { const l = this.yan.querySelector('a, button'); if (l) l.focus(); }
   }
 
-  // Sahne hareketi; sayaç rAF ile bir kez sayar.
   sahneOynat(kok) {
     kok = kok || this.icerik;
-    kok.querySelectorAll('[data-ik-sahne]').forEach((s) => {
-      s.querySelectorAll('[data-ik-oge]').forEach((o, i) => o.style.setProperty('--ik-s', i));
-      s.querySelectorAll('[data-ik-satir]').forEach((o, i) => o.style.setProperty('--ik-s', i));
+    if (!this._sakin) kok.querySelectorAll('[data-ik-sahne]').forEach((s) => {
+      ['oge', 'satir'].forEach((a) => s.querySelectorAll('[data-ik-' + a + ']').forEach((o, i) => o.style.setProperty('--ik-s', i)));
       s.classList.remove('ik-sahne'); void s.offsetWidth; s.classList.add('ik-sahne');
     });
     const say = [...kok.querySelectorAll('[data-ik-sayac]')];
     say.forEach((x) => { if (x.dataset.ikHedef == null) x.dataset.ikHedef = x.textContent; });
     cancelAnimationFrame(this._raf);
     const bitir = () => say.forEach((x) => { x.textContent = x.dataset.ikHedef; });
-    if (!say.length || azHareket()) return bitir();
+    if (!say.length || azHareket() || this._sakin) return bitir();
     const bas = performance.now() + 250, sure = 1200;
     const adim = (t) => {
       const x = Math.min(1, Math.max(0, (t - bas) / sure)), y = 1 - Math.pow(1 - x, 3);

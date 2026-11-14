@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="CRM" aktif="crm" yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
+<Yonetim baslik="CRM" aktif="crm" veri={['musteriler', 'etiketler?tur=musteri']} yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
 <label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
 <div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>

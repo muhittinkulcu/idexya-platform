@@ -7,8 +7,11 @@ import { MENU, menuAdi } from '../data/panel-menu.js';
 import ORTAK from '../idexya-kabuk/katmanlar.json';
 import '../idexya-kabuk/kabuk.css';
 // baslik verilmezse sayfanın menüdeki adı kullanılır (menüyle aynı ad iki yerde elle yazılmaz).
-interface Props { baslik?: string; aktif: string; yol?: string; aciklama?: string; }
-const { aktif, yol = '', aciklama = '' } = Astro.props;
+// veri: sayfanın açılışta okuduğu /api/yonetim/* uçları (ör. ['talepler']). İstek HTML ayrıştırılırken başlar (preload);
+// sayfa betiği aynı adresi fetch ile isteyince yanıt hazırdır. Özet (ozet) her sayfada kabuk rozetleri için okunur.
+interface Props { baslik?: string; aktif: string; yol?: string; aciklama?: string; veri?: string[]; }
+const { aktif, yol = '', aciklama = '', veri = [] } = Astro.props;
+const onYukle = [...new Set(['ozet', ...veri])];
 const baslik = Astro.props.baslik || menuAdi('/' + Astro.url.pathname.replace(/^\/yonetim\/|\/$/g, ''));
 // Konum yolu: Website ve CRM › grup › modül. Modül yalnız sayfa başlığı modül adından farklıysa görünür (ör. Müşteri kartı).
 // Grubu olmayan sayfa kendi yol metnini kullanır.
@@ -76,8 +79,14 @@ const ayarMetni = JSON.stringify(ayar).replace(/</g, '\\u003c');
 <meta name="apple-mobile-web-app-title" content="Website">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="/fonts/inter-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Oturumdaki kullanıcı: Worker Access kimliğini yazar (worker/index.js); yerelde boş kalır. Veri, betik değil. -->
+<meta name="idexya-kullanici" content="">
 <!-- Tema ilk boyamadan önce (yanıp sönme yok) ve eski tema seçiminin idx-gorunum'a taşınması; satır içi betik değil. -->
 <script is:inline src="/panel-gorunum.js"></script>
+<!-- Kabuk klasik betik olarak <head>'de (tools/panel-kabuk.mjs): öğe kapanır kapanmaz, ilk boyamadan önce kurulur; sayfa geçişinde
+     içerik hiçbir karede kabuksuz çizilmez. Derleme adrese içerik özeti ekler (?v=…), dosya bir yıl önbellekte kalır. -->
+<script is:inline src="/panel-kabuk.js"></script>
+{onYukle.map((v) => <link rel="preload" href={`/api/yonetim/${v}`} as="fetch" crossorigin="anonymous">)}
 <style is:global>
 /* Yazı tipleri depoda (public/fonts, SIL OFL: OFL-inter.txt); dış yazı tipi isteği yok. Yazı ailesi ve kalınlık ortak kabuğun
    Görünüm panelinden gelir (--ik-yazi, --w-govde, --w-vurgu; idexya-ortak arayuz-kabugu.md "Ortak parçalar"). */
@@ -207,9 +216,8 @@ tr[data-sayfa-gizli]{display:none}
   </div>
 </idexya-kabuk>
 <script>
-  // Sıra önemli: kabuk-bagla.js etkin adresi ayar bloğuna yazar, sonra kabuk.js öğeyi tanımlar ve kurar.
-  import '../scripts/yonetim/kabuk-bagla.js';
-  import '../idexya-kabuk/kabuk.js';
+  // Kabuk <head>'deki /panel-kabuk.js ile gelir. Yüklenemediyse (ör. astro dev, ağ hatası) aynı kod modül olarak sonradan gelir.
+  if (!customElements.get('idexya-kabuk')) import('../scripts/yonetim/kabuk-giris.js');
   import { tabloSayfalama } from '../scripts/yonetim/tablo-sayfa.js';
   import { kartBilgi } from '../scripts/yonetim/kart-bilgi.js';
   tabloSayfalama();

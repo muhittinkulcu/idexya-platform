@@ -4,8 +4,8 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build && node tools/sitemap.mjs && node tools/panel-veri.mjs",
+    "dev": "node tools/panel-kabuk.mjs && astro dev",
+    "build": "node tools/panel-kabuk.mjs && astro build && node tools/sitemap.mjs && node tools/panel-veri.mjs && node tools/panel-kabuk.mjs --surum",
     "preview": "astro preview",
     "deploy": "npm run build && wrangler deploy",
     "test": "node tools/test-temel-yol.mjs && node tools/test-panel-menu.mjs && node tools/test-referans.mjs && node tools/test-sablon.mjs && node tools/test-tek-kayit.mjs && node tools/test-teklif-dosya.mjs && node tools/test-teklif-katalog.mjs"
@@ -17,6 +17,7 @@
     "qrcode-generator": "2.0.4"
   },
   "devDependencies": {
+    "esbuild": "0.28.2",
     "jsqr": "1.4.0",
     "wrangler": "4.145.0"
   },

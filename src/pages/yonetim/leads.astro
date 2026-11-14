@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Talepler" aktif="talepler" aciklama="Siteden gelen her talep önce burada ayıklanır. Gerçek talep tek tıkla CRM'e geçer; aynı e-posta veya telefonla kayıtlı müşteri varsa yeni kart açılmaz, mevcut karta eklenir.">
+<Yonetim baslik="Talepler" aktif="talepler" veri={['talepler']} aciklama="Siteden gelen her talep önce burada ayıklanır. Gerçek talep tek tıkla CRM'e geçer; aynı e-posta veya telefonla kayıtlı müşteri varsa yeni kart açılmaz, mevcut karta eklenir.">
 <div role="tablist" aria-label="Talep durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line)); align-self: flex-start; flex-wrap: wrap"></div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="Talep listesi" class="kart" data-liste style="flex: 2 1 380px; overflow: hidden"></section>

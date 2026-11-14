@@ -110,6 +110,7 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-ara-simge{flex:0 0 26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:7px;background:rgba(255,255,255,.07);font-size:12px;font-weight:var(--w-orta)}
 .ik-ara-yol{font-size:12px;color:#8FA1B5;white-space:nowrap}
 .ik-ara-bos{padding:22px 12px;text-align:center;color:#A3AFBB}
+.ik-ara-durum{padding:6px 10px;font-size:12px;color:#8FA1B5}.ik-ara-durum:empty{padding:0}.ik-ara-sakin .ik-ara-oge{animation:none}
 .ik-ara-ipucu{display:flex;gap:14px;padding:10px 10px 4px;margin-top:6px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:#8FA1B5}
 
 /* Görünüm paneli */
@@ -314,3 +315,14 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
   .ik-suzgec-not{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){.ik,.ik *,.ik *::before,.ik *::after{animation:none!important;transition:none!important}}
+/* Oturumdaki ilk açılıştan sonraki sayfa yüklemelerinde giriş hareketi yok (kabuk.js _sakin). */
+.ik-sakin{animation:none!important}
+/* Çok sayfalı üründe sayfalar arası geçiş (çapraz belge View Transitions): paket çubuğu, yan menü ve sekme satırı yerinde
+   kalır, yalnız içerik alanı kısa bir çapraz geçişle değişir. "Hareketi azalt" açıksa geçiş yok. */
+@media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}
+.ik-ust{view-transition-name:ik-ust}.ik-yan{view-transition-name:ik-yan}.ik-sekmeler{view-transition-name:ik-sekmeler}.ik-icerik{view-transition-name:ik-icerik}
+::view-transition-group(*){animation-duration:.15s}
+/* Kabuk parçaları karışmaz: yeni hâli anında görünür (vurgu ve yeni sekme hemen yerinde), içeriğin üstünde kalır. */
+::view-transition-group(ik-ust),::view-transition-group(ik-yan),::view-transition-group(ik-sekmeler){z-index:1;animation:none}
+::view-transition-old(ik-ust),::view-transition-old(ik-yan),::view-transition-old(ik-sekmeler){display:none}
+::view-transition-new(ik-ust),::view-transition-new(ik-yan),::view-transition-new(ik-sekmeler){animation:none}

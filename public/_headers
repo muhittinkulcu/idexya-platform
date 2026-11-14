@@ -10,3 +10,12 @@
 # Panel service worker her açılışta güncel sürümle denetlensin (eski kabuk takılı kalmasın).
 /panel-sw.js
   Cache-Control: no-cache
+
+# Derlenmiş varlıklar: dosya adında içerik özeti var (Astro /_astro/; panel kabuğu ve tema betiği ?v=<özet>, tools/panel-kabuk.mjs); içerik değişince adres değişir.
+# Bir yıl önbellekte kalır, sayfa geçişlerinde yeniden doğrulama isteği (304) gitmez.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+/panel-kabuk.js
+  Cache-Control: public, max-age=31536000, immutable
+/panel-gorunum.js
+  Cache-Control: public, max-age=31536000, immutable

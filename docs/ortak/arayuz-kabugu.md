@@ -75,7 +75,8 @@ performans en önemli hususlar."
    betik ya da görsel yüklenmez: Inter ve görseller her projede kendi sunucusundan gelir. Kullanıcıya görünen her veri
    metin olarak basılır (`innerHTML` yok). Kabuk yetki kararı vermez; menüde ne görüneceğini sunucunun döndürdüğü yetki
    belirler.
-3. **Hız bütçesi.** Kabuğun JS'i sıkıştırılmış hâlde 15 kB'ı, CSS'i 10 kB'ı geçmez. Ana ekran telefonda
+3. **Hız bütçesi.** Kabuğun JS'i küçültülmüş ve sıkıştırılmış (minify + gzip; ürünlerin sunduğu boyut) hâlde 15 kB'ı,
+   CSS'i 10 kB'ı geçmez. Kaynaktaki yorumlar bütçeye sayılmaz (karar 14 Kas 2026). Ana ekran telefonda
    Lighthouse performans puanı en az 90; ilk boyama 1,5 sn altında. Galaksi arka planı sayfa içeriği çizildikten
    sonra, boşta kalan zamanda bir kez çizilir; ekran dışındayken çizim ve animasyon durur.
 4. **Hareket.** Animasyonlar yalnız `transform` ve `opacity` ile yapılır (ekran kartında çalışır, sayfayı yeniden
@@ -102,6 +103,10 @@ Her modül ve sayfa geçişinde içerik aynı sahne düzeniyle açılır: başl�
 sayılar sıfırdan sayar, kart içi çizgi grafikler kendini çizer, tablo satırları akarak gelir. Uyarı ve hata
 durumlarının noktası yavaşça atar. Kartın üzerine gelince kart yükselir ve solunda modül renginde çizgi belirir.
 Hepsi `transform`/`opacity` ile ve bir kez çalışır; "hareketi azalt" açıksa kapalıdır.
+Giriş hareketleri ve sayaçlar sekmedeki ilk açılışta oynar; aynı oturumda sonraki sayfa yüklemelerinde kabuk ve içerik
+hemen son hâliyle çizilir. Çok sayfalı üründe sayfalar arası geçişte paket çubuğu, yan menü ve sekme satırı yerinde
+kalır, yalnız içerik alanı kısa (150 ms) çapraz geçişle değişir (çapraz belge View Transitions; Muhittin, 14 Kas 2026:
+"tasarımdaki gibi hızlı geçsin"). Ayrıntı `kabuk/README.md`.
 
 ## Daraltılmış yan menü (Muhittin, 14 Kas 2026)
 
