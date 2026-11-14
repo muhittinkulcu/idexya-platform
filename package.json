@@ -11,7 +11,7 @@
     "test": "node tools/test-temel-yol.mjs && node tools/test-panel-menu.mjs && node tools/test-referans.mjs && node tools/test-sablon.mjs && node tools/test-tek-kayit.mjs && node tools/test-teklif-dosya.mjs && node tools/test-teklif-katalog.mjs"
   },
   "dependencies": {
-    "astro": "7.3.5",
+    "astro": "7.4.7",
     "html-to-image": "^1.11.13",
     "jose": "6.2.12",
     "qrcode-generator": "2.0.4"
