@@ -9,6 +9,9 @@ const z = (etiket, sinir = 30000, ek = {}) => ({ tur: 'zengin', etiket, sinir, .
 const TARIH = { desen: '^\\d{4}-\\d{2}-\\d{2}$', desenHata: 'YYYY-AA-GG biçiminde olmalı (ör. 2026-11-01)' };
 const ml = (etiket, oge = 'madde', sinir = 400, enCok = 40) => ({ tur: 'metinListe', etiket, oge, sinir, enCok });
 
+// Referans kategorileri için panelde açılır öneri listesi; liste dışı kategori de yazılabilir.
+export const REFERANS_KATEGORILERI = ['E-ticaret', 'Sağlık', 'Eğitim', 'Hizmet', 'Üretim', 'Turizm', 'Gıda', 'Moda', 'Teknoloji', 'Kurumsal'];
+
 const SSS_OGE = { tur: 'nesne', baslikAlan: 'soru', alanlar: { soru: m('Soru', 200, { zorunlu: true }), cevap: u('Cevap', 1500, { zorunlu: true }) } };
 
 export const DOSYALAR = {
@@ -74,8 +77,15 @@ export const DOSYALAR = {
   },
   referanslar: {
     ad: 'Referanslar', yol: 'src/data/referanslar.json',
-    aciklama: 'Ana sayfadaki “Birlikte büyüdüğümüz markalar” bölümü. Liste boşsa bölüm görünmez. Yalnız izin aldığınız markaları ekleyin.',
-    sema: { tur: 'liste', etiket: 'Markalar', oge: 'marka', enCok: 60, ogeSema: { tur: 'nesne', baslikAlan: 'ad', alanlar: { ad: m('Marka adı', 80, { zorunlu: true }), logo: { tur: 'gorsel', etiket: 'Logo (isteğe bağlı)' } } } }
+    aciklama: 'Ana sayfadaki “Birlikte büyüdüğümüz markalar” bölümü ve yalnız bağlantıyla açılan kategorili referans sayfası (tekliflerdeki QR kod). Liste boşsa ana sayfadaki bölüm görünmez. Yalnız izin aldığınız markaları ekleyin.',
+    sema: { tur: 'liste', etiket: 'Markalar', oge: 'marka', enCok: 60, ogeSema: { tur: 'nesne', baslikAlan: 'ad', alanlar: {
+      ad: m('Marka adı', 80, { zorunlu: true }),
+      kategori: m('Kategori', 40, { zorunlu: true, oneriler: REFERANS_KATEGORILERI }),
+      hizmet: m('Yapılan iş (kısa, ör. Google Ads ve e-ticaret sitesi)', 120),
+      aciklama: u('Açıklama', 240),
+      site: m('Site adresi (isteğe bağlı, https://…)', 200, { desen: '^https://[^\\s<>"\']+$', desenHata: 'https:// ile başlayan adres olmalı' }),
+      logo: { tur: 'gorsel', etiket: 'Logo (isteğe bağlı)' }
+    } } }
   },
   yazilar: {
     ad: 'Blog yazıları', yol: 'src/data/yazilar.json',

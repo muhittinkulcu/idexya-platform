@@ -1,0 +1,120 @@
+---
+// Gizli referans sayfasının kabuğu (Muhittin, 14 Kas 2026). Yalnız /r/<kod> adresinden, kod doğruysa sunulur (worker/referans.js);
+// bu adres doğrudan açılamaz (sunucu 404 verir). Menüde, site haritasında ve site içi aramada yer almaz; arama motorlarına kapalıdır.
+// Veri: src/data/referanslar.json (panelde Site içeriği › Referanslar). Ana sayfadaki logo bölümüyle aynı listedir.
+import Site from '../../layouts/Site.astro';
+import referanslar from '../../data/referanslar.json';
+import { REFERANS_KATEGORILERI } from '../../data/icerik-sema.js';
+
+const markalar = referanslar.filter((r) => r && r.ad).map((r) => ({ ...r, kategori: (r.kategori || '').trim() || 'Diğer' }));
+const sira = (k) => { const i = REFERANS_KATEGORILERI.indexOf(k); return i < 0 ? 99 : i; };
+const kategoriler = [...new Set(markalar.map((r) => r.kategori))]
+  .sort((a, b) => sira(a) - sira(b) || a.localeCompare(b, 'tr'))
+  .map((k) => ({ ad: k, sayi: markalar.filter((r) => r.kategori === k).length }));
+const bas = (ad) => ad.split(/\s+/).filter(Boolean).slice(0, 2).map((x) => x[0]).join('').toLocaleUpperCase('tr-TR');
+const alanAdi = (u) => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return ''; } };
+---
+<Site baslik="Referanslar" aciklama="Idexya | Good Things ile çalışan markalar ve yaptığımız işler." aramayaKapali>
+<style>
+  .rf{position:relative;background:var(--bg);color:var(--tx);overflow:hidden}
+  .rf::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 520px at 85% -10%,rgba(240,122,35,.12),transparent 62%),linear-gradient(rgba(0,37,89,.05) 1px,transparent 1px) 0 0/64px 64px,linear-gradient(90deg,rgba(0,37,89,.05) 1px,transparent 1px) 0 0/64px 64px}
+  :global(.koyu) .rf::before{background:radial-gradient(900px 520px at 85% -10%,rgba(240,122,35,.16),transparent 62%),linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px) 0 0/64px 64px,linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px) 0 0/64px 64px}
+  .rf-ic{position:relative;max-width:1240px;margin:0 auto;padding:clamp(40px,8vw,96px) var(--kenar,20px) clamp(48px,8vw,96px);box-sizing:border-box;display:flex;flex-direction:column;gap:clamp(24px,4vw,40px)}
+  .rf-ust{display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500;letter-spacing:.08em;color:var(--acc)}
+  .rf-ust::before{content:"";width:32px;height:2px;background:var(--brand)}
+  .rf h1{margin:0;font-size:clamp(32px,6vw,56px);line-height:1.1;letter-spacing:-.02em;font-weight:500;color:var(--head)}
+  .rf-giris{margin:0;max-width:62ch;font-size:clamp(16px,2vw,18px);line-height:1.65;font-weight:400;color:var(--tx2)}
+  .rf-say{margin:0;font-size:14px;font-weight:400;color:var(--tx2)}
+  .rf-bas{display:flex;flex-direction:column;gap:16px}
+
+  .rf-liste{display:flex;flex-direction:column;gap:16px}
+  .rf-suzgec{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 8px;margin:0 calc(-1 * var(--kenar,20px));padding-inline:var(--kenar,20px);scroll-snap-type:x proximity;scrollbar-width:thin}
+  .rf-cip{flex:none;scroll-snap-align:start;min-height:44px;display:inline-flex;align-items:center;gap:8px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--head);font:inherit;font-size:15px;font-weight:400;cursor:pointer;transition:background-color .25s,border-color .25s,color .25s}
+  .rf-cip small{font-size:12px;color:var(--tx2);transition:color .25s}
+  .rf-cip:hover{border-color:color-mix(in srgb,var(--brand) 55%,var(--line))}
+  .rf-cip[aria-pressed="true"]{background:var(--head);border-color:var(--head);color:var(--bg)}
+  .rf-cip[aria-pressed="true"] small{color:color-mix(in srgb,var(--bg) 75%,transparent)}
+  .rf-cip:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+
+  .rf-izgara{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px;transition:opacity .2s ease}
+  .rf-izgara.gecis{opacity:0}
+  .rf-kart{display:flex;flex-direction:column;gap:14px;padding:20px;border:1px solid var(--line);border-radius:18px;background:var(--card);box-sizing:border-box;min-width:0;
+    opacity:0;transform:translateY(16px);animation:rf-gel .6s cubic-bezier(.2,.7,.2,1) forwards;animation-delay:calc(var(--i, 0) * 70ms);transition:border-color .25s,box-shadow .25s}
+  .rf-kart:hover{border-color:color-mix(in srgb,var(--brand) 45%,var(--line));box-shadow:0 18px 40px -26px var(--shadow)}
+  @keyframes rf-gel{to{opacity:1;transform:none}}
+  .rf-logo{height:72px;display:flex;align-items:center;justify-content:flex-start}
+  .rf-logo img{max-height:56px;max-width:min(100%,200px);object-fit:contain}
+  .rf-harf{width:56px;height:56px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;background:var(--tint);color:var(--tintx);font-size:20px;font-weight:500;letter-spacing:.02em}
+  .rf-kart h2{margin:0;font-size:20px;line-height:1.3;font-weight:500;color:var(--head);overflow-wrap:anywhere}
+  .rf-etiket{align-self:flex-start;display:inline-flex;align-items:center;padding:3px 10px;border-radius:999px;background:var(--tint);color:var(--tintx);font-size:12.5px;font-weight:500}
+  .rf-is{margin:0;font-size:15px;line-height:1.55;font-weight:400;color:var(--tx)}
+  .rf-is span{display:block;font-size:12.5px;color:var(--tx2);margin-bottom:2px}
+  .rf-aciklama{margin:0;font-size:15px;line-height:1.65;font-weight:400;color:var(--tx2);overflow-wrap:anywhere}
+  .rf-site{margin-top:auto;align-self:flex-start;min-height:44px;display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:500;color:var(--acc);text-decoration:none}
+  .rf-site:hover{text-decoration:underline}
+  .rf-sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .rf-bos{padding:28px;border:1px dashed var(--line);border-radius:18px;background:var(--card);font-size:16px;line-height:1.6;color:var(--tx2)}
+
+  .rf-cagri{display:flex;flex-direction:column;gap:14px;padding:clamp(24px,5vw,44px);border-radius:24px;background:linear-gradient(140deg,var(--tint),var(--card) 70%);border:1px solid var(--line)}
+  .rf-cagri h2{margin:0;font-size:clamp(24px,4vw,34px);line-height:1.2;font-weight:500;letter-spacing:-.015em;color:var(--head)}
+  .rf-cagri p{margin:0;max-width:60ch;font-size:16px;line-height:1.65;font-weight:400;color:var(--tx2)}
+  .rf-eylem{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .rf-dugme{min-height:48px;display:inline-flex;align-items:center;justify-content:center;padding:0 20px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--head);font:inherit;font-size:15px;font-weight:500;text-decoration:none;cursor:pointer}
+  .rf-dugme.ana{background:var(--fill);border-color:var(--fill);color:#FFFFFF}
+  .rf-dugme:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+  @media (max-width:520px){.rf-eylem .rf-dugme{flex:1 1 100%}.rf-kart{padding:18px;gap:10px}.rf-logo{height:56px}.rf-harf{width:48px;height:48px;font-size:18px}.rf-kart h2{font-size:18px}.rf-izgara{gap:12px}}
+
+  @media (prefers-reduced-motion:reduce){
+    .rf-kart{animation:none;opacity:1;transform:none}
+    .rf-izgara,.rf-cip,.rf-kart{transition:none}
+  }
+</style>
+<section class="rf" aria-labelledby="rf-baslik">
+  <div class="rf-ic">
+    <header class="rf-bas">
+      <span class="rf-ust">REFERANSLAR</span>
+      <h1 id="rf-baslik">Birlikte büyüdüğümüz markalar</h1>
+      <p class="rf-giris">Farklı sektörlerden markalarla reklam, e-ticaret, SEO ve yazılım işlerinde birlikte çalışıyoruz. Sektör seçerek size benzeyen işlere göz atabilirsiniz.</p>
+      {markalar.length > 0 && <p class="rf-say">{markalar.length} marka · {kategoriler.length} sektör</p>}
+    </header>
+
+    {markalar.length > 0 ? (
+      <div class="rf-liste" data-rf>
+        {kategoriler.length > 1 && (
+          <div class="rf-suzgec" role="group" aria-label="Sektöre göre süz">
+            <button type="button" class="rf-cip" aria-pressed="true" data-rf-suz="">Tümü <small>{markalar.length}</small></button>
+            {kategoriler.map((k) => <button type="button" class="rf-cip" aria-pressed="false" data-rf-suz={k.ad}>{k.ad} <small>{k.sayi}</small></button>)}
+          </div>
+        )}
+        <p class="rf-sr" role="status" aria-live="polite" data-rf-durum></p>
+        <ul class="rf-izgara" data-rf-izgara>
+          {markalar.map((r, i) => (
+            <li class="rf-kart" data-kategori={r.kategori} style={`--i: ${Math.min(i, 12)}`}>
+              <div class="rf-logo">{r.logo ? <img src={r.logo} alt={`${r.ad} logosu`} loading={i < 6 ? 'eager' : 'lazy'} decoding="async" /> : <span class="rf-harf" aria-hidden="true">{bas(r.ad)}</span>}</div>
+              <h2>{r.ad}</h2>
+              <span class="rf-etiket">{r.kategori}</span>
+              {r.hizmet && <p class="rf-is"><span>Yapılan iş</span>{r.hizmet}</p>}
+              {r.aciklama && <p class="rf-aciklama">{r.aciklama}</p>}
+              {r.site && alanAdi(r.site) && <a class="rf-site" href={r.site} target="_blank" rel="noopener nofollow">{alanAdi(r.site)} <span aria-hidden="true">↗</span><span class="rf-sr"> (yeni sekmede açılır)</span></a>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ) : (
+      <p class="rf-bos">Referans listemiz güncelleniyor. Benzer işlerimizi konuşmak için bize yazın; size uygun örnekleri paylaşalım.</p>
+    )}
+
+    <aside class="rf-cagri" aria-labelledby="rf-cagri-baslik">
+      <h2 id="rf-cagri-baslik">Markanız için de konuşalım</h2>
+      <p>Reklam hesaplarınızı ve sitenizi ücretsiz inceleyelim; nereden başlamanız gerektiğini ve neyi ölçeceğimizi açıkça anlatalım.</p>
+      <div class="rf-eylem">
+        <button type="button" class="rf-dugme ana" data-hizli-talep="analiz">Ücretsiz analiz isteyin</button>
+        <a class="rf-dugme" href="https://wa.me/905078700629" target="_blank" rel="noopener">WhatsApp’tan yazın</a>
+        <a class="rf-dugme" href="mailto:info@idexya.com">info@idexya.com</a>
+      </div>
+    </aside>
+  </div>
+</section>
+<!-- Süzgeç betiği ayrı dosyada (satır içi betik yok); Astro işlemesin diye is:inline ile yalnız etiket yazılır. -->
+<script is:inline src="/js/referans-suzgec.js" defer></script>
+</Site>

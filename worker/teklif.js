@@ -3,6 +3,7 @@
 // Tutarlar sunucuda kuruş (tam sayı) üzerinden hesaplanır; istemcinin gönderdiği toplamlar dikkate alınmaz.
 // Durum akışı: taslak → gonderildi → kabul | red. Yalnız taslak düzenlenir ve silinir.
 import { json, hata, simdi, kimlik, kirp, islemYaz } from './ortak.js';
+import { teklifReferansi } from './referans.js';
 // Aylık ve tek seferlik tutarlar toplanmaz (12 Kas 2026): hesap ekran önizlemesiyle ortak modülde.
 import { teklifHesapla, toplamSutunlari, teklifBloklari, bloklarMetni } from '../src/scripts/yonetim/teklif-toplam.js';
 
@@ -134,7 +135,9 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
     const mus = await db.prepare('SELECT id, firma, ad, eposta, telefon, asama FROM musteriler WHERE id = ?').bind(t.musteri_id).first();
     // Karışık teklifte iki gelir kaydı olur (aylık ilk ay, tek seferlik); gelir ilk kayıttır (eski istemcilerle uyum).
     const gelirler = (await db.prepare("SELECT id, durum, vade, odeme_tarihi, tutar, aciklama FROM muhasebe WHERE tur = 'gelir' AND belge_no = ? ORDER BY olusturma, aciklama LIMIT 10").bind(t.no).all()).results;
-    return json({ ok: true, teklif: t, musteri: mus || null, gelir: gelirler[0] || null, gelirler });
+    // Referans sayfası bağlantısı ve QR (kod tanımlı değilse null): teklif çıktısında gösterilir.
+    const referans = await teklifReferansi(db, t.id);
+    return json({ ok: true, teklif: t, musteri: mus || null, gelir: gelirler[0] || null, gelirler, referans });
   }
 
   // Güncelleme: yalnız taslak
@@ -209,6 +212,7 @@ export async function yonetimTeklifApi(db, yontem, yol, govde, kim) {
       if (t.durum !== 'taslak') return hata('Yalnız taslak teklif silinebilir', 409);
       const r = await db.prepare("DELETE FROM teklifler WHERE id = ? AND durum = 'taslak'").bind(t.id).run();
       if (!r.meta || !r.meta.changes) return hata('Teklif bu arada değişti; sayfayı yenileyin', 409);
+      await db.prepare('DELETE FROM referans_acilis WHERE teklif_id = ?').bind(t.id).run();
       await islemYaz(db, kim.eposta, 'teklif_sil', t.id, t.no);
       return json({ ok: true });
     }

@@ -52,6 +52,13 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
 .notlar h2{margin:0 0 4px;font-size:11px;letter-spacing:.08em;color:var(--tx2);font-weight:600}
 .notlar p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .alt{margin-top:24px;font-size:11px;color:var(--tx2)}
+/* Referans sayfası QR'ı (worker/referans.js SVG üretir; 4 modül sessiz alan SVG'nin içinde) */
+.referans{display:flex;gap:16px;align-items:center;margin-top:20px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;break-inside:avoid}
+.referans .qr{flex:none;width:32mm;height:32mm}
+.referans .qr svg{display:block;width:100%;height:100%}
+.referans h2{margin:0 0 4px;font-size:11px;letter-spacing:.08em;color:var(--tx2);font-weight:600}
+.referans .ref-cagri{margin:0;font-size:15px;color:var(--head);font-weight:600}
+.referans .ref-adres{margin:4px 0 0;font-size:12px;color:var(--tx2);overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
 @media (max-width:600px){
   .sayfa{max-width:100%;margin:0;padding:20px 16px;min-height:0;box-shadow:none}
   .belge{text-align:left}.belge dl{justify-content:start}
@@ -97,6 +104,10 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
   </table>
   <dl class="toplam" data-toplam></dl>
   <section class="notlar" data-notlar hidden><h2>NOTLAR</h2><p data-not-metin></p></section>
+  <section class="referans" data-referans hidden aria-label="Referanslar">
+    <div class="qr" data-qr></div>
+    <div><h2>REFERANSLAR</h2><p class="ref-cagri">Referanslarımızı görmek için okutun</p><p class="ref-adres" data-ref-adres></p></div>
+  </section>
   <p class="alt" data-alt></p>
 </main>
 <script>
@@ -141,6 +152,15 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
     ciftler($('[data-toplam]'), toplamSatirlari(teklifBloklari(t), t.kdv_orani, { matrah: true }).map(([a, b, g]) => [a, b, g ? 'genel' : '']));
     $('[data-notlar]').hidden = !t.notlar;
     $('[data-not-metin]').textContent = t.notlar || '';
+    // Referans sayfası QR'ı: kod panelde (Site içeriği › Referanslar) üretilmemişse bölüm gizli kalır.
+    if (v.referans && v.referans.svg) {
+      const svg = new DOMParser().parseFromString(v.referans.svg, 'image/svg+xml').documentElement;
+      if (svg && svg.nodeName === 'svg') {
+        $('[data-qr]').replaceChildren(document.importNode(svg, true));
+        $('[data-ref-adres]').textContent = v.referans.kisa;
+        $('[data-referans]').hidden = false;
+      }
+    }
     $('[data-alt]').textContent = `Fiyatlar Türk lirası (TL) cinsindendir.${t.gecerlilik ? ` Bu teklif ${gun(t.gecerlilik)} tarihine kadar geçerlidir.` : ''} Sorularınız için ${(a && a.eposta) || 'info@idexya.com'} adresine yazabilir ya da ${(a && a.telefon) || '0507 870 06 29'} numaralı telefonu arayabilirsiniz.${a && a.teklif_notu ? ' ' + a.teklif_notu : ''}`;
     $('[data-sayfa]').hidden = false;
     $('[data-yazdir]').disabled = false;

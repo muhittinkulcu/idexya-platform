@@ -34,6 +34,7 @@ import { yonetimSiteSaglikApi, siteSaglikCron } from './site-saglik.js';
 import { yonetimDonusumApi, reklamTemizle, talepReklamSorgu } from './donusum.js';
 import { ekibeBildir, yonetimEpostaApi } from './eposta.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
+import { referansSayfasi, yonetimReferansApi } from './referans.js';
 import { panelAlani, panelKoku, eskiYol, SAYFALAR } from './panel-yollar.js';
 import { eskiAramayiCevir } from '../src/data/panel-parametre.js';
 
@@ -301,7 +302,7 @@ async function yonetimApi(istek, env, yol, kim) {
     return json({ ok: true });
   }
   const uyeYaniti = (await yonetimUyeApi(db, yontem, yol, govde, kim)) || (await yonetimIcerikApi(db, yontem, yol, govde, kim)) || (await yonetimAsistanApi(db, yontem, yol)) || (await yonetimReklamApi(db, env, yontem, yol, kim, govde)) || (await yonetimBultenApi(db, yontem, yol, govde, kim)) || (await yonetimHaftalikBultenApi(db, yontem, yol, govde, kim)) || (await yonetimTemaApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBannerApi(db, yontem, yol, govde, kim, istek)) || (await yonetimInstagramApi(db, env, yontem, yol, govde, kim)) || (await yonetimSistemApi(db, env, yontem, yol, govde, kim)) || (await yonetimYayinApi(db, env, istek, yontem, yol, govde, kim)) || (await yonetimTeklifApi(db, yontem, yol, govde, kim)) || (await yonetimTeklifDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeSablonApi(db, env, yontem, yol, govde, kim)) || (await yonetimBelgeDosyaApi(db, env, yontem, yol, govde, kim)) || (await yonetimEtiketApi(db, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimTekKayitApi(db, env, yontem, yol, govde, kim)) || (await yonetimAnaKayitApi(db, env, yontem, yol, kim, govde)) || (await yonetimCrmApi(db, env, yontem, yol, govde, kim)) || (await yonetimPortalApi(db, yontem, yol, govde, kim)) || (await yonetimDenetimApi(db, env, istek, yontem, yol, kim)) || (await yonetimOlcumApi(db, yontem, yol))
-    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim));
+    || (await yonetimGorevApi(db, yontem, yol, govde, kim)) || (await yonetimMusteriAlaniApi(db, env, yontem, yol, govde, kim)) || (await yonetimEnvanterApi(db, yontem, yol, govde, kim)) || (await yonetimYedekApi(db, env, yontem, yol, kim)) || (await yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, new URL(istek.url))) || (await yonetimDonusumApi(db, yontem, yol, govde, kim, istek)) || (await yonetimBelgeApi(db, yontem, yol, govde, kim)) || (await yonetimMuhasebeApi(db, yontem, yol, govde, kim)) || (await yonetimEpostaApi(db, env, yontem, yol, kim)) || (await yonetimReferansApi(db, yontem, yol, kim));
   if (uyeYaniti) return uyeYaniti;
   return hata('Bulunamadı', 404);
 }
@@ -343,6 +344,9 @@ export default {
       if (yol === '/tr/bulten' || yol.startsWith('/tr/bulten/')) { await semaKur(env.DB); return await bultenSayfasi(istek, env, ctx, async () => !!(await yonetici(istek, env))); }
       if (yol === '/api/tema') { await semaKur(env.DB); return await temaApi(istek, env, ctx); }
       if (yol === '/sitemap-bulten.xml') { await semaKur(env.DB); return await bultenSitemap(env); }
+      // Gizli referans sayfası (worker/referans.js): yalnız kod doğruysa açılır, değilse sıradan 404.
+      const referansEslesme = !panel && yol.match(/^\/r\/([a-z0-9]{6,12})\/?$/);
+      if (referansEslesme) { await semaKur(env.DB); return await referansSayfasi(istek, env, ctx, referansEslesme[1]); }
       if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
       if (/^\/uye\/uye-icerik\/?$/.test(yol)) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
       if (yol.startsWith('/uye/')) return env.ASSETS.fetch(istek);

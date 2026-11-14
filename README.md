@@ -81,3 +81,14 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
   sonra `node tools/test-asistan.mjs <anahtarsız-adres> <sahte-anahtarlı-adres>`
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
   sonra boş veritabanıyla `node tools/test-yonetim.mjs http://127.0.0.1:8787 <ekran-klasörü>` (uçtan uca: form → talep → CRM → kart).
+
+## Gizli referans sayfası (`/r/<kod>`)
+
+- Menüde, site haritasında ve site içi aramada yer almayan, yalnız bağlantıyla açılan kategorili referans listesi (`worker/referans.js`,
+  kabuk `src/pages/kabuk/referanslar.astro`, veri `src/data/referanslar.json`, panelde Site içeriği › Referanslar).
+- Kod D1 `ayarlar` tablosunda (`referans_kodu`); panelde "Kod üret / Yeni kod üret" ile değişir, eski bağlantılar o an geçersiz olur.
+  Kod yoksa ya da yanlışsa sitenin sıradan 404 sayfası döner. Yanıt başlıkları: `X-Robots-Tag: noindex, nofollow`, `Referrer-Policy: no-referrer`.
+- Teklif çıktısında QR kod (sunucuda SVG, `qrcode-generator` MIT, hata düzeltme M, 4 modül sessiz alan): `/r/<kod>?t=<teklif anahtarı>`.
+  Anahtar `teklifler.referans_anahtari` (teklif ilk okunduğunda üretilir). Geçerli `t` ile açılışta müşteri kartına günde en çok bir
+  "Müşteri referansları açtı" kaydı düşer (`referans_acilis`: yalnız teklif, gün, zaman). Bağlantı önizleyicileri sayılmaz.
+- Test: `node tools/test-referans.mjs` (sunucu gerekmez).

@@ -18,6 +18,8 @@ function yolTemizle(p) {
   const yol = p.split(/[?#]/)[0];
   if (!/^\/[\w\-./%~]*$/.test(yol) || yol.includes('//')) return null;
   if (/^\/(yonetim|api|kabuk|cdn-cgi)(\/|$)/.test(yol)) return null;
+  // Gizli referans sayfasının kodu ziyaret istatistiğine yazılmaz (worker/referans.js).
+  if (/^\/r\//.test(yol)) return '/r/…';
   return yol;
 }
 
