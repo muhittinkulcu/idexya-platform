@@ -5,6 +5,11 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <nav class="kart" aria-label="İçerik dosyaları" data-dosyalar style="padding: 8px; display: flex; flex-wrap: wrap; gap: 4px"></nav>
 <div data-durum-kutu></div>
 <p data-aciklama style="margin: 0; color: var(--tx2)"></p>
+<section class="kart" data-referans-kodu hidden aria-labelledby="referans-kodu-baslik" style="padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+<b id="referans-kodu-baslik" style="font-size: 15px">Referans sayfası bağlantısı</b>
+<p style="margin: 0; font-size: 14px; color: var(--tx2)">Bu sayfa sitede hiçbir menüde, site haritasında ya da aramada yer almaz; yalnız bağlantıyı bilen açabilir. Tekliflerin çıktısında bu bağlantı QR kod olarak yer alır.</p>
+<div data-referans-icerik style="display: flex; flex-direction: column; gap: 10px"><div class="bos">Yükleniyor…</div></div>
+</section>
 <section class="kart" data-duzenleyici style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px" aria-live="polite"><div class="bos">Yükleniyor…</div></section>
 <div class="kart si-cubuk" style="padding: 14px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; position: sticky; bottom: 12px; z-index: 5; box-shadow: 0 10px 30px var(--shadow)">
 <input data-not maxlength="120" placeholder="Değişiklik notu (isteğe bağlı)" aria-label="Değişiklik notu" style="flex: 1 1 240px; min-height: 42px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit">
@@ -95,6 +100,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const g = s.tur === 'uzun' ? el('textarea', { id, maxlength: s.sinir, rows: Math.min(10, Math.max(3, Math.ceil(String(deger || '').length / 90))) }, deger || '') : el('input', { id, value: deger || '', maxlength: s.sinir || 300, placeholder: s.tur === 'yol' ? '/tr/…' : s.tur === 'url' ? 'https://… veya /…' : '' });
     g.addEventListener('input', () => { ata(g.value); isaretle(); });
     etiket.append(g);
+    // Öneri listesi (ör. referans kategorileri): açılır listeden seçilir, liste dışı değer de yazılabilir.
+    if (s.oneriler) { const lid = id + '-oneri'; g.setAttribute('list', lid); g.setAttribute('autocomplete', 'off'); etiket.append(el('datalist', { id: lid }, ...s.oneriler.map((x) => el('option', { value: x }))), el('small', {}, 'Listeden seçin ya da yeni bir kategori yazın.')); }
+    if (s.tur === 'uzun' && s.sinir <= 400) { const say = el('small', {}, `${String(deger || '').length} / ${s.sinir} karakter`); g.addEventListener('input', () => { say.textContent = `${g.value.length} / ${s.sinir} karakter`; }); etiket.append(say); }
     if (s.tur === 'gorsel') {
       const on = el('img', { src: deger || '', alt: '', hidden: !deger });
       g.addEventListener('input', () => { on.src = g.value; on.hidden = !g.value; });
@@ -139,6 +147,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     history.replaceState(null, '', adresMetni({ dosya: ad }) + location.hash);
     q('[data-dosyalar]').replaceChildren(...Object.entries(DOSYALAR).map(([k, d]) => el('button', { type: 'button', class: 'dugme kucuk', 'aria-pressed': String(k === ad), style: k === ad ? 'background: var(--tint); color: var(--tintx); border-color: transparent' : 'border-color: transparent; background: transparent', onclick: () => ac(k) }, d.ad)));
     q('[data-aciklama]').textContent = DOSYALAR[ad].aciklama;
+    referansKoduCiz();
     const ed = q('[data-duzenleyici]'); ed.replaceChildren(el('div', { class: 'bos' }, 'Yükleniyor…'));
     try {
       const r = await api('icerik-dosya/' + ad);
@@ -176,6 +185,35 @@ import Yonetim from '../../layouts/Yonetim.astro';
         ? el('div', { class: 'uyari bilgi' }, `Yayın açık: değişiklikler ${r.depo} deposunun ${r.dal} dalına kaydedilir. `, r.sonYayinlar.length ? `Son yayın: ${tarih(r.sonYayinlar[0].zaman)} · ${r.sonYayinlar[0].detay || ''} (${r.sonYayinlar[0].kim})` : '')
         : el('div', { class: 'uyari hata' }, 'Yayınlama kapalı. İçeriği görüp düzenleyebilirsiniz ama yayınlamak için Cloudflare’de GITHUB_TOKEN gizli değeri tanımlanmalı (yalnız bu depoya “Contents: Read and write” izni olan ince ayarlı GitHub anahtarı). Gösterilen içerik yayındaki sürümdür.'));
     } catch (h) { genelHata(h.message); }
+  }
+  // --- Referans sayfası kodu (yalnız Referanslar dosyasında) ---
+  async function referansKoduCiz() {
+    const kutu = q('[data-referans-kodu]'), ic = q('[data-referans-icerik]');
+    kutu.hidden = ad !== 'referanslar';
+    if (kutu.hidden) return;
+    let r;
+    try { r = await api('referans-kodu'); } catch (h) { ic.replaceChildren(el('div', { class: 'uyari hata' }, 'Kod okunamadı: ' + h.message)); return; }
+    const durum = el('span', { role: 'status', style: 'font-size: 14px; color: var(--tx2)' });
+    const yeni = el('button', { type: 'button', class: 'dugme' + (r.kod ? '' : ' ana'), onclick: async () => {
+      const metin = r.kod
+        ? 'Yeni referans kodu üretilsin mi?\n\nEski bağlantı ve daha önce gönderilen tekliflerdeki QR kodlar hemen geçersiz olur; açan kişi “Sayfa bulunamadı” görür. Bu işlem geri alınamaz.'
+        : 'Referans sayfası için ilk kod üretilsin mi? Kod üretildikten sonra teklif çıktılarında QR kod görünür.';
+      if (!confirm(metin)) return;
+      yeni.disabled = true;
+      try { await api('referans-kodu/yeni', {}); await referansKoduCiz(); q('[data-referans-icerik] [role=status]').textContent = 'Yeni kod üretildi.'; }
+      catch (h) { durum.textContent = h.message; yeni.disabled = false; }
+    } }, r.kod ? 'Yeni kod üret' : 'Kod üret');
+    if (!r.kod) { ic.replaceChildren(el('p', { style: 'margin: 0; font-size: 14px' }, 'Henüz kod üretilmedi; referans sayfası kapalı ve tekliflerde QR kod görünmüyor.'), el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, yeni, durum)); return; }
+    const kopyala = el('button', { type: 'button', class: 'dugme ana', onclick: async () => {
+      try { await navigator.clipboard.writeText(r.baglanti); durum.textContent = 'Bağlantı kopyalandı.'; }
+      catch (e) { durum.textContent = 'Kopyalanamadı; bağlantıyı seçip elle kopyalayın.'; }
+    } }, 'Bağlantıyı kopyala');
+    ic.replaceChildren(
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' },
+        el('code', { style: 'padding: 8px 12px; border-radius: 10px; background: var(--card2); border: 1px solid rgb(var(--line)); font-size: 14px; overflow-wrap: anywhere' }, r.baglanti),
+        el('a', { class: 'dugme kucuk', href: r.baglanti, target: '_blank', rel: 'noopener noreferrer' }, 'Sayfayı aç ↗')),
+      el('small', { style: 'color: var(--tx2)' }, `Kod: ${r.kod} · son değişiklik ${tarih(r.guncelleme)}. Teklif çıktılarındaki bağlantıya teklife özel bir ek (?t=…) eklenir; müşteri açtığında müşteri kartına günde bir kez “Müşteri referansları açtı” yazılır.`),
+      el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, kopyala, yeni, durum));
   }
   durumCiz(); ac(ad);
 </script>

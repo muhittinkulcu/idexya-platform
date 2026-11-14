@@ -1,7 +1,7 @@
 // Aylık bülten ilgi listesi (Muhittin, 23 Eki 2026). Şimdilik yalnızca e-posta ve açık ticari ileti onayı toplanır;
 // gönderim servisi ve İYS kaydı hazır olunca bülten gönderilir. Onay kaydı (zaman, metin sürümü, sayfa) saklanır.
 // Ayrılan kişinin kaydı onayın geri alınmasından 3 yıl sonra silinir (worker/saklama.js).
-import { json, hata, simdi, kimlik, kirp, ozet, islemYaz, EPOSTA_DESEN, ayniKaynak, govdeOku, ipAl, robotDogrula, GUVENLIK_BASLIKLARI } from './ortak.js';
+import { json, hata, simdi, kimlik, kirp, ozet, islemYaz, EPOSTA_DESEN, ayniKaynak, govdeOku, ipAl, robotDogrula, GUVENLIK_BASLIKLARI, sayfaMaskele } from './ortak.js';
 
 // Onay metni değişirse sürüm artırılır; hangi kişinin hangi metne onay verdiği böylece bilinir.
 export const ONAY_SURUM = '2026-10-23';
@@ -25,7 +25,7 @@ export async function bultenApi(istek, env, yol) {
     if (son && son.n >= 5) return hata('Çok fazla deneme. Lütfen biraz sonra tekrar deneyin.', 429);
     const dogrulama = await robotDogrula(env, g.turnstile, ip);
     if (dogrulama === 'kaldi') return hata('Robot doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.', 403);
-    const z = simdi(), sayfaYol = kirp(g.sayfa, 200);
+    const z = simdi(), sayfaYol = sayfaMaskele(kirp(g.sayfa, 200));
     // Kayıtlı adres için aynı yanıt döner (listede kimin olduğu dışarıdan anlaşılmasın). Ayrılmış kişi yeniden onay verirse kayıt yeni onayla güncellenir.
     await db.prepare(`INSERT INTO bulten (id, eposta, durum, onay_zamani, onay_surum, sayfa, ip_ozet, dogrulama, ayrilma_anahtari)
       VALUES (?, ?, 'aktif', ?, ?, ?, ?, ?, ?)

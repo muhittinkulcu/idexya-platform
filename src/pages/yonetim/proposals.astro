@@ -183,7 +183,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
       kabul: [gelirAlani(t, v.gelirler || (v.gelir ? [v.gelir] : [])), yazdir, dugme('Kopyala', 'kopyala')], red: [yazdir, dugme('Kopyala', 'kopyala')]
     }[t.durum] || [yazdir];
     const bilgi = [['Oluşturma', tarih(t.olusturma)], ['Geçerlilik', gun(t.gecerlilik)], t.gonderim_zamani ? ['Gönderildi', tarih(t.gonderim_zamani)] : null,
-      t.karar_zamani ? [t.durum === 'kabul' ? 'Kabul' : 'Ret', tarih(t.karar_zamani)] : null, ['Hazırlayan', t.olusturan]].filter(Boolean);
+      t.karar_zamani ? [t.durum === 'kabul' ? 'Kabul' : 'Ret', tarih(t.karar_zamani)] : null, ['Hazırlayan', t.olusturan],
+      v.referans ? ['Referans sayfası', v.referans.acilis_gun ? `${v.referans.acilis_gun} gün açıldı · son ${tarih(v.referans.son_acilis)}` : 'Henüz açılmadı'] : null].filter(Boolean);
     const th = (b, sag) => el('th', { scope: 'col', style: `padding: 8px 10px; font-size: 12px; color: var(--tx2); text-align: ${sag ? 'right' : 'left'}` }, b);
     const td = (c, sag) => el('td', { style: `padding: 8px 10px; border-top: 1px solid rgb(var(--line)); vertical-align: top; ${sag ? 'text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums' : 'overflow-wrap: anywhere'}` }, c);
     detay.replaceChildren(

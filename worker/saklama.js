@@ -18,7 +18,9 @@ export const KURALLAR = [
   // Reklam tıklama kimlikleri (worker/donusum.js): en çok 1 yıl; talebi silinenler hemen.
   { ad: 'Reklam tıklama kimlikleri (1 yıl)', sql: 'DELETE FROM talep_reklam WHERE tiklama_zamani < ? OR talep_id NOT IN (SELECT id FROM talepler)', sure: YIL },
   { ad: 'Dönüşüm aktarım kayıtları (1 yıl)', sql: 'DELETE FROM donusum_aktarim WHERE zaman < ? OR talep_id NOT IN (SELECT id FROM talepler)', sure: YIL },
-  { ad: 'Gerçek kullanıcı hız örnekleri (90 gün)', sql: 'DELETE FROM hiz_olcum WHERE gun < ?', sure: 90 * 86400000 }
+  { ad: 'Gerçek kullanıcı hız örnekleri (90 gün)', sql: 'DELETE FROM hiz_olcum WHERE gun < ?', sure: 90 * 86400000 },
+  // Gizli referans sayfası açılışları (worker/referans.js): yalnız teklif, gün ve zaman; 12 ay sonra silinir. Müşteri kartındaki kayıt kalır.
+  { ad: 'Referans sayfası açılışları (12 ay)', sql: 'DELETE FROM referans_acilis WHERE zaman < ?', sure: YIL }
 ];
 
 export async function saklamaUygula(db, an = Date.now()) {

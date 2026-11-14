@@ -215,7 +215,9 @@ export const SEMA = [
   `CREATE TABLE IF NOT EXISTS belge_dosyalari (
     id TEXT PRIMARY KEY, musteri_id TEXT NOT NULL, sablon_id TEXT NOT NULL, sablon_surum INTEGER NOT NULL, ad TEXT NOT NULL, belge_no TEXT,
     tarih TEXT NOT NULL, dosya_anahtari TEXT NOT NULL, dosya_adi TEXT, boyut INTEGER NOT NULL, taslak INTEGER NOT NULL DEFAULT 0, olusturan TEXT NOT NULL, olusturma TEXT NOT NULL)`,
-  `CREATE INDEX IF NOT EXISTS belge_dosya_musteri ON belge_dosyalari (musteri_id, tarih)`
+  `CREATE INDEX IF NOT EXISTS belge_dosya_musteri ON belge_dosyalari (musteri_id, tarih)`,
+  // Gizli referans sayfası (worker/referans.js): teklif bağlantısıyla açılış, teklif başına İstanbul gününde tek satır. Yalnız zaman; IP ya da kişi bilgisi yok.
+  `CREATE TABLE IF NOT EXISTS referans_acilis (teklif_id TEXT NOT NULL, gun TEXT NOT NULL, zaman TEXT NOT NULL, PRIMARY KEY (teklif_id, gun))`
 ];
 
 // Var olan tablolara sonradan eklenen sütunlar: semaKur yalnız eksikse ALTER TABLE çalıştırır, ardından dizinler kurulur.
@@ -230,11 +232,14 @@ export const EK_SUTUNLAR = [
   // Teklif tutarları türe göre (12 Kas 2026: aylık ve tek seferlik toplanmaz). Boşsa o türde kalem yok; eski teklifte hepsi boş.
   // İki tür birlikteyken ara_toplam/kdv/toplam 0 yazılır ve tutarlar yalnız bu sütunlardadır (src/scripts/yonetim/teklif-toplam.js).
   ['teklifler', 'ara_aylik', 'REAL'], ['teklifler', 'kdv_aylik', 'REAL'], ['teklifler', 'toplam_aylik', 'REAL'],
-  ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL']
+  ['teklifler', 'ara_tek', 'REAL'], ['teklifler', 'kdv_tek', 'REAL'], ['teklifler', 'toplam_tek', 'REAL'],
+  // Referans sayfası bağlantısındaki teklif anahtarı (?t=…): tahmin edilemez 10 karakter, teklif ilk okunduğunda üretilir (worker/referans.js).
+  ['teklifler', 'referans_anahtari', 'TEXT']
 ];
 export const EK_DIZINLER = [
   // Şablondan üretilen belgenin numarası tekil (boş numara serbest). Tablo yeni olduğundan mevcut veriyle çakışmaz.
   `CREATE UNIQUE INDEX IF NOT EXISTS belge_dosya_no ON belge_dosyalari (belge_no)`,
   `CREATE INDEX IF NOT EXISTS musteri_ana_kayit ON musteriler (ana_kayit_id)`,
-  `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`
+  `CREATE INDEX IF NOT EXISTS musteri_arsiv ON musteriler (arsiv)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS teklif_referans_anahtari ON teklifler (referans_anahtari)`
 ];
