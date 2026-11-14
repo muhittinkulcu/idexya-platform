@@ -56,3 +56,15 @@ export function konumEkle(konum, istekAdresi, temel) {
   const yol = yolEkle(hedef.pathname, temel);
   return hedef.origin + yol + hedef.search + hedef.hash;
 }
+
+// Tarayıcıda sayfanın öneki: Worker os alanında her HTML'e <meta name="idexya-temel-yol" content="/website"> koyar
+// (veri; betik değil). Meta yoksa (idexya.com, panel.idexya.com) boş döner ve adresler aynen kalır.
+export function sayfaOneki() {
+  try {
+    const m = document.querySelector('meta[name="idexya-temel-yol"]');
+    const v = m ? String(m.getAttribute('content') || '').trim() : '';
+    return onekGecerli(v) ? v : '';
+  } catch (e) { return ''; }
+}
+// Site ve panel betiklerindeki kök göreli istek adresi: sayfaYolu('/api/tema') → os'ta '/website/api/tema', sitede aynen.
+export const sayfaYolu = (u) => yolEkle(u, sayfaOneki());

@@ -4,7 +4,7 @@
 import { readFileSync } from 'fs';
 import { generateKeyPair, exportJWK, SignJWT, createLocalJWKSet } from 'jose';
 import { onekGecerli, yolEkle, yolCikar, srcsetEkle, cssEkle, konumEkle, onekli } from '../src/data/temel-yol.js';
-import { temelAyar, osAlaniMi, istekAyir, cerezOnekle, yanitOnekle, agBetigi } from '../worker/temel-yol.js';
+import { temelAyar, osAlaniMi, istekAyir, cerezOnekle, yanitOnekle } from '../worker/temel-yol.js';
 import { audListesi, jetonDogrula, kaynakIzinli, izinliKokenler } from '../worker/erisim.js';
 
 let kalan = 0, gecen = 0;
@@ -34,17 +34,6 @@ kontrol('Location aynı köken önekli', konumEkle('https://os.idexya.com/dashbo
 kontrol('Location göreli önekli', konumEkle('/leads?tab=new', 'https://os.idexya.com/leads/', T) === 'https://os.idexya.com/website/leads?tab=new');
 kontrol('Location zaten önekli aynen', konumEkle('https://os.idexya.com/website/leads', 'https://os.idexya.com/x', T) === 'https://os.idexya.com/website/leads');
 kontrol('Location başka köken aynen', konumEkle('https://idexya.com/tr/', 'https://os.idexya.com/x', T) === 'https://idexya.com/tr/');
-
-// Site önizlemesi için sayfa başına konan ağ betiği aynı kuralı uygular (fetch, sendBeacon, XHR).
-{
-  const w = { navigator: { sendBeacon: (u) => u }, fetch: (u) => u };
-  const xhr = function () {}; xhr.prototype.open = function (m, u) { return u; };
-  new Function('window', 'document', 'XMLHttpRequest', 'MutationObserver', 'with (window) {' + agBetigi(T) + '}')(Object.assign(w, { XMLHttpRequest: xhr }), { documentElement: {} }, xhr, undefined);
-  const ornek = ['/', '/a?b=1#c', '/website', '/website/', '/website?x', '/website#y', '/websitex', '/cdn-cgi/access/logout', '/cdn-cgix', '//x', '/\\x', 'x', '?a', 'https://a/b', ''];
-  kontrol('ağ betiği kuralı yolEkle ile aynı (' + ornek.length + ' örnek)', ornek.every((u) => w.__idexyaOnek(u) === yolEkle(u, T)));
-  kontrol('ağ betiği fetch/sendBeacon/XHR önekli', w.fetch('/api/olcum') === '/website/api/olcum' && w.navigator.sendBeacon('/api/olcum') === '/website/api/olcum' && new xhr().open('GET', '/api/x') === '/website/api/x');
-  kontrol('ağ betiği önek metni güvenli (JSON)', agBetigi(T).endsWith('})("/website");'));
-}
 
 // 2. Ayar ve os alanı
 kontrol('ayar boşken kapalı', temelAyar({}) === null && temelAyar({ PANEL_TEMEL_YOL: '/website' }) === null && temelAyar({ PANEL_OS_ALAN: 'os.idexya.com' }) === null);

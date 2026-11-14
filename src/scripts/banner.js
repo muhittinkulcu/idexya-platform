@@ -1,6 +1,7 @@
 // Banner stüdyosu çizici (Muhittin, 28 Eki 2026). Site ve paneldeki canlı önizleme aynı kodu kullanır.
 // Veri /api/bannerlar'dan gelir; son liste tarayıcıda saklanır ve sayfa açılır açılmaz ondan çizilir (titreme olmasın),
 // ardından güncel liste alınıp yeniden yerleştirilir. Metinler yalnız textContent ile yazılır.
+import { sayfaYolu } from '../data/temel-yol.js';
 const ONBELLEK = 'idx-bn-liste';
 const WA = '905078700629';
 export const KAPAKLAR = ['arama', 'sosyal', 'analitik', 'konsol', 'etiket', 'magaza', 'pazaryeri', 'yonetim', 'birlesik', 'site', 'seo', 'icerik'];
@@ -69,7 +70,7 @@ export function uygunMu(b, yol, onizleme) {
 
 // ---- İstatistik (yalnız sayılar; kimlik yok) ----
 let kuyruk = [], zamanlayici = null;
-const gonder = () => { if (!kuyruk.length) return; const veri = JSON.stringify({ olaylar: kuyruk.splice(0, 20) }); try { if (!navigator.sendBeacon('/api/bannerlar/olay', new Blob([veri], { type: 'application/json' }))) fetch('/api/bannerlar/olay', { method: 'POST', body: veri, keepalive: true }); } catch (e) {} };
+const gonder = () => { if (!kuyruk.length) return; const veri = JSON.stringify({ olaylar: kuyruk.splice(0, 20) }); try { if (!navigator.sendBeacon(sayfaYolu('/api/bannerlar/olay'), new Blob([veri], { type: 'application/json' }))) fetch(sayfaYolu('/api/bannerlar/olay'), { method: 'POST', body: veri, keepalive: true }); } catch (e) {} };
 function olay(b, tur, onizleme) { if (onizleme) return; kuyruk.push({ id: b.id, olay: tur }); clearTimeout(zamanlayici); zamanlayici = setTimeout(gonder, 2500); }
 addEventListener('pagehide', gonder);
 
@@ -112,7 +113,7 @@ function kapatDugme(b, kok, onizleme, sonra) {
 }
 
 function gorsel(b) {
-  const src = b.gorsel || (b.kapak ? `/kapak/cizim/${b.kapak}.webp` : '');
+  const src = sayfaYolu(b.gorsel || (b.kapak ? `/kapak/cizim/${b.kapak}.webp` : ''));
   return src ? el('img', { class: 'bn-resim', src, alt: b.gorsel ? b.gorselAlt || '' : '', loading: 'lazy', decoding: 'async' }) : null;
 }
 
@@ -226,7 +227,7 @@ export async function bannerlariKur() {
   const onceki = saklama(() => JSON.parse(localStorage.getItem(ONBELLEK) || 'null'));
   if (onceki && Array.isArray(onceki)) yerlestir(onceki);
   try {
-    const r = await fetch('/api/bannerlar', { headers: { Accept: 'application/json' } });
+    const r = await fetch(sayfaYolu('/api/bannerlar'), { headers: { Accept: 'application/json' } });
     const s = await r.json();
     if (!s.ok) return;
     const yeni = JSON.stringify(s.bannerlar);

@@ -1,6 +1,7 @@
 // Tema düzenleyici ayarlarını sayfaya uygular (worker/tema-ayar.js, panel: /yonetim/tema/).
 // Ayar yoksa derlenmiş site olduğu gibi kalır. Son ayar localStorage'da tutulur; Site.astro'daki erken betik
 // gizli öğeleri ilk boyamadan önce saklar. ?tema=onizleme adresinde paneldeki kaydedilmemiş taslak kullanılır.
+import { sayfaYolu } from '../data/temel-yol.js';
 const ONIZLEME = new URLSearchParams(location.search).get('tema') === 'onizleme';
 const ANAHTAR = ONIZLEME ? 'idx-tema-onizleme' : 'idx-tema';
 const oku = () => { try { const r = JSON.parse(localStorage.getItem(ANAHTAR) || 'null'); return r && (r.tema || r); } catch { return null; } };
@@ -78,7 +79,7 @@ export function temaAyarKur() {
     addEventListener('storage', (o) => { if (o.key === ANAHTAR) location.reload(); });
     return;
   }
-  fetch('/api/tema', { credentials: 'omit' }).then((r) => r.json()).then((s) => {
+  fetch(sayfaYolu('/api/tema'), { credentials: 'omit' }).then((r) => r.json()).then((s) => {
     if (!s || !s.ok) return;
     const onceki = localStorage.getItem(ANAHTAR) || 'null';
     const yeni = JSON.stringify(s.tema ? { tema: s.tema, surum: s.surum } : null);

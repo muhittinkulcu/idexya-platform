@@ -1,16 +1,9 @@
 // Tarayıcıda temel yol (önek). Önek tek yerden okunur: Worker os alanında her panel sayfasına
 // <meta name="idexya-temel-yol" content="/website"> ekler (worker/temel-yol.js). Meta yoksa önek boştur ve hiçbir şey
 // değişmez (panel.idexya.com). Kural src/data/temel-yol.js'de; burada yalnız tarayıcıya bağlanır.
-import { onekGecerli, yolEkle, yolCikar } from '../../data/temel-yol.js';
+import { yolEkle, yolCikar, sayfaOneki } from '../../data/temel-yol.js';
 
-function oku() {
-  try {
-    const m = document.querySelector('meta[name="idexya-temel-yol"]');
-    const v = m ? String(m.getAttribute('content') || '').trim() : '';
-    return onekGecerli(v) ? v : '';
-  } catch (e) { return ''; }
-}
-export const TEMEL = oku();
+export const TEMEL = sayfaOneki();
 
 // Kök göreli adrese önek: yol('/api/yonetim/ozet') → '/website/api/yonetim/ozet' (önek boşsa aynen).
 export const yol = (u) => yolEkle(u, TEMEL);

@@ -12,12 +12,13 @@ const { baslik = 'Instagram hesabımızı takip edin', adet = 6 } = Astro.props;
   <ul class="ia-serit" data-izgara></ul>
 </section>
 <script>
+  import { sayfaYolu } from '../data/temel-yol.js';
   type G = { id: string; baglanti: string; aciklama: string | null; video?: boolean; gorsel: string };
   const OYNAT = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg>';
   const IG = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6" fill="currentColor"/></svg>';
   document.querySelectorAll<HTMLElement>('[data-instagram]').forEach(async (kok) => {
     try {
-      const r = await fetch('/api/instagram');
+      const r = await fetch(sayfaYolu('/api/instagram'));
       const s = await r.json();
       if (!r.ok || !s.ok || !s.gonderiler.length) return;
       const adet = Number(kok.dataset.adet) || 6;
@@ -25,7 +26,7 @@ const { baslik = 'Instagram hesabımızı takip edin', adet = 6 } = Astro.props;
         const li = document.createElement('li'), a = document.createElement('a'), img = document.createElement('img'), ust = document.createElement('span'), alt = document.createElement('span');
         a.href = g.baglanti; a.target = '_blank'; a.rel = 'noopener';
         a.setAttribute('aria-label', (g.aciklama ? g.aciklama.slice(0, 120) : 'Instagram gönderisi') + ' (Instagram’da açılır)');
-        img.src = g.gorsel; img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
+        img.src = sayfaYolu(g.gorsel); img.alt = ''; img.loading = 'lazy'; img.decoding = 'async';
         ust.className = 'ia-tur'; ust.innerHTML = g.video ? OYNAT : IG;
         alt.className = 'ia-yazi'; alt.textContent = g.aciklama || 'Instagram’da görüntüle';
         a.append(img, ust, alt); li.append(a); return li;

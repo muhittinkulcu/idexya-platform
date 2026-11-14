@@ -2,6 +2,7 @@
 // Gönderilen: sayfa yolu, yönlendiren sitenin yalnız alan adı (ya da "dogrudan"), ekran genişliğine göre cihaz sınıfı;
 // sayfadan ayrılırken de LCP, INP (yaklaşık) ve CLS değerleri. Çerez, yerel depolama, kimlik ya da parmak izi kullanılmaz.
 // "Do Not Track" ya da "Global Privacy Control" açıksa hiçbir şey gönderilmez.
+import { sayfaYolu } from '../data/temel-yol.js';
 export function olcumBaslat() {
   try {
     const n = navigator;
@@ -14,7 +15,7 @@ export function olcumBaslat() {
     if (document.referrer) {
       try { const h = new URL(document.referrer).hostname.replace(/^www\./, ''); kaynak = h === location.hostname.replace(/^www\./, '') ? 'ic' : h || 'dogrudan'; } catch (e) { kaynak = 'dogrudan'; }
     }
-    const gonder = (veri) => { try { n.sendBeacon('/api/olcum', JSON.stringify({ p: location.pathname, c: cihaz, n: bulunamadi, ...veri })); } catch (e) { /* ölçüm sessizce atlanır */ } };
+    const gonder = (veri) => { try { n.sendBeacon(sayfaYolu('/api/olcum'), JSON.stringify({ p: location.pathname, c: cihaz, n: bulunamadi, ...veri })); } catch (e) { /* ölçüm sessizce atlanır */ } };
     gonder({ t: 'g', r: kaynak });
 
     if (typeof PerformanceObserver === 'undefined') return;

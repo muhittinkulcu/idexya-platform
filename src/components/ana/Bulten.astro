@@ -19,6 +19,7 @@
   </div>
 </form>
 <script>
+  import { sayfaYolu } from '../../data/temel-yol.js';
   import { robotBagla } from '../../scripts/form.js';
   document.querySelectorAll<HTMLFormElement>('form[data-bulten]').forEach((f) => {
     const robot = robotBagla(f);
@@ -33,7 +34,7 @@
       if (robot.gerekli && !robot.jeton()) return yaz('Lütfen robot doğrulamasını tamamlayın.', false);
       const d = f.querySelector('button')!; d.disabled = true;
       try {
-        const r = await fetch('/api/bulten', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eposta, onay: true, sayfa: location.pathname, turnstile: robot.jeton(), web_adresi_tekrar: (f.elements.namedItem('web_adresi_tekrar') as HTMLInputElement).value }) });
+        const r = await fetch(sayfaYolu('/api/bulten'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ eposta, onay: true, sayfa: location.pathname, turnstile: robot.jeton(), web_adresi_tekrar: (f.elements.namedItem('web_adresi_tekrar') as HTMLInputElement).value }) });
         const s = await r.json().catch(() => ({}));
         if (!r.ok || !s.ok) throw new Error(s.hata || 'Kayıt yapılamadı. Lütfen tekrar deneyin.');
         f.reset(); yaz('Teşekkürler, listeye eklendiniz. İlk bülten hazır olduğunda e-postanıza gelecek.', true);

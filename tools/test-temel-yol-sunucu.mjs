@@ -39,6 +39,13 @@ kontrol('os sayfasında önek meta etiketi', od.durum === 200 && od.govde.includ
 kontrol('os sayfasında çift önek yok', !od.govde.includes('/website/website'));
 const kokGoreli = [...od.govde.matchAll(/\s(?:href|src|action|srcset)="(\/[^"]*)"/g)].map((m) => m[1]).filter((u) => !u.startsWith('/website/') && !u.startsWith('/cdn-cgi/'));
 kontrol('os sayfasında öneksiz kök adres yok' + (kokGoreli.length ? ': ' + kokGoreli.slice(0, 5).join(', ') : ''), kokGoreli.length === 0);
+// Önek yalnız veri olarak (meta) eklenir: satır içi betik gövdesi yok (JSON veri bloğu hariç); panel alanıyla aynı sayıda <script>.
+const satirIci = (h) => [...h.matchAll(/<script(?![^>]*\bsrc=)([^>]*)>([\s\S]*?)<\/script>/gi)].filter((m) => !/application\/json/.test(m[1]) && m[2].trim()).length;
+kontrol('os HTML\'inde satır içi betik yok (dashboard)', satirIci(od.govde) === 0);
+const ot = await iste('os.localhost', '/website/theme'), oo = await iste('os.localhost', '/website/?tema=onizleme');
+kontrol('os HTML\'inde satır içi betik yok (tema, site önizlemesi)', ot.durum === 200 && satirIci(ot.govde) === 0 && oo.durum === 200 && satirIci(oo.govde) === satirIci((await iste('panel.localhost', '/?tema=onizleme')).govde));
+kontrol('os ve panel HTML\'inde <script> sayısı aynı', (od.govde.match(/<script/g) || []).length === (pd.govde.match(/<script/g) || []).length);
+console.log('  os CSP: ' + od.basliklar['content-security-policy']);
 kontrol('os sayfasında güvenlik başlıkları', /frame-ancestors 'none'/.test(od.basliklar['content-security-policy'] || '') && od.basliklar['x-frame-options'] === 'DENY');
 const cssYol = (od.govde.match(/href="(\/website\/_astro\/Yonetim[^"]+\.css)"/) || [])[1];
 const css = cssYol ? await iste('os.localhost', cssYol) : { govde: '' };
@@ -99,6 +106,15 @@ await s.waitForSelector('[data-alan] article a', { timeout: 8000 }).catch(() => 
 const kart = await s.$eval('[data-alan] article a', (a) => a.getAttribute('href')).catch(() => '');
 kontrol('CRM kart bağlantısı önekli: ' + kart, kart.startsWith('/website/customer?id='));
 await s.screenshot({ path: SS + '/os-crm.png' });
+
+// Tema düzenleyici: site önizlemesi iframe'de önekli açılır; sitenin kendi istekleri de önekli gider (ortak yardımcı).
+await s.goto(OS + '/website/theme');
+await s.waitForTimeout(2500);
+const cerceve = await s.$eval('[data-iframe]', (f) => f.getAttribute('src')).catch(() => '');
+kontrol('tema önizlemesi önekli: ' + cerceve, cerceve.startsWith('/website/'));
+const oneksiz2 = istekler.filter((u) => !u.startsWith('/website/') && !u.startsWith('/cdn-cgi/'));
+kontrol('tema önizlemesi dahil tüm istekler önekli' + (oneksiz2.length ? ': ' + [...new Set(oneksiz2)].slice(0, 6).join(', ') : ''), oneksiz2.length === 0);
+kontrol('site önizlemesinin kendi istekleri önekli (bannerlar, olcum)', istekler.some((u) => u.startsWith('/website/api/bannerlar')) && istekler.some((u) => u.startsWith('/website/api/olcum')));
 
 kontrol('os sayfalarında 4xx/5xx yok' + (kotu.length ? ': ' + [...new Set(kotu)].slice(0, 6).join(', ') : ''), kotu.length === 0);
 kontrol('os sayfalarında konsol hatası yok' + (hatalar.length ? ': ' + hatalar.slice(0, 4).join(' | ') : ''), hatalar.length === 0);

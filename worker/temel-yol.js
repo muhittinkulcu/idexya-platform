@@ -50,23 +50,10 @@ class StilOnek {
   }
 }
 
-// Önek ağı: panelin iframe ile önizlediği site sayfaları (Tema düzenleyici, bülten önizlemesi) kendi betikleriyle
-// fetch('/api/…'), sendBeacon ve öneksiz görsel kullanır; bunlar önek dışına (os alanında 404) gitmesin diye sayfanın en
-// başında kurulur. Kural src/data/temel-yol.js yolEkle ile aynıdır (tools/test-temel-yol.mjs ikisini karşılaştırır).
-export function agBetigi(temel) {
-  return `(function(T){var e=function(u){if(typeof u!=='string'||u.charAt(0)!=='/'||u.charAt(1)==='/'||u.charAt(1)==='\\\\'||/^\\/cdn-cgi(\\/|$)/.test(u))return u;if(u===T||(u.indexOf(T)===0&&'/?#'.indexOf(u.charAt(T.length))>=0))return u;return T+u;};`
-    + `window.__idexyaOnek=e;var f=window.fetch;if(f)window.fetch=function(i,o){return f.call(this,typeof i==='string'?e(i):i,o);};`
-    + `var n=window.navigator;if(n&&n.sendBeacon){var b=n.sendBeacon.bind(n);n.sendBeacon=function(u,d){return b(e(u),d);};}`
-    + `var X=window.XMLHttpRequest&&XMLHttpRequest.prototype,x=X&&X.open;if(x)X.open=function(m,u){var a=[].slice.call(arguments);a[1]=e(u);return x.apply(this,a);};`
-    + `var A=['href','src','action','poster'],d=function(el){if(!el||el.nodeType!==1)return;for(var i=0;i<A.length;i++){var v=el.getAttribute(A[i]);if(v!==null){var y=e(v);if(y!==v)el.setAttribute(A[i],y);}}},`
-    + `g=function(k){if(!k||k.nodeType!==1)return;d(k);var l=k.querySelectorAll('[href],[src],[action],[poster]');for(var i=0;i<l.length;i++)d(l[i]);};`
-    + `if(window.MutationObserver)new MutationObserver(function(r){for(var i=0;i<r.length;i++){if(r[i].type==='attributes')d(r[i].target);else for(var j=0;j<r[i].addedNodes.length;j++)g(r[i].addedNodes[j]);}}).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:A});`
-    + `})(${JSON.stringify(temel)});`;
-}
-
+// Önek sayfaya yalnız veri olarak (meta) konur; satır içi betik eklenmez.
 class MetaEkle {
   constructor(temel) { this.temel = temel; }
-  element(e) { e.prepend(`<meta name="idexya-temel-yol" content="${this.temel}"><script>${agBetigi(this.temel)}</script>`, { html: true }); }
+  element(e) { e.prepend(`<meta name="idexya-temel-yol" content="${this.temel}">`, { html: true }); }
 }
 
 export function htmlOnekle(yanit, temel) {

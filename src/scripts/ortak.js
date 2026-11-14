@@ -3,6 +3,7 @@ import { asistan } from './asistan.js';
 import { bannerlariKur } from './banner.js';
 import { formlar } from './form.js';
 import { reklamIzBaslat } from './reklam-iz.js';
+import { sayfaYolu } from '../data/temel-yol.js';
 // Ortak istemci davranışları: tema, çerez onayı, sekme ve süzgeçler.
 const oku = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const yaz = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* tarayıcı depolamayı engelliyor olabilir */ } };
@@ -136,8 +137,8 @@ function arama() {
   const yukle = async () => {
     if (dizin) return dizin;
     const [a, b] = await Promise.all([
-      fetch('/arama.json').then((r) => r.json()).catch(() => []),
-      fetch('/api/icerik', { credentials: 'same-origin' }).then((r) => r.json()).then((s) => (s.icerikler || []).filter((i) => !i.ozel).map((i) => ({ t: i.baslik, u: '/icerik/' + i.kisa_ad, d: i.ozet || '', k: 'İçerik' + (i.kategori ? ' · ' + i.kategori : '') }))).catch(() => [])
+      fetch(sayfaYolu('/arama.json')).then((r) => r.json()).catch(() => []),
+      fetch(sayfaYolu('/api/icerik'), { credentials: 'same-origin' }).then((r) => r.json()).then((s) => (s.icerikler || []).filter((i) => !i.ozel).map((i) => ({ t: i.baslik, u: '/icerik/' + i.kisa_ad, d: i.ozet || '', k: 'İçerik' + (i.kategori ? ' · ' + i.kategori : '') }))).catch(() => [])
     ]);
     dizin = [...a, ...b].map((x) => ({ ...x, st: sade(x.t), sd: sade(x.d + ' ' + x.k) }));
     return dizin;
