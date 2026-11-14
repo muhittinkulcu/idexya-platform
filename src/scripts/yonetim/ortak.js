@@ -1,7 +1,10 @@
 // Yönetim paneli ortak yardımcıları. Sunucudan gelen her metin textContent ile yazılır (HTML olarak yorumlanmaz).
+// Temel yol ilk yüklenir: os.idexya.com/website altında adresler tek önek değişkeninden (src/scripts/yonetim/temel-yol.js).
+import { yol as onekle } from './temel-yol.js';
 import { adresMetni, adrestenOku, capaTr } from '../../data/panel-parametre.js';
 import { MENU } from '../../data/panel-menu.js';
 export { adresMetni, capaTr };
+export { yol, git, panelYolu, TEMEL, SITE_KOKU } from './temel-yol.js';
 // Adres seçeneğini Türkçe adıyla okur (adres İngilizce: ?tab=new → prm('sekme') === 'yeni')
 export const prm = (ad) => adrestenOku(ad, location.search);
 export const ASAMALAR = [
@@ -19,6 +22,7 @@ export function el(etiket, ozellik = {}, ...cocuklar) {
     if (k === 'class') e.className = v;
     else if (k === 'style') e.style.cssText = v;
     else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (k === 'href' || k === 'src' || k === 'action') e.setAttribute(k, onekle(String(v)));
     else e.setAttribute(k, v === true ? '' : v);
   }
   for (const c of cocuklar.flat()) if (c !== null && c !== undefined && c !== false) e.append(c instanceof Node ? c : String(c));
@@ -45,7 +49,7 @@ export function once(iso) {
 export const para = (n) => (n === null || n === undefined || n === '' ? '—' : new Intl.NumberFormat('tr-TR').format(n) + ' TL');
 
 export async function api(yol, govde) {
-  const r = await fetch('/api/yonetim/' + yol, govde === undefined ? { credentials: 'same-origin' } : {
+  const r = await fetch(onekle('/api/yonetim/' + yol), govde === undefined ? { credentials: 'same-origin' } : {
     method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(govde)
   });
   const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
@@ -65,7 +69,7 @@ export function genelHata(metin) {
 
 // Yan menü rozetleri ortak kabuktadır (rozetYap). Hangi sayaç hangi modülde: src/data/panel-menu.js `sayac`.
 // Bilinmiyorsa ya da sıfırsa rozet görünmez; yalnız bilinen ve sıfırdan büyük sayı görünür.
-const ROZET_URL = MENU.flatMap((g) => g.ogeler).filter((o) => o.sayac && o.href).map((o) => [o.sayac, o.href]);
+const ROZET_URL = MENU.flatMap((g) => g.ogeler).filter((o) => o.sayac && o.href).map((o) => [o.sayac, onekle(o.href)]);
 export function sayacGuncelle(ozet) {
   const kabuk = document.querySelector('idexya-kabuk');
   if (!kabuk || typeof kabuk.rozetYap !== 'function') return;

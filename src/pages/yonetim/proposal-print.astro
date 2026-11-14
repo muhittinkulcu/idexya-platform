@@ -112,7 +112,7 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
   <p class="alt" data-alt></p>
 </main>
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, yol } from '../../scripts/yonetim/ortak.js';
   import { teklifBloklari, toplamSatirlari, TUR_ADI } from '../../scripts/yonetim/teklif-toplam.js';
   const $ = (s) => document.querySelector(s);
   const id = new URLSearchParams(location.search).get('id') || '';
@@ -136,7 +136,7 @@ td.ad{overflow-wrap:anywhere}td.ad small{display:block;color:var(--tx2);font-siz
       $('[data-iletisim]').textContent = [a.firma_unvan, a.adres, a.eposta, a.telefon, a.vergi].filter(Boolean).join(' · ');
     }
     document.title = `${t.no} · ${t.baslik} · Idexya`;
-    $('[data-geri]').href = '/proposals?id=' + encodeURIComponent(t.id);
+    $('[data-geri]').href = yol('/proposals?id=' + encodeURIComponent(t.id));
     $('[data-bilgi]').textContent = `${t.no} · ${DURUM[t.durum] || t.durum}`;
     ciftler($('[data-belge]'), [['Teklif no', t.no], ['Tarih', tarih(t.gonderim_zamani || t.olusturma, false)]]);
     $('[data-musteri]').replaceChildren(

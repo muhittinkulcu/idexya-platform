@@ -1,6 +1,8 @@
 // Idexya Platform sunucu tarafı: talep formu ve yönetim paneli API'si.
 // Statik sayfalar Workers Static Assets'ten gelir; bu dosya yalnız /api/* ve /yonetim* için çalışır.
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { createRemoteJWKSet } from 'jose';
+import { jetonDogrula, kaynakIzinli, yerelGiris } from './erisim.js';
+import { temelAyar, osAlaniMi, istekAyir, yanitOnekle, osYoluIzinli, kapiDenetle, siteKoku } from './temel-yol.js';
 import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
 import { asistanApi, yonetimAsistanApi } from './asistan.js';
@@ -45,23 +47,19 @@ const ALAN_ADI = { firma: 'Firma', ad: 'Yetkili kişi', eposta: 'E-posta', telef
 // Varsayılan kapalıdır: TEAM_DOMAIN ve POLICY_AUD tanımlı değilse yönetim paneli açılmaz.
 // Yerel geliştirmede yalnız localhost'ta ve YEREL_GIRIS=evet iken açılır.
 let jwks = null;
+// POLICY_AUD virgülle birden çok değer alabilir (geçişte eski panel + yeni os uygulaması); doğrulama worker/erisim.js.
 async function yonetici(istek, env) {
   const url = new URL(istek.url);
-  if (env.YEREL_GIRIS === 'evet' && (['localhost', '127.0.0.1', 'panel.localhost'].includes(url.hostname))) return { eposta: 'yerel@gelistirme' };
+  if (yerelGiris(url, env)) return { eposta: 'yerel@gelistirme' };
   if (!env.TEAM_DOMAIN || !env.POLICY_AUD) return null;
   const jeton = istek.headers.get('cf-access-jwt-assertion');
   if (!jeton) return null;
   try {
     jwks = jwks || createRemoteJWKSet(new URL(`${env.TEAM_DOMAIN}/cdn-cgi/access/certs`));
-    const { payload } = await jwtVerify(jeton, jwks, { issuer: env.TEAM_DOMAIN, audience: env.POLICY_AUD });
-    const izinli = (env.YONETICILER || '').split(',').map((x) => x.trim().toLowerCase()).filter(Boolean);
-    const e = String(payload.email || '').toLowerCase();
-    // İzinli yönetici listesi boşsa panel kapalıdır (Access politikası geniş olsa bile).
-    if (!izinli.length || !e || !izinli.includes(e)) return null;
-    return { eposta: e };
   } catch (e) {
     return null;
   }
+  return await jetonDogrula(jeton, env, jwks);
 }
 
 // --- Herkese açık: talep formu ---
@@ -113,14 +111,12 @@ async function talepAl(istek, env) {
 }
 
 // --- Yönetim API'si ---
-async function yonetimApi(istek, env, yol, kim) {
+// izinli: yalnız os alanındaki istekte [https://<os alanı>] (worker/erisim.js); diğer alanlarda boş, yalnız aynı köken.
+async function yonetimApi(istek, env, yol, kim, izinli = []) {
   const db = env.DB;
   await semaKur(db);
   const yontem = istek.method;
-  if (yontem !== 'GET') {
-    const kaynak = istek.headers.get('origin');
-    if (!kaynak || new URL(kaynak).host !== new URL(istek.url).host) return hata('Geçersiz kaynak', 403);
-  }
+  if (yontem !== 'GET' && !kaynakIzinli(istek, izinli)) return hata('Geçersiz kaynak', 403);
   // Teklif PDF yükleme çok parçalı gövdeyle gelir (en fazla 20 MB); JSON gövde okunmadan önce ayrılır.
   if (yol === 'teklif-dosyalari' && yontem === 'POST') return await teklifDosyasiYukle(istek, env, kim);
   // Şablon sayfa görseli de çok parçalı gelir (JPG/PNG, en fazla 8 MB).
@@ -307,75 +303,104 @@ async function yonetimApi(istek, env, yol, kim) {
   return hata('Bulunamadı', 404);
 }
 
+// Bugünkü yönlendirme (panel.idexya.com ve site). os: os alanından önek ayrılmış istek ({ os: true, izinli }); yalnız
+// /yonetim yönlendirmesinin kökü ve yazma kaynağı denetimi değişir, yönlendirmelerin öneki yanitOnekle'de eklenir.
+async function isle(istek, env, ctx, os) {
+  const url = new URL(istek.url);
+  const yol = url.pathname;
+  try {
+    // Yönetim paneli yalnız panel.idexya.com'da, İngilizce adreslerle açılır (worker/panel-yollar.js).
+    const panel = os ? true : panelAlani(url, env);
+    if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${os ? url.origin : panelKoku(url, env)}${eskiYol(yol)}${eskiAramayiCevir(url.search) || url.search}`, 301);
+    let panelSayfa = null;
+    if (panel) {
+      // Kök adres panele gider; ?tema=… (tema düzenleyici önizlemesi) sitenin kendisini açar.
+      if (yol === '/' && !url.searchParams.has('tema')) return Response.redirect(`${url.origin}/dashboard`, 302);
+      const m = yol.match(/^\/([a-z-]+)(\/?)$/);
+      if (m && SAYFALAR.has(m[1])) {
+        // Eski Türkçe seçenekler (?sekme=yeni) İngilizce adrese taşınır (?tab=new)
+        const arama = eskiAramayiCevir(url.search);
+        if (m[2] || arama) return Response.redirect(`${url.origin}/${m[1]}${arama || url.search}`, 301);
+        panelSayfa = m[1];
+      }
+    }
+    if (yol === '/api/talep') {
+      if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
+      return await talepAl(istek, env);
+    }
+    if (yol === '/api/icerik' || yol.startsWith('/api/icerik/')) {
+      await semaKur(env.DB);
+      return await icerikApi(istek, env, yol.slice('/api/icerik'.length).replace(/^\/|\/$/g, ''));
+    }
+    if (yol.startsWith('/api/medya/')) { await semaKur(env.DB); return await medyaApi(istek, env, yol.slice('/api/medya/'.length).replace(/\/$/, '')); }
+    if (yol === '/api/instagram' || yol.startsWith('/api/instagram/')) { await semaKur(env.DB); return await instagramApi(istek, env, yol.slice('/api/instagram'.length).replace(/^\/|\/$/g, ''), ctx); }
+    if (yol === '/api/bulten' || yol.startsWith('/api/bulten/')) { await semaKur(env.DB); return await bultenApi(istek, env, yol.slice('/api/bulten'.length).replace(/^\/|\/$/g, '')); }
+    if (yol === '/api/olcum') { await semaKur(env.DB); return await olcumAl(istek, env); }
+    if (yol === '/api/bannerlar' || yol.startsWith('/api/bannerlar/')) { await semaKur(env.DB); return await bannerApi(istek, env, yol.slice('/api/bannerlar'.length).replace(/^\/|\/$/g, ''), ctx); }
+    if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
+    if (yol === '/tr/bulten' || yol.startsWith('/tr/bulten/')) { await semaKur(env.DB); return await bultenSayfasi(istek, env, ctx, async () => !!(await yonetici(istek, env))); }
+    if (yol === '/api/tema') { await semaKur(env.DB); return await temaApi(istek, env, ctx); }
+    if (yol === '/sitemap-bulten.xml') { await semaKur(env.DB); return await bultenSitemap(env); }
+    // Referans sayfası (worker/referans.js): sabit adres, sitede bağlantısı yok, noindex; liste boşken 404.
+    if (!panel && (yol === '/referans' || yol === '/referans/')) { await semaKur(env.DB); return await referansSayfasi(istek, env, ctx); }
+    if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
+    if (/^\/uye\/uye-icerik\/?$/.test(yol)) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
+    if (yol.startsWith('/uye/')) return env.ASSETS.fetch(istek);
+    const icerikEslesme = yol.match(/^\/icerik\/([a-z0-9-]{1,80})\/?$/);
+    if (icerikEslesme) { await semaKur(env.DB); return await icerikSayfasi(istek, env, icerikEslesme[1]); }
+    if (yol.startsWith('/api/uye/')) {
+      await semaKur(env.DB);
+      const uyeYol = yol.slice('/api/uye/'.length).replace(/\/$/, '');
+      return (await uyeMusteriApi(istek, env, uyeYol)) || (await uyeApi(istek, env, uyeYol));
+    }
+    if (yol.startsWith('/api/yonetim/') || yol.startsWith('/yonetim/') || panelSayfa) {
+      const kim = await yonetici(istek, env);
+      if (!kim) {
+        if (yol.startsWith('/api/')) return hata('Giriş gerekli', 401);
+        return new Response('Bu sayfa için giriş gerekli.', { status: 401, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
+      }
+      if (yol.startsWith('/api/yonetim/')) return await yonetimApi(istek, env, yol.slice('/api/yonetim/'.length).replace(/\/$/, ''), kim, os ? os.izinli : []);
+      const yanit = await env.ASSETS.fetch(panelSayfa ? new Request(new URL(`/yonetim/${panelSayfa}/`, url), istek) : istek);
+      const y = new Response(yanit.body, yanit);
+      Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => y.headers.set(k, v));
+      // Satır içi betik yok (script-src 'self'); yalnız satır içi stil izinli. Denetim: tools/test-temel-yol-sunucu.mjs.
+      y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+      return y;
+    }
+    if (yol.startsWith('/api/')) return hata('Bulunamadı', 404);
+    return env.ASSETS.fetch(istek);
+  } catch (e) {
+    console.error('hata', yol, e && e.message);
+    return hata('Beklenmeyen bir hata oluştu', 500);
+  }
+}
+
+// os alanı (PANEL_OS_ALAN) ve temel yol (PANEL_TEMEL_YOL) ayarlıysa: yönlendirici kapısı (X-Idexya-Kapi), sonra yalnız
+// /website/* altındaki panel yolları (osYoluIzinli) bugünkü panel yönlendirmesine girer; gerisi 404. Yanıt (HTML, CSS,
+// yönlendirme, çerez) önekli döner (worker/temel-yol.js).
+const BULUNAMADI = () => new Response('Bulunamadı', { status: 404, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
+async function osIstegi(istek, env, ctx, ayar) {
+  const kapi = await kapiDenetle(istek, env);
+  if (kapi === 503) return new Response('Hizmet kapalı', { status: 503, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
+  if (kapi) return BULUNAMADI();
+  const ic = istekAyir(istek, ayar);
+  if (!ic) return BULUNAMADI();
+  const icUrl = new URL(ic.url);
+  if (!osYoluIzinli(icUrl.pathname, icUrl.search)) return BULUNAMADI();
+  const yanit = await isle(ic, env, ctx, { os: true, izinli: [`https://${icUrl.hostname}`] });
+  return await yanitOnekle(yanit, ic.url, ayar.temel, siteKoku(icUrl, env));
+}
+
 export default {
   async fetch(istek, env, ctx) {
-    const url = new URL(istek.url);
-    const yol = url.pathname;
-    try {
-      // Yönetim paneli yalnız panel.idexya.com'da, İngilizce adreslerle açılır (worker/panel-yollar.js).
-      const panel = panelAlani(url, env);
-      if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${panelKoku(url, env)}${eskiYol(yol)}${eskiAramayiCevir(url.search) || url.search}`, 301);
-      let panelSayfa = null;
-      if (panel) {
-        // Kök adres panele gider; ?tema=… (tema düzenleyici önizlemesi) sitenin kendisini açar.
-        if (yol === '/' && !url.searchParams.has('tema')) return Response.redirect(`${url.origin}/dashboard`, 302);
-        const m = yol.match(/^\/([a-z-]+)(\/?)$/);
-        if (m && SAYFALAR.has(m[1])) {
-          // Eski Türkçe seçenekler (?sekme=yeni) İngilizce adrese taşınır (?tab=new)
-          const arama = eskiAramayiCevir(url.search);
-          if (m[2] || arama) return Response.redirect(`${url.origin}/${m[1]}${arama || url.search}`, 301);
-          panelSayfa = m[1];
-        }
-      }
-      if (yol === '/api/talep') {
-        if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
-        return await talepAl(istek, env);
-      }
-      if (yol === '/api/icerik' || yol.startsWith('/api/icerik/')) {
-        await semaKur(env.DB);
-        return await icerikApi(istek, env, yol.slice('/api/icerik'.length).replace(/^\/|\/$/g, ''));
-      }
-      if (yol.startsWith('/api/medya/')) { await semaKur(env.DB); return await medyaApi(istek, env, yol.slice('/api/medya/'.length).replace(/\/$/, '')); }
-      if (yol === '/api/instagram' || yol.startsWith('/api/instagram/')) { await semaKur(env.DB); return await instagramApi(istek, env, yol.slice('/api/instagram'.length).replace(/^\/|\/$/g, ''), ctx); }
-      if (yol === '/api/bulten' || yol.startsWith('/api/bulten/')) { await semaKur(env.DB); return await bultenApi(istek, env, yol.slice('/api/bulten'.length).replace(/^\/|\/$/g, '')); }
-      if (yol === '/api/olcum') { await semaKur(env.DB); return await olcumAl(istek, env); }
-      if (yol === '/api/bannerlar' || yol.startsWith('/api/bannerlar/')) { await semaKur(env.DB); return await bannerApi(istek, env, yol.slice('/api/bannerlar'.length).replace(/^\/|\/$/g, ''), ctx); }
-      if (yol.startsWith('/api/asistan/')) { await semaKur(env.DB); return await asistanApi(istek, env, yol.slice('/api/asistan/'.length).replace(/\/$/, '')); }
-      if (yol === '/tr/bulten' || yol.startsWith('/tr/bulten/')) { await semaKur(env.DB); return await bultenSayfasi(istek, env, ctx, async () => !!(await yonetici(istek, env))); }
-      if (yol === '/api/tema') { await semaKur(env.DB); return await temaApi(istek, env, ctx); }
-      if (yol === '/sitemap-bulten.xml') { await semaKur(env.DB); return await bultenSitemap(env); }
-      // Referans sayfası (worker/referans.js): sabit adres, sitede bağlantısı yok, noindex; liste boşken 404.
-      if (!panel && (yol === '/referans' || yol === '/referans/')) { await semaKur(env.DB); return await referansSayfasi(istek, env, ctx); }
-      if (yol.startsWith('/kabuk/')) return hata('Bulunamadı', 404);
-      if (/^\/uye\/uye-icerik\/?$/.test(yol)) return Response.redirect(new URL('/icerik/', istek.url).toString(), 302);
-      if (yol.startsWith('/uye/')) return env.ASSETS.fetch(istek);
-      const icerikEslesme = yol.match(/^\/icerik\/([a-z0-9-]{1,80})\/?$/);
-      if (icerikEslesme) { await semaKur(env.DB); return await icerikSayfasi(istek, env, icerikEslesme[1]); }
-      if (yol.startsWith('/api/uye/')) {
-        await semaKur(env.DB);
-        const uyeYol = yol.slice('/api/uye/'.length).replace(/\/$/, '');
-        return (await uyeMusteriApi(istek, env, uyeYol)) || (await uyeApi(istek, env, uyeYol));
-      }
-      if (yol.startsWith('/api/yonetim/') || yol.startsWith('/yonetim/') || panelSayfa) {
-        const kim = await yonetici(istek, env);
-        if (!kim) {
-          if (yol.startsWith('/api/')) return hata('Giriş gerekli', 401);
-          return new Response('Bu sayfa için giriş gerekli.', { status: 401, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
-        }
-        if (yol.startsWith('/api/yonetim/')) return await yonetimApi(istek, env, yol.slice('/api/yonetim/'.length).replace(/\/$/, ''), kim);
-        const yanit = await env.ASSETS.fetch(panelSayfa ? new Request(new URL(`/yonetim/${panelSayfa}/`, url), istek) : istek);
-        const y = new Response(yanit.body, yanit);
-        Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => y.headers.set(k, v));
-        y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
-        return y;
-      }
-      if (yol.startsWith('/api/')) return hata('Bulunamadı', 404);
-      return env.ASSETS.fetch(istek);
-    } catch (e) {
-      console.error('hata', yol, e && e.message);
-      return hata('Beklenmeyen bir hata oluştu', 500);
+    const ayar = temelAyar(env);
+    if (ayar && osAlaniMi(new URL(istek.url), ayar)) {
+      try { return await osIstegi(istek, env, ctx, ayar); }
+      catch (e) { console.error('hata', 'os', e && e.message); return hata('Beklenmeyen bir hata oluştu', 500); }
     }
+    return await isle(istek, env, ctx, null);
   },
+
   // Saatlik zamanlayıcı (wrangler.jsonc triggers, her saat başı UTC):
   // · her saat: müşteri ana kaydı (IDOS) önbelleğinde yalnız değişenler eşitlenir (worker/ana-kayit.js; ayar yoksa atlanır);
   // · 07.00 UTC'de günlük işler: ana kaydın tam eşitlemesi, saklama süresi dolan kişisel verinin silinmesi, IDOS reklam

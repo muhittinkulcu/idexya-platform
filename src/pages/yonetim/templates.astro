@@ -132,7 +132,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 
 <script>
-  import { api, el, prm, adresMetni, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, prm, adresMetni, genelHata, yol } from '../../scripts/yonetim/ortak.js';
   import { bugunIst, gun, musterileriDoldur, dosyaIndir } from '../../scripts/yonetim/kayit.js';
   import { SAYFA_EN, SAYFA_BOY, tlTam, tlBelge, kurusOku, toplamlar, teklifTutari } from '../../scripts/yonetim/sablon-hesap.js';
   import { gorselAdresi, planHazirla, sayfaCiz, belgePdf } from '../../scripts/yonetim/belge-uret.js';
@@ -428,7 +428,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const fd = new FormData(); fd.append('dosya', f); fd.append('sayfa', String(sira));
     durumYaz('Görsel yükleniyor…');
     try {
-      const r = await fetch(`/api/yonetim/belge-sablonlari/${encodeURIComponent(duzenId)}/gorsel`, { method: 'POST', credentials: 'same-origin', body: fd });
+      const r = await fetch(yol(`/api/yonetim/belge-sablonlari/${encodeURIComponent(duzenId)}/gorsel`), { method: 'POST', credentials: 'same-origin', body: fd });
       const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
       if (!r.ok || !s.ok) throw new Error(s.hata || `Yüklenemedi (${r.status})`);
       if (gorselHedef === null) { ed.sayfalar.push({ tip: 'sabit', ad: `Yeni sayfa ${sira}`, gorsel: s.anahtar, metinler: {}, alanlar: {} }); ed.secili = ed.sayfalar.length - 1; }
@@ -627,7 +627,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       const fd = new FormData();
       fd.append('dosya', new File([pdf], ad, { type: 'application/pdf' }));
       for (const [k, v] of Object.entries({ musteri_id: d.m.id, sablon_id: bSablon.id, sablon_surum: String(aktifSurum.surum), ad: bForm.belge_ad.value.trim(), belge_no: bForm.belge_no.value.trim(), tarih: d.veri.tarih, firma_vkn: String(bForm2.ham.firma_vkn ?? '').trim() })) fd.append(k, v);
-      const r = await fetch('/api/yonetim/belge-dosyalari', { method: 'POST', credentials: 'same-origin', body: fd });
+      const r = await fetch(yol('/api/yonetim/belge-dosyalari'), { method: 'POST', credentials: 'same-origin', body: fd });
       const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
       if (!r.ok || !s.ok) throw new Error(s.hata || `Kaydedilemedi (${r.status})`);
       bYaz('');
@@ -656,7 +656,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       fd.append('dosya', new File([pdf], ad, { type: 'application/pdf' }));
       for (const [k, v] of Object.entries({ musteri_id: d.m.id, ad: bForm.ad.value.trim(), tarih: d.veri.tarih, gecerlilik: bForm.gecerlilik.value, tutar: `${Math.floor(tutar / 100)},${String(tutar % 100).padStart(2, '0')}`, durum: bForm.durum.value, kaynak: 'sablon' })) fd.append(k, v);
       if (!bForm.asama.disabled && bForm.asama.checked) fd.append('asama', '1');
-      const r = await fetch('/api/yonetim/teklif-dosyalari', { method: 'POST', credentials: 'same-origin', body: fd });
+      const r = await fetch(yol('/api/yonetim/teklif-dosyalari'), { method: 'POST', credentials: 'same-origin', body: fd });
       const s = await r.json().catch(() => ({ ok: false, hata: 'Sunucudan geçersiz yanıt geldi' }));
       if (!r.ok || !s.ok) throw new Error(s.hata || `Kaydedilemedi (${r.status})`);
       bYaz('');

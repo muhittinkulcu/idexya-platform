@@ -46,7 +46,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .si-gorsel img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid rgb(var(--line))}
 </style>
 <script>
-  import { api, el, tarih, genelHata, prm, adresMetni, capaTr } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, prm, adresMetni, capaTr, yol } from '../../scripts/yonetim/ortak.js';
   import { DOSYALAR, dogrula, ekDenetim } from '../../data/icerik-sema.js';
   import { yaziEditoru } from '../../scripts/yonetim/editor.js';
   const q = (s) => document.querySelector(s);
@@ -109,7 +109,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (s.tur === 'uzun' && s.sinir <= 400) { const say = el('small', {}, `${String(deger || '').length} / ${s.sinir} karakter`); g.addEventListener('input', () => { say.textContent = `${g.value.length} / ${s.sinir} karakter`; }); etiket.append(say); }
     if (s.tur === 'gorsel') {
       const on = el('img', { src: deger || '', alt: '', hidden: !deger });
-      g.addEventListener('input', () => { on.src = g.value; on.hidden = !g.value; });
+      g.addEventListener('input', () => { on.src = yol(g.value); on.hidden = !g.value; });
       etiket.append(el('span', { class: 'si-gorsel' }, on, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => medyaSec((url) => { g.value = url; g.dispatchEvent(new Event('input')); }) }, 'Medyadan seç')));
     }
     return etiket;
@@ -173,7 +173,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (!confirm(`${d.ad} yayınlansın mı? Site 1–2 dakika içinde güncellenir.`)) return;
     const b = o.currentTarget; b.disabled = true; q('[data-kayit-durum]').textContent = 'Yayınlanıyor…'; hk.replaceChildren();
     try {
-      const s = await fetch('/api/yonetim/icerik-dosya/' + ad, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ veri: r.veri, sha, not: q('[data-not]').value }) });
+      const s = await fetch(yol('/api/yonetim/icerik-dosya/' + ad), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ veri: r.veri, sha, not: q('[data-not]').value }) });
       const j = await s.json().catch(() => ({}));
       if (!s.ok || !j.ok) { hk.replaceChildren(el('div', { class: 'uyari hata' }, j.hata || 'Yayınlanamadı', j.hatalar ? el('ul', {}, ...j.hatalar.map((x) => el('li', {}, x))) : null)); q('[data-kayit-durum]').textContent = ''; return; }
       sha = j.sha; degisti = false; q('[data-not]').value = '';

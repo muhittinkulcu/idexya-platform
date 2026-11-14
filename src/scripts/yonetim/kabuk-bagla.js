@@ -3,13 +3,23 @@
 //   1. Kabuk kurulmadan önce etkin sayfa adresi (?tab= ve #bölüm dahil) ayar bloğuna yazılır; ilk sekme doğru adresle açılır.
 //   2. Kabuk hazır olunca: sayfa içi sekmeler adresi değiştirdikçe etkinYap, rozetler, kullanıcı ve eşitleme durumu.
 // Sunucudan gelen her metin kabukta textContent ile yazılır.
-import { api, genelHata, sayacGuncelle, tarih } from './ortak.js';
+import { api, genelHata, sayacGuncelle, tarih, yol, panelYolu, TEMEL } from './ortak.js';
 
 const AYAR = document.getElementById('idexya-kabuk-ayar');
 const SARGI = document.querySelector('.yonetim');
 let ayar = null;
 try { ayar = JSON.parse(AYAR ? AYAR.textContent : 'null'); } catch (e) { ayar = null; }
 const katman = ayar && Array.isArray(ayar.katmanlar) ? ayar.katmanlar.find((k) => k.anahtar === ayar.katman) : null;
+
+// Temel yol (os.idexya.com/website): bu katmanın kök göreli adresleri önekli olur. Diğer katmanların tam adresleri ve
+// çıkış adresi (/cdn-cgi/access/logout, Access'in alan kökündeki ucu) aynen kalır. Önek boşsa hiçbir şey değişmez.
+if (ayar && katman && TEMEL) {
+  katman.url = yol(katman.url);
+  katman.gruplar.forEach((g) => g.moduller.forEach((m) => { m.url = yol(m.url); m.sayfalar.forEach((s) => { s.url = yol(s.url); }); }));
+  (ayar.eylemler || []).forEach((e) => { if (e) e.url = yol(e.url); });
+  if (ayar.bildirimUrl) ayar.bildirimUrl = yol(ayar.bildirimUrl);
+  if (ayar.etkin) ['modulUrl', 'sayfaUrl'].forEach((k) => { if (ayar.etkin[k]) ayar.etkin[k] = yol(ayar.etkin[k]); });
+}
 
 // Menüdeki adresler ve menünün kullandığı adres seçenekleri (tab, file). Sekme ve vurgu yalnız menü adresine bağlanır:
 // ?id= gibi kayıt seçimleri yeni sekme açmaz (üye, yazı, teklif seçmek "Üyeler" sekmesinde kalır).
@@ -102,7 +112,7 @@ if (yeniMenu) {
 // ?new=1 ile açılan sayfada o sayfanın "yeni" düğmesine basılır (Teklifler kendi akışını yürütür).
 let yeniIstek = new URLSearchParams(location.search).get('new') === '1';
 try { if (sessionStorage.getItem('idx-yeni') === location.pathname) yeniIstek = true; sessionStorage.removeItem('idx-yeni'); } catch (e) { /* gizli kip */ }
-if (yeniIstek && !location.pathname.startsWith('/proposals')) {
+if (yeniIstek && !panelYolu().startsWith('/proposals')) {
   let deneme = 0;
   const bas = () => {
     const d = document.querySelector('.ik-icerik [data-yeni], .ik-icerik [data-yeni-ac]') || [...document.querySelectorAll('.sayfa button')].filter((b) => /^\+ Yeni /.test(b.textContent || '')).pop();

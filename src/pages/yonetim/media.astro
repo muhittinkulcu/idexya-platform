@@ -9,7 +9,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 <section class="kart" aria-label="Görseller" data-liste style="padding: 20px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px"></section>
 <script>
-  import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, tarih, genelHata, yol } from '../../scripts/yonetim/ortak.js';
   const liste = document.querySelector('[data-liste]'), durum = document.querySelector('[data-durum]'), ara = document.querySelector('[data-ara]');
   let tum = [];
   async function kucult(dosya) {
@@ -52,7 +52,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   }
   async function sil(m, zorla = false) {
     if (!zorla && !confirm(`“${m.ad}” silinsin mi?`)) return;
-    const r = await fetch(`/api/yonetim/medya/${m.id}/sil`, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ zorla }) });
+    const r = await fetch(yol(`/api/yonetim/medya/${m.id}/sil`), { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ zorla }) });
     const s = await r.json().catch(() => ({}));
     if (r.status === 409 && s.kullanan) { if (confirm(`Bu görsel şu içeriklerde kullanılıyor: ${s.kullanan.join(', ')}. Yine de silinsin mi? (İçeriklerde görsel görünmez olur.)`)) return sil(m, true); return; }
     if (!r.ok || !s.ok) { genelHata(s.hata || 'Silinemedi'); return; }

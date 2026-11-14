@@ -29,6 +29,26 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
 - Denetim: `PW_KOK=<playwright klasörü> node tools/test-cati.mjs http://127.0.0.1:8795 <ekran klasörü>`.
 - Canlı değişmedi kanıtı: main'de ve dalda bayraksız `npm run build`, sonra `node tools/cati-kanit.mjs <main dist> dist`.
 
+## Tek adres: panel `os.idexya.com/website` arkasında (isteğe bağlı, varsayılan kapalı)
+
+Plan: idexya-ortak `tek-adres-plani.md`. Önek Astro derlemesine konmaz (site aynı derlemede); Worker isteği ayırır, yanıtı
+öneklendirir (`worker/temel-yol.js`, kural `src/data/temel-yol.js`).
+
+- Değişkenler: `PANEL_TEMEL_YOL` (boş ya da `/website`), `PANEL_OS_ALAN` (virgüllü alan adları, ör. `os.idexya.com,os-onizleme.idexya.com`),
+  gizli `KAPI_ANAHTARI_WEBSITE` (yönlendiricinin `X-Idexya-Kapi` başlığındaki modül anahtarı). Önek ve alan birlikte geçerli
+  değilse hiçbir şey değişmez; anahtar boşsa os alanı 503, başlık tutmazsa 404.
+- os alanında **yalnız panelin kendisi** sunulur: panel sayfaları, `/api/yonetim/*`, `/yonetim/*` (eski adres yönlendirmesi ve
+  `/yonetim/veri/*`), `/api/medya/*`, Instagram görselleri, `/_astro/*`, `/fonts/*`, `/kapak/cizim/*`, panel simgeleri,
+  `panel.webmanifest`, `panel-gorunum.js`. Site sayfaları ve herkese açık uçlar (`/tr/…`, `/api/talep`, `/uye/…`) os alanında 404.
+- Tema düzenleyicinin canlı önizlemesi os alanında kapalıdır (site sayfası panelle aynı kökende açılmaz); önizleme
+  `panel.idexya.com`'da. Paneldeki site bağlantıları (bülten önizlemesi, yazı sayfası) os alanında `panel.idexya.com`'da açılır.
+- Yazma isteği kaynağı: aynı köken; os alanında yalnız `https://<os alanı>`. `YEREL_GIRIS` yalnız `*.localhost` adlarında etkindir.
+- `panel.idexya.com` bugünkü gibi çalışır. Yönlendirici isteği **adresini değiştirmeden** iletmelidir (Host = os alanı;
+  `Origin`, `Cookie`, `Cf-Access-Jwt-Assertion` korunur, `X-Idexya-Kapi` eklenir).
+- Test: `npm test` (sunucusuz). Uçtan uca: `npx wrangler dev --local --port 8791 --var YEREL_GIRIS:evet --var PANEL_TEMEL_YOL:/website
+  --var PANEL_OS_ALAN:os.localhost --var KAPI_ANAHTARI_WEBSITE:yerel-deneme --persist-to <boş klasör>`, sonra
+  `KAPI=yerel-deneme PW_KANAL=chrome PW_KOK=<playwright klasörü> node tools/test-temel-yol-sunucu.mjs 8791 <ekran klasörü>`.
+
 ## Yönetim paneli (`/yonetim`)
 
 - Sunucu kodu `worker/index.js`; veritabanı Cloudflare D1 (`DB`), şema `worker/sema.js` ilk istekte kendiliğinden kurulur.
@@ -36,7 +56,8 @@ Yeni çatı site `src/cati/`, `src/layouts/Cati.astro`, `src/components/cati/` a
 - `/yonetim/*` ve `/api/yonetim/*` yalnız Cloudflare Access girişiyle açılır; sunucu Access jetonunu ayrıca doğrular.
   Değişkenler tanımlanmadan panel **kapalıdır** (401):
   - `TEAM_DOMAIN` — ör. `https://<ekip>.cloudflareaccess.com`
-  - `POLICY_AUD` — Access uygulamasının "Application Audience (AUD) Tag" değeri
+  - `POLICY_AUD` — Access uygulamasının "Application Audience (AUD) Tag" değeri; tek adrese geçişte virgülle birden çok
+    değer alabilir (eski panel + os uygulaması), jeton bunlardan biriyle eşleşmelidir
   - `YONETICILER` — izinli e-postalar, virgülle (ör. `info@idexya.com`)
   - Gizli: `IP_TUZ` (uzun rastgele metin; IP adresleri yalnız bununla özetlenerek saklanır, KVKK)
   - Gizli: `TURNSTILE_SECRET` ve derleme değişkeni `PUBLIC_TURNSTILE_SITE_KEY` — **ikisi birlikte** girilir; yalnız biri

@@ -7,7 +7,8 @@
     "dev": "astro dev",
     "build": "astro build && node tools/sitemap.mjs && node tools/panel-veri.mjs",
     "preview": "astro preview",
-    "deploy": "npm run build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy",
+    "test": "node tools/test-temel-yol.mjs && node tools/test-panel-menu.mjs && node tools/test-referans.mjs && node tools/test-sablon.mjs && node tools/test-tek-kayit.mjs && node tools/test-teklif-dosya.mjs && node tools/test-teklif-katalog.mjs"
   },
   "dependencies": {
     "astro": "7.3.5",

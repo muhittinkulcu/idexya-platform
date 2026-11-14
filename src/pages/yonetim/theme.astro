@@ -70,12 +70,15 @@ const varsayilan = {
   .te-cerceve-kap{position:relative;overflow:hidden;border-radius:14px;border:1px solid rgb(var(--line));background:var(--card2);height:640px}
   .te-cerceve-kap iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;background:#fff}
   .te-not{margin:0;font-size:12px;color:var(--tx2)}
+  .te-kapali{display:flex;align-items:center;justify-content:center}
+  .te-kapali-not{max-width:420px;padding:24px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+  .te-kapali-not p{margin:0;color:var(--tx2)}
   .te-alt{position:fixed;left:auto;right:24px;bottom:16px;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;box-shadow:0 20px 50px -20px var(--shadow);max-width:calc(100vw - 48px)}.te-alt .dugme{white-space:nowrap}
   .te-mesaj{font-size:13px;color:var(--tx2)}
   @media (max-width:1200px){.te{grid-template-columns:1fr}.te-sag{position:static}}
 </style>
 <script>
-  import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
+  import { api, el, genelHata, TEMEL, SITE_KOKU } from '../../scripts/yonetim/ortak.js';
   const VARS = JSON.parse(document.getElementById('tema-varsayilan').textContent);
   const kopya = (x) => JSON.parse(JSON.stringify(x));
   let kayitli = null, taslak = null, sekme = 'menu', cihaz = 'masa', degisti = false;
@@ -188,7 +191,18 @@ const varsayilan = {
     if (cihaz === 'tel') { iframe.style.left = Math.max(0, (kap.clientWidth - g * olcek) / 2) + 'px'; } else iframe.style.left = '0';
     void h;
   }
-  function yukleIframe() { const s = $('[data-sayfa]').value; iframe.src = `${s}${s.includes('?') ? '&' : '?'}tema=onizleme`; cerceve(); }
+  // Tek adreste (os.idexya.com/website) site sayfası panelle aynı kökende açılmaz: önizleme kapalıdır, panel.idexya.com'da açılır.
+  let onizlemeKapali = false;
+  function onizlemeKapat() {
+    if (onizlemeKapali) return; onizlemeKapali = true;
+    iframe.remove(); $('[data-sayfa]').disabled = true;
+    kap.classList.add('te-kapali');
+    kap.append(el('div', { class: 'te-kapali-not', 'data-onizleme-kapali': '' },
+      el('b', {}, 'Canlı önizleme bu adreste kapalı'),
+      el('p', {}, 'Güvenlik için site sayfaları panelle aynı adreste açılmaz. Ayarları buradan kaydedebilirsiniz; önizleme panel.idexya.com’daki tema düzenleyicide.'),
+      SITE_KOKU ? el('a', { class: 'dugme', href: SITE_KOKU + '/theme', target: '_blank', rel: 'noopener' }, 'Önizlemeyi panel.idexya.com’da aç ↗') : null));
+  }
+  function yukleIframe() { if (TEMEL) { onizlemeKapat(); return; } const s = $('[data-sayfa]').value; iframe.src = `${s}${s.includes('?') ? '&' : '?'}tema=onizleme`; cerceve(); }
   document.querySelectorAll('[data-cihaz]').forEach((d) => d.addEventListener('click', () => { cihaz = d.dataset.cihaz; document.querySelectorAll('[data-cihaz]').forEach((x) => x.setAttribute('aria-pressed', String(x === d))); cerceve(); }));
   $('[data-sayfa]').addEventListener('change', yukleIframe);
   addEventListener('resize', cerceve);
