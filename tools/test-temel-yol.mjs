@@ -6,6 +6,7 @@ import { generateKeyPair, exportJWK, SignJWT, createLocalJWKSet } from 'jose';
 import { onekGecerli, yolEkle, yolCikar, srcsetEkle, cssEkle, konumEkle, onekli, siteAdresi } from '../src/data/temel-yol.js';
 import { temelAyar, osAlaniMi, istekAyir, cerezOnekle, yanitOnekle, osYoluIzinli, kapiDenetle, sabitSureliEsit, siteKoku } from '../worker/temel-yol.js';
 import { audListesi, jetonDogrula, kaynakIzinli, yerelGiris } from '../worker/erisim.js';
+import { onyuklemeKurallari, onyuklemeBasligi, ONYUKLEME_YOL } from '../worker/onyukleme.js';
 
 let kalan = 0, gecen = 0;
 const kontrol = (ad, kosul) => { console.log((kosul ? 'GEÇTİ ' : 'KALDI ') + ad); if (kosul) gecen++; else kalan++; };
@@ -56,7 +57,7 @@ for (const y of ['/', '/dashboard', '/api/yonetim/ozet', '/_astro/x.js', '/websi
 
 // os alanında yalnız panel yolları (önek ayrılmış hali)
 for (const y of ['/', '/dashboard', '/leads', '/leads/', '/customer', '/api/yonetim/ozet', '/api/yonetim/musteriler/toplu', '/yonetim', '/yonetim/talepler/', '/yonetim/veri/sablon/ortak/logo.png',
-  '/api/medya/abc', '/api/instagram/123/gorsel', '/api/instagram/akis/123/gorsel', '/_astro/x.js', '/fonts/inter.woff2', '/kapak/cizim/arama.webp', '/favicon-panel.svg', '/favicon-panel-32.png', '/panel-ikon-192.png', '/panel.webmanifest', '/panel-gorunum.js'])
+  '/api/medya/abc', '/api/instagram/123/gorsel', '/api/instagram/akis/123/gorsel', '/_astro/x.js', '/fonts/inter.woff2', '/kapak/cizim/arama.webp', '/favicon-panel.svg', '/favicon-panel-32.png', '/panel-ikon-192.png', '/panel.webmanifest', '/panel-gorunum.js', '/panel-kabuk.js', '/panel-onyukleme.json'])
   kontrol(`os izinli: ${y}`, osYoluIzinli(y, ''));
 for (const [y, a] of [['/', '?tema=onizleme'], ['/tr/', ''], ['/tr/iletisim', ''], ['/en/', ''], ['/icerik/x', ''], ['/api/talep', ''], ['/api/uye/giris', ''], ['/uye/', ''], ['/uye/hesap', ''],
   ['/api/icerik', ''], ['/api/tema', ''], ['/api/bannerlar', ''], ['/api/olcum', ''], ['/api/asistan/mesaj', ''], ['/api/bulten', ''], ['/api/instagram', ''], ['/arama.json', ''], ['/referans', ''], ['/sitemap.xml', ''], ['/robots.txt', ''], ['/tr/bulten/x/', ''], ['/kabuk/icerik/', ''], ['/maskot/idos-kedi.webp', ''], ['/favicon.svg', ''], ['/panel-sw.js', ''], ['/bilinmeyen', '']])
@@ -153,6 +154,31 @@ kontrol('yazma isteği kaynak denetimi kaynakIzinli ile', /yontem !== 'GET' && !
 kontrol('ayar kapalıyken isle(…, null)', /return await isle\(istek, env, ctx, null\)/.test(kod));
 const wr = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
 kontrol('run_worker_first /website ve /website/*', wr.includes('"/website", "/website/*"'));
+kontrol('run_worker_first önceden yükleme kuralları', wr.includes(`"${ONYUKLEME_YOL}"`));
+
+// Önceden yükleme kuralları (worker/onyukleme.js): yalnız aynı köken panel sayfaları; API, Access ve çıkış ASLA.
+// URLPattern'ın yol kalıbı burada basit bir dönüştürücüyle sınanır (* = herhangi karakter dizisi).
+const kalip = (k) => new RegExp('^' + k.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*') + '$');
+function onyuklenir(kural, yol, secici = '') {
+  const kosul = kural.prefetch[0].where.and;
+  return kosul.every((c) => {
+    if (c.href_matches) return kalip(c.href_matches.pathname).test(yol);
+    if (c.not && c.not.href_matches) return !kalip(c.not.href_matches.pathname).test(yol);
+    if (c.not && c.not.selector_matches) return !c.not.selector_matches.split(',').map((x) => x.trim()).includes(secici);
+    return false;
+  });
+}
+for (const [temel, ad] of [['', 'panel'], [T, 'os']]) {
+  const k = onyuklemeKurallari(temel);
+  kontrol(`${ad}: yalnız prefetch (prerender yok), eagerness moderate, belge kuralları`, Object.keys(k).join() === 'prefetch' && k.prefetch.length === 1 && k.prefetch[0].eagerness === 'moderate' && k.prefetch[0].source === 'document');
+  kontrol(`${ad}: kurallar belgeye göre (aynı köken)`, k.prefetch[0].where.and.filter((c) => c.href_matches || (c.not && c.not.href_matches)).every((c) => (c.href_matches || c.not.href_matches) && (c.relative_to || c.not.relative_to) === 'document'));
+  for (const y of ['/dashboard', '/leads', '/crm', '/proposals', '/customer']) kontrol(`${ad} önceden yüklenir: ${temel}${y}`, onyuklenir(k, temel + y));
+  for (const y of ['/api/yonetim/ozet', '/api/yonetim/musteriler/toplu', '/api/talep', '/cdn-cgi/access/logout', '/yonetim/veri/x', '/yonetim/talepler/'])
+    kontrol(`${ad} ASLA önceden yüklenmez: ${y.startsWith('/cdn-cgi') ? y : temel + y}`, !onyuklenir(k, y.startsWith('/cdn-cgi') ? y : temel + y));
+  kontrol(`${ad} çıkış bağlantısı (.ik-profil-cikis) ve yeni pencere önceden yüklenmez`, !onyuklenir(k, temel + '/dashboard', '.ik-profil-cikis') && !onyuklenir(k, temel + '/dashboard', '[target]') && !onyuklenir(k, temel + '/dashboard', '[download]'));
+  kontrol(`${ad} başlık: "${temel}${ONYUKLEME_YOL}"`, onyuklemeBasligi(temel) === `"${temel}${ONYUKLEME_YOL}"`);
+}
+kontrol('os: önek dışı yol önceden yüklenmez (başka uygulama, /marketing/…)', !onyuklenir(onyuklemeKurallari(T), '/marketing/dashboard'));
 
 console.log(`${gecen} GEÇTİ, ${kalan} KALDI`);
 process.exit(kalan ? 1 : 0);

@@ -102,6 +102,10 @@ Her modül ve sayfa geçişinde içerik aynı sahne düzeniyle açılır: başl�
 sayılar sıfırdan sayar, kart içi çizgi grafikler kendini çizer, tablo satırları akarak gelir. Uyarı ve hata
 durumlarının noktası yavaşça atar. Kartın üzerine gelince kart yükselir ve solunda modül renginde çizgi belirir.
 Hepsi `transform`/`opacity` ile ve bir kez çalışır; "hareketi azalt" açıksa kapalıdır.
+Giriş hareketleri ve sayaçlar sekmedeki ilk açılışta oynar; aynı oturumda sonraki sayfa yüklemelerinde kabuk ve içerik
+hemen son hâliyle çizilir. Çok sayfalı üründe sayfalar arası geçişte paket çubuğu, yan menü ve sekme satırı yerinde
+kalır, yalnız içerik alanı kısa (150 ms) çapraz geçişle değişir (çapraz belge View Transitions; Muhittin, 14 Kas 2026:
+"tasarımdaki gibi hızlı geçsin"). Ayrıntı `kabuk/README.md`.
 
 ## Daraltılmış yan menü (Muhittin, 14 Kas 2026)
 

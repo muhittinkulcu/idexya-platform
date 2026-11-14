@@ -314,3 +314,14 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
   .ik-suzgec-not{margin-left:0}
 }
 @media (prefers-reduced-motion:reduce){.ik,.ik *,.ik *::before,.ik *::after{animation:none!important;transition:none!important}}
+/* Oturumdaki ilk açılıştan sonraki sayfa yüklemelerinde giriş hareketi yok (kabuk.js _sakin). */
+.ik-sakin{animation:none!important}
+/* Çok sayfalı üründe sayfalar arası geçiş (çapraz belge View Transitions): paket çubuğu, yan menü ve sekme satırı yerinde
+   kalır, yalnız içerik alanı kısa bir çapraz geçişle değişir. "Hareketi azalt" açıksa geçiş yok. */
+@media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}
+.ik-ust{view-transition-name:ik-ust}.ik-yan{view-transition-name:ik-yan}.ik-sekmeler{view-transition-name:ik-sekmeler}.ik-icerik{view-transition-name:ik-icerik}
+::view-transition-group(*){animation-duration:.15s}
+/* Kabuk parçaları karışmaz: yeni hâli anında görünür (vurgu ve yeni sekme hemen yerinde), içeriğin üstünde kalır. */
+::view-transition-group(ik-ust),::view-transition-group(ik-yan),::view-transition-group(ik-sekmeler){z-index:1;animation:none}
+::view-transition-old(ik-ust),::view-transition-old(ik-yan),::view-transition-old(ik-sekmeler){display:none}
+::view-transition-new(ik-ust),::view-transition-new(ik-yan),::view-transition-new(ik-sekmeler){animation:none}

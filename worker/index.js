@@ -1,6 +1,7 @@
 // Idexya Platform sunucu tarafı: talep formu ve yönetim paneli API'si.
 // Statik sayfalar Workers Static Assets'ten gelir; bu dosya yalnız /api/* ve /yonetim* için çalışır.
 import { createRemoteJWKSet } from 'jose';
+import { ONYUKLEME_YOL, onyuklemeYaniti, onyuklemeBasligi } from './onyukleme.js';
 import { jetonDogrula, kaynakIzinli, yerelGiris } from './erisim.js';
 import { temelAyar, osAlaniMi, istekAyir, yanitOnekle, osYoluIzinli, kapiDenetle, siteKoku } from './temel-yol.js';
 import { uyeApi, yonetimUyeApi } from './uye.js';
@@ -324,6 +325,8 @@ async function isle(istek, env, ctx, os) {
         panelSayfa = m[1];
       }
     }
+    // Panel sayfaları arası önceden yükleme kuralları (worker/onyukleme.js); yalnız panel alanında.
+    if (panel && yol === ONYUKLEME_YOL) return onyuklemeYaniti(os ? os.temel : '');
     if (yol === '/api/talep') {
       if (istek.method !== 'POST') return hata('Yöntem desteklenmiyor', 405);
       return await talepAl(istek, env);
@@ -361,8 +364,16 @@ async function isle(istek, env, ctx, os) {
       }
       if (yol.startsWith('/api/yonetim/')) return await yonetimApi(istek, env, yol.slice('/api/yonetim/'.length).replace(/\/$/, ''), kim, os ? os.izinli : []);
       const yanit = await env.ASSETS.fetch(panelSayfa ? new Request(new URL(`/yonetim/${panelSayfa}/`, url), istek) : istek);
-      const y = new Response(yanit.body, yanit);
+      let y = new Response(yanit.body, yanit);
       Object.entries(GUVENLIK_BASLIKLARI).forEach(([k, v]) => y.headers.set(k, v));
+      if (y.status === 200 && (y.headers.get('content-type') || '').includes('text/html')) {
+        // Oturumdaki kullanıcı sayfaya veri olarak yazılır (kabuk profili ilk çizimde doğru; tarayıcıda saklanmaz).
+        // setAttribute değeri kaçışlar; betik eklenmez.
+        y.headers.delete('etag');
+        y = new HTMLRewriter().on('meta[name="idexya-kullanici"]', { element(e) { e.setAttribute('content', String(kim.eposta || '').slice(0, 200)); } }).transform(y);
+        // Önceden yükleme kuralları (Chrome/Edge): imleç panel bağlantısında durunca sayfa HTML'i önceden alınır.
+        y.headers.set('Speculation-Rules', onyuklemeBasligi(os ? os.temel : ''));
+      }
       // Satır içi betik yok (script-src 'self'); yalnız satır içi stil izinli. Denetim: tools/test-temel-yol-sunucu.mjs.
       y.headers.set('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
       return y;
@@ -387,7 +398,7 @@ async function osIstegi(istek, env, ctx, ayar) {
   if (!ic) return BULUNAMADI();
   const icUrl = new URL(ic.url);
   if (!osYoluIzinli(icUrl.pathname, icUrl.search)) return BULUNAMADI();
-  const yanit = await isle(ic, env, ctx, { os: true, izinli: [`https://${icUrl.hostname}`] });
+  const yanit = await isle(ic, env, ctx, { os: true, izinli: [`https://${icUrl.hostname}`], temel: ayar.temel });
   return await yanitOnekle(yanit, ic.url, ayar.temel, siteKoku(icUrl, env));
 }
 

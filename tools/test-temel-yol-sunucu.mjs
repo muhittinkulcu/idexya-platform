@@ -77,6 +77,25 @@ kontrol('panel: aynı köken kabul (422)', (await yaz('panel.localhost', '/api/y
 // Deneme talebi (site formu ucu; panel alanında bugünkü adres)
 await iste('panel.localhost', '/api/talep', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ad: 'Önek Deneme', eposta: 'onek@ornek.com', kvkk: true, kaynak: 'iletisim' }) });
 
+// 2b. Sayfa geçişi hızı: önceden yükleme kuralları, kullanıcı metası, sürümlü klasik betikler (worker/onyukleme.js, tools/panel-kabuk.mjs)
+const kurallar = await iste('os.localhost', '/website/panel-onyukleme.json');
+let kj = null; try { kj = JSON.parse(kurallar.govde); } catch (e) { kj = null; }
+const kjMetin = JSON.stringify(kj || {});
+kontrol('os önceden yükleme kuralları: application/speculationrules+json', kurallar.durum === 200 && /application\/speculationrules\+json/.test(kurallar.basliklar['content-type'] || ''));
+kontrol('os kuralları yalnız /website/* (API, /cdn-cgi, /yonetim hariç)', kjMetin.includes('"/website/*"') && kjMetin.includes('"/website/api/*"') && kjMetin.includes('"/api/*"') && kjMetin.includes('"/cdn-cgi/*"') && kjMetin.includes('"/website/yonetim/*"') && kjMetin.includes('.ik-profil-cikis'));
+const pk2 = await iste('panel.localhost', '/panel-onyukleme.json');
+kontrol('panel kuralları öneksiz /*', pk2.durum === 200 && pk2.govde.includes('"/*"') && !pk2.govde.includes('/website'));
+kontrol('os sayfası Speculation-Rules: "/website/panel-onyukleme.json"', od.basliklar['speculation-rules'] === '"/website/panel-onyukleme.json"');
+kontrol('panel sayfası Speculation-Rules: "/panel-onyukleme.json"', pd.basliklar['speculation-rules'] === '"/panel-onyukleme.json"');
+kontrol('API yanıtında Speculation-Rules yok', !(await iste('panel.localhost', '/api/yonetim/ozet')).basliklar['speculation-rules']);
+const onIstek = await iste('os.localhost', '/website/leads', { headers: { 'sec-purpose': 'prefetch' } });
+kontrol('os önceden yükleme isteği (Sec-Purpose: prefetch, kapı başlıklı) → 200, no-store', onIstek.durum === 200 && onIstek.basliklar['cache-control'] === 'no-store');
+kontrol('kullanıcı metası dolu (os ve panel)', od.govde.includes('<meta name="idexya-kullanici" content="yerel@gelistirme">') && pd.govde.includes('<meta name="idexya-kullanici" content="yerel@gelistirme">'));
+const kabukAdres = (od.govde.match(/<script src="(\/website\/panel-kabuk\.js\?v=[0-9a-f]{12})"><\/script>/) || [])[1];
+kontrol('os <head>: sürümlü klasik kabuk betiği ' + (kabukAdres || 'YOK'), !!kabukAdres && /<script src="\/website\/panel-gorunum\.js\?v=[0-9a-f]{12}"><\/script>/.test(od.govde));
+const kb = kabukAdres ? await iste('os.localhost', kabukAdres) : { durum: 0, basliklar: {} };
+kontrol('os kabuk betiği 200, bir yıl önbellek', kb.durum === 200 && /immutable/.test(kb.basliklar['cache-control'] || ''));
+
 // 3. Tarayıcı
 const t = await chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : { channel: process.env.PW_KANAL || undefined });
 const bag = await t.newContext({ viewport: { width: 1440, height: 900 }, extraHTTPHeaders: { 'x-idexya-kapi': KAPI } });
@@ -85,7 +104,15 @@ const hatalar = [], istekler = [], kotu = [];
 s.on('pageerror', (e) => hatalar.push('JS: ' + e.message));
 s.on('console', (m) => { if (m.type() === 'error') hatalar.push('konsol: ' + m.text()); });
 s.on('request', (r) => { const u = new URL(r.url()); if (u.origin === OS) istekler.push(u.pathname + u.search); });
-s.on('response', (r) => { const u = new URL(r.url()); if (u.origin === OS && r.status() >= 400) kotu.push(r.status() + ' ' + u.pathname); });
+// Önceden yükleme (Speculation Rules) isteklerini tarayıcı kendisi başlatır; Playwright'ın ek başlığı (kapı anahtarı) onlara
+// eklenmez, yerelde 404 alırlar. Canlıda kapı başlığını yönlendirici Worker sunucuda ekler; sunucu tarafı aşağıda (iste) denetlenir.
+const onyukleme = [];
+s.on('response', async (r) => {
+  const u = new URL(r.url());
+  if (u.origin !== OS || r.status() < 400) return;
+  if (/prefetch/i.test((await r.request().headerValue('sec-purpose').catch(() => null)) || '')) onyukleme.push(u.pathname);
+  else kotu.push(r.status() + ' ' + u.pathname);
+});
 
 await s.goto(OS + '/website/dashboard');
 await s.waitForFunction(() => document.querySelector('idexya-kabuk .ik-yan a'), null, { timeout: 10000 });
@@ -133,6 +160,7 @@ kontrol('tema: site önizlemesi isteği yok', !istekler.some((u) => u.includes('
 await s.screenshot({ path: SS + '/os-theme.png' });
 
 kontrol('os sayfalarında 4xx/5xx yok' + (kotu.length ? ': ' + [...new Set(kotu)].slice(0, 6).join(', ') : ''), kotu.length === 0);
+kontrol('önceden yüklenen adresler yalnız panel sayfaları' + (onyukleme.length ? ' (' + [...new Set(onyukleme)].join(', ') + ')' : ''), onyukleme.every((u) => /^\/website\/[a-z-]+$/.test(u)));
 kontrol('os sayfalarında konsol hatası yok' + (hatalar.length ? ': ' + hatalar.slice(0, 4).join(' | ') : ''), hatalar.length === 0);
 
 // 4. Panel alanı bugünkü gibi (öneksiz)

@@ -59,8 +59,18 @@ const olay = (el, ad, detail, iptal) => el.dispatchEvent(new CustomEvent('idexya
 class IdexyaKabuk extends HTMLElement {
   connectedCallback() {
     if (this._kuruldu) return;
-    if (D.readyState === 'loading') { D.addEventListener('DOMContentLoaded', () => this.connectedCallback(), { once: true }); return; }
+    // Kabuk <head>'de klasik betikle tanımlıysa ayrıştırıcı öğenin içini yazarken buraya gelinir: kurulum kapanış etiketinden
+    // hemen sonra (sonraki kardeş eklenince, ilk boyamadan önce) yapılır; içerik kabuksuz çizilmez.
+    if (D.readyState === 'loading' && !this.nextSibling) {
+      const g = new MutationObserver(() => { if (this.nextSibling) { g.disconnect(); this.connectedCallback(); } });
+      g.observe(this.parentNode, { childList: true });
+      D.addEventListener('DOMContentLoaded', () => { g.disconnect(); this.connectedCallback(); }, { once: true });
+      return;
+    }
     this._kuruldu = true;
+    olay(this, 'kur', {}); // ürün ayar bloğunu son kez değiştirebilir (ör. etkin adres)
+    // Oturumdaki ilk açılış değilse giriş hareketleri ve sayaçlar oynamaz; kabuk son hâliyle çizilir.
+    try { this._sakin = sessionStorage.getItem('idx-acildi') === '1'; sessionStorage.setItem('idx-acildi', '1'); } catch (e) { /* gizli kip */ }
     let ham = null;
     try { ham = JSON.parse((D.querySelector('script#idexya-kabuk-ayar[type="application/json"]') || {}).textContent || 'null'); } catch (e) { ham = null; }
     const { ayar, hatalar } = ayarDogrula(ham);
@@ -76,6 +86,7 @@ class IdexyaKabuk extends HTMLElement {
     ayar.katmanlar.forEach((k) => k.gruplar.forEach((g) => g.moduller.forEach((m) => [m].concat(m.sayfalar).forEach((x) => { if (x.rozet) this.rozet[x.url] = x.rozet; }))));
     this.kur();
     this.etkinYap(ayar.etkin);
+    this._ilk = 1;
     D.addEventListener('keydown', (e) => {
       const t = e.target;
       if (e.defaultPrevented || e.isComposing || !(e.metaKey || e.ctrlKey) || e.altKey || e.key.toLowerCase() !== 'k') return;
@@ -162,7 +173,7 @@ class IdexyaKabuk extends HTMLElement {
     if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (this.sonuc.contains(l)) this.giris.value = '';
     this.kapat(false); this.cekmece(false); this.ucanKapat();
-    if (l.classList.contains('ik-profil-cikis')) try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-kapali)-/.test(k) && localStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
+    if (l.classList.contains('ik-profil-cikis')) try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-kapali)-/.test(k) && localStorage.removeItem(k)); Object.keys(sessionStorage).forEach((k) => /^idx-/.test(k) && sessionStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
     const url = guvenliUrl(l.getAttribute('href'), this.a.kokenler);
     if (!url || !olay(this, 'git', { url }, true)) e.preventDefault();
   }
@@ -381,6 +392,7 @@ class IdexyaKabuk extends HTMLElement {
 
   etkinYap(etkin) {
     const U = (x) => guvenliUrl(x, this.a.kokenler);
+    if (this._ilk) this._sakin = 0;
     etkin = etkin || {};
     this.a.etkin = { modulUrl: U(etkin.modulUrl), sayfaUrl: U(etkin.sayfaUrl), ad: String(etkin.ad || '').slice(0, 120) };
     this.e = etkinBul(this.k, this.a.etkin);
@@ -460,7 +472,7 @@ class IdexyaKabuk extends HTMLElement {
                   type: 'button', class: 'ik-modul-ac', 'aria-expanded': String(acik), 'aria-label': m.ad + ' sayfalarını ' + (acik ? 'gizle' : 'göster'),
                   onclick: () => { this.acikMod[m.url] = !acik; this.yanCiz(); this.odakBul('.ik-modul-ac', m.ad); }
                 }, svg(SAG, 12, 2)) : null),
-              acik ? h('div', { class: 'ik-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad, this.rz(s)))) : null);
+              acik ? h('div', { class: this._sakin ? 'ik-sayfalar ik-sakin' : 'ik-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad, this.rz(s)))) : null);
           })));
       }));
     }
@@ -513,7 +525,7 @@ class IdexyaKabuk extends HTMLElement {
   // Sahne hareketi; sayaç rAF ile bir kez sayar.
   sahneOynat(kok) {
     kok = kok || this.icerik;
-    kok.querySelectorAll('[data-ik-sahne]').forEach((s) => {
+    if (!this._sakin) kok.querySelectorAll('[data-ik-sahne]').forEach((s) => {
       s.querySelectorAll('[data-ik-oge]').forEach((o, i) => o.style.setProperty('--ik-s', i));
       s.querySelectorAll('[data-ik-satir]').forEach((o, i) => o.style.setProperty('--ik-s', i));
       s.classList.remove('ik-sahne'); void s.offsetWidth; s.classList.add('ik-sahne');
@@ -522,7 +534,7 @@ class IdexyaKabuk extends HTMLElement {
     say.forEach((x) => { if (x.dataset.ikHedef == null) x.dataset.ikHedef = x.textContent; });
     cancelAnimationFrame(this._raf);
     const bitir = () => say.forEach((x) => { x.textContent = x.dataset.ikHedef; });
-    if (!say.length || azHareket()) return bitir();
+    if (!say.length || azHareket() || this._sakin) return bitir();
     const bas = performance.now() + 250, sure = 1200;
     const adim = (t) => {
       const x = Math.min(1, Math.max(0, (t - bas) / sure)), y = 1 - Math.pow(1 - x, 3);

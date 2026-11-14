@@ -47,6 +47,23 @@ değiştirilmez (yapım kuralı 1).
 - Yazı tipi dosyalarını kabuk getirmez. Ürün kendi sunucusundan `@font-face` ile verir (Inter zorunlu,
   diğerleri isteğe bağlı). Seçilen aile yüklü değilse tarayıcı Inter'e, o da yoksa sistem yazısına düşer.
 
+### Çok sayfalı ürün: kabuk ilk boyamadan önce (önerilen)
+
+Modül betikleri (`type="module"`) ayrıştırma bittikten sonra çalışır; tarayıcı ilk kareyi (ve sayfa geçişinin yeni
+görüntüsünü) çoğu zaman ondan önce çizer, içerik bir kare kabuksuz görünür. `blocking="render"` ve
+`<link rel="expect">` bunu önlemez (14 Kas 2026, Chrome 157 ölçümü). Çok sayfalı üründe kabuk, `kabuk.js` ve ürünün
+bağlantı kodu birlikte **klasik** tek dosyaya paketlenip (ör. esbuild `format: 'iife'`) `<head>`'de harici betik olarak
+yüklenir (`<script src="/…/kabuk.js?v=<özet>">`, satır içi değil; uzun önbellek). Kabuk, `<head>`'de tanımlıysa
+ayrıştırıcı öğeyi kapatır kapatmaz (sonraki kardeş eklenince, ilk boyamadan önce) kurulur; `DOMContentLoaded`
+beklenmez. Örnek: idexya-platform `tools/panel-kabuk.mjs`. Tek sayfa uygulama (IDOS `web/`) bunu gerektirmez.
+
+### Sayfalar arası geçiş (çapraz belge View Transitions)
+
+`kabuk.css` çok sayfalı üründe aynı kökendeki geçişleri `@view-transition { navigation: auto }` ile açar: paket
+çubuğu (`ik-ust`), yan menü (`ik-yan`) ve sekme satırı (`ik-sekmeler`) adlandırılmış öğedir ve yerinde kalır, yalnız
+içerik alanı (`ik-icerik`) 150 ms çapraz geçişle değişir. "Hareketi azalt" açıksa geçiş yoktur. Tek sayfa uygulamada
+etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boyamadan önce kurulmalıdır (yukarıdaki bölüm).
+
 ## Ayar şeması
 
 ```jsonc
@@ -112,6 +129,7 @@ Bir ürünün menüsü değişince bu dosya da güncellenir; `test/katmanlar.tes
 
 | Olay (öğeden kabarcıklanır) | Ne zaman | `detail` |
 |---|---|---|
+| `idexya-kabuk:kur` | Kurulumdan hemen önce, ayar okunmadan | `{}` — ürün ayar bloğunu son kez değiştirebilir (ör. etkin adres, oturumdaki kullanıcı) |
 | `idexya-kabuk:hazir` | Kabuk kuruldu | `{ ayar }` (doğrulanmış) |
 | `idexya-kabuk:git` | Kabuktaki bir bağlantıya tıklandı ya da aramada Enter | `{ url }` — **iptal edilebilir** |
 | `idexya-kabuk:asistan` | Asistan düğmesine tıklandı | `{}` — paneli ürün açar |
@@ -154,17 +172,23 @@ sırayla süzülür, `[data-ik-satir]` tablo satırı akar, `[data-ik-sayac]` me
 (bir kez, `requestAnimationFrame` biter). Uyarı ve hata etiketinin noktası yavaşça atar.
 "Hareketi azalt" açıksa bütün hareket kapanır, sayaçlar hemen son değeri gösterir.
 
+**Yalnız oturumdaki ilk açılışta** (Muhittin, 14 Kas 2026): kabuk `sessionStorage` `idx-acildi` işaretine bakar. Sekmede
+daha önce bir kabuklu sayfa açıldıysa sayfa yüklenirken giriş hareketleri (sahne, sayaç, yan menüdeki alt sayfa listesinin
+açılışı) oynamaz, kabuk ve içerik hemen son hâliyle çizilir. Sonraki `etkinYap` çağrısından (uygulama içi gezinme) itibaren
+hareketler yine oynar.
+
 Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuzey`, `--ik-gomuk`,
 `--ik-cizgi`, `--ik-metin`, `--ik-ikincil`, `--ik-paket`, `--ik-izgara`; katman vurgusu `--ik-vurgu`,
 `--ik-vurgu-yazi`, `--ik-yumusak`. Yazı: `--ik-yazi` (aile), `--w-ince`, `--w-govde`, `--w-orta`,
 `--w-vurgu`. Bileşenlerde sabit kalınlık sayısı yazılmaz.
 
-## Tarayıcıda saklananlar (`localStorage`)
+## Tarayıcıda saklananlar (`localStorage`, `sessionStorage`)
 
 **Kural:** sekme adına ya da adresine ve menü adına müşteri ya da kişi adı konmaz (sekme adı menüdeki
 sayfa adından gelir; müşteri kartı gibi sayfalarda `etkin.ad` genel tutulur, ör. "Müşteri kartı"). Saklanan
 sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adresse geri yüklenir. Profil menüsündeki
-"Çıkış yap" `idx-sekme-*` ve `idx-yan-kapali-*` anahtarlarını siler.
+"Çıkış yap" `idx-sekme-*` ve `idx-yan-kapali-*` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
+anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
 |---|---|
@@ -173,6 +197,7 @@ sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adress
 | `idx-yan-dar` | Yan menü daraltılmış mı |
 | `idx-yan-kapali-<katman>` | Kapalı grup başlıkları |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
+| `idx-acildi` (`sessionStorage`) | Bu sekmede kabuk daha önce açıldı mı (giriş hareketleri yalnız ilk açılışta) |
 
 `<html>` üzerine `data-tema` (`acik`/`koyu`) ve `data-tema-secim` yazılır. localStorage alan adına bağlıdır:
 katmanlar ayrı alan adlarındayken seçim her birinde ayrı saklanır; tek adres (`os.idexya.com`, aşama 2)

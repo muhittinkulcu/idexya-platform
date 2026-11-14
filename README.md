@@ -103,6 +103,23 @@ Plan: idexya-ortak `tek-adres-plani.md`. Önek Astro derlemesine konmaz (site ay
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
   sonra boş veritabanıyla `node tools/test-yonetim.mjs http://127.0.0.1:8787 <ekran-klasörü>` (uçtan uca: form → talep → CRM → kart).
 
+## Panel sayfa geçişi hızı (14 Kas 2026)
+
+- **Kabuk ilk boyamadan önce:** `tools/panel-kabuk.mjs` kabuk bağlantısını ve ortak kabuğu (`src/scripts/yonetim/kabuk-giris.js`) tek
+  klasik betiğe paketler (`public/panel-kabuk.js`, git'e girmez; `npm run build` ve `npm run dev` üretir). Yonetim.astro onu `<head>`'de
+  yükler; derleme adrese içerik özeti ekler (`?v=…`, `panel-gorunum.js` de), `public/_headers` bir yıl önbellek verir. Modül betiğiyle
+  sayfa bir kare kabuksuz çiziliyordu.
+- **Önceden yükleme:** panel sayfası yanıtında `Speculation-Rules: "/panel-onyukleme.json"` (`worker/onyukleme.js`; Chrome/Edge). İmleç
+  bir panel bağlantısında ~200 ms durunca HTML önceden alınır. API, `/cdn-cgi` (çıkış dahil), `/yonetim/*`, yeni pencere ve indirme
+  bağlantıları önceden yüklenmez. Astro prefetch kullanılmaz (panel HTML'i `no-store`).
+- **Geçiş:** çapraz belge View Transitions (ortak kabuk `kabuk.css`); kabuk yerinde kalır, içerik 150 ms çapraz geçer.
+- **Veri:** sayfa `veri={[...]}` ile açılışta okuduğu uçları bildirir (`<link rel="preload" as="fetch">`); aynı anda giden aynı okuma
+  isteği bir kez gider. "Eski göster, arkadan tazele" yalnız `ozet` ve `grafik` uçlarının sayısal özetiyle (`src/scripts/yonetim/ortak.js`
+  `SAKLA`; sessionStorage, kullanıcıya bağlı anahtar, 10 dakika; çıkışta ve 401'de silinir). Kişi/müşteri verisi saklanmaz.
+- **Kullanıcı:** Worker panel sayfasına `<meta name="idexya-kullanici">` yazar (Access kimliği); kabuk profili ilk çizimde doğru.
+- **Ölçüm:** `PW_KANAL=chrome PW_KOK=<playwright klasörü> node tools/olc-gecis.mjs http://panel.localhost:8791 <klasör> 3 gecikmeli`
+  (os alanı: `http://os.localhost:8791/website`; araç yönlendiriciyi taklit eden yerel vekil kurar).
+
 ## Referans sayfası (`/referans`)
 
 - Kategorili referans listesi: https://idexya.com/referans (`worker/referans.js`, kabuk `src/pages/kabuk/referanslar.astro`,

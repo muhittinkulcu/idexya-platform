@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Teklifler" aktif="teklif" yol="Satış ve müşteri" aciklama="CRM’deki müşterilere kalem kalem fiyat teklifi hazırlayın, yazdırın ya da PDF olarak kaydedin. Tutarlar ve KDV sunucuda hesaplanır; teklif gönderildi olarak işaretlenince düzenlenemez.">
+<Yonetim baslik="Teklifler" aktif="teklif" veri={['teklifler', 'teklif-dosyalari']} yol="Satış ve müşteri" aciklama="CRM’deki müşterilere kalem kalem fiyat teklifi hazırlayın, yazdırın ya da PDF olarak kaydedin. Tutarlar ve KDV sunucuda hesaplanır; teklif gönderildi olarak işaretlenince düzenlenemez.">
 <div class="uyari bilgi">Bu panel teklifi e-postayla <b>göndermez</b>. Teklifi “Yazdır / PDF” ile PDF olarak kaydedip müşteriye kendiniz iletin, sonra “Gönderildi olarak işaretle”yi seçin. İşaretleme, kabul ve ret müşteri kartının günlüğüne yazılır; gönderim ve kabulde müşterinin CRM aşaması da güncellenir.</div>
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between">
 <div role="tablist" aria-label="Teklif durumu" data-sekmeler style="display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 12px; background: var(--track, var(--card2)); max-width: 100%"></div>
