@@ -3,7 +3,7 @@ import { createRequire } from 'module';
 const { chromium } = createRequire(import.meta.url)('playwright');
 const B = process.argv[2] || 'http://127.0.0.1:8787';
 const SS = process.argv[3] || '.';
-const t = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
+const t = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || '/opt/pw-browsers/chromium' });
 const s = await t.newPage({ viewport: { width: 1440, height: 900 } });
 const h = []; s.on('pageerror', (e) => h.push('JS: ' + e.message)); s.on('console', (m) => { if (m.type() === 'error' && !m.text().includes('ERR_TUNNEL')) h.push('konsol: ' + m.text()); });
 const kontrol = (ad, kosul) => { console.log((kosul ? 'GEÇTİ ' : 'KALDI ') + ad); if (!kosul) h.push('KALDI ' + ad); };
@@ -29,7 +29,8 @@ for (const [yol, ad, ek] of [['/tr/iletisim', 'İletişim Deneme', {}], ['/', 'A
 await s.goto(B + '/yonetim/');
 await s.waitForSelector('[data-kpi] .kart');
 kontrol('genel bakış: 3 yeni talep', (await s.textContent('[data-kpi]')).includes('3'));
-kontrol('menü rozeti 3', (await s.textContent('[data-sayac="talep"]')) === '3');
+// Rozet ortak kabuk yan menüsünde (rozetYap): Talepler modülünde 3
+kontrol('menü rozeti 3', !!(await s.waitForFunction(() => { const r = document.querySelector('.ik-yan .ik-rozet[data-r="/leads"]'); return r && !r.hidden && r.textContent === '3'; }, null, { timeout: 5000 }).catch(() => null)));
 await s.screenshot({ path: SS + '/y-genel.png', fullPage: true });
 
 await s.goto(B + '/yonetim/talepler/');
@@ -78,25 +79,27 @@ for (const [g, ad] of [[390, 'mobil'], [768, 'tablet']]) {
     kontrol(`${ad} ${y} yatay taşma yok (${tas})`, tas <= 0);
   }
 }
-// Menü: Sistem › Eşitleme iki alt öğeyle; sayfa açılınca doğru grup açık, doğru alt öğe seçili; CRM altında eşitleme yok
+// Menü (ortak kabuk yan menüsü): Sistem › Eşitleme üç sayfayla; sayfa açılınca modül açık, doğru sayfa seçili; CRM altında eşitleme yok
 await s.setViewportSize({ width: 1440, height: 900 });
-for (const [yol, alt, baslik] of [['data-sync', 'Reklam verisi çekimi', 'Reklam verisi çekimi'], ['crm-sync', 'Reklam hesabı eşleştirme', 'Reklam hesabı eşleştirme']]) {
-  await s.goto(B + '/yonetim/' + yol + '/'); await s.waitForTimeout(300);
-  const m = await s.evaluate(() => ({
-    altlar: [...document.querySelectorAll('[data-alt="esitle"] a')].map((a) => a.textContent.trim()),
-    acik: !document.querySelector('[data-alt="esitle"]').hidden,
-    secili: (document.querySelector('[data-alt="esitle"] a[aria-current=page]') || {}).textContent,
-    crmAlt: [...document.querySelectorAll('[data-alt="crm"] a')].map((a) => a.textContent.trim()),
-    yol: [...document.querySelectorAll('[data-yol] li')].filter((l) => !l.hidden).map((l) => l.textContent.trim()).join(' › '),
-    h1: document.querySelector('h1[data-baslik]').textContent.replace(/\.$/, '')
-  }));
-  kontrol(`${yol}: Eşitleme altında iki öğe`, m.altlar.join('|') === 'Reklam verisi çekimi|Reklam hesabı eşleştirme');
-  kontrol(`${yol}: Eşitleme açık, "${alt}" seçili`, m.acik && m.secili === alt);
-  kontrol(`${yol}: başlık "${baslik}", yol Sistem › Eşitleme (${m.yol})`, m.h1 === baslik && m.yol.startsWith('Sistem › Eşitleme'));
-  kontrol(`${yol}: CRM altında eşitleme yok`, m.crmAlt.join('|') === 'Satış panosu|Mükerrer kartlar');
+const menu = (modulAd) => s.evaluate((ad) => {
+  const metin = (a) => a.childNodes[0].textContent.trim();
+  const m = [...document.querySelectorAll('.ik-yan .ik-modul')].find((x) => x.querySelector('.ik-modul-satir a span:nth-child(2)').textContent === ad);
+  if (!m) return null;
+  const sayfalar = [...m.querySelectorAll('.ik-sayfalar a')];
+  return { altlar: sayfalar.map(metin), acik: sayfalar.length > 0, secili: (sayfalar.find((a) => a.getAttribute('aria-current') === 'page') || { childNodes: [{ textContent: '' }] }).childNodes[0].textContent.trim() };
+}, modulAd);
+for (const [yol, alt, baslik] of [['data-sync', 'Reklam verisi çekimi', 'Reklam verisi çekimi'], ['crm-sync', 'Reklam hesabı eşleştirme', 'Reklam hesabı eşleştirme'], ['crm-migrate', 'IDOS’a müşteri taşıma', 'IDOS’a müşteri taşıma']]) {
+  await s.goto(B + '/yonetim/' + yol + '/'); await s.waitForSelector('.ik-yan .ik-modul'); await s.waitForTimeout(300);
+  const es = await menu('Eşitleme');
+  const yolMetni = (await s.textContent('[data-konum]')).replace(/\s+/g, ' ').trim();
+  const h1 = (await s.textContent('h1 [data-baslik]')).trim();
+  kontrol(`${yol}: Eşitleme altında üç sayfa`, es && es.altlar.join('|') === 'Reklam verisi çekimi|Reklam hesabı eşleştirme|IDOS’a müşteri taşıma');
+  kontrol(`${yol}: Eşitleme açık, "${alt}" seçili`, es && es.acik && es.secili === alt);
+  kontrol(`${yol}: başlık "${baslik}", konum Website ve CRM › Sistem › Eşitleme (${yolMetni})`, h1 === baslik && yolMetni.startsWith('Website ve CRM › Sistem › Eşitleme'));
 }
-await s.goto(B + '/yonetim/crm-conflicts/'); await s.waitForTimeout(300);
-kontrol('crm-conflicts: CRM açık, "Mükerrer kartlar" seçili', await s.evaluate(() => !document.querySelector('[data-alt="crm"]').hidden && (document.querySelector('[data-alt="crm"] a[aria-current=page]') || {}).textContent === 'Mükerrer kartlar'));
+await s.goto(B + '/yonetim/crm-conflicts/'); await s.waitForSelector('.ik-yan .ik-modul'); await s.waitForTimeout(300);
+const crm = await menu('Müşteriler (CRM)');
+kontrol('crm-conflicts: CRM açık, "Mükerrer kartlar" seçili, altında eşitleme yok', crm && crm.acik && crm.secili === 'Mükerrer kartlar' && crm.altlar.join('|') === 'Satış panosu|Mükerrer kartlar');
 await s.setViewportSize({ width: 390, height: 900 }); await s.goto(B + '/yonetim/crm/'); await s.waitForTimeout(500);
 await s.screenshot({ path: SS + '/y-crm-390.png', fullPage: true });
 console.log(h.length ? 'SORUNLAR:\n' + h.join('\n') : 'Tüm kontroller geçti, JS hatası yok.');

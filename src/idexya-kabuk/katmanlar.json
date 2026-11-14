@@ -1,0 +1,1171 @@
+{
+ "surum": 1,
+ "katmanlar": [
+  {
+   "anahtar": "idos",
+   "ad": "IDOS",
+   "url": "https://marketing.idexya.com/dashboard",
+   "renk": "#C2510F",
+   "renkKoyu": "#F07A23",
+   "aciklama": "Idexya ana ekranı: üç katmanın özeti.",
+   "gruplar": []
+  },
+  {
+   "anahtar": "marketing",
+   "ad": "Marketing",
+   "url": "https://marketing.idexya.com/",
+   "renk": "#2F55D4",
+   "renkKoyu": "#7F9AF2",
+   "aciklama": "Meta, Google, GA4, Search Console ve Tag Manager verisi; yapay zekâ önerileri, kritik konular ve raporlar.",
+   "gruplar": [
+    {
+     "baslik": "Komuta merkezi",
+     "simge": "izgara",
+     "moduller": [
+      {
+       "ad": "Genel bakış",
+       "url": "https://marketing.idexya.com/dashboard",
+       "sayfalar": [
+        {
+         "ad": "Genel merkez",
+         "url": "https://marketing.idexya.com/dashboard"
+        },
+        {
+         "ad": "Özet",
+         "url": "https://marketing.idexya.com/overview"
+        },
+        {
+         "ad": "Ajans geneli",
+         "url": "https://marketing.idexya.com/overview/agency"
+        }
+       ]
+      },
+      {
+       "ad": "Bugün",
+       "url": "https://marketing.idexya.com/today/urgent",
+       "sayfalar": [
+        {
+         "ad": "Acil",
+         "url": "https://marketing.idexya.com/today/urgent"
+        },
+        {
+         "ad": "Karar bekleyen",
+         "url": "https://marketing.idexya.com/today/pending"
+        },
+        {
+         "ad": "Uygulanacak",
+         "url": "https://marketing.idexya.com/today/approved"
+        },
+        {
+         "ad": "Uyarılar",
+         "url": "https://marketing.idexya.com/today/alerts"
+        },
+        {
+         "ad": "İzleniyor",
+         "url": "https://marketing.idexya.com/today/monitoring"
+        }
+       ]
+      },
+      {
+       "ad": "Gelen kutusu",
+       "url": "https://marketing.idexya.com/inbox",
+       "sayfalar": [
+        {
+         "ad": "Sohbetler",
+         "url": "https://marketing.idexya.com/inbox"
+        },
+        {
+         "ad": "Bilgi tabanı",
+         "url": "https://marketing.idexya.com/inbox/knowledge-base"
+        }
+       ]
+      },
+      {
+       "ad": "Hedef ve bütçe",
+       "url": "https://marketing.idexya.com/overview/goals",
+       "sayfalar": [
+        {
+         "ad": "Hedefler",
+         "url": "https://marketing.idexya.com/overview/goals"
+        },
+        {
+         "ad": "Bütçe temposu",
+         "url": "https://marketing.idexya.com/overview/budget"
+        }
+       ]
+      },
+      {
+       "ad": "Operasyon",
+       "url": "https://marketing.idexya.com/overview/interventions",
+       "sayfalar": [
+        {
+         "ad": "Öncelikli müdahaleler",
+         "url": "https://marketing.idexya.com/overview/interventions"
+        },
+        {
+         "ad": "Görev, rapor ve veri",
+         "url": "https://marketing.idexya.com/overview/operations"
+        }
+       ]
+      },
+      {
+       "ad": "Portföy",
+       "url": "https://marketing.idexya.com/portfolio",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Müşteriler ve CRM",
+     "simge": "kisiler",
+     "moduller": [
+      {
+       "ad": "Müşteriler",
+       "url": "https://marketing.idexya.com/clients",
+       "sayfalar": [
+        {
+         "ad": "Müşteri listesi",
+         "url": "https://marketing.idexya.com/clients"
+        },
+        {
+         "ad": "Toplu düzenleme",
+         "url": "https://marketing.idexya.com/bulk-edit"
+        }
+       ]
+      },
+      {
+       "ad": "CRM",
+       "url": "https://marketing.idexya.com/crm",
+       "sayfalar": [
+        {
+         "ad": "CRM panosu",
+         "url": "https://marketing.idexya.com/crm"
+        },
+        {
+         "ad": "Takipler",
+         "url": "https://marketing.idexya.com/crm/follow-ups"
+        },
+        {
+         "ad": "Sözleşmeler",
+         "url": "https://marketing.idexya.com/crm/contracts"
+        },
+        {
+         "ad": "Kişiler",
+         "url": "https://marketing.idexya.com/crm/contacts"
+        }
+       ]
+      },
+      {
+       "ad": "Satış hattı",
+       "url": "https://marketing.idexya.com/sales",
+       "sayfalar": [
+        {
+         "ad": "Satış panosu",
+         "url": "https://marketing.idexya.com/sales"
+        },
+        {
+         "ad": "Adaylar",
+         "url": "https://marketing.idexya.com/sales/leads"
+        },
+        {
+         "ad": "Randevular",
+         "url": "https://marketing.idexya.com/sales/appointments"
+        },
+        {
+         "ad": "Huni ve özet",
+         "url": "https://marketing.idexya.com/sales/summary"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Meta",
+     "simge": "megafon",
+     "moduller": [
+      {
+       "ad": "Reklam yöneticisi",
+       "url": "https://marketing.idexya.com/meta",
+       "sayfalar": [
+        {
+         "ad": "Genel bakış",
+         "url": "https://marketing.idexya.com/meta"
+        },
+        {
+         "ad": "Kampanyalar",
+         "url": "https://marketing.idexya.com/meta/campaigns"
+        },
+        {
+         "ad": "Reklam setleri",
+         "url": "https://marketing.idexya.com/meta/ad-sets"
+        },
+        {
+         "ad": "Reklamlar",
+         "url": "https://marketing.idexya.com/meta/ads"
+        },
+        {
+         "ad": "Otomatik kurallar",
+         "url": "https://marketing.idexya.com/meta/rules"
+        }
+       ]
+      },
+      {
+       "ad": "Hedef kitleler",
+       "url": "https://marketing.idexya.com/meta/audience",
+       "sayfalar": [
+        {
+         "ad": "Kitle ve yerleşim",
+         "url": "https://marketing.idexya.com/meta/audience"
+        },
+        {
+         "ad": "Yaş ve cinsiyet",
+         "url": "https://marketing.idexya.com/meta/breakdowns"
+        },
+        {
+         "ad": "Bölge, cihaz ve saat",
+         "url": "https://marketing.idexya.com/meta/delivery"
+        }
+       ]
+      },
+      {
+       "ad": "Kreatif",
+       "url": "https://marketing.idexya.com/meta/creatives",
+       "sayfalar": [
+        {
+         "ad": "Kreatif merkezi",
+         "url": "https://marketing.idexya.com/meta/creatives"
+        },
+        {
+         "ad": "Kreatif yorgunluğu",
+         "url": "https://marketing.idexya.com/meta/creative-fatigue"
+        },
+        {
+         "ad": "Reklam kalitesi",
+         "url": "https://marketing.idexya.com/meta/ad-quality"
+        }
+       ]
+      },
+      {
+       "ad": "Analiz ve raporlama",
+       "url": "https://marketing.idexya.com/meta/analysis",
+       "sayfalar": [
+        {
+         "ad": "Dönem karşılaştırma",
+         "url": "https://marketing.idexya.com/meta/analysis"
+        },
+        {
+         "ad": "Uyarılar",
+         "url": "https://marketing.idexya.com/meta/alerts"
+        },
+        {
+         "ad": "Değişiklik geçmişi",
+         "url": "https://marketing.idexya.com/meta/history"
+        }
+       ]
+      },
+      {
+       "ad": "Reklam hesabı ayarları",
+       "url": "https://marketing.idexya.com/meta/accounts",
+       "sayfalar": [
+        {
+         "ad": "Hesaplar ve ödeme",
+         "url": "https://marketing.idexya.com/meta/accounts"
+        },
+        {
+         "ad": "Harcama mutabakatı",
+         "url": "https://marketing.idexya.com/meta/reconciliation"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Google Ads",
+     "simge": "megafon",
+     "moduller": [
+      {
+       "ad": "Genel bakış",
+       "url": "https://marketing.idexya.com/google",
+       "sayfalar": []
+      },
+      {
+       "ad": "Kampanyalar",
+       "url": "https://marketing.idexya.com/google/campaigns",
+       "sayfalar": [
+        {
+         "ad": "Kampanyalar",
+         "url": "https://marketing.idexya.com/google/campaigns"
+        },
+        {
+         "ad": "Reklam grupları",
+         "url": "https://marketing.idexya.com/google/ad-groups"
+        },
+        {
+         "ad": "Reklamlar",
+         "url": "https://marketing.idexya.com/google/ads"
+        }
+       ]
+      },
+      {
+       "ad": "Kitleler, anahtar kelimeler ve içerikler",
+       "url": "https://marketing.idexya.com/google/keywords",
+       "sayfalar": [
+        {
+         "ad": "Anahtar kelimeler",
+         "url": "https://marketing.idexya.com/google/keywords"
+        },
+        {
+         "ad": "Arama terimleri",
+         "url": "https://marketing.idexya.com/google/search-terms"
+        },
+        {
+         "ad": "Cihaz ve zaman",
+         "url": "https://marketing.idexya.com/google/segments"
+        },
+        {
+         "ad": "Konumlar",
+         "url": "https://marketing.idexya.com/google/locations"
+        }
+       ]
+      },
+      {
+       "ad": "Hedefler",
+       "url": "https://marketing.idexya.com/google/conversions",
+       "sayfalar": []
+      },
+      {
+       "ad": "Alışveriş",
+       "url": "https://marketing.idexya.com/google/products",
+       "sayfalar": []
+      },
+      {
+       "ad": "Analizler ve raporlar",
+       "url": "https://marketing.idexya.com/google/analysis",
+       "sayfalar": [
+        {
+         "ad": "Dönem karşılaştırma",
+         "url": "https://marketing.idexya.com/google/analysis"
+        },
+        {
+         "ad": "Uyarılar",
+         "url": "https://marketing.idexya.com/google/alerts"
+        },
+        {
+         "ad": "Değişiklik geçmişi",
+         "url": "https://marketing.idexya.com/google/history"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Google Analytics",
+     "simge": "grafik",
+     "moduller": [
+      {
+       "ad": "Raporlar",
+       "url": "https://marketing.idexya.com/analytics",
+       "sayfalar": []
+      },
+      {
+       "ad": "Edinme",
+       "url": "https://marketing.idexya.com/analytics/acquisition",
+       "sayfalar": []
+      },
+      {
+       "ad": "Etkileşim",
+       "url": "https://marketing.idexya.com/analytics/engagement",
+       "sayfalar": [
+        {
+         "ad": "Etkileşime genel bakış",
+         "url": "https://marketing.idexya.com/analytics/engagement"
+        },
+        {
+         "ad": "Etkinlikler",
+         "url": "https://marketing.idexya.com/analytics/events"
+        },
+        {
+         "ad": "Sayfalar ve ekranlar",
+         "url": "https://marketing.idexya.com/analytics/pages"
+        },
+        {
+         "ad": "Açılış sayfası",
+         "url": "https://marketing.idexya.com/analytics/landing-pages"
+        }
+       ]
+      },
+      {
+       "ad": "Para kazanma",
+       "url": "https://marketing.idexya.com/analytics/ecommerce",
+       "sayfalar": []
+      },
+      {
+       "ad": "Kullanıcı özellikleri",
+       "url": "https://marketing.idexya.com/analytics/demographics",
+       "sayfalar": []
+      },
+      {
+       "ad": "Teknoloji",
+       "url": "https://marketing.idexya.com/analytics/tech",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Search Console",
+     "simge": "dunya",
+     "moduller": [
+      {
+       "ad": "Genel bakış",
+       "url": "https://marketing.idexya.com/search-console",
+       "sayfalar": []
+      },
+      {
+       "ad": "Performans",
+       "url": "https://marketing.idexya.com/search-console/queries",
+       "sayfalar": [
+        {
+         "ad": "Arama sonuçları",
+         "url": "https://marketing.idexya.com/search-console/queries"
+        },
+        {
+         "ad": "Sayfalar",
+         "url": "https://marketing.idexya.com/search-console/pages"
+        },
+        {
+         "ad": "Ülkeler",
+         "url": "https://marketing.idexya.com/search-console/countries"
+        },
+        {
+         "ad": "Cihazlar ve kırılımlar",
+         "url": "https://marketing.idexya.com/search-console/breakdowns"
+        },
+        {
+         "ad": "Arama görünümü",
+         "url": "https://marketing.idexya.com/search-console/search-appearance"
+        }
+       ]
+      },
+      {
+       "ad": "Dizine ekleme",
+       "url": "https://marketing.idexya.com/search-console/indexing",
+       "sayfalar": []
+      },
+      {
+       "ad": "Deneyim",
+       "url": "https://marketing.idexya.com/search-console/core-web-vitals",
+       "sayfalar": [
+        {
+         "ad": "Önemli web verileri",
+         "url": "https://marketing.idexya.com/search-console/core-web-vitals"
+        },
+        {
+         "ad": "HTTPS ve site sağlığı",
+         "url": "https://marketing.idexya.com/search-console/site-health"
+        }
+       ]
+      },
+      {
+       "ad": "Teknik SEO",
+       "url": "https://marketing.idexya.com/search-console/technical-audit",
+       "sayfalar": []
+      },
+      {
+       "ad": "Rakipler",
+       "url": "https://marketing.idexya.com/search-console/competitors",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "İşletme profili",
+     "simge": "dunya",
+     "moduller": [
+      {
+       "ad": "Genel bakış",
+       "url": "https://marketing.idexya.com/business-profile",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Tag Manager",
+     "simge": "ayrac",
+     "moduller": [
+      {
+       "ad": "Çalışma alanı",
+       "url": "https://marketing.idexya.com/tag-manager",
+       "sayfalar": [
+        {
+         "ad": "Genel bakış",
+         "url": "https://marketing.idexya.com/tag-manager"
+        },
+        {
+         "ad": "Etiketler",
+         "url": "https://marketing.idexya.com/tag-manager/tags"
+        },
+        {
+         "ad": "Tetikleyiciler",
+         "url": "https://marketing.idexya.com/tag-manager/triggers"
+        },
+        {
+         "ad": "Değişkenler",
+         "url": "https://marketing.idexya.com/tag-manager/variables"
+        },
+        {
+         "ad": "Veri katmanı",
+         "url": "https://marketing.idexya.com/tag-manager/data-layer"
+        }
+       ]
+      },
+      {
+       "ad": "Sürümler",
+       "url": "https://marketing.idexya.com/tag-manager/versions",
+       "sayfalar": []
+      },
+      {
+       "ad": "Yönetici",
+       "url": "https://marketing.idexya.com/tag-manager/containers",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Yapay zekâ ile reklam yönetimi",
+     "simge": "yildiz",
+     "moduller": [
+      {
+       "ad": "Günlük",
+       "url": "https://marketing.idexya.com/ai",
+       "sayfalar": [
+        {
+         "ad": "Sabah masası",
+         "url": "https://marketing.idexya.com/ai"
+        },
+        {
+         "ad": "Uyarı merkezi",
+         "url": "https://marketing.idexya.com/ai/alerts"
+        }
+       ]
+      },
+      {
+       "ad": "Analiz",
+       "url": "https://marketing.idexya.com/ai/analyses",
+       "sayfalar": [
+        {
+         "ad": "Karşılaştırmalı analizler",
+         "url": "https://marketing.idexya.com/ai/analyses"
+        },
+        {
+         "ad": "AI panosu",
+         "url": "https://marketing.idexya.com/ai/board"
+        },
+        {
+         "ad": "Kreatif yorgunluğu",
+         "url": "https://marketing.idexya.com/ai/creative"
+        }
+       ]
+      },
+      {
+       "ad": "Öneri döngüsü",
+       "url": "https://marketing.idexya.com/agents",
+       "sayfalar": [
+        {
+         "ad": "Ajanlar ve eşikler",
+         "url": "https://marketing.idexya.com/agents"
+        },
+        {
+         "ad": "Uygulananlar ve etkisi",
+         "url": "https://marketing.idexya.com/results"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Ekip",
+     "simge": "kisiler",
+     "moduller": [
+      {
+       "ad": "Görevler",
+       "url": "https://marketing.idexya.com/tasks",
+       "sayfalar": []
+      },
+      {
+       "ad": "Ekip",
+       "url": "https://marketing.idexya.com/team",
+       "sayfalar": [
+        {
+         "ad": "Ekip panosu",
+         "url": "https://marketing.idexya.com/team"
+        },
+        {
+         "ad": "İş günlüğü",
+         "url": "https://marketing.idexya.com/team/worklog"
+        },
+        {
+         "ad": "Duyurular",
+         "url": "https://marketing.idexya.com/team/announcements"
+        }
+       ]
+      },
+      {
+       "ad": "Akademi",
+       "url": "https://marketing.idexya.com/academy",
+       "sayfalar": [
+        {
+         "ad": "Öğren",
+         "url": "https://marketing.idexya.com/academy"
+        },
+        {
+         "ad": "İçerik yönetimi",
+         "url": "https://marketing.idexya.com/academy/content"
+        },
+        {
+         "ad": "Ekip ilerlemesi",
+         "url": "https://marketing.idexya.com/academy/team"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Raporlar",
+     "simge": "belge",
+     "moduller": [
+      {
+       "ad": "Gönderim",
+       "url": "https://marketing.idexya.com/share",
+       "sayfalar": [
+        {
+         "ad": "Onay bekleyen",
+         "url": "https://marketing.idexya.com/share"
+        },
+        {
+         "ad": "Planlı raporlar",
+         "url": "https://marketing.idexya.com/share/scheduled"
+        }
+       ]
+      },
+      {
+       "ad": "Raporlar",
+       "url": "https://marketing.idexya.com/share/create",
+       "sayfalar": [
+        {
+         "ad": "Rapor oluştur ve arşiv",
+         "url": "https://marketing.idexya.com/share/create"
+        },
+        {
+         "ad": "Performans raporu",
+         "url": "https://marketing.idexya.com/performance"
+        }
+       ]
+      },
+      {
+       "ad": "Tasarım",
+       "url": "https://marketing.idexya.com/share/designer",
+       "sayfalar": [
+        {
+         "ad": "Rapor tasarımcısı",
+         "url": "https://marketing.idexya.com/share/designer"
+        },
+        {
+         "ad": "Rapor oluşturucu",
+         "url": "https://marketing.idexya.com/share/builder"
+        },
+        {
+         "ad": "Şablonlar",
+         "url": "https://marketing.idexya.com/share/templates"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Yönetim",
+     "simge": "esitle",
+     "moduller": [
+      {
+       "ad": "Veri ve kayıtlar",
+       "url": "https://marketing.idexya.com/data",
+       "sayfalar": []
+      },
+      {
+       "ad": "Hesabım",
+       "url": "https://marketing.idexya.com/profile",
+       "sayfalar": [
+        {
+         "ad": "Profil",
+         "url": "https://marketing.idexya.com/profile"
+        },
+        {
+         "ad": "Ayarlar",
+         "url": "https://marketing.idexya.com/settings"
+        },
+        {
+         "ad": "Yenilikler",
+         "url": "https://marketing.idexya.com/changelog"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "anahtar": "website",
+   "ad": "Website ve CRM",
+   "url": "https://panel.idexya.com/dashboard",
+   "renk": "#B84406",
+   "renkKoyu": "#F29A62",
+   "aciklama": "idexya.com talepleri, CRM fırsatları, teklifler, site içeriği ve IDOS ile eşitleme.",
+   "gruplar": [
+    {
+     "baslik": "Özet",
+     "simge": "izgara",
+     "moduller": [
+      {
+       "ad": "Genel bakış",
+       "url": "https://panel.idexya.com/dashboard",
+       "sayfalar": []
+      },
+      {
+       "ad": "Bildirimler",
+       "url": "https://panel.idexya.com/notifications",
+       "sayfalar": [
+        {
+         "ad": "Onay bekleyenler",
+         "url": "https://panel.idexya.com/notifications#approvals"
+        },
+        {
+         "ad": "Sistem uyarıları",
+         "url": "https://panel.idexya.com/notifications#alerts"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Satış",
+     "simge": "kisiler",
+     "moduller": [
+      {
+       "ad": "Talepler",
+       "url": "https://panel.idexya.com/leads",
+       "sayfalar": [
+        {
+         "ad": "Yeni",
+         "url": "https://panel.idexya.com/leads?tab=new"
+        },
+        {
+         "ad": "CRM’e alınan",
+         "url": "https://panel.idexya.com/leads?tab=crm"
+        },
+        {
+         "ad": "Spam",
+         "url": "https://panel.idexya.com/leads?tab=spam"
+        },
+        {
+         "ad": "Tümü",
+         "url": "https://panel.idexya.com/leads?tab=all"
+        }
+       ]
+      },
+      {
+       "ad": "Müşteriler (CRM)",
+       "url": "https://panel.idexya.com/crm",
+       "sayfalar": [
+        {
+         "ad": "Satış panosu",
+         "url": "https://panel.idexya.com/crm"
+        },
+        {
+         "ad": "Mükerrer kartlar",
+         "url": "https://panel.idexya.com/crm-conflicts"
+        }
+       ]
+      },
+      {
+       "ad": "Hesap envanteri",
+       "url": "https://panel.idexya.com/accounts",
+       "sayfalar": []
+      },
+      {
+       "ad": "Teklifler",
+       "url": "https://panel.idexya.com/proposals",
+       "sayfalar": [
+        {
+         "ad": "Taslaklar",
+         "url": "https://panel.idexya.com/proposals?tab=draft"
+        },
+        {
+         "ad": "Gönderilenler",
+         "url": "https://panel.idexya.com/proposals?tab=sent"
+        },
+        {
+         "ad": "Kabul edilenler",
+         "url": "https://panel.idexya.com/proposals?tab=accepted"
+        }
+       ]
+      },
+      {
+       "ad": "Belge şablonları",
+       "url": "https://panel.idexya.com/templates",
+       "sayfalar": [
+        {
+         "ad": "Şablonlar",
+         "url": "https://panel.idexya.com/templates"
+        },
+        {
+         "ad": "Müşteriye belge oluştur",
+         "url": "https://panel.idexya.com/templates?tab=create"
+        },
+        {
+         "ad": "Hizmet kataloğu",
+         "url": "https://panel.idexya.com/templates?tab=catalog"
+        }
+       ]
+      },
+      {
+       "ad": "Görevler ve takvim",
+       "url": "https://panel.idexya.com/tasks",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Pazarlama ve iletişim",
+     "simge": "megafon",
+     "moduller": [
+      {
+       "ad": "Asistan sohbetleri",
+       "url": "https://panel.idexya.com/assistant",
+       "sayfalar": []
+      },
+      {
+       "ad": "Bülten listesi",
+       "url": "https://panel.idexya.com/subscribers",
+       "sayfalar": []
+      },
+      {
+       "ad": "Instagram gönderileri",
+       "url": "https://panel.idexya.com/instagram",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Web sitesi",
+     "simge": "dunya",
+     "moduller": [
+      {
+       "ad": "Site içeriği",
+       "url": "https://panel.idexya.com/site-content",
+       "sayfalar": [
+        {
+         "ad": "Hizmetler",
+         "url": "https://panel.idexya.com/site-content?file=services"
+        },
+        {
+         "ad": "Paketler",
+         "url": "https://panel.idexya.com/site-content?file=packages"
+        },
+        {
+         "ad": "Ürünler",
+         "url": "https://panel.idexya.com/site-content?file=products#products"
+        },
+        {
+         "ad": "Kategoriler",
+         "url": "https://panel.idexya.com/site-content?file=products#categories"
+        },
+        {
+         "ad": "Referanslar",
+         "url": "https://panel.idexya.com/site-content?file=references"
+        },
+        {
+         "ad": "Blog yazıları",
+         "url": "https://panel.idexya.com/site-content?file=posts"
+        },
+        {
+         "ad": "Menüler",
+         "url": "https://panel.idexya.com/site-content?file=site-menu"
+        },
+        {
+         "ad": "Sık sorulan sorular",
+         "url": "https://panel.idexya.com/site-content?file=faq"
+        },
+        {
+         "ad": "Yasal sayfalar",
+         "url": "https://panel.idexya.com/site-content?file=legal"
+        }
+       ]
+      },
+      {
+       "ad": "Yazılar ve kaynaklar",
+       "url": "https://panel.idexya.com/articles",
+       "sayfalar": []
+      },
+      {
+       "ad": "Tema düzenleyici",
+       "url": "https://panel.idexya.com/theme",
+       "sayfalar": []
+      },
+      {
+       "ad": "Haftalık bülten",
+       "url": "https://panel.idexya.com/weekly-newsletter",
+       "sayfalar": []
+      },
+      {
+       "ad": "Banner stüdyosu",
+       "url": "https://panel.idexya.com/banners",
+       "sayfalar": []
+      },
+      {
+       "ad": "Medya kütüphanesi",
+       "url": "https://panel.idexya.com/media",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Analiz",
+     "simge": "grafik",
+     "moduller": [
+      {
+       "ad": "Ziyaretçiler",
+       "url": "https://panel.idexya.com/visitors",
+       "sayfalar": []
+      },
+      {
+       "ad": "SEO ve GEO",
+       "url": "https://panel.idexya.com/seo",
+       "sayfalar": []
+      },
+      {
+       "ad": "Hız ve güvenlik",
+       "url": "https://panel.idexya.com/performance",
+       "sayfalar": []
+      },
+      {
+       "ad": "Müşteri siteleri",
+       "url": "https://panel.idexya.com/client-sites",
+       "sayfalar": []
+      },
+      {
+       "ad": "Reklam dönüşümleri",
+       "url": "https://panel.idexya.com/conversions",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Üyelik ve erişim",
+     "simge": "kisiler",
+     "moduller": [
+      {
+       "ad": "Üyeler ve yetkiler",
+       "url": "https://panel.idexya.com/members",
+       "sayfalar": []
+      },
+      {
+       "ad": "Müşteri alanı",
+       "url": "https://panel.idexya.com/client-portal",
+       "sayfalar": [
+        {
+         "ad": "Erişimler",
+         "url": "https://panel.idexya.com/client-portal?tab=access"
+        },
+        {
+         "ad": "Davetler",
+         "url": "https://panel.idexya.com/client-portal?tab=invites"
+        }
+       ]
+      },
+      {
+       "ad": "Destek talepleri",
+       "url": "https://panel.idexya.com/support",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Finans",
+     "simge": "belge",
+     "moduller": [
+      {
+       "ad": "Muhasebe",
+       "url": "https://panel.idexya.com/accounting",
+       "sayfalar": []
+      },
+      {
+       "ad": "Belgeler",
+       "url": "https://panel.idexya.com/documents",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Sistem",
+     "simge": "esitle",
+     "moduller": [
+      {
+       "ad": "Ayarlar",
+       "url": "https://panel.idexya.com/settings",
+       "sayfalar": []
+      },
+      {
+       "ad": "Entegrasyonlar",
+       "url": "https://panel.idexya.com/integrations",
+       "sayfalar": []
+      },
+      {
+       "ad": "Eşitleme",
+       "url": "https://panel.idexya.com/data-sync",
+       "sayfalar": [
+        {
+         "ad": "Reklam verisi çekimi",
+         "url": "https://panel.idexya.com/data-sync"
+        },
+        {
+         "ad": "Reklam hesabı eşleştirme",
+         "url": "https://panel.idexya.com/crm-sync"
+        },
+        {
+         "ad": "IDOS’a müşteri taşıma",
+         "url": "https://panel.idexya.com/crm-migrate"
+        }
+       ]
+      },
+      {
+       "ad": "Yedekler",
+       "url": "https://panel.idexya.com/backups",
+       "sayfalar": []
+      },
+      {
+       "ad": "İşlem geçmişi",
+       "url": "https://panel.idexya.com/activity-log",
+       "sayfalar": []
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "anahtar": "creative",
+   "ad": "Creative",
+   "url": "https://creative.idexya.com/",
+   "renk": "#DC2626",
+   "renkKoyu": "#F87171",
+   "aciklama": "İçerik takvimi, onaylar, yayın kuyruğu, kanal analizleri ve markalar.",
+   "gruplar": [
+    {
+     "baslik": "Özet",
+     "simge": "izgara",
+     "moduller": [
+      {
+       "ad": "Genel bakış",
+       "url": "https://creative.idexya.com/dashboard",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Yayın",
+     "simge": "takvim",
+     "moduller": [
+      {
+       "ad": "Takvim",
+       "url": "https://creative.idexya.com/calendar",
+       "sayfalar": [
+        {
+         "ad": "Takvim",
+         "url": "https://creative.idexya.com/calendar"
+        },
+        {
+         "ad": "Özel günler",
+         "url": "https://creative.idexya.com/calendar/special-days"
+        }
+       ]
+      },
+      {
+       "ad": "Onaylar",
+       "url": "https://creative.idexya.com/approvals",
+       "sayfalar": []
+      },
+      {
+       "ad": "İçerikler",
+       "url": "https://creative.idexya.com/content",
+       "sayfalar": [
+        {
+         "ad": "Arşiv",
+         "url": "https://creative.idexya.com/content"
+        },
+        {
+         "ad": "Yayınlananlar",
+         "url": "https://creative.idexya.com/content/published"
+        },
+        {
+         "ad": "Yayın durumu",
+         "url": "https://creative.idexya.com/content/status"
+        },
+        {
+         "ad": "Yayın planı",
+         "url": "https://creative.idexya.com/content/schedule"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "baslik": "Analiz",
+     "simge": "grafik",
+     "moduller": [
+      {
+       "ad": "Analiz",
+       "url": "https://creative.idexya.com/analytics",
+       "sayfalar": [
+        {
+         "ad": "Kırılım",
+         "url": "https://creative.idexya.com/analytics"
+        },
+        {
+         "ad": "Performans",
+         "url": "https://creative.idexya.com/analytics/performance"
+        },
+        {
+         "ad": "Yayın içgörüleri",
+         "url": "https://creative.idexya.com/analytics/posts"
+        }
+       ]
+      },
+      {
+       "ad": "Markalar",
+       "url": "https://creative.idexya.com/brands",
+       "sayfalar": []
+      }
+     ]
+    },
+    {
+     "baslik": "Sistem",
+     "simge": "esitle",
+     "moduller": [
+      {
+       "ad": "Ayarlar",
+       "url": "https://creative.idexya.com/settings",
+       "sayfalar": [
+        {
+         "ad": "Genel",
+         "url": "https://creative.idexya.com/settings"
+        },
+        {
+         "ad": "Entegrasyonlar",
+         "url": "https://creative.idexya.com/settings/integrations"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

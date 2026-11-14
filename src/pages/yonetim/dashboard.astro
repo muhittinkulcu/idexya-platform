@@ -4,8 +4,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Genel bakış" aktif="genel">
 <style is:global>
   /* Talep kaynağı renkleri: sabit sıra, iki tema ayrı doğrulandı (dataviz validate_palette). Açık temada 3. ve 5. renk 3:1 altında; tablo görünümü bunun için var. */
-  .acik{--s1:#eb6834;--s2:#2a78d6;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4}
-  .koyu{--s1:#d95926;--s2:#3987e5;--s3:#199e70;--s4:#9085e9;--s5:#d55181}
+  :root{--s1:#eb6834;--s2:#2a78d6;--s3:#1baf7a;--s4:#6250d6;--s5:#e87ba4}
+  html[data-tema=koyu]{--s1:#d95926;--s2:#3987e5;--s3:#199e70;--s4:#9085e9;--s5:#d55181}
   .pano{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:stretch}
   .pano>.modul{grid-column:span 1;padding:22px;display:flex;flex-direction:column;gap:14px}
   .pano>.modul.tam{grid-column:span 2}

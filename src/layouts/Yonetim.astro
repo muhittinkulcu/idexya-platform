@@ -1,61 +1,62 @@
 ---
-// Yönetim paneli yerleşimi (IDOS tasarım dili). Sayfa verisi tarayıcıda /api/yonetim/* uçlarından okunur;
-// sayfalar derlemede veri içermez. Menü, üst çubuk ve tema tercihleri yalnız bu tarayıcıda (localStorage) saklanır.
+// Yönetim paneli yerleşimi (Website ve CRM katmanı). İskelet idexya-ortak'taki ortak kabuk <idexya-kabuk>:
+// paket çubuğu, mega menü, arama, Görünüm paneli, yan menü, sayfa sekmeleri (src/idexya-kabuk, scripts/ortak_esitle.sh ile
+// eşitlenir; elle düzenlenmez). Bu dosya yalnız kabuğun ayarını yazar ve sayfa başlığını, eylem çubuğunu ve içeriği verir.
+// Sayfa verisi tarayıcıda /api/yonetim/* uçlarından okunur; sayfalar derlemede veri içermez.
 import { MENU, menuAdi } from '../data/panel-menu.js';
+import ORTAK from '../idexya-kabuk/katmanlar.json';
+import '../idexya-kabuk/kabuk.css';
 // baslik verilmezse sayfanın menüdeki adı kullanılır (menüyle aynı ad iki yerde elle yazılmaz).
 interface Props { baslik?: string; aktif: string; yol?: string; aciklama?: string; }
 const { aktif, yol = '', aciklama = '' } = Astro.props;
 const baslik = Astro.props.baslik || menuAdi('/' + Astro.url.pathname.replace(/^\/yonetim\/|\/$/g, ''));
-const I = {
-  hedef: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><circle cx="12" cy="12" r="1"></circle>',
-  nabiz: '<path d="M3 12h4l3-8 4 16 3-8h4"></path>',
-  yedek: '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"></path>',
-  anahtar: '<circle cx="8" cy="15" r="4"></circle><path d="M10.8 12.2L20 3M16 7l3 3M14 9l2 2"></path>',
-  destek: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path><path d="M9.5 9.5a2.5 2.5 0 1 1 3.4 2.3c-.6.3-.9.8-.9 1.4V14"></path><path d="M12 17h.01"></path>',
-  genel: '<rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect>',
-  bildirim: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"></path>',
-  talep: '<path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z"></path>',
-  crm: '<circle cx="9" cy="8" r="4"></circle><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M17 11l2 2 4-4"></path>',
-  teklif: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 15l2 2 4-4"></path>',
-  gorev: '<rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18M9 16l2 2 4-4"></path>',
-  eposta: '<path d="M22 2L11 13"></path><path d="M22 2l-7 20-4-9-9-4z"></path>',
-  belge: '<rect x="4" y="3" width="16" height="18" rx="2"></rect><path d="M8 7h8M8 11h3M13 11h3M8 15h8"></path>',
-  muhasebe: '<path d="M4 3h16v18l-3-2-2 2-3-2-3 2-2-2-3 2z"></path><path d="M8 8h8M8 12h8M8 16h5"></path>',
-  esitle: '<path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 12a9 9 0 0 1 15.5-6.2L21 8"></path><path d="M21 3v5h-5M3 21v-5h5"></path>',
-  uye: '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"></path>',
-  portal: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"></path>',
-  icerik: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path>',
-  medya: '<rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 19"></path>',
-  tema: '<rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 9h18M8 9v11"></path>',
-  radar: '<circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="5"></circle><path d="M12 12l6-6"></path>',
-  banner: '<path d="M3 11l14-6v14L3 13z"></path><path d="M17 9a3 3 0 0 1 0 6"></path><path d="M7 13.5V19a1 1 0 0 0 1 1h2"></path>',
-  asistan: '<path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.5 8.5 0 1 1 21 11.5z"></path>',
-  seo: '<circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>',
-  ziyaret: '<circle cx="12" cy="12" r="9"></circle><path d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"></path>',
-  hiz: '<path d="M13 2L3 14h9l-1 8 10-12h-9z"></path>',
-  entegre: '<path d="M9 2v6M15 2v6M6 8h12v4a6 6 0 0 1-12 0zM12 18v4"></path>',
-  ayar: '<circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"></path>',
-  gecmis: '<circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path>'
-};
-// Sayfa yolu (üst çubuk) her zaman menüdeki grup adından gelir; sayfaların kendi yol metni yalnız grubu olmayan sayfalarda kullanılır.
+// Konum yolu: Website ve CRM › grup › modül. Modül yalnız sayfa başlığı modül adından farklıysa görünür (ör. Müşteri kartı).
+// Grubu olmayan sayfa kendi yol metnini kullanır.
 const grup = MENU.find((g) => g.ogeler.some((o) => o.k === aktif));
-const grupAdi = (grup || {}).ad;
-const sayfaYolu = grupAdi && grupAdi !== 'Özet' ? grupAdi : yol;
-// Sayfa yolu (Muhittin, 30 Eki 2026): her parça tıklanır; grubun kendi sayfası olmadığı için grup, ilk alt sayfasına gider.
-// Modül bağlantısı yalnız sayfa başlığı modül adından farklıysa (ör. Müşteri kartı) ya da alt sekme seçiliyken görünür.
-const grupHref = grup ? (grup.ogeler.find((o) => o.href) || {}).href : '';
 const modul = grup ? grup.ogeler.find((o) => o.k === aktif) : null;
+const grupAdi = grup && grup.ad !== 'Özet' ? grup.ad : yol;
 const modulYolda = modul && modul.href && modul.ad !== baslik;
-const svg = (k) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k] || ''}</svg>`;
-// Idexya X işareti (public/favicon.svg ile aynı yol): yan menü logosu ve paket çubuğu kullanır.
-const X_YOL = 'M805.5 941.0C789.5 939.6 773.1 936.9 764.5 934.3C756.7 931.9 756.3 931.6 746.0 921.1C720.9 895.7 667.2 833.4 568.0 714.7C530.9 670.3 500.2 634.0 499.9 634.0C497.9 634.0 368.7 785.5 284.0 887.0L239.0 941.0L164.7 941.0C123.9 941.0 85.5 940.5 79.4 940.0C63.6 938.6 56.3 936.2 51.0 930.4C40.2 918.6 33.5 891.3 39.1 882.0C43.7 874.4 70.2 843.0 241.0 642.0C332.3 534.6 409.4 443.6 475.3 365.5C505.5 329.8 577.5 245.7 635.2 178.8L740.3 57.0L784.4 57.0C881.2 57.1 907.3 59.5 922.5 69.4C931.9 75.6 943.7 87.6 947.1 94.5L950.2 100.9L947.5 105.6C938.4 121.1 872.8 202.1 816.0 268.0C775.4 315.1 659.1 452.8 640.6 475.8C631.9 486.6 630.8 488.3 631.7 490.3C632.8 492.5 666.2 532.8 697.4 569.5C734.7 613.3 800.8 690.6 817.0 709.5C880.9 783.6 951.0 872.7 961.4 892.7C963.7 897.3 963.4 900.9 960.0 907.6C955.9 915.9 943.1 930.3 937.5 933.0C932.5 935.4 919.2 938.3 905.0 940.1C893.5 941.5 819.7 942.2 805.5 941.0ZM208.3 288.3C124.9 190.0 109.8 171.6 92.2 146.6C59.9 100.5 56.7 78.3 80.8 67.3C88.5 63.7 102.8 61.1 119.7 60.2C137.8 59.1 266.0 59.9 266.0 61.1C266.0 63.5 318.9 126.0 381.0 197.0C446.5 271.9 463.4 293.0 471.3 309.8C474.0 315.5 474.5 317.6 474.5 324.0C474.5 330.7 474.1 332.4 470.6 339.4C465.6 349.8 459.5 356.3 452.2 359.0C439.2 363.9 432.8 364.3 350.5 364.7L273.5 365.0L208.3 288.3Z';
-// Paket çubuğu (ortak kabuk, Muhittin 14 Kas 2026): üç Idexya modülü tek yazılımın sekmeleri gibi; nokta rengi modülün rengi.
-const MODULLER = [
-  { ad: 'Marketing', href: 'https://marketing.idexya.com/', renk: '#7F9AF2' },
-  { ad: 'Website ve CRM', href: '/dashboard', renk: '#F29A62', bu: true },
-  { ad: 'Creative', href: 'https://creative.idexya.com/', renk: '#F87171' }
+
+// Kabuk ayarı (idexya-ortak kabuk/README.md "Ayar şeması"). Katman listesi ortak (katmanlar.json); bu katman kendi menüsünden
+// ezilir: adresi olmayan ("Yakında") modül ve sayfa konmaz. Grup simgeleri: Muhittin, 14 Kas 2026.
+const GRUP_SIMGE = { 'Özet': 'izgara', 'Satış': 'kisiler', 'Pazarlama ve iletişim': 'megafon', 'Web sitesi': 'dunya', 'Analiz': 'grafik', 'Üyelik ve erişim': 'kisiler', 'Finans': 'belge', 'Sistem': 'esitle' };
+const gruplar = MENU.map((g) => ({
+  baslik: g.ad,
+  simge: GRUP_SIMGE[g.ad] || 'izgara',
+  moduller: g.ogeler.filter((o) => o.href).map((o) => ({
+    ad: o.ad,
+    url: o.href,
+    sayfalar: (o.altlar || []).filter((a) => a.href).map((a) => ({ ad: a.ad, url: a.href }))
+  }))
+}));
+const katmanlar = ORTAK.katmanlar.map((k) => (k.anahtar === 'website' ? { ...k, url: '/dashboard', gruplar } : k));
+// "+ Yeni oluştur": sayfanın eylem çubuğunda menü, kabuk aramasında eylem olarak çıkar.
+const YENI = [
+  { grup: 'Web sitesi', ad: 'Blog yazısı', eylem: 'Yeni blog yazısı', aciklama: 'Sitedeki blogda yayınlanır', url: '/site-content?file=posts&new=1' },
+  { grup: 'Web sitesi', ad: 'Üyelere özel yazı / kaynak', eylem: 'Yeni yazı ya da kaynak', aciklama: 'Herkese, üyelere ya da seçtiğiniz kişilere', url: '/articles?new=1' },
+  { grup: 'Web sitesi', ad: 'Paket', eylem: 'Yeni paket', aciklama: 'Paketler sayfasına yeni paket', url: '/site-content?file=packages&new=1' },
+  { grup: 'Web sitesi', ad: 'Hizmet', eylem: 'Yeni hizmet', aciklama: 'Hizmet alanının içinden eklenir', url: '/site-content?file=services' },
+  { grup: 'Web sitesi', ad: 'Haftalık bülten sayısı', eylem: 'Yeni haftalık bülten sayısı', aciklama: 'AI ve dijital pazarlama gelişmeleri, kaynaklı özet', url: '/weekly-newsletter?new=1' },
+  { grup: 'Web sitesi', ad: 'Banner, duyuru ya da açılır pencere', eylem: 'Yeni banner ya da duyuru', aciklama: 'Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu', url: '/banners?new=1' },
+  { grup: 'Web sitesi', ad: 'Sık sorulan soru', eylem: 'Yeni sık sorulan soru', aciklama: 'Ana sayfadaki sorular', url: '/site-content?file=faq&new=1' },
+  { grup: 'Satış ve iş', ad: 'Müşteri', eylem: 'Yeni müşteri', aciklama: 'CRM’e elle müşteri kaydı', url: '/crm?new=1' },
+  { grup: 'Satış ve iş', ad: 'Teklif', eylem: 'Yeni teklif', aciklama: 'Kalemli, KDV’li teklif hazırlayın', url: '/proposals?new=1' },
+  { grup: 'Satış ve iş', ad: 'Görev', eylem: 'Yeni görev', aciklama: 'Takvime görev ve hatırlatma', url: '/tasks?new=1' }
 ];
-import '../styles/cam.css';
+const YENI_GRUP = [...new Set(YENI.map((y) => y.grup))];
+// Etkin sayfa derlemede modül adresidir; gerçek adres (?tab= dahil) tarayıcıda kabuk kurulmadan önce yazılır (kabuk-bagla.js).
+const ayar = {
+  katman: 'website',
+  katmanlar,
+  etkin: { modulUrl: modul && modul.href ? modul.href : null, sayfaUrl: modul && modul.href ? modul.href : null, ad: '' },
+  kullanici: { ad: 'Kullanıcı', rol: '' },
+  durum: { baglanti: null, esitleme: '' },
+  eylemler: YENI.map((y) => ({ ad: y.eylem, url: y.url, katman: 'website' })),
+  bildirimUrl: '/notifications',
+  cikisUrl: '/cdn-cgi/access/logout'
+};
+// Yapım kuralı 6: JSON içindeki her "<" < olarak yazılır; </script> bloğu erken kapatamaz.
+const ayarMetni = JSON.stringify(ayar).replace(/</g, '\\u003c');
 ---
 <!doctype html>
 <html lang="tr">
@@ -75,77 +76,31 @@ import '../styles/cam.css';
 <meta name="apple-mobile-web-app-title" content="Website">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preload" href="/fonts/inter-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<!-- Tema ilk boyamadan önce (yanıp sönme yok) ve eski tema seçiminin idx-gorunum'a taşınması; satır içi betik değil. -->
+<script is:inline src="/panel-gorunum.js"></script>
 <style is:global>
-/* Yazı tipleri depoda (public/fonts, SIL OFL: OFL-inter.txt, OFL-bricolage-grotesque.txt); dış yazı tipi isteği yok.
-   İnce ve ferah görünüm (Muhittin, 12 Kas 2026): Inter 300 gövde, 400 düğme ve etiket, 500 başlık; satır aralığı 1,65.
-   Bricolage Grotesque yalnız logo yazısı içindir. */
+/* Yazı tipleri depoda (public/fonts, SIL OFL: OFL-inter.txt); dış yazı tipi isteği yok. Yazı ailesi ve kalınlık ortak kabuğun
+   Görünüm panelinden gelir (--ik-yazi, --w-govde, --w-vurgu; idexya-ortak arayuz-kabugu.md "Ortak parçalar"). */
 @font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/inter-latin-ext-300-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/inter-latin-300-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/inter-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/inter-latin-400-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/inter-latin-ext-500-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Inter';font-style:normal;font-weight:500;font-display:swap;src:url(/fonts/inter-latin-500-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-ext-600-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:600;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-600-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-ext-800-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
-@font-face{font-family:'Bricolage Grotesque';font-style:normal;font-weight:800;font-display:swap;src:url(/fonts/bricolage-grotesque-latin-800-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
-body{margin:0;background:#F2F4F7}
-html[data-tema=koyu] body{background:#15202B}
+body{margin:0}
 [hidden]{display:none!important}
-/* Ortak kabuk (Muhittin, 14 Kas 2026): üç Idexya modülü (Marketing, Website ve CRM, Creative) aynı ERP yazılımının modülleri gibi
-   görünür. Açık temada zemin, yüzey, çizgi ve yazı renkleri üç modülde ortaktır; turuncu vurgular (--brand, --acc, --fill, --tint,
-   --tintx, --btnline) bu modülün rengi olarak kalır. Önceki krem palet: 10 Kas 2026. */
-.acik{--bg:#F2F4F7;--side:#FFFFFF;--card:255 255 255;--panel:255 255 255;--card2:#F7F8FA;--line:220 225 232;--track:#E6EAF0;--tx:#17202B;--tx2:#56606E;--head:#15202B;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--err:#8A1F2E;--errb:#FCE4E6;--shadow:rgba(0,37,89,.12);--btnline:#F5C7A6;--ustbg:rgba(242,244,247,.9)}
-/* Koyu zemin Marketing'in laciverti (Muhittin, 13 Kas 2026: "Marketing'in dark rengi diğerlerinde de olsun, platform rengi korunarak"): yalnız zemin/yüzey/çizgi; turuncu vurgu, metin ve durum renkleri aynı. */
-.koyu{--bg:#15202B;--side:#192734;--card:28 39 51;--panel:25 39 52;--card2:#22303C;--line:47 61 74;--track:#22303C;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--err:#FF9AA6;--errb:rgba(255,122,138,.14);--shadow:rgba(0,0,0,.5);--btnline:rgba(247,137,74,.35);--ustbg:rgba(21,32,43,.9)}
+/* Renkler: zemin, yüzey, çizgi ve yazı ortak kabukla aynı; turuncu vurgular (--brand, --acc, --fill, --tint, --tintx, --btnline)
+   bu modülün rengi. Tema ortak kabuktan: <html data-tema="acik|koyu"> (Görünüm paneli, idx-gorunum). */
+:root{--bg:#F2F4F7;--card:255 255 255;--panel:255 255 255;--card2:#F7F8FA;--line:220 225 232;--track:#E6EAF0;--tx:#17202B;--tx2:#56606E;--head:#15202B;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--err:#8A1F2E;--errb:#FCE4E6;--shadow:rgba(0,37,89,.12);--btnline:#F5C7A6}
+/* Koyu zemin Marketing'in laciverti (Muhittin, 13 Kas 2026); turuncu vurgu, metin ve durum renkleri aynı. */
+html[data-tema=koyu]{--bg:#15202B;--card:28 39 51;--panel:25 39 52;--card2:#22303C;--line:47 61 74;--track:#22303C;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--err:#FF9AA6;--errb:rgba(255,122,138,.14);--shadow:rgba(0,0,0,.5);--btnline:rgba(247,137,74,.35)}
 a{color:var(--acc)}a:hover{color:var(--tintx)}
-.kabuk{background:var(--bg);color:var(--tx);font-family:'Inter',system-ui,sans-serif;font-weight:300;font-size:14.5px;line-height:1.65;letter-spacing:.005em;min-height:100vh;display:flex;align-items:flex-start}
-.baslik-font,.sayfa h1,.sayfa h2{font-family:'Inter',system-ui,sans-serif;letter-spacing:-.01em}
-.kabuk b,.kabuk strong,.kabuk th,.kabuk h1,.kabuk h2,.kabuk h3,.kabuk h4,.kabuk dt{font-weight:500}
-/* Yan menü */
-.yan{flex:0 0 288px;width:288px;box-sizing:border-box;background:var(--side);border-right:1px solid rgb(var(--line));padding:0 12px;display:flex;flex-direction:column;gap:16px;min-height:100vh;align-self:stretch;transition:flex-basis .2s ease,width .2s ease}
-/* Sabit menü ekran boyundadır ve yalnız modül listesi kendi içinde kayar; logo ve çıkış hep görünür.
-   Sabit değilken menü sayfayla kayar, logo üstte ve çıkış altta yapışık kalır. */
-.yan.sabit{position:sticky;top:var(--paket-h);height:calc(100vh - var(--paket-h) - var(--durum-h));min-height:0;align-self:flex-start}
-.yan.sabit .yan-govde{flex:1 1 0;min-height:0;overflow-y:auto;scrollbar-width:thin;margin:0 -12px;padding:0 12px}
-.yan.dar{flex-basis:76px;width:76px}
-.yan.dar .etiket,.yan.dar .ok,.yan.dar .ok-yer,.yan.dar .rozet,.yan.dar .alt,.yan.dar .mg>.grup-ad,.yan.dar [data-ara-kutu],.yan.dar [data-tumu],.yan.dar [data-favori-blok]{display:none!important}
-.yan.dar .mo{justify-content:center}
-.yan.gizli{display:none}
-.yan-govde{display:flex;flex-direction:column;gap:16px;flex:1}
-.logo{position:sticky;top:var(--paket-h);z-index:3;background:var(--side);margin:0 -12px;padding:18px 18px 4px;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.logo-arac{display:flex;gap:6px}
-.yan.dar .logo,.yan.dar .logo-arac{flex-direction:column;align-items:center;gap:10px}
-.modul-baslik{display:flex;flex-direction:column;gap:1px;min-width:0;line-height:1.25}
-.modul-baslik small{font-size:12px;color:var(--tx2)}
-.modul-baslik b{font-size:15px;font-weight:500;color:var(--acc);white-space:nowrap}
-.yan.dar .modul-baslik{display:none}
-.yan-alt{position:sticky;bottom:var(--durum-h);z-index:3;background:var(--side);margin:auto -12px 0;padding:10px 12px 16px;border-top:1px solid rgb(var(--line))}
-.mo.cikis{color:var(--tx2)}
-.mo.cikis:hover{background:var(--errb);color:var(--err)}
-/* Dar menüde üzerine gelince açılan modül listesi */
-.ucan{position:fixed;z-index:35;min-width:220px;max-width:280px;box-sizing:border-box;background:rgb(var(--card));border:1px solid rgb(var(--line));border-radius:14px;box-shadow:0 20px 40px -18px var(--shadow);padding:6px;display:flex;flex-direction:column;gap:1px;font-size:13px}
-.ucan-bas{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:36px;padding:0 10px;border-radius:10px;font-size:14px;font-weight:500;color:var(--head);text-decoration:none}
-a.ucan-bas:hover{background:var(--card2);color:var(--head)}
-.ucan .alt-ln{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;padding:0 10px;border-radius:10px;color:var(--tx);text-decoration:none}
-.ucan a.alt-ln:hover{background:var(--card2);color:var(--tx)}
-.ucan a.alt-ln[aria-current=page]{color:var(--tintx);font-weight:500;background:var(--card2)}
-.ucan span.alt-ln{color:var(--tx2)}
-.ucan small{padding:0 6px;border:1px solid rgb(var(--line));border-radius:6px;font-size:10px;font-weight:500;color:var(--tx2);white-space:nowrap}
-.ucan .ucan-cizgi{height:1px;background:rgb(var(--line));margin:4px 6px}
-/* Dar menüde modüller arası geçiş (Muhittin, 13 Kas 2026): liste yeni hizaya kayar, içerik soldan belirir. */
-.ucan{transition:top .2s cubic-bezier(.2,.8,.2,1)}
-.ucan.gecis>*{animation:ucan-gecis .2s cubic-bezier(.2,.8,.2,1) both}
-@keyframes ucan-gecis{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.ucan{transition:none}.ucan.gecis>*{animation:none}}
+.yonetim{color:var(--tx);font-size:14.5px;line-height:1.65}
+.baslik-font,.sayfa h2{letter-spacing:-.01em}
+.yonetim b,.yonetim strong,.yonetim th,.yonetim h2,.yonetim h3,.yonetim h4,.yonetim dt{font-weight:var(--w-vurgu)}
 .ikon{width:38px;height:38px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--head);cursor:pointer;padding:0}
 .ikon:hover{background:var(--card2)}
 .ikon[aria-pressed=true]{background:var(--tint);color:var(--tintx);border-color:var(--btnline)}
-.tema-grup{display:inline-flex;flex:0 0 auto;gap:2px;padding:3px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card))}
-.tema-grup button{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:var(--tx2);cursor:pointer;padding:0}
-.tema-grup button:hover{background:var(--card2);color:var(--head)}
-.tema-grup button[aria-pressed=true]{background:var(--tint);color:var(--tintx)}
-.tema-grup button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
 /* A kuralı: tablo sayfalama (src/scripts/yonetim/tablo-sayfa.js). Yazdırırken bütün satırlar çıkar. */
 tr[data-sayfa-gizli]{display:none}
 .tablo-sayfa{display:flex;justify-content:space-between;align-items:center;gap:8px 16px;flex-wrap:wrap;padding:10px 2px 0;font-size:13px;color:var(--tx2)}
@@ -176,54 +131,6 @@ tr[data-sayfa-gizli]{display:none}
 .toplu-cubuk input[type=text]{width:140px}
 .toplu-cubuk .toplu-mesaj{color:var(--head)}
 @media print{.toplu-cubuk,.toplu-tumu,.toplu-hucre,.toplu-kart-kutu{display:none!important}}
-.mg{display:flex;flex-direction:column;gap:1px}
-.mg>.grup-ad{padding:0 12px 6px;font-size:12px;font-weight:500;color:var(--tx2)}
-.ara-satir{display:flex;gap:6px;align-items:center}.ara-satir .ara-kutu{flex:1;min-width:0}
-.tum-ac{flex:none;width:34px;height:34px}
-.tum-ac[aria-pressed=true] svg{transform:rotate(180deg)}
-.yan.dar .ara-satir{display:none}
-.mo{width:100%;min-height:40px;display:flex;align-items:center;gap:11px;padding:0 12px;border:0;border-radius:8px;background:transparent;color:var(--tx);font:inherit;font-size:14px;text-align:left;text-decoration:none;cursor:pointer;box-sizing:border-box}
-.mo:hover{background:var(--card2);color:var(--tx)}
-.mo[aria-current=page]{background:var(--tint);color:var(--tintx);font-weight:500}
-.mo .etiket{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* Sağ sütun hizası: ok işareti olmayan satırlarda da aynı genişlikte boş yer ayrılır, etiketler aynı çizgide durur. */
-.ok-yer{width:14px;flex:0 0 14px}
-.mo.yakinda{color:var(--tx2)}
-.mo small,.alt small{padding:0 5px;border:1px solid rgb(var(--line));border-radius:6px;font-size:9.5px;line-height:16px;color:var(--tx2);white-space:nowrap}
-.ok{transition:transform .2s ease;color:var(--tx2)}
-.mo[aria-expanded=true] .ok{transform:rotate(90deg)}
-.alt{display:flex;flex-direction:column;gap:1px;margin:2px 0 6px 20px;padding-left:12px;border-left:2px solid var(--track)}
-.alt a,.alt span{min-height:34px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 10px;border-radius:10px;font-size:13px;color:var(--tx);text-decoration:none}
-.alt a:hover{background:var(--card2)}
-.alt a[aria-current=page]{color:var(--tintx);font-weight:500;background:var(--card2)}
-.alt span{color:var(--tx2)}
-.rozet{padding:0 7px;border-radius:999px;background:var(--fill);color:#FFFFFF;font-size:11px;font-weight:500}
-.ara-kutu{display:flex;align-items:center;gap:8px;height:40px;padding:0 12px;border-radius:12px;background:var(--bg);color:var(--tx2)}
-.ara-kutu input{flex:1;min-width:0;border:0;outline:none;background:transparent;color:var(--tx);font:inherit;font-size:13px}
-.idos-kart{margin-top:auto;border-radius:18px;background:#002559;color:#FFFFFF;padding:16px;display:flex;flex-direction:column;gap:6px}
-.koyu .idos-kart{background:#0F1720;border:1px solid rgb(var(--line))}
-/* Sağ alan */
-main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:column;min-height:100vh}
-.ust{background:var(--ustbg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgb(var(--line));z-index:5}
-.ust.sabit{position:sticky;top:var(--paket-h)}
-.ust-satir{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px clamp(14px,3vw,36px)}
-.ust.ince .ust-satir{padding-top:7px;padding-bottom:7px}
-.ust-serit{display:flex;gap:8px;overflow-x:auto;padding:0 clamp(14px,3vw,36px) 12px}
-.ust-serit span{flex:0 0 auto;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px;border-radius:11px;background:rgb(var(--card));border:1px solid rgb(var(--line));font-size:13px;color:var(--tx2)}
-.ust-serit b{color:var(--head)}
-.ust-ac{align-self:center;height:28px;padding:0 14px;border:1px solid rgb(var(--line));border-top:0;border-radius:0 0 12px 12px;background:rgb(var(--card));color:var(--tx2);font:inherit;font-size:12px;cursor:pointer}
-/* Panel araması paket çubuğunda (koyu zemin); sonuç kutusu temanın renklerini kullanır. */
-.panel-ara{width:100%;max-width:420px;position:relative}
-.panel-ara label{display:flex;align-items:center;gap:10px;height:34px;padding:0 12px;border-radius:8px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:#E7ECF1}
-.panel-ara label:focus-within{border-color:#F07A23;background:rgba(255,255,255,.12)}
-.panel-ara input{flex:1;min-width:0;border:0;outline:none;background:transparent;color:#E7ECF1;font:inherit;font-size:13.5px}
-.panel-ara input::placeholder{color:#B8C3CE;opacity:1}
-.ara-kisa{font-size:11px;color:#B8C3CE;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:1px 6px}
-.panel-ara .kure-kucuk{width:16px;height:16px}
-.kure-kucuk{width:20px;height:20px;border-radius:50%;flex:0 0 auto;background:radial-gradient(circle at 35% 30%,#FFB58A,#F07A23 55%,#B84406)}
-.ara-sonuc{position:absolute;left:0;right:0;top:calc(100% + 6px);background:rgb(var(--card));border:1px solid rgb(var(--line));border-radius:14px;box-shadow:0 20px 40px -20px var(--shadow);padding:6px;display:flex;flex-direction:column;z-index:30;max-height:340px;overflow-y:auto}
-.ara-sonuc a{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;text-decoration:none;color:var(--tx);font-size:13px}
-.ara-sonuc a:hover,.ara-sonuc a.secili{background:var(--tint);color:var(--tintx)}
 .dugme{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--head);font:inherit;font-weight:400;cursor:pointer;text-decoration:none;box-sizing:border-box}
 .dugme:hover{background:var(--card2);color:var(--head)}
 .dugme.ana{border:0;background:var(--fill);color:#FFFFFF;font-weight:500}
@@ -231,19 +138,7 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 .dugme.ikincil{border-color:var(--btnline);color:var(--acc)}
 .dugme:disabled{opacity:.55;cursor:default}
 .dugme.kucuk{min-height:32px;padding:0 10px;font-size:13px}
-.avatar{width:40px;height:40px;border-radius:13px;background:#002559;color:#FFFFFF;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:500}
-.koyu .avatar{background:var(--card2)}
-.avatar{border:0;cursor:pointer;font:inherit}.avatar:hover,.avatar[aria-expanded=true]{box-shadow:0 0 0 3px var(--tint)}
-.profil{position:relative}
-.profil-menu{position:absolute;right:0;top:calc(100% + 8px);z-index:60;min-width:240px;padding:6px;border-radius:14px;background:rgb(var(--card));border:1px solid rgb(var(--line));box-shadow:0 18px 48px rgba(0,0,0,.18);display:flex;flex-direction:column}
-.profil-menu[hidden]{display:none!important}
-.profil-bas{display:flex;flex-direction:column;gap:2px;padding:10px 12px 12px;border-bottom:1px solid rgb(var(--line));margin-bottom:4px;min-width:0}
-.profil-bas small{font-size:11px;color:var(--tx2)}.profil-bas b{font-size:13px;color:var(--head);overflow-wrap:anywhere}
-.profil-menu a{padding:9px 12px;border-radius:9px;color:var(--tx);text-decoration:none;font-size:14px}
-.profil-menu a:hover,.profil-menu a:focus-visible{background:var(--card2);color:var(--head)}
-.profil-menu .profil-cikis{margin-top:4px;border-top:1px solid rgb(var(--line));border-radius:0 0 9px 9px;color:var(--err,#B42318)}
-.sayfa{padding:28px clamp(14px,3vw,36px) 60px;display:flex;flex-direction:column;gap:20px;box-sizing:border-box}
-.sayfa h1{margin:0;font-size:clamp(24px,2.4vw,30px);line-height:1.2;font-weight:500;color:var(--head)}
+.sayfa{padding:20px clamp(14px,3vw,36px) 60px;display:flex;flex-direction:column;gap:20px;box-sizing:border-box}
 .kart{background:rgb(var(--card));border:1px solid rgb(var(--line));border-radius:12px;box-sizing:border-box;min-width:0}
 .cip{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:400;white-space:nowrap}
 .cip.yeni{background:var(--infob);color:var(--info)}.cip.crm,.cip.kazanildi{background:var(--okb);color:var(--ok)}.cip.spam,.cip.kaybedildi{background:var(--errb);color:var(--err)}
@@ -253,114 +148,20 @@ main.icerik{flex:1 1 0;min-width:0;max-width:100%;display:flex;flex-direction:co
 .bos{padding:28px 18px;text-align:center;color:var(--tx2)}
 .uyari{padding:12px 14px;border-radius:14px;font-size:14px}
 .uyari.hata{background:var(--errb);color:var(--err)}.uyari.bilgi{background:var(--infob);color:var(--info)}.uyari.ok{background:var(--okb);color:var(--ok)}
-/* Cam teması (src/styles/cam.css, ortak tanım sürüm 1): zemin lekeleri sayfa arkasında görünsün diye kabuk saydam;
-   yan menünün yapışkan üst ve alt parçaları menüyle aynı cam yüzeyi kullanır. Site bileşeni IcerikStil "R G B" değişkenlerine uyarlanır. */
-.cam .kabuk{background:transparent}
-@media (min-width:861px){.cam .logo,.cam .yan-alt{background:rgb(var(--cam-yuzey) / var(--cam-yuzey-a));-webkit-backdrop-filter:blur(var(--cam-bulaniklik));backdrop-filter:blur(var(--cam-bulaniklik))}}
-.kabuk .icerik-kilit,.kabuk .icerik-yorum-form,.kabuk .icerik-kart{background:rgb(var(--card));border-color:rgb(var(--line))}
-.kabuk .icerik-dugme.ikincil,.kabuk .icerik-yorum-form input:not([type=checkbox]),.kabuk .icerik-yorum-form textarea{border-color:rgb(var(--line))}
-.kabuk .icerik-yorumlar{border-top-color:rgb(var(--line))}
-/* Logo işareti: Idexya X'i (public/favicon.svg ve idexya-agency-os app/static/brand/idexya-x.svg ile aynı yol); renk --brand. */
-/* Sayfa yolu: parçalar bağlantı; son parça bulunulan sayfa. Dar ekranda ara parçalar kısalır, satır taşmaz. */
-.sayfa-yolu{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--tx2);min-width:0;flex:1 1 auto}
-.sayfa-yolu ol{display:flex;align-items:center;gap:6px;margin:0;padding:0;list-style:none;min-width:0;flex-wrap:nowrap}
-.sayfa-yolu li{display:flex;align-items:center;gap:6px;min-width:0}.sayfa-yolu li[hidden]{display:none}
-.sayfa-yolu li+li::before{content:"›";color:var(--tx2);flex:none}
-.sayfa-yolu li:not([data-yol-son]){flex:0 1 auto}
-.sayfa-yolu li[data-yol-son]{flex:0 0 auto;max-width:100%}
-.sayfa-yolu a,.sayfa-yolu li>span{color:var(--tx2);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:4px}
-.sayfa-yolu a:hover,.sayfa-yolu a:focus-visible{color:var(--acc);text-decoration:underline;text-underline-offset:3px}
-.sayfa-yolu [aria-current=page]{font-size:17px;font-weight:500;color:var(--head);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
-.sayfa-yolu .yol-alt[aria-current=page]{font-size:13px;font-weight:500;color:var(--head)}
-.sayfa-yolu .yol-modul{font-size:17px;font-weight:500;letter-spacing:-.01em}
-@media (max-width:860px){.sayfa-yolu li:not([data-yol-son]) a,.sayfa-yolu li:not([data-yol-son])>span{max-width:28vw}}
-/* Özelleştir çekmecesi */
-.perde{position:fixed;inset:0;background:rgba(10,14,20,.35);z-index:40}
-.cekmece{font-family:'Inter',system-ui,sans-serif;font-weight:300;line-height:1.65;color:var(--tx);position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);z-index:41;background:rgb(var(--card));border-left:1px solid rgb(var(--line));box-shadow:-30px 0 60px -30px var(--shadow);display:flex;flex-direction:column}
-.cekmece h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.01em;color:var(--head)}
-.cekmece h3{margin:0;font-size:12px;color:var(--tx2);font-weight:500}
-.cekmece .bolum{display:flex;flex-direction:column;gap:10px;padding:16px 0;border-top:1px solid rgb(var(--line))}
-.cekmece label.sat{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:14px;cursor:pointer}
-.cekmece input[type=checkbox]{width:20px;height:20px;accent-color:var(--fill)}
+/* Site bileşeni IcerikStil "R G B" değişkenlerine uyarlanır. */
+.yonetim .icerik-kilit,.yonetim .icerik-yorum-form,.yonetim .icerik-kart{background:rgb(var(--card));border-color:rgb(var(--line))}
+.yonetim .icerik-dugme.ikincil,.yonetim .icerik-yorum-form input:not([type=checkbox]),.yonetim .icerik-yorum-form textarea{border-color:rgb(var(--line))}
+.yonetim .icerik-yorumlar{border-top-color:rgb(var(--line))}
 .segment{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:12px;background:var(--bg)}
 .segment button{height:36px;border:0;border-radius:9px;background:transparent;color:var(--tx2);font:inherit;font-size:13px;font-weight:400;cursor:pointer}
 .segment button[aria-pressed=true]{font-weight:500;background:rgb(var(--card));color:var(--head);box-shadow:0 1px 3px var(--shadow)}
-.yildiz{width:30px;height:30px;border-radius:9px;border:1px solid rgb(var(--line));background:rgb(var(--card));cursor:pointer;font-size:14px;color:rgb(var(--line))}
-.yildiz[aria-pressed=true]{color:var(--brand)}
 :focus-visible{outline:3px solid var(--brand);outline-offset:2px}
-/* Ortak kabuk (14 Kas 2026): paket çubuğu (en üstte, iki temada aynı lacivert), sayfa sekmeleri ve durum çubuğu.
-   Yükseklikler yapışkan yan menü ve üst çubuğun hizası için değişkendir; telefonda paket ve durum çubuğu akışta kalır. */
-:root{--paket-h:48px;--durum-h:28px}
-.paket{position:sticky;top:0;z-index:20;height:48px;box-sizing:border-box;display:flex;align-items:stretch;gap:clamp(12px,2vw,28px);padding:0 clamp(12px,2vw,24px);background:#15202B;color:#E7ECF1;border-bottom:1px solid #22303C;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:400;line-height:1}
-.paket-marka{flex:none;display:flex;align-items:center;gap:9px;color:#E7ECF1;text-decoration:none;font-weight:500;font-size:15px}
-.paket-marka:hover{color:#FFFFFF}
-.paket-marka svg{color:#F07A23}
-.paket-sekmeler{display:flex;align-items:stretch;gap:2px;min-width:0;overflow-x:auto;scrollbar-width:none}
-.paket-sekmeler::-webkit-scrollbar{display:none}
-.paket-sekme{position:relative;flex:none;display:flex;align-items:center;gap:8px;padding:0 14px;color:#B8C3CE;text-decoration:none;white-space:nowrap}
-.paket-sekme:hover{color:#E7ECF1;background:rgba(255,255,255,.06)}
-.paket-sekme[aria-current=page]{color:#E7ECF1;font-weight:500}
-.paket-sekme[aria-current=page]::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--modul)}
-.paket-nokta{flex:none;width:8px;height:8px;border-radius:50%;background:var(--modul)}
-.paket a:focus-visible{outline:2px solid #F07A23;outline-offset:-3px;border-radius:4px}
-.paket-araclar{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:12px}
-.paket-orta{flex:1 1 auto;min-width:0;display:flex;justify-content:center}
-.paket .tema-grup{border-color:rgba(255,255,255,.12);background:rgba(255,255,255,.06)}
-.paket .tema-grup button{width:28px;height:28px;color:#B8C3CE}
-.paket .tema-grup button:hover{background:rgba(255,255,255,.1);color:#FFFFFF}
-.paket .tema-grup button[aria-pressed=true]{background:rgba(240,122,35,.22);color:#FFB58A}
-.paket .tema-grup button:focus-visible,.paket button:focus-visible{outline:2px solid #F07A23;outline-offset:1px}
-.paket .avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);color:#E7ECF1}
-.paket .avatar:hover,.paket .avatar[aria-expanded=true]{box-shadow:0 0 0 3px rgba(240,122,35,.35)}
-.paket .profil-menu{top:calc(100% + 10px);color:var(--tx);font-weight:300;line-height:1.5}
-/* Sayfa sekmeleri: açılan sayfalar sekme olarak durur (src/scripts/yonetim/sekmeler.js, localStorage 'idx-sekmeler'). */
-.sayfa-sekmeleri{display:flex;align-items:flex-end;gap:2px;min-height:39px;box-sizing:border-box;padding:6px clamp(14px,3vw,36px) 0;background:var(--track);border-bottom:1px solid rgb(var(--line));overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
-.sayfa-sekme{position:relative;flex:none;display:flex;align-items:center;max-width:240px;height:32px;box-sizing:border-box;border:1px solid transparent;border-bottom:0;border-radius:6px 6px 0 0;color:var(--tx2);font-size:13px}
-.sayfa-sekme:hover{background:var(--card2);color:var(--tx)}
-.sayfa-sekme a{min-width:0;padding:0 6px 0 12px;color:inherit;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:30px;border-radius:4px}
-.sayfa-sekme.kalici a{padding-right:12px}
-.sayfa-sekme a:hover{color:inherit}
-.sayfa-sekme button{flex:none;width:22px;height:22px;margin-right:5px;padding:0;border:0;border-radius:4px;background:transparent;color:inherit;font:inherit;font-size:15px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
-.sayfa-sekme button:hover{background:rgb(var(--line));color:var(--head)}
-.sayfa-sekme a:focus-visible,.sayfa-sekme button:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
-.sayfa-sekme.etkin{height:33px;margin-bottom:-1px;background:rgb(var(--card));border-color:rgb(var(--line));color:var(--head);font-weight:500}
-.sayfa-sekme.etkin::before{content:"";position:absolute;left:-1px;right:-1px;top:-1px;height:2px;border-radius:6px 6px 0 0;background:var(--acc)}
-/* Durum çubuğu: masaüstünde ekranın altında sabit; hücreler ayrı kenarlıkla. */
-.durum{position:fixed;left:0;right:0;bottom:0;z-index:19;height:var(--durum-h);box-sizing:border-box;display:flex;align-items:stretch;background:var(--side);border-top:1px solid rgb(var(--line));color:var(--tx2);font-family:'Inter',system-ui,sans-serif;font-size:12px;font-weight:400;line-height:1}
-.durum-hucre{display:flex;align-items:center;gap:6px;padding:0 12px;border-right:1px solid rgb(var(--line));white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.durum-hucre[hidden]{display:none}
-.durum-sag{margin-left:auto;border-right:0;border-left:1px solid rgb(var(--line))}
-.durum-nokta{flex:none;width:7px;height:7px;border-radius:50%;background:var(--tx2)}
-.durum-nokta[data-d=bagli]{background:#22A06B}.durum-nokta[data-d=sorun]{background:#D64545}
-main.icerik{padding-bottom:var(--durum-h)}
-@media (max-width:860px){
-  :root{--paket-h:0px;--durum-h:0px}
-  /* Telefonda paket çubuğu iki satır: üstte marka ve modül sekmeleri (yatay kayar), altta arama, tema ve hesap. */
-  .paket{position:relative;height:auto;flex-wrap:wrap;gap:0 10px}
-  .paket-marka span{display:none}
-  .paket-marka,.paket-sekmeler{height:48px}
-  .paket-sekmeler{flex:1 1 0}
-  .paket-sekme{padding:0 10px}
-  .paket-araclar{flex:0 0 100%;gap:8px;padding:0 0 8px}
-  .paket-orta{justify-content:flex-start}
-  .panel-ara{max-width:none}
-  .paket .tema-grup button{width:26px;height:26px}
-  .durum{position:static;height:auto;min-height:28px;flex-wrap:wrap}
-  .durum-hucre{padding:6px 12px}
-}
-@media (max-width:860px){
-  .kabuk{flex-direction:column;align-items:stretch}
-  main.icerik{width:100%}
-  .yan,.yan.dar{flex:0 0 auto;width:100%;min-height:0;height:auto!important;position:relative!important;padding:10px 12px}
-  .yan .yan-govde,.yan .yan-alt{display:none}.yan.acik-menu .yan-govde{display:flex}.yan.acik-menu .yan-alt{display:block;position:static}
-  .yan.sabit .yan-govde{flex:none;min-height:auto;overflow:visible;margin:0;padding:0}
-  .yan-alt{margin:12px 0 0;padding:10px 0 0}
-  .logo{position:static;padding:0;margin:0}
-  .yan.gizli{display:flex}
-  .masa{display:none!important}
-}
-@media (min-width:861px){.mobil{display:none!important}}
-@media print{.yan,.ust,.ust-ac,.paket,.sayfa-sekmeleri,.durum{display:none!important}.kabuk{background:#FFFFFF;color:#000000}}
+/* Sayfa başlığı (ortak kabuk ik-sayfa-bas): konum yolu, başlık ve eylem çubuğu. */
+.ik-konum a{color:inherit;text-decoration:none}.ik-konum a:hover,.ik-konum a:focus-visible{color:var(--acc);text-decoration:underline;text-underline-offset:3px}
+.ik-sayfa-bas h1 .alt-baslik{color:var(--tx2);font-weight:var(--w-govde)}
+.ik-sayfa-bas>div:first-child{flex:1 1 360px;min-width:0}
+.ik-sayfa-bas p{margin:4px 0 0;max-width:820px;color:var(--tx2)}
+@media print{.ik-eylemler{display:none!important}}
 .yeni-menu{position:relative}
 .yeni-menu summary{list-style:none;cursor:pointer}.yeni-menu summary::-webkit-details-marker{display:none}
 .yeni-liste{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:320px;padding:8px;border-radius:16px;background:rgb(var(--card));border:1px solid rgb(var(--line));box-shadow:0 24px 60px var(--shadow);display:flex;flex-direction:column}
@@ -369,247 +170,48 @@ main.icerik{padding-bottom:var(--durum-h)}
 .yeni-liste a:hover,.yeni-liste a:focus-visible{background:var(--card2,var(--bg))}
 .yeni-liste strong{font-size:14px;color:var(--head)}.yeni-liste span{font-size:12.5px;color:var(--tx2)}
 </style>
-<script is:inline>(function(){var s='sistem',c=true;try{s=localStorage.getItem('idx-tema-secim')||(localStorage.getItem('idx-tema')==='koyu'?'koyu':'sistem');c=localStorage.getItem('idx-cam')!=='duz'}catch(e){}if(['acik','koyu','sistem','saat'].indexOf(s)<0)s='sistem';var k=false;if(s==='sistem'){try{k=matchMedia('(prefers-color-scheme: dark)').matches}catch(e){}}else if(s==='saat'){var h=new Date().getHours();k=h<7||h>=19}else k=s==='koyu';var d=document.documentElement;d.dataset.temaSecim=s;d.dataset.tema=k?'koyu':'acik';d.classList.toggle('cam',c);d.classList.toggle('dark',k)})()</script>
 </head>
 <body>
-<header class="paket acik" id="paket" aria-label="Idexya">
-  <a class="paket-marka" href="/dashboard" aria-label="Idexya · Website ve CRM genel bakış"><svg viewBox="0 0 1000 1000" width="22" height="22" aria-hidden="true" focusable="false"><path fill="currentColor" fill-rule="evenodd" d={X_YOL}></path></svg><span>Idexya</span></a>
-  <nav class="paket-sekmeler" aria-label="Idexya modülleri">
-    {MODULLER.map((m) => (
-      <a class="paket-sekme" href={m.href} style={`--modul: ${m.renk}`} aria-current={m.bu ? 'page' : undefined} rel={m.bu ? undefined : 'noopener'}><span class="paket-nokta" aria-hidden="true"></span>{m.ad}</a>
-    ))}
-  </nav>
-  <div class="paket-araclar">
-    <div class="paket-orta">
-          <div class="panel-ara" data-u="arama" id="paket-ara">
-            <label><span class="kure-kucuk" aria-hidden="true"></span><input type="search" placeholder="Panelde ara: modül veya sayfa" aria-label="Panelde ara" data-panel-ara autocomplete="off"><span class="masa ara-kisa">⌘K</span></label>
-            <div class="ara-sonuc" data-ara-sonuc hidden role="listbox" aria-label="Arama sonuçları"></div>
-          </div>
-    </div>
-        <div class="tema-grup" role="group" aria-label="Tema" data-tema-grup><button type="button" data-tema-sec="acik" aria-pressed="false" title="Açık tema" aria-label="Açık tema"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></button><button type="button" data-tema-sec="koyu" aria-pressed="false" title="Koyu tema" aria-label="Koyu tema"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg></button><button type="button" data-tema-sec="sistem" aria-pressed="false" title="Sistem: cihazın tema ayarını izler" aria-label="Sistem teması: cihazın ayarını izler"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg></button><button type="button" data-tema-sec="saat" aria-pressed="false" title="Saate göre: 07.00–19.00 açık, dışında koyu" aria-label="Saate göre tema: 07.00–19.00 arası açık, dışında koyu"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></button></div>
-        <div class="profil" data-profil>
-          <button type="button" class="avatar" data-kim-avatar aria-haspopup="menu" aria-expanded="false" aria-controls="profil-menu" aria-label="Hesap menüsü"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg></button>
-          <div class="profil-menu" id="profil-menu" role="menu" hidden>
-            <div class="profil-bas"><small>Oturum açık</small><b data-kim-eposta>—</b></div>
-            <a role="menuitem" href="/settings">Ayarlar</a>
-            <a role="menuitem" href="/notifications">Bildirimler</a>
-            <a role="menuitem" href="/activity-log">İşlem geçmişi</a>
-            <a role="menuitem" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
-            <a role="menuitem" class="profil-cikis" href="/cdn-cgi/access/logout">Çıkış yap</a>
-          </div>
-        </div>
-  </div>
-</header>
-<div class="kabuk acik" id="kabuk">
-<script is:inline>(function(){var t=document.documentElement.dataset.tema||'acik';document.getElementById('kabuk').className='kabuk '+t;document.getElementById('paket').className='paket '+t})()</script>
-<aside class="yan sabit" id="yan" aria-label="Yan menü" data-cam="yuzey">
-  <div class="logo">
-    <div class="modul-baslik"><small>Modül</small><b>Website ve CRM</b></div>
-    <span class="logo-arac masa">
-      <button type="button" class="ikon" data-yan-daralt aria-label="Yan menüyü daralt veya genişlet" title="Menüyü daralt veya genişlet"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"></rect><path d="M9 4v16"></path></svg></button>
-      <button type="button" class="ikon" data-yan-sabitle aria-pressed="true" aria-label="Yan menüyü sabitle"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5M9 3h6l-1 6 4 4H6l4-4z"></path></svg></button>
-    </span>
-    <button type="button" class="dugme kucuk mobil" aria-expanded="false" aria-controls="yan-govde" data-menu-ac>Menü</button>
-  </div>
-  <div class="yan-govde" id="yan-govde">
-    <div class="ara-satir">
-    <label class="ara-kutu" data-ara-kutu>
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg>
-      <input type="search" placeholder="Modül ara" aria-label="Menüde modül ara" data-menu-ara>
-    </label>
-    <button type="button" class="ikon tum-ac" data-tumu aria-pressed="false" aria-label="Tüm alt menüleri aç" title="Tümünü aç / kapat"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 10l5-5 5 5M7 14l5 5 5-5"></path></svg></button>
-    </div>
-    <div class="mg" data-favori-blok hidden>
-      <span class="grup-ad">Sık kullanılanlar</span>
-      <div data-favoriler style="display: flex; flex-direction: column; gap: 1px"></div>
-    </div>
-    <nav aria-label="Panel modülleri" style="display: flex; flex-direction: column; gap: 16px" data-menu>
-      {MENU.map((g) => (
-        <div class="mg" data-grup>
-          <span class="grup-ad">{g.ad}</span>
-          {g.ogeler.map((o) => {
-            const aktifMi = aktif === o.k;
-            const altVar = o.altlar && o.altlar.length;
-            return (
-              <div data-modul={o.k} data-ad={o.ad} data-href={o.href || ''} data-sabit={o.sabit ? '1' : undefined}>
-                {o.href && !altVar ? (
-                  <a class="mo" href={o.href} aria-label={o.ad} aria-current={aktifMi ? 'page' : undefined}><Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span>{o.sayac && <span class="rozet" data-sayac={o.sayac} hidden></span>}<span class="ok-yer" aria-hidden="true"></span></a>
-                ) : altVar ? (
-                  <button type="button" class="mo" aria-label={o.ad} aria-expanded={aktifMi ? 'true' : 'false'} aria-current={aktifMi ? 'page' : undefined} data-ac={o.k} data-git={o.href || ''}>
-                    <Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span>
-                    {o.sayac && <span class="rozet" data-sayac={o.sayac} hidden></span>}
-                    {!o.href && <small class="etiket" style="flex: 0 0 auto">Yakında</small>}
-                    <svg class="ok" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
-                  </button>
-                ) : (
-                  <span class="mo yakinda" aria-label={o.ad + ' · yakında'} aria-disabled="true"><Fragment set:html={svg(o.i || o.k)} /><span class="etiket">{o.ad}</span><small class="etiket" style="flex: 0 0 auto">Yakında</small><span class="ok-yer" aria-hidden="true"></span></span>
-                )}
-                {altVar && (
-                  <div class="alt" data-alt={o.k} hidden={!aktifMi}>
-                    {o.altlar.map((a) => a.href ? <a href={a.href} data-alt-link data-ad={a.ad}>{a.ad}</a> : <span data-ad={a.ad}>{a.ad}<small>Yakında</small></span>)}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ))}
-    </nav>
-    <div class="idos-kart" data-idos-kart>
-      <span style="display: flex; justify-content: space-between; align-items: center"><b style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 16px; font-weight: 800">ID<span style="color: #F07A23">OS</span></b><small style="color: #B9BEC4; font-size: 11px" data-idos-durum>Reklam verisi</small></span>
-      <span style="font-size: 12px; color: #B9BEC4; line-height: 1.5" data-idos-detay>Durum yükleniyor…</span>
-      <a href="/data-sync" style="font-size: 12px; font-weight: 500; color: #FFFFFF">{menuAdi('/data-sync')}</a>
-    </div>
-  </div>
-  <div class="yan-alt">
-    <a class="mo cikis" href="/cdn-cgi/access/logout" aria-label="Çıkış yap" title="Çıkış yap"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg><span class="etiket">Çıkış yap</span></a>
-  </div>
-</aside>
-
-<main class="icerik">
-  <header class="ust sabit" id="ust" data-cam="yuzey">
-    <div class="ust-satir">
-      <button type="button" class="ikon" data-yan-ac hidden aria-label="Yan menüyü aç"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg></button>
-      <nav aria-label="Sayfa yolu" class="sayfa-yolu">
-        <span class="masa" data-u="tarih" data-tarih></span>
-        <ol data-yol data-modul-href={modul && modul.href ? modul.href : ''} data-modul-ad={modul ? modul.ad : ''}>
-          {sayfaYolu && <li>{grupHref ? <a href={grupHref}>{sayfaYolu}</a> : <span>{sayfaYolu}</span>}</li>}
-          {modulYolda && <li><a href={modul.href}>{modul.ad}</a></li>}
-          <li data-yol-son><b class="baslik-font" aria-current="page" data-baslik>{baslik}</b></li>
-        </ol>
-      </nav>
-      <span style="flex: 1 1 0"></span>
-      <span class="masa" data-u="hizli" style="display: inline-flex; gap: 8px">
+<script is:inline type="application/json" id="idexya-kabuk-ayar" set:html={ayarMetni}></script>
+<idexya-kabuk>
+  <div class="yonetim" data-sayfa-adi={baslik}>
+    <header class="ik-sayfa-bas">
+      <div>
+        <nav class="ik-konum" aria-label="Konum" data-konum>
+          <span>Website ve CRM</span>{grupAdi && <> › <span>{grupAdi}</span></>}{modulYolda && <> › <a href={modul.href}>{modul.ad}</a></>}
+        </nav>
+        <h1><span data-baslik>{baslik}</span><span class="alt-baslik" data-alt-baslik hidden></span></h1>
+        {aciklama && <p>{aciklama}</p>}
+      </div>
+      <div class="ik-eylemler">
+        <button type="button" class="ik-dugme" data-yenile>Yenile</button>
+        <button type="button" class="ik-dugme" data-yazdir>Yazdır</button>
+        <a class="ik-dugme" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
         <details class="yeni-menu" data-yeni-menu>
-          <summary class="dugme ana">+ Yeni oluştur</summary>
+          <summary class="ik-dugme ik-dugme-ana">+ Yeni oluştur</summary>
           <div class="yeni-liste" role="menu" aria-label="Ne oluşturmak istiyorsunuz?">
-            <b>Web sitesi</b>
-            <a role="menuitem" href="/site-content?file=posts&new=1"><strong>Blog yazısı</strong><span>Sitedeki blogda yayınlanır</span></a>
-            <a role="menuitem" href="/articles?new=1"><strong>Üyelere özel yazı / kaynak</strong><span>Herkese, üyelere ya da seçtiğiniz kişilere</span></a>
-            <a role="menuitem" href="/site-content?file=packages&new=1"><strong>Paket</strong><span>Paketler sayfasına yeni paket</span></a>
-            <a role="menuitem" href="/site-content?file=services"><strong>Hizmet</strong><span>Hizmet alanının içinden eklenir</span></a>
-            <a role="menuitem" href="/weekly-newsletter?new=1"><strong>Haftalık bülten sayısı</strong><span>AI ve dijital pazarlama gelişmeleri, kaynaklı özet</span></a>
-            <a role="menuitem" href="/banners?new=1"><strong>Banner, duyuru ya da açılır pencere</strong><span>Kayan/sabit şerit, görsel banner, pop-up, köşe kutusu</span></a>
-            <a role="menuitem" href="/site-content?file=faq&new=1"><strong>Sık sorulan soru</strong><span>Ana sayfadaki sorular</span></a>
-            <b>Satış ve iş</b>
-            <a role="menuitem" href="/crm?new=1"><strong>Müşteri</strong><span>CRM’e elle müşteri kaydı</span></a>
-            <a role="menuitem" href="/proposals?new=1"><strong>Teklif</strong><span>Kalemli, KDV’li teklif hazırlayın</span></a>
-            <a role="menuitem" href="/tasks?new=1"><strong>Görev</strong><span>Takvime görev ve hatırlatma</span></a>
+            {YENI_GRUP.map((g) => (
+              <>
+                <b>{g}</b>
+                {YENI.filter((y) => y.grup === g).map((y) => <a role="menuitem" href={y.url}><strong>{y.ad}</strong><span>{y.aciklama}</span></a>)}
+              </>
+            ))}
           </div>
         </details>
-        <a class="dugme ikincil" href="https://idexya.com/" target="_blank" rel="noopener">Siteyi aç ↗</a>
-      </span>
-      <button type="button" class="dugme" data-ozellestir aria-haspopup="dialog"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg><span class="masa">Özelleştir</span></button>
-    </div>
-    <div class="ust-serit" data-ust-serit hidden>
-      <span>Yeni talep <b data-s="talep">—</b></span>
-      <span>CRM’deki müşteri <b data-s="musteri">—</b></span>
-      <span>Bekleyen üye <b data-s="uye">—</b></span>
-      <span>Onay bekleyen yorum <b data-s="yorum">—</b></span>
-      <span data-kim style="margin-left: auto"></span>
-    </div>
-  </header>
-  <button type="button" class="ust-ac" data-ust-ac hidden>⌄ Üst menü</button>
-  <nav class="sayfa-sekmeleri" aria-label="Açık sayfalar" data-sayfa-sekmeleri></nav>
-  <div class="sayfa">
-    <div style="display: flex; flex-direction: column; gap: 6px">
-      <h1 data-baslik>{baslik}<span style="color: var(--brand)">.</span></h1>
-      {aciklama && <span style="color: var(--tx2); max-width: 820px">{aciklama}</span>}
-    </div>
-    <div data-genel-hata hidden class="uyari hata" role="alert"></div>
-    <slot />
-  </div>
-</main>
-<footer class="durum" aria-label="Durum çubuğu">
-  <span class="durum-hucre"><span class="durum-nokta" data-durum-nokta aria-hidden="true"></span><span data-durum-baglanti>Bağlanıyor</span></span>
-  <span class="durum-hucre" data-durum-eposta>—</span>
-  <span class="durum-hucre">Modül: Website ve CRM</span>
-  <span class="durum-hucre" data-durum-idos hidden></span>
-  <span class="durum-hucre durum-sag">Idexya OS</span>
-</footer>
-<div class="ucan" data-ucan hidden></div>
-<div class="perde" data-perde hidden></div>
-<aside class="cekmece" data-cekmece hidden role="dialog" aria-modal="true" aria-labelledby="ozellestir-baslik">
-  <div style="display: flex; align-items: center; justify-content: space-between; padding: 22px 22px 8px">
-    <h2 id="ozellestir-baslik">Özelleştir</h2>
-    <button type="button" class="ikon" data-cekmece-kapat aria-label="Kapat"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
-  </div>
-  <div style="flex: 1; overflow-y: auto; padding: 0 22px 16px">
-    <div class="bolum" style="border-top: 0">
-      <h3>Görünüm</h3>
-      <div class="segment" role="group" aria-label="Panel görünümü" data-cam-secim>
-        <button type="button" data-v="cam">Cam</button><button type="button" data-v="duz">Düz</button>
       </div>
-      <span style="font-size: 13px; color: var(--tx2)">Cam: menü ve kartlar saydam, arkası bulanık. Düz: opak yüzeyler. Seçim yalnız bu tarayıcıda tutulur.</span>
-    </div>
-    <div class="bolum">
-      <h3>Üst menü</h3>
-      <label class="sat">Göster <input type="checkbox" data-t="ustAcik"></label>
-      <label class="sat">Sabitle (kaydırınca üstte kalsın) <input type="checkbox" data-t="ustSabit"></label>
-      <span style="font-size: 13px; color: var(--tx2)">Yükseklik</span>
-      <div class="segment" role="group" aria-label="Üst menü yüksekliği" data-segment="ustBoy">
-        <button type="button" data-v="ince">İnce</button><button type="button" data-v="normal">Normal</button><button type="button" data-v="genis">Geniş</button>
-      </div>
-      <span style="font-size: 13px; color: var(--tx2)">İçerik</span>
-      <label class="sat">Tarih <input type="checkbox" data-u-t="tarih"></label>
-      <label class="sat">Arama kutusu <input type="checkbox" data-u-t="arama"></label>
-      <label class="sat">Hızlı işlemler <input type="checkbox" data-u-t="hizli"></label>
-    </div>
-    <div class="bolum">
-      <h3>Yan menü</h3>
-      <div class="segment" role="group" aria-label="Yan menü görünümü" data-segment="yanMod">
-        <button type="button" data-v="genis">Geniş</button><button type="button" data-v="dar">Dar</button><button type="button" data-v="gizli">Gizli</button>
-      </div>
-      <label class="sat">Sabitle <input type="checkbox" data-t="yanSabit"></label>
-      <label class="sat">IDOS kartını göster <input type="checkbox" data-t="idosKart"></label>
-      <span style="font-size: 13px; color: var(--tx2)">Modüller · ★ sık kullanılanlara ekler</span>
-      <div data-modul-ayar style="display: flex; flex-direction: column; gap: 8px"></div>
+    </header>
+    <div class="sayfa">
+      <div data-genel-hata hidden class="uyari hata" role="alert"></div>
+      <slot />
     </div>
   </div>
-  <div style="display: flex; gap: 10px; padding: 14px 22px; border-top: 1px solid rgb(var(--line))">
-    <button type="button" class="dugme" style="flex: 1" data-sifirla>Varsayılana dön</button>
-    <button type="button" class="dugme ana" style="flex: 1" data-cekmece-kapat>Tamam</button>
-  </div>
-</aside>
-</div>
-
+</idexya-kabuk>
 <script>
-  // "+ Yeni oluştur" menüsü: dışarı tıklayınca ya da Esc ile kapanır. ?yeni=1 ile açılan sayfada o sayfanın "yeni" düğmesine basılır.
-  {
-    // Açılır menü (Yeni oluştur): dışarı tıklama ve Esc kapatır.
-    document.querySelectorAll<HTMLDetailsElement>('[data-yeni-menu]').forEach((d) => {
-      document.addEventListener('click', (o) => { if (d.open && !d.contains(o.target as Node)) d.open = false; });
-      d.addEventListener('keydown', (o) => { if (o.key === 'Escape' && d.open) { d.open = false; d.querySelector('summary')!.focus(); } });
-    });
-    const m = document.querySelector<HTMLDetailsElement>('[data-yeni-menu]');
-    if (m) {
-      // Bazı sayfalar adres çubuğunu yeniden yazdığı için "yeni" isteği oturumda da tutulur
-      m.querySelectorAll<HTMLAnchorElement>('a').forEach((a) => a.addEventListener('click', () => { try { if (a.search.includes('new=1')) sessionStorage.setItem('idx-yeni', a.pathname); } catch (e) {} }));
-    }
-    // PWA: service worker yalnız panel alan adında kaydedilir (idexya.com sitesine karışmaz). Kabuk varlıklarını saklar, veriyi saklamaz.
-    if ('serviceWorker' in navigator && /^panel\.(idexya\.com|localhost)$/.test(location.hostname)) {
-      addEventListener('load', () => { navigator.serviceWorker.register('/panel-sw.js', { scope: '/' }).catch(() => {}); });
-    }
-    let yeniIstek = new URLSearchParams(location.search).get('new') === '1';
-    try { if (sessionStorage.getItem('idx-yeni') === location.pathname) { yeniIstek = true; } sessionStorage.removeItem('idx-yeni'); } catch (e) {}
-    if (yeniIstek && !location.pathname.startsWith('/proposals')) {
-      let deneme = 0;
-      const bas = () => {
-        const d = document.querySelector<HTMLElement>('main [data-yeni], main [data-yeni-ac]') || [...document.querySelectorAll<HTMLButtonElement>('main .si-liste ~ button, main button')].filter((b) => /^\+ Yeni /.test(b.textContent || '')).pop();
-        if (d) { d.click(); d.scrollIntoView({ block: 'center' }); return; }
-        if (++deneme < 40) setTimeout(bas, 150);
-      };
-      setTimeout(bas, 200);
-    }
-  }
-</script>
-<script>
-  import { kabuk } from '../scripts/yonetim/ortak.js';
+  // Sıra önemli: kabuk-bagla.js etkin adresi ayar bloğuna yazar, sonra kabuk.js öğeyi tanımlar ve kurar.
+  import '../scripts/yonetim/kabuk-bagla.js';
+  import '../idexya-kabuk/kabuk.js';
   import { tabloSayfalama } from '../scripts/yonetim/tablo-sayfa.js';
   import { kartBilgi } from '../scripts/yonetim/kart-bilgi.js';
-  import { sayfaSekmeleri } from '../scripts/yonetim/sekmeler.js';
-  kabuk();
-  sayfaSekmeleri();
   tabloSayfalama();
   kartBilgi();
 </script>
