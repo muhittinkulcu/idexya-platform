@@ -38,7 +38,7 @@ import { yonetimDonusumApi, reklamTemizle, talepReklamSorgu } from './donusum.js
 import { ekibeBildir, yonetimEpostaApi } from './eposta.js';
 import { yonetimMuhasebeApi } from './muhasebe.js';
 import { referansSayfasi } from './referans.js';
-import { panelAlani, panelKoku, eskiYol, SAYFALAR } from './panel-yollar.js';
+import { panelAlani, panelKoku, eskiYol, SAYFALAR, eskiPanelOsHedefi } from './panel-yollar.js';
 import { eskiAramayiCevir } from '../src/data/panel-parametre.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
@@ -312,6 +312,9 @@ async function isle(istek, env, ctx, os) {
   try {
     // Yönetim paneli yalnız panel.idexya.com'da, İngilizce adreslerle açılır (worker/panel-yollar.js).
     const panel = os ? true : panelAlani(url, env);
+    // Tek adres: eski panel adresindeki yönetim arayüzü os.idexya.com/website'e 301 (ayar yoksa hiçbir şey; panel-yollar.js).
+    const osHedef = os ? null : eskiPanelOsHedefi(url, env, istek.method);
+    if (osHedef) return new Response(null, { status: 301, headers: { Location: osHedef, 'Cache-Control': 'public, max-age=3600', ...GUVENLIK_BASLIKLARI } });
     if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${os ? url.origin : panelKoku(url, env)}${eskiYol(yol)}${eskiAramayiCevir(url.search) || url.search}`, 301);
     let panelSayfa = null;
     if (panel) {

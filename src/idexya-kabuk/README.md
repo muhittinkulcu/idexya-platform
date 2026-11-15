@@ -71,7 +71,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 ```jsonc
 {
   "katman": "marketing",                 // geçerli katman: idos | marketing | website | creative
-  "katmanlar": [{ "anahtar": "idos", "ad": "IDOS", "url": "https://marketing.idexya.com/dashboard", "renk": "#C2510F", "renkKoyu": "#F07A23", "gruplar": [] }, {
+  "katmanlar": [{ "anahtar": "idos", "ad": "IDOS", "url": "https://os.idexya.com/", "renk": "#C2510F", "renkKoyu": "#F07A23", "gruplar": [] }, {
     "anahtar": "marketing", "ad": "Marketing",
     "url": "https://marketing.idexya.com/", // katman ana sayfası (ilk sekme "Genel bakış" buraya gider)
     "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada ve paket çubuğunda vurgu (#RRGGBB)
@@ -94,8 +94,9 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 }
 ```
 
-- IDOS katmanının (ana sayfa) adresi, tek adres (`os.idexya.com`) gelene kadar
-  `https://marketing.idexya.com/dashboard` (Muhittin, 14 Kas 2026).
+- IDOS katmanının (ana ekran) adresi tek adresin köküdür: `https://os.idexya.com/` (15 Kas 2026; önceden
+  `https://marketing.idexya.com/dashboard`). Ana ekranı IDOS uygulaması üretir, yönlendirici kökte yönlendirmesiz sunar
+  (`tek-adres-plani.md` "Ana ekran").
 - `idos` katmanının `gruplar` listesi boştur: ok düğmesi, yan menü ve sekmeler çizilmez; logo ("Idexya") ona gider.
 - Gruplar boşsa (ya da katman `idos` ise) yan menü ve sekme satırı çizilmez.
 - **Rozet** (Muhittin, 14 Kas 2026): modül ve sayfada isteğe bağlı `rozet` (sayı). Yan menüde, daraltılmış
