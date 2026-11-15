@@ -88,7 +88,10 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   }],
   "etkin": { "modulUrl": "/meta", "sayfaUrl": "/meta/kampanyalar", "ad": "" }, // ad isteğe bağlı (menüde olmayan sayfa için)
   "kullanici": { "ad": "Muhittin", "rol": "süper admin", "eposta": "..." }, // eposta isteğe bağlı; Ayarlar > Hesap'ta görünür
-  "durum": { "baglanti": true, "esitleme": "2026-11-14T10:39:00+03:00" }, // baglanti: true | false | null (bilinmiyor)
+  "durum": { "baglanti": true, "esitleme": "2026-11-14T10:39:00+03:00" }, // baglanti: true | false | "uyari" | null (bilinmiyor)
+  // Uyarı (bağlı ama sorun var): { "baglanti": "uyari", "metin": "3 kaynak eşitlenemiyor", "esitleme": "...", "url": "/data" }
+  // metin kapsülde görünür (en çok 80 karakter; boşsa "Eşitlemede sorun var"), nokta sarı; url verilirse kapsül oraya gider
+  // (idexya-kabuk:git). url her durumda kullanılabilir; eski değerler (true, false, null) değişmeden çalışır. durumYap() aynı alanları alır.
   "asistan": { "etiket": "IDOS’a sor" },  // isteğe bağlı; yoksa düğme çizilmez. Görsel kabuğun kedisidir (kedi.webp), ürün vermez
   "eylemler": [{ "ad": "Yeni öneri oluştur", "url": "/oneriler?yeni=1", "katman": "marketing" }], // isteğe bağlı, aramada çıkar
   "bildirimUrl": "/notifications",

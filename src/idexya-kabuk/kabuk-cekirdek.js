@@ -138,7 +138,7 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
       katman, katmanlar, eylemler, kokenler, bayraklar,
       etkin: { modulUrl: U(e.modulUrl), sayfaUrl: U(e.sayfaUrl), ad: metin(e.ad) },
       kullanici: { ad: metin(kul.ad) || 'Kullanıcı', rol: metin(kul.rol), eposta: metin(kul.eposta, 254) },
-      durum: { baglanti: d.baglanti === true ? true : d.baglanti === false ? false : null, esitleme: metin(d.esitleme, 40) },
+      durum: durumCoz(d, U),
       asistan: as,
       bildirimUrl: U(a.bildirimUrl),
       cikisUrl: U(a.cikisUrl),
@@ -149,6 +149,14 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
         .filter((x) => x.ad && x.url).slice(0, 20)
     }
   };
+}
+
+// Durum kapsülü (README "Ayar şeması"): baglanti true (Bağlı) | false (Bağlantı yok) | 'uyari' (bağlı ama sorun var: ürünün
+// kısa metniyle, ör. "3 kaynak eşitlenemiyor") | null (bilinmiyor). `url` verilirse kapsül oraya bağlantıdır (IDOS: Veri sağlığı).
+export function durumCoz(d, U = (x) => guvenliUrl(x)) {
+  d = d && typeof d === 'object' ? d : {};
+  const b = d.baglanti === true || d.baglanti === false || d.baglanti === 'uyari' ? d.baglanti : null;
+  return { baglanti: b, esitleme: metin(d.esitleme, 40), metin: b === 'uyari' ? metin(d.metin, 80) || 'Eşitlemede sorun var' : '', url: U(d.url) || null };
 }
 
 export function etkinBul(katman, etkin) {

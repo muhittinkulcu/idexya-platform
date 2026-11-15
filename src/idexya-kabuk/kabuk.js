@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, etkinKatman, katmanRozeti, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir,
-  kaynakDurumu, sekmeEkle, sekmeKapat, hepsiAcik, hepsiDegistir, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi
+  kaynakDurumu, sekmeEkle, sekmeKapat, hepsiAcik, hepsiDegistir, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -246,14 +246,19 @@ class IdexyaKabuk extends HTMLElement {
     this.sabitDugme.setAttribute('aria-label', t); this.sabitDugme.title = t;
   }
 
+  // Durum kapsülü: Bağlı | Bağlantı yok | uyarı (ürünün kısa metni, sarı nokta; yalnız renkle anlatılmaz) | bilinmiyor.
+  // `url` varsa kapsül o adrese gider (idexya-kabuk:git olayıyla). Eski değerler (true, false, null) aynen çalışır.
   durumYap(d) {
-    this.a.durum = Object.assign({}, this.a.durum, d);
-    const { baglanti, esitleme } = this.a.durum;
-    const b = baglanti === true ? 'Bağlı' : baglanti === false ? 'Bağlantı yok' : 'Bağlantı bilinmiyor';
-    this.kapsul.title = 'Veri eşitleme: ' + b + '. Son eşitleme ' + (esitleme || '—');
-    this.kapsul.replaceChildren(
-      h('span', { class: 'ik-canli', 'data-durum': String(baglanti) }), h('span', { class: 'ik-kapsul-ana' }, b),
-      h('span', { class: 'ik-ayrac' }), h('span', null, 'Eşitleme ' + saatKisa(esitleme)));
+    const g = Object.assign({}, this.a.durum, d);
+    this.a.durum = durumCoz(g, (x) => guvenliUrl(osAdresi(x), this.a.kokenler));
+    const { baglanti, esitleme, metin, url } = this.a.durum;
+    const b = baglanti === true ? 'Bağlı' : baglanti === false ? 'Bağlantı yok' : baglanti === 'uyari' ? metin : 'Bağlantı bilinmiyor';
+    const t = 'Veri eşitleme: ' + b + '. Son eşitleme ' + (esitleme || '—') + (url ? '. Ayrıntı için tıkla' : '');
+    const ic = [h('span', { class: 'ik-canli', 'data-durum': String(baglanti) }), h('span', { class: 'ik-kapsul-ana' }, b),
+      h('span', { class: 'ik-ayrac' }), h('span', null, 'Eşitleme ' + saatKisa(esitleme))];
+    this.kapsul.classList.toggle('ik-kapsul-uyari', baglanti === 'uyari');
+    this.kapsul.title = t;
+    this.kapsul.replaceChildren(url ? h('a', { href: url, 'data-ik-git': '', class: 'ik-kapsul-bag', 'aria-label': t }, ic) : h('span', { class: 'ik-kapsul-bag' }, ic));
   }
 
   // Rozet: 0 ise görünmez; bağlantı adına "N yeni" eklenir.

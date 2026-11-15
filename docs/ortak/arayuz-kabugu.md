@@ -35,8 +35,9 @@ Ana ekranda ızgara fareyi izleyen turuncu ışıkla birlikte belirginleşir.
 
 ## Modül renkleri
 
-Tek gezinmede (talimat 4.2) bütün maddelerin vurgusu aynıdır: açıkta `#2F55D4`, koyuda `#7F9AF2` (ana düğme, seçili
-menü öğesi, sekme çizgisi). Renk `katmanlar.json`'da madde başına yazılır; ileride ayrılabilir.
+Tek gezinmede (talimat 4.2) maddelerin vurgusu IDOS mavisidir: açıkta `#2F55D4`, koyuda `#7F9AF2` (ana düğme, seçili
+menü öğesi, sekme çizgisi). Creative kendi kırmızısını korur (`#DC2626` / `#F87171`). Renk `katmanlar.json`'da madde
+başına yazılır.
 
 Madde simgeleri (`katmanlar.json` `simge`): Genel bakış `ev`, Müşteriler `kisiler`, Görevler ve onaylar `onay`, Marketing
 `megafon`, CRM `huni`, Web ve Commerce `dunya`, Creative `palet`, Marketplace `magaza`, AI Center `yildiz`, Raporlar `belge`,
