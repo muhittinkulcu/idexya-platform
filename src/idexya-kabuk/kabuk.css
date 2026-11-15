@@ -1,9 +1,9 @@
 /* Idexya ortak kabuk stilleri. Sözleşme: arayuz-kabugu.md. Kaynak idexya-ortak; projede elle düzenlenmez.
    Hareket yalnız transform, opacity, clip-path ve filter ile; "hareketi azalt" açıksa hepsi kapanır. */
-:root{--ik-zemin:#F2F4F7;--ik-yuzey:#FFFFFF;--ik-gomuk:#F7F8FA;--ik-cizgi:#DCE1E8;--ik-metin:#17202B;--ik-ikincil:#56606E;--ik-paket:#15202B;--ik-izgara:rgba(0,37,89,.055);--ik-cam:rgba(255,255,255,.86);
+:root{--ik-zemin:#F2F4F7;--ik-yuzey:#FFFFFF;--ik-gomuk:#F7F8FA;--ik-cizgi:#DCE1E8;--ik-metin:#17202B;--ik-ikincil:#56606E;--ik-paket:#F07A23;--ik-paket-yazi:#15202B;--ik-izgara:rgba(0,37,89,.055);--ik-cam:rgba(255,255,255,.86);
   --ik-ok:#1A7148;--ik-ok-z:#E5F4EC;--ik-uyari:#8A4B00;--ik-uyari-z:#FCF1DE;--ik-hata:#B42318;--ik-hata-z:#FDECEA;--ik-bilgi:#46505C;--ik-bilgi-z:#EEF1F4;
   --w-ince:300;--w-govde:350;--w-orta:400;--w-vurgu:500;color-scheme:light}
-html[data-tema=koyu]{--ik-zemin:#15202B;--ik-yuzey:#1C2733;--ik-gomuk:#192734;--ik-cizgi:#2F3D4A;--ik-metin:#E7ECF1;--ik-ikincil:#A3AFBB;--ik-paket:#0E161E;--ik-izgara:rgba(255,255,255,.04);--ik-cam:rgba(28,39,51,.86);
+html[data-tema=koyu]{--ik-zemin:#15202B;--ik-yuzey:#1C2733;--ik-gomuk:#192734;--ik-cizgi:#2F3D4A;--ik-metin:#E7ECF1;--ik-ikincil:#A3AFBB;--ik-paket:#E2691A;--ik-izgara:rgba(255,255,255,.04);--ik-cam:rgba(28,39,51,.86);
   --ik-ok:#7DD3A8;--ik-ok-z:rgba(125,211,168,.14);--ik-uyari:#F5C26B;--ik-uyari-z:rgba(245,194,107,.14);--ik-hata:#F59A92;--ik-hata-z:rgba(245,154,146,.14);--ik-bilgi:#B9C4CF;--ik-bilgi-z:rgba(185,196,207,.12);color-scheme:dark}
 body:has(>idexya-kabuk){margin:0;background:var(--ik-zemin)}
 idexya-kabuk{display:block}
@@ -19,46 +19,54 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik :focus-visible:where(:not(.ik-icerik *)){outline:2px solid #6F8DF0;outline-offset:2px}
 .ik svg:where(:not(.ik-icerik *)){flex:none}
 .ik-soluk{color:var(--ik-ikincil);font-size:12px}.ik-kucuk{font-size:12px}
-.ik-ikon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:#E7ECF1;padding:0}
-.ik-ikon:hover{background:rgba(255,255,255,.08)}
-.ik-ikon[aria-pressed=true]{background:rgba(240,122,35,.18);color:#FFB070}
+.ik-ikon{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:var(--ik-paket-yazi);padding:0}
+.ik-ikon:hover{background:rgba(21,32,43,.1)}
+.ik-ikon[aria-pressed=true]{background:#15202B;color:#FFFFFF}.ik-ikon[aria-pressed=true]:hover{background:#25313D}
 .ik-cerceve{width:32px;height:32px;border:1px solid var(--ik-cizgi);color:var(--ik-ikincil)}.ik-cerceve:hover{background:var(--ik-gomuk)}
 .ik-tel{display:none}
 
-/* Paket çubuğu */
-.ik-ust{position:relative;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:16px;min-height:48px;padding:0 16px;background:var(--ik-paket);color:#E7ECF1}
+/* Paket çubuğu: Idexya turuncusu (idexya.com --brand #F07A23; koyu temada bir ton koyu), üstündeki her şey lacivert
+   (#15202B, turuncuda 5,8:1 / koyu temada 4,9:1, WCAG AA). Turuncu öğeler (X, katman simgeleri) lacivert rozet içinde. */
+.ik-ust{position:relative;top:0;z-index:30;display:flex;flex-wrap:wrap;align-items:center;gap:16px;min-height:48px;padding:0 16px;background:var(--ik-paket);color:var(--ik-paket-yazi)}
 .ik-ust.ik-sabit{position:sticky}
+.ik-ust :is(.ik-logo,.ik-katman-ad,.ik-ok,.ik-ikon,.ik-profil):focus-visible{outline-color:#15202B}
 .ik-logo{display:flex;align-items:center;gap:10px;padding-right:8px}
-.ik-logo-ad{font-weight:var(--w-orta);letter-spacing:.01em}
+.ik-logo-x{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#15202B}
+.ik-logo-ad{font-weight:var(--w-vurgu);letter-spacing:.01em}
 .ik-katmanlar{display:flex;align-self:stretch;gap:2px;min-width:0}
 .ik-katman{display:flex;align-items:stretch;border-top:3px solid transparent;border-bottom:3px solid transparent;transition:border-color .3s,background .25s}
-.ik-katman:hover{background:rgba(255,255,255,.06)}
-.ik-katman.ik-secili{background:rgba(255,255,255,.07);border-bottom-color:var(--ik-k)}
-.ik-katman-ad{display:flex;align-items:center;gap:8px;padding:0 6px 0 14px;color:#B8C3CE;font-weight:var(--w-orta);white-space:nowrap}
+.ik-katman:hover{background:rgba(21,32,43,.08)}
+.ik-katman.ik-secili{background:rgba(255,255,255,.24);border-bottom-color:#15202B}
+.ik-katman-ad{display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;color:var(--ik-paket-yazi);font-weight:var(--w-orta);white-space:nowrap}
 .ik-katman:last-child .ik-katman-ad,.ik-katman-ad:only-child{padding-right:14px}
-.ik-secili .ik-katman-ad{color:#FFFFFF}
-.ik-nokta{width:8px;height:8px;border-radius:2px;background:var(--ik-k)}
-.ik-ok{display:flex;align-items:center;padding:0 10px 0 4px;border:0;background:transparent;color:#B8C3CE}
-.ik-ok:hover{background:rgba(255,255,255,.08)}
+/* .ik-secili a (sekme kuralı) koyu temada açık yazı verir; çubukta yazı her temada lacivert kalır. */
+.ik-katman.ik-secili .ik-katman-ad{color:var(--ik-paket-yazi);font-weight:var(--w-vurgu)}
+/* Katman simgesi: lacivert rozet içinde katmanın koyu tema rengi (renk kimliği; turuncu zeminde de seçilir). */
+.ik-katman-simge{display:flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:6px;background:#15202B;color:var(--ik-k)}
+.ik-ok{display:flex;align-items:center;padding:0 10px 0 4px;border:0;background:transparent;color:var(--ik-paket-yazi)}
+.ik-ok:hover{background:rgba(21,32,43,.1)}
 .ik-ok svg{transition:transform .2s ease}.ik-ok[aria-expanded=true] svg{transform:rotate(180deg)}
 .ik-ara-kap{position:relative;flex:1 1 200px;display:flex;justify-content:center}
 .ik-ara-alan{position:relative;width:100%;max-width:480px}
-.ik-ara{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid transparent;color:#B8C3CE;transition:background .2s,border-color .2s}
-.ik-arama-acik .ik-ara{background:rgba(255,255,255,.14);border-color:rgba(240,122,35,.7)}
-.ik-ara input{flex:1;min-width:0;border:0;background:transparent;color:#E7ECF1;font:inherit;outline:none}
+.ik-ara{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:8px;background:rgba(255,255,255,.92);border:1px solid rgba(21,32,43,.12);color:#56606E;transition:background .2s,border-color .2s,box-shadow .2s}
+.ik-arama-acik .ik-ara,.ik-ara:focus-within{background:#FFFFFF;border-color:#15202B;box-shadow:0 0 0 1px #15202B}
+.ik-ara input{flex:1;min-width:0;border:0;background:transparent;color:#15202B;font:inherit;outline:none}
 .ik-ara input:focus-visible{outline:none}
-.ik-ara:focus-within{border-color:rgba(240,122,35,.7)}
-.ik-ara input::placeholder{color:#8FA1B5}
+.ik-ara input::placeholder{color:#56606E}
 .ik-ara input::-webkit-search-cancel-button{display:none}
-.ik-ara kbd{font:inherit;font-size:12px;padding:1px 6px;border:1px solid rgba(255,255,255,.2);border-radius:4px}
+.ik-ara kbd{font:inherit;font-size:12px;padding:1px 6px;border:1px solid rgba(21,32,43,.22);border-radius:4px}
+html[data-tema=koyu] .ik-ara{background:rgba(14,22,30,.82);border-color:rgba(14,22,30,.4);color:#A3AFBB}
+html[data-tema=koyu] :is(.ik-arama-acik .ik-ara,.ik-ara:focus-within){background:#0E161E;border-color:#0E161E;box-shadow:0 0 0 1px #0E161E}
+html[data-tema=koyu] .ik-ara input{color:#E7ECF1}html[data-tema=koyu] .ik-ara input::placeholder{color:#A3AFBB}html[data-tema=koyu] .ik-ara kbd{border-color:rgba(255,255,255,.22)}
 .ik-arac{display:flex;align-items:center;gap:6px}
-.ik-kapsul{display:flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 10px;margin-right:4px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);font-size:12px;color:#B8C3CE;white-space:nowrap}
-.ik-kapsul-ana{color:#E7ECF1}.ik-ayrac{width:1px;height:12px;background:rgba(255,255,255,.15)}
-.ik-canli{position:relative;width:7px;height:7px;border-radius:50%;background:#8FA1B5}
-.ik-canli[data-durum=true]{background:#2FBF71}.ik-canli[data-durum=false]{background:#F59A92}
-.ik-canli[data-durum=true]::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #2FBF71;animation:ik-canli 2s ease-out infinite}
+.ik-kapsul{display:flex;align-items:center;gap:8px;height:30px;padding:0 12px 0 10px;margin-right:4px;border-radius:999px;background:rgba(255,255,255,.26);border:1px solid rgba(21,32,43,.16);font-size:12px;color:var(--ik-paket-yazi);white-space:nowrap}
+.ik-kapsul-ana{font-weight:var(--w-vurgu)}.ik-ayrac{width:1px;height:12px;background:rgba(21,32,43,.3)}
+.ik-canli{position:relative;width:7px;height:7px;border-radius:50%;background:#46505C}
+.ik-canli[data-durum=true]{background:#0B6B3A}.ik-canli[data-durum=false]{background:#9B1C1C}
+.ik-canli[data-durum=true]::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid #0B6B3A;animation:ik-canli 2s ease-out infinite}
 .ik-profil-kap{position:relative}
-.ik-profil{width:32px;height:32px;border:0;border-radius:50%;background:#2C3B4A;color:#E7ECF1;font-weight:var(--w-orta)}
+.ik-profil{width:32px;height:32px;border:0;border-radius:50%;background:#15202B;color:#FFFFFF;font-weight:var(--w-orta)}
+.ik-ust .ik-profil{color:#FFFFFF}.ik-profil:hover{background:#25313D}
 .ik-acilir{position:absolute;z-index:41;box-sizing:border-box;border-radius:16px;background:rgba(24,34,46,.94);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 80px -20px rgba(0,0,0,.6);color:#E7ECF1;animation:ik-ac .22s cubic-bezier(.2,.7,.2,1) both}
 .ik-profil-menu{right:0;top:calc(100% + 10px);min-width:200px;padding:12px}
 .ik-profil-ad{font-weight:var(--w-orta)}
@@ -78,7 +86,7 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-mega-sutun{display:flex;flex-direction:column;gap:2px;animation:ik-sutun .5s cubic-bezier(.2,.85,.2,1) both;animation-delay:calc(var(--i) * 55ms + 90ms)}
 .ik-mega-bas{flex:0 1 300px;gap:10px;padding-right:24px;border-right:1px solid rgba(255,255,255,.08)}
 .ik-mega-baslik{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:var(--w-ince);letter-spacing:-.01em}
-.ik-mega-kare{width:12px;height:12px;border-radius:3px;background:var(--ik-mr);box-shadow:0 0 14px var(--ik-mr)}
+.ik-mega-kare{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--ik-mr) 16%,transparent);color:var(--ik-mr);box-shadow:0 0 18px -4px var(--ik-mr)}
 .ik-mega-bas p{margin:0;font-weight:var(--w-ince);color:#B8C3CE}
 .ik-mega-ana{align-self:flex-start;display:inline-flex;align-items:center;height:36px;margin-top:6px;padding:0 16px;border-radius:999px;background:var(--ik-mr);color:#0E161E!important;font-weight:var(--w-orta)}
 /* Gruplar sütunlara akar (masonry gibi): bir grup bölünmez, sütunlar arasında satır boşluğu kalmaz. */
@@ -119,6 +127,7 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-yan{position:relative;z-index:20;flex:0 0 240px;min-width:0;display:flex;flex-direction:column;background:var(--ik-yuzey);border-right:1px solid var(--ik-cizgi);transition:flex-basis .3s cubic-bezier(.2,.85,.2,1)}
 .ik-yan.ik-dar{flex-basis:72px}
 .ik-yan-bas{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 12px 10px 16px;border-bottom:1px solid var(--ik-cizgi)}
+.ik-yan-dugmeler{display:flex;gap:6px}
 .ik-dar .ik-yan-bas{justify-content:center;padding-left:12px}
 .ik-yan-ad{font-weight:var(--w-orta);color:var(--ik-vurgu)}
 .ik-agac{flex:1;padding:8px 8px 16px;display:flex;flex-direction:column;gap:2px}
@@ -126,6 +135,11 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-grup-bas>span{display:flex;align-items:center;gap:8px}
 .ik-grup-ok{transition:transform .2s}[aria-expanded=false]>.ik-grup-ok{transform:rotate(-90deg)}
 .ik-grup-ic{display:flex;flex-direction:column;gap:1px}
+/* Grup açılıp kapanırken yükseklik yumuşak değişir (0fr ↔ 1fr); kapalı içerik görünmez ve odak almaz (visibility).
+   "Hareketleri azalt" bütün geçişleri kapatır. */
+.ik-grup-kap{display:grid;grid-template-rows:1fr;transition:grid-template-rows .26s cubic-bezier(.2,.85,.2,1),visibility 0s}
+.ik-grup-kap>.ik-grup-ic{min-height:0;overflow:clip;overflow-clip-margin:4px}
+.ik-grup.ik-kapali>.ik-grup-kap{grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows .26s cubic-bezier(.2,.85,.2,1),visibility 0s .26s}
 .ik-modul-satir{display:flex;align-items:stretch;border-radius:6px}
 .ik-modul-satir.ik-secili{background:var(--ik-yumusak)}
 .ik-modul-satir a{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:7px 4px 7px 10px}
@@ -178,7 +192,8 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 /* Asistan düğmesi */
 .ik-asistan-kap{position:fixed;right:0;bottom:22px;z-index:35;display:flex;align-items:center;gap:10px}
 .ik-asistan{width:52px;height:52px;padding:0;border:3px solid #F07A23;border-radius:50%;overflow:hidden;background:#FFFFFF;box-shadow:0 12px 30px -8px rgba(240,122,35,.6);transform:translateX(18px);transition:transform .25s;animation:ik-kedi 4s ease-in-out infinite}
-.ik-asistan img{width:100%;height:100%;object-fit:cover;display:block}
+/* Asistanın kedisi (IDOS maskotu, Ankara kedisi) kabuğun parçasıdır: kedi.webp kabuk klasöründe, ürünün paketleyicisi göreli adresi çözer. */
+.ik-kedi{display:block;width:100%;height:100%;background:#FFF4EA url(kedi.webp) center/cover no-repeat}
 .ik-asistan-kap:hover .ik-asistan,.ik-asistan:focus-visible{transform:translateX(-10px) scale(1.06)}
 .ik-asistan-ipucu{padding:6px 12px;border-radius:999px;background:#15202B;color:#FFFFFF;font-size:13px;font-weight:var(--w-orta);box-shadow:0 8px 20px -8px rgba(0,0,0,.5);opacity:0;transform:translateX(6px);transition:opacity .2s,transform .2s;pointer-events:none}
 .ik-asistan-kap:hover .ik-asistan-ipucu,.ik-asistan-kap:focus-within .ik-asistan-ipucu{opacity:1;transform:none}
@@ -247,8 +262,8 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-onizleme{position:relative;display:block;width:100%;aspect-ratio:1.6;margin-bottom:8px;border-radius:8px;overflow:hidden;background:#F2F4F7;box-shadow:0 6px 16px -8px rgba(0,0,0,.4);--y:#FFFFFF;--k:#FFFFFF}
 .ik-oniz-koyu{background:#15202B;--y:#192734;--k:#1C2733}
 .ik-onizleme i{position:absolute;border-radius:3px;background:var(--k)}
-.ik-onizleme i:nth-child(1){left:0;right:0;top:0;height:15%;border-radius:0;background:#15202B}
-.ik-onizleme i:nth-child(2){left:5%;top:5%;width:6%;height:5%;border-radius:2px;background:#7F9AF2}
+.ik-onizleme i:nth-child(1){left:0;right:0;top:0;height:15%;border-radius:0;background:#F07A23}
+.ik-onizleme i:nth-child(2){left:5%;top:4%;width:6%;height:7%;border-radius:2px;background:#15202B}
 .ik-onizleme i:nth-child(3){left:0;top:15%;bottom:0;width:26%;border-radius:0;background:var(--y)}
 .ik-onizleme i:nth-child(4){left:33%;top:25%;width:60%;height:22%}
 .ik-onizleme i:nth-child(5){left:37%;top:30%;width:20%;height:5%;border-radius:2px;background:#2F55D4}

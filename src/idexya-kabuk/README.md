@@ -20,8 +20,9 @@ değiştirilmez (yapım kuralı 1).
 | `ayarlar.js` | `<idexya-ayarlar>`: ortak Ayarlar sayfasının içeriği (aşağıda "Ayarlar sayfası") | evet |
 | `kabuk.css` | Bütün stiller, renk değişkenleri, açık/koyu, hareketler, telefon düzeni | evet |
 | `README.md` | Bu belge | evet |
-| `katmanlar.json` | Dört katmanın ortak listesi (ad, adres, renk, gruplar, modüller, sayfalar); mega menü ve arama için | evet |
-| `demo.html`, `demo.js`, `demo.css`, `demo-ayar.json`, `demo-kedi.svg` | Yerel deneme sayfası | hayır |
+| `katmanlar.json` | Dört katmanın ortak listesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); mega menü ve arama için | evet |
+| `kedi.webp` | Asistan düğmesinin kedisi (IDOS maskotu, Ankara kedisi; 200×200). `kabuk.css` göreli adresle (`url(kedi.webp)`) kullanır, ürünün paketleyicisi (Vite, Astro) dosyayı özetli adla yayar | evet |
+| `demo.html`, `demo.js`, `demo.css`, `demo-ayar.json` | Yerel deneme sayfası | hayır |
 | `test/` | Node birim testleri ve Playwright tarayıcı denemesi | hayır |
 
 ## Kullanım
@@ -71,8 +72,8 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 ```jsonc
 {
   "katman": "marketing",                 // geçerli katman: idos | marketing | website | creative
-  "katmanlar": [{ "anahtar": "idos", "ad": "IDOS", "url": "https://marketing.idexya.com/dashboard", "renk": "#C2510F", "renkKoyu": "#F07A23", "gruplar": [] }, {
-    "anahtar": "marketing", "ad": "Marketing",
+  "katmanlar": [{ "anahtar": "idos", "ad": "IDOS", "simge": "ev", "url": "https://marketing.idexya.com/dashboard", "renk": "#C2510F", "renkKoyu": "#F07A23", "gruplar": [] }, {
+    "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // katman simgesi (simge adı, aşağıda)
     "url": "https://marketing.idexya.com/", // katman ana sayfası (ilk sekme "Genel bakış" buraya gider)
     "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada ve paket çubuğunda vurgu (#RRGGBB)
     "aciklama": "Mega menünün solundaki açıklama",
@@ -85,7 +86,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   "etkin": { "modulUrl": "/meta", "sayfaUrl": "/meta/kampanyalar", "ad": "" }, // ad isteğe bağlı (menüde olmayan sayfa için)
   "kullanici": { "ad": "Muhittin", "rol": "süper admin", "eposta": "..." }, // eposta isteğe bağlı; Ayarlar > Hesap'ta görünür
   "durum": { "baglanti": true, "esitleme": "2026-11-14T10:39:00+03:00" }, // baglanti: true | false | null (bilinmiyor)
-  "asistan": { "gorsel": "/img/kedi.webp", "etiket": "IDOS’a sor" },     // isteğe bağlı; yoksa düğme çizilmez
+  "asistan": { "etiket": "IDOS’a sor" },  // isteğe bağlı; yoksa düğme çizilmez. Görsel kabuğun kedisidir (kedi.webp), ürün vermez
   "eylemler": [{ "ad": "Yeni öneri oluştur", "url": "/oneriler?yeni=1", "katman": "marketing" }], // isteğe bağlı, aramada çıkar
   "bildirimUrl": "/notifications",
   "cikisUrl": "/cdn-cgi/access/logout",
@@ -101,18 +102,46 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 - **Rozet** (Muhittin, 14 Kas 2026): modül ve sayfada isteğe bağlı `rozet` (sayı). Yan menüde, daraltılmış
   paneldeki modül satırında ve mega menüde turuncu küçük sayı olarak görünür; 0 ya da yoksa görünmez. Bağlantının
   erişilebilir adına "N yeni" eklenir. 99'dan büyükse "99+". Sonradan `rozetYap(url, sayi)` ile güncellenir.
+- **Katman simgesi** (Muhittin, 15 Kas 2026; 14 Kas'taki "modül simgesi yok" kararının katman için değişikliği): her katmanın
+  `simge` alanı (simge adı) `katmanlar.json`'da verilir; kabuk paket çubuğundaki katman sekmesinin solunda, mega menünün başlığında
+  ve ⌘K aramasında o katmanın sayfa satırlarında çizer. Simge, katmanın koyu tema rengiyle (`renkKoyu`) lacivert rozet içindedir
+  (renk kimliği turuncu çubukta da seçilir). Eksik ya da bilinmeyen ad anahtarın varsayılanına döner: IDOS `ev`, Marketing
+  `megafon`, Website ve CRM `dunya`, Creative `palet`. SVG yolu kabul edilmez (yalnız ad; dışarıdan çizim verisi alınmaz).
+- **Asistan kedisi** (Muhittin, 15 Kas 2026: "ben kediyi sevmiştim"): asistan düğmesinin görseli kabuğun parçasıdır
+  (`kedi.webp`, eşitlemeyle gelir); üç üründe aynıdır. Ayardaki `asistan.gorsel` yok sayılır. Düğme yalnız ürün `asistan`
+  verdiğinde (asistan paneli olan üründe) çizilir.
 - **Kararlar** (Muhittin, 14 Kas 2026): modül başına simge yoktur, grup simgesi yeter. Adresi olmayan ("Yakında")
   modül ve sayfa gösterilmez; doğrulama onları atar.
 - **Yetki kabukta değildir.** Kullanıcının görmemesi gereken modül sunucu tarafından ayara hiç konmaz.
 - Doğrulama (`ayarDogrula`): adres yalnız http(s) olabilir ve sayfanın kendi kökenine (göreli adres) ya da
   ayardaki bir katman `url`'sinin kökenine gitmelidir; başka dış adres atılır. Ters bölü (`\`), boşluk, denetim
-  karakteri, `javascript:`, `data:` ve `//` ile başlayanlar atılır. `asistan.gorsel` yalnız aynı köken. Renk `#RRGGBB` değilse varsayılana döner.
+  karakteri, `javascript:`, `data:` ve `//` ile başlayanlar atılır. Renk `#RRGGBB` değilse varsayılana döner.
   Geçersiz parça atılır, neden konsola tek bir uyarı olarak yazılır, kabuk yine çizilir.
 - Esitleme metni ISO saat (`...T10:39`) ya da `14.11.2026 10.39` olabilir; kapsülde `Eşitleme 10.39`, yoksa
   `Eşitleme —` görünür (bilinmeyen değer 0 değil "—").
 
-Simge adları: `izgara`, `megafon`, `grafik`, `yildiz`, `belge`, `gelen`, `kisiler`, `dunya`, `esitle`,
-`takvim`, `gorsel`, `ayrac`. Bilinmeyen ad `izgara` olur.
+Simge adları (grup ve katman): `ev`, `izgara`, `megafon`, `grafik`, `yildiz`, `belge`, `gelen`, `kisiler`, `dunya`, `esitle`,
+`takvim`, `gorsel`, `palet`, `ayrac`. Grupta bilinmeyen ad `izgara` olur.
+
+**Paket çubuğu rengi** (Muhittin, 15 Kas 2026: "üstteki lacivert bar turuncu olsun"): zemin Idexya turuncusu `--ik-paket`
+(idexya.com `--brand` `#F07A23`; koyu temada `#E2691A`), üstündeki yazı, simge, arama kutusu, durum kapsülü ve etkin katman
+çizgisi lacivert `--ik-paket-yazi` `#15202B` (karşıtlık açıkta 5,8:1, koyuda 4,9:1; WCAG AA, `test/yapim-kurallari.test.mjs`
+denetler). Beyaz yazı turuncuda 2,8:1 olduğu için kullanılmaz. Idexya X logosu ve katman simgeleri lacivert rozet içindedir;
+sabitleme düğmesi basılıyken lacivert dolgu alır. Arama kutusu açık temada beyaz, koyu temada lacivert; açılır menüler (mega,
+arama sonuçları, profil) koyu cam olarak kalır.
+
+**Tüm grupları aç / kapat** (Muhittin, 15 Kas 2026): yan menü başlığında ("Katman" satırı), daraltma düğmesinin solunda simge
+düğme. Hiç kapalı grup yoksa "Tüm grupları kapat", varsa "Tüm grupları aç" (`aria-label` ve `title`, simge de değişir). Seçim
+`idx-yan-kapali-<katman>` kaydında saklanır. Daraltılmış (dar) yan menüde ve tek gruplu katmanda çizilmez; telefonda çekmecede görünür.
+
+**Üzerine gelince açılan grup** (Muhittin, 15 Kas 2026: "Sidebar açıkken modüllerin üzerine geldiğimde otomatik olarak açılsın
+alt menüleri"): geniş yan menüde fare kapalı bir grubun üzerinde 150 ms durunca grup geçici açılır (kayıt değişmez). Fare
+gruptan yukarı ya da yana çıkınca 300 ms sonra kapanır; aşağıdaki gruba geçerken üstteki kapanmaz (içerik imlecin altından
+kaymasın), menüden çıkınca 300 ms sonra hepsi kapanır. Kayıtla açık gruplar (tıklama, "tümünü aç") hiç kapanmaz; etkin
+sayfanın grubu ve odağı içeren grup açık kalır; geçici açık grup tıklanırsa açık kaydedilir. Yalnız fare (`pointerType`
+`mouse`); dokunmatik, kalem ve klavyede tıklama davranışı aynıdır; telefonda (çekmece) ve daraltılmış menüde (uçan panel) yoktur.
+Açılıp kapanma yükseklik geçişiyledir (`grid-template-rows` 0fr ↔ 1fr), "hareketleri azalt"ta geçiş yoktur. Gruplar her zaman
+çizilir, kapalı olan CSS ile gizlenir (`visibility`, odak almaz); açıp kapamak ağacı yeniden kurmaz, kaydırma yerinde kalır.
 
 ## Katman listesi (`katmanlar.json`)
 

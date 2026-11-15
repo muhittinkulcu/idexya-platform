@@ -8,8 +8,8 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 
 | Sıra | Parça | İçerik |
 |---|---|---|
-| 1 | Paket çubuğu | En üst, tam genişlik, ~48 px, zemin `#15202B` (iki temada da). Solda Idexya X ve "Idexya" (ana ekrana döner), yanında modül sekmeleri: IDOS (ana sayfa), Marketing, Website ve CRM, Creative. Seçili modülün altında 3 px renk çizgisi. |
-| 2 | Menü ağacı | Solda; üç düzey: katman (Marketing, Website ve CRM, Creative) › grup başlığı › modül › sayfa. Modüller açılıp kapanır, altında sayfaları girintili listelenir. Grup başlığında yalnız ilk harf büyük. Daraltılabilir; daraltınca simgeler kalır. |
+| 1 | Paket çubuğu | En üst, tam genişlik, ~48 px, zemin Idexya turuncusu `#F07A23` (koyu temada `#E2691A`), üstündeki yazı ve simgeler lacivert `#15202B` (Muhittin, 15 Kas 2026). Solda lacivert rozet içinde Idexya X ve "Idexya" (ana ekrana döner), yanında modül sekmeleri, her birinin solunda kendi simgesi: IDOS (ana sayfa), Marketing, Website ve CRM, Creative. Seçili modülün altında 3 px lacivert çizgi. |
+| 2 | Menü ağacı | Solda; üç düzey: katman (Marketing, Website ve CRM, Creative) › grup başlığı › modül › sayfa. Modüller açılıp kapanır, altında sayfaları girintili listelenir. Grup başlığında yalnız ilk harf büyük. Daraltılabilir; daraltınca simgeler kalır. Başlıkta "tüm grupları aç / kapat" düğmesi; geniş menüde fareyle üzerine gelince kapalı grup açılır (Muhittin, 15 Kas 2026). |
 | 3 | Sayfa sekmeleri | Açılan her sayfa sekme olur (en çok 8). Genel bakış ilk sırada ve kapatılamaz. × ile kapanır. |
 | 4 | Sayfa başlığı ve eylem çubuğu | Solda konum yolu ve başlık; sağda sırayla Yenile, Dışa aktar, Yazdır ve tek ana eylem (vurgu renginde). |
 | 5 | Süzgeç satırı | Müşteri, marka ya da site seçimi; dönem; süzgeç. Üst süzgeç sayfadaki her kartı etkiler. |
@@ -25,7 +25,7 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 | Çizgi | `#DCE1E8` | `#2F3D4A` |
 | Yazı | `#17202B` | `#E7ECF1` |
 | İkincil yazı | `#56606E` | `#A3AFBB` |
-| Paket çubuğu | `#15202B` | `#0E161E` |
+| Paket çubuğu | `#F07A23` (yazı `#15202B`) | `#E2691A` (yazı `#15202B`) |
 
 **Zemin ızgarası (Muhittin, 14 Kas 2026):** her modülün ve Ana ekranın zemininde idexya.com ana sayfasındaki
 gibi 64 px'lik hafif ızgara çizgileri bulunur. Çizgi rengi açıkta `rgba(0,37,89,.055)`, koyuda
@@ -37,11 +37,14 @@ Ana ekranda ızgara fareyi izleyen turuncu ışıkla birlikte belirginleşir.
 Her modülün yalnız bir vurgu rengi vardır; ana düğme, seçili menü ve sekme çizgisi bu renktir.
 Renk, modülün X işaretiyle aynı ailedendir.
 
-| Modül | Vurgu (açık) | Paket çubuğunda nokta |
+| Modül | Vurgu (açık) | Paket çubuğunda simge rengi (lacivert rozet içinde) |
 |---|---|---|
 | Marketing | `#2F55D4` | `#7F9AF2` |
 | Website ve CRM | `#B84406` | `#F29A62` |
 | Creative | `#DC2626` | `#F87171` |
+
+Katman simgeleri (`katmanlar.json` `simge`): IDOS `ev`, Marketing `megafon`, Website ve CRM `dunya`, Creative `palet`.
+Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünür; görsel kabuğun parçasıdır, üç üründe aynıdır.
 
 ## Ortak parçalar
 
