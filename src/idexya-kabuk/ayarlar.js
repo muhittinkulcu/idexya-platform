@@ -123,7 +123,7 @@ class IdexyaAyarlar extends HTMLElement {
         h('dt', null, 'Ad'), h('dd', null, kul.ad || '—'),
         h('dt', null, 'E-posta'), h('dd', null, kul.eposta || '—'),
         h('dt', null, 'Rol'), h('dd', null, kul.rol || '—')),
-      cikis ? h('div', { class: 'ik-kart-son' }, h('a', { href: cikis, class: 'ik-dugme', onclick: (e) => this.cikis(e) }, 'Oturumu kapat')) : null);
+      cikis ? h('div', { class: 'ik-kart-son' }, h('a', { href: cikis, class: 'ik-dugme', onclick: (e) => this.cikis(e, cikis) }, 'Oturumu kapat')) : null);
 
     // e. Klavye kısayolları: yalnız kabukta olanlar.
     const kisayol = [[MAC ? '⌘ K' : 'Ctrl K', 'Tüm katmanlarda ara'], ['↑ ↓', 'Arama sonuçlarında gez'], ['Enter', 'Seçili sonuca git'],
@@ -165,8 +165,10 @@ class IdexyaAyarlar extends HTMLElement {
     if (e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || !this.kabuk) return;
     if (!this.kabuk.dispatchEvent(new CustomEvent('idexya-kabuk:git', { detail: { url }, bubbles: true, cancelable: true }))) e.preventDefault();
   }
-  cikis() {
+  // Çıkış da modül bağlantısı gibi olay yayar: ürünün kendi çıkış rotası (ör. Creative /logout) tek sayfa uygulamada yakalanır.
+  cikis(e, url) {
     try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-kapali)-/.test(k) && localStorage.removeItem(k)); Object.keys(sessionStorage).forEach((k) => /^idx-/.test(k) && sessionStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
+    this.git(e, url);
   }
 }
 
