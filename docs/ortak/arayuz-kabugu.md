@@ -8,8 +8,8 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 
 | Sıra | Parça | İçerik |
 |---|---|---|
-| 1 | Paket çubuğu | En üst, tam genişlik, ~48 px, zemin Idexya turuncusu `#F07A23` (koyu temada `#E2691A`), üstündeki yazı ve simgeler lacivert `#15202B` (Muhittin, 15 Kas 2026). Solda lacivert rozet içinde Idexya X ve "Idexya" (ana ekrana döner), yanında modül sekmeleri, her birinin solunda kendi simgesi: IDOS (ana sayfa), Marketing, Website ve CRM, Creative. Seçili modülün altında 3 px lacivert çizgi. |
-| 2 | Menü ağacı | Solda; üç düzey: katman (Marketing, Website ve CRM, Creative) › grup başlığı › modül › sayfa. Modüller açılıp kapanır, altında sayfaları girintili listelenir. Grup başlığında yalnız ilk harf büyük. Daraltılabilir; daraltınca simgeler kalır. Başlıkta "tüm grupları aç / kapat" düğmesi; geniş menüde fareyle üzerine gelince kapalı grup açılır (Muhittin, 15 Kas 2026). |
+| 1 | Üst alan | En üst, tam genişlik, ~52 px, yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; talimat 4.2). Soldan sağa: IDOS kimliği (lacivert rozet içinde turuncu X ve "IDOS", ana ekrana döner), ürün yuvası (aktif müşteri seçimi, tarih aralığı), global arama (⌘K), veri eşitleme durumu, üst çubuğu sabitle, bildirimler, tema, kullanıcı menüsü. **Modül sekmesi ve mega menü yoktur**: modül gezinmesi yalnız sol menüdedir. Turuncu yalnız X logosunda ve sol menüdeki açık maddenin çizgisinde. |
+| 2 | Sol menü | Tek menü, 11 madde (talimat 4.2): Genel bakış, Müşteriler, Görevler ve onaylar, Marketing, CRM, Web ve Commerce, Creative, Marketplace (verisi yok; bayrakla açılır, bugün gizli), AI Center, Raporlar, Ayarlar. Yalnız açık maddenin (adresin bulunduğu) grupları ve sayfaları onun altında açılır: madde › grup › modül › sayfa. Tek gruplu maddede grup başlığı çizilmez; çok gruplu maddede başta yalnız etkin sayfanın grubu açıktır. Daraltılabilir; daraltınca madde simgeleri kalır. Başlıkta "tüm grupları aç / kapat"; geniş menüde fareyle üzerine gelince kapalı grup açılır. Veri almayan öğe menüye konmaz. Sayfalar bulundukları uygulamada kalır; bağlantı os.idexya.com'da yol önekine çevrilir. |
 | 3 | Sayfa sekmeleri | Açılan her sayfa sekme olur (en çok 8). Genel bakış ilk sırada ve kapatılamaz. × ile kapanır. |
 | 4 | Sayfa başlığı ve eylem çubuğu | Solda konum yolu ve başlık; sağda sırayla Yenile, Dışa aktar, Yazdır ve tek ana eylem (vurgu renginde). |
 | 5 | Süzgeç satırı | Müşteri, marka ya da site seçimi; dönem; süzgeç. Üst süzgeç sayfadaki her kartı etkiler. |
@@ -25,7 +25,8 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 | Çizgi | `#DCE1E8` | `#2F3D4A` |
 | Yazı | `#17202B` | `#E7ECF1` |
 | İkincil yazı | `#56606E` | `#A3AFBB` |
-| Paket çubuğu | `#F07A23` (yazı `#15202B`) | `#E2691A` (yazı `#15202B`) |
+| Üst alan (cam) | `rgba(255,255,255,.85)` + bulanıklık (yazı `#17202B`) | `rgba(21,32,43,.66)` + bulanıklık (yazı `#E7ECF1`) |
+| Turuncu çizgi (açık madde) | `#DE681B` | `#F07A23` |
 
 **Zemin ızgarası (Muhittin, 14 Kas 2026):** her modülün ve Ana ekranın zemininde idexya.com ana sayfasındaki
 gibi 64 px'lik hafif ızgara çizgileri bulunur. Çizgi rengi açıkta `rgba(0,37,89,.055)`, koyuda
@@ -34,16 +35,12 @@ Ana ekranda ızgara fareyi izleyen turuncu ışıkla birlikte belirginleşir.
 
 ## Modül renkleri
 
-Her modülün yalnız bir vurgu rengi vardır; ana düğme, seçili menü ve sekme çizgisi bu renktir.
-Renk, modülün X işaretiyle aynı ailedendir.
+Tek gezinmede (talimat 4.2) bütün maddelerin vurgusu aynıdır: açıkta `#2F55D4`, koyuda `#7F9AF2` (ana düğme, seçili
+menü öğesi, sekme çizgisi). Renk `katmanlar.json`'da madde başına yazılır; ileride ayrılabilir.
 
-| Modül | Vurgu (açık) | Paket çubuğunda simge rengi (lacivert rozet içinde) |
-|---|---|---|
-| Marketing | `#2F55D4` | `#7F9AF2` |
-| Website ve CRM | `#B84406` | `#F29A62` |
-| Creative | `#DC2626` | `#F87171` |
-
-Katman simgeleri (`katmanlar.json` `simge`): IDOS `ev`, Marketing `megafon`, Website ve CRM `dunya`, Creative `palet`.
+Madde simgeleri (`katmanlar.json` `simge`): Genel bakış `ev`, Müşteriler `kisiler`, Görevler ve onaylar `onay`, Marketing
+`megafon`, CRM `huni`, Web ve Commerce `dunya`, Creative `palet`, Marketplace `magaza`, AI Center `yildiz`, Raporlar `belge`,
+Ayarlar `ayar`.
 Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünür; görsel kabuğun parçasıdır, üç üründe aynıdır.
 
 ## Ortak parçalar
@@ -58,7 +55,7 @@ Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünü
 - Durum etiketi: yazı ve nokta birlikte; renk tek başına anlatmaz. Onaylandı, uygulandı ve etkisi doğrulandı ayrı etiketlerdir.
 - Tema: açık, koyu, sistem, zaman (gündüz açık, gece koyu; varsayılan 07.00–19.00 açık) dört seçenek. Üst çubuktaki tema
   düğmesi açılır pencere açmaz, tıklayınca dört seçenek arasında sırayla geçer; simge seçimi gösterir (Muhittin, 15 Kas 2026).
-- Ayarlar: yan menünün altındaki "Ayarlar" ayrı bir sayfaya gider (her üründe temel yolun altında `/settings`); sayfanın
+- Ayarlar: sol menünün "Ayarlar" maddesi ve profil menüsündeki "Ayarlar" ayrı bir sayfaya gider (her üründe temel yolun altında `/settings`); sayfanın
   içeriği ortak `<idexya-ayarlar>` bileşenidir (görünüm, arayüz, bölge, hesap, klavye kısayolları, modül ayarları;
   yalnız gerçekten çalışan ayarlar). Ayrıntı: `kabuk/README.md` "Tema ve Ayarlar sayfası".
 
@@ -72,7 +69,7 @@ Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünü
 Kaynak: Muhittin, 14 Kas 2026: "IDOS'un eski versiyonlarındaki gibi yamalar şeklinde olmasın; güvenlik, hız ve
 performans en önemli hususlar."
 
-1. **Tek kaynak, üç kopya değil.** Kabuk (paket çubuğu, mega menü, sayfa sekmeleri, durum çubuğu, tema düğmesi, Ayarlar sayfası içeriği,
+1. **Tek kaynak, üç kopya değil.** Kabuk (üst alan, sol menü, sayfa sekmeleri, durum çubuğu, tema düğmesi, Ayarlar sayfası içeriği,
    asistan düğmesi) bir kez yazılır: çatıdan bağımsız, bağımlılıksız bir web bileşeni (`<idexya-kabuk>`) ve ona ait
    tek CSS dosyası. Bu depoda tutulur, `ortak_esitle.sh` ile üç projeye birebir kopyalanır; projede elle düzenlenmez.
    Var olan kabuk kodunun üstüne ek katman yapılmaz; eski parça yenisi gelince silinir.
@@ -93,14 +90,10 @@ performans en önemli hususlar."
    içine yazarken JSON'daki her `<` karakterini `\u003c` olarak yazar (JS: `JSON.stringify(x).replace(/</g, '\\u003c')`,
    Python: `json.dumps(x).replace('<', '\\u003c')`). `&lt;` işe yaramaz; betik içinde HTML varlıkları çözülmez.
 
-## Mega menü (Muhittin, 14 Kas 2026)
+## Mega menü (kaldırıldı)
 
-Paket çubuğunda modül adına tıklamak modülün ana sayfasına götürür; yanındaki ok mega menüyü açar. Mega menü
-yarı saydam buzlu camdır (arkadaki sayfa bulanık görünür). Solda modülün adı ve açıklaması; yanında gruplar ve
-modüller. Bir modüle tıklayınca sayfaları akordeon gibi hemen altında açılır (aynı anda bir modül açık); ilk satır
-modülün ana sayfasıdır. Her sayfaya tek tıkla gidilir.
-Mega menü açıkken paket çubuğu etkin kalır (perde çubuğun altından başlar); başka bir modülün üzerine gelince mega
-menü o modüle geçer; Esc ve dışarı tıklama kapatır. Bir açılır panel (mega menü, arama, profil) açılınca diğerleri kapanır.
+14 Kas 2026'da gelen mega menü ve üst çubuktaki modül sekmeleri tek gezinme kararıyla (talimat 4.2) kaldırıldı: modüller
+yalnız sol menüdedir. Açılır paneller (arama, profil) birbirini kapatır; Esc ve dışarı tıklama kapatır.
 
 ## Sayfa hareketleri (Muhittin, 14 Kas 2026)
 
@@ -109,14 +102,14 @@ sayılar sıfırdan sayar, kart içi çizgi grafikler kendini çizer, tablo sat�
 durumlarının noktası yavaşça atar. Kartın üzerine gelince kart yükselir ve solunda modül renginde çizgi belirir.
 Hepsi `transform`/`opacity` ile ve bir kez çalışır; "hareketi azalt" açıksa kapalıdır.
 Giriş hareketleri ve sayaçlar sekmedeki ilk açılışta oynar; aynı oturumda sonraki sayfa yüklemelerinde kabuk ve içerik
-hemen son hâliyle çizilir. Çok sayfalı üründe sayfalar arası geçişte paket çubuğu, yan menü ve sekme satırı yerinde
+hemen son hâliyle çizilir. Çok sayfalı üründe sayfalar arası geçişte üst alan, yan menü ve sekme satırı yerinde
 kalır, yalnız içerik alanı kısa (150 ms) çapraz geçişle değişir (çapraz belge View Transitions; Muhittin, 14 Kas 2026:
 "tasarımdaki gibi hızlı geçsin"). Ayrıntı `kabuk/README.md`.
 
 ## Daraltılmış yan menü (Muhittin, 14 Kas 2026)
 
-Daraltınca her grup kendi simgesiyle durur (kısaltma ya da nokta yok); bulunulan grubun solunda modül renginde
+Daraltınca her madde kendi simgesiyle durur (kısaltma ya da nokta yok); bulunulan maddenin solunda turuncu
 işaret vardır. Simgenin üzerine gelince (ya da klavyeyle odaklanınca) sağa yarı saydam bir panel kayarak açılır:
-grup adı, modüller ve her modülün sayfaları. Başka simgeye geçince panel o hizaya kayar ve içerik sırayla yenilenir.
+madde adı (maddeye bağlantı), grup başlıkları, modüller ve her modülün sayfaları. Başka simgeye geçince panel o hizaya kayar ve içerik sırayla yenilenir.
 Fare panele geçerken kapanmaz (kısa bekleme); dışarı çıkınca ya da Esc ile kapanır. Geniş menüde de grup
 başlıkları aynı simgeleri taşır.

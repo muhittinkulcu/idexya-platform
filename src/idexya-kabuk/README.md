@@ -1,6 +1,6 @@
 # `<idexya-kabuk>`: ortak arayüz kabuğu
 
-Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: paket çubuğu, mega menü, arama
+Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: üst alan (cam), tek sol menü (11 madde), arama
 (komut paleti), tema düğmesi, Ayarlar sayfası (`<idexya-ayarlar>`), yan menü (geniş ve daraltılmış), sayfa sekmeleri, zemin ızgarası, asistan
 düğmesi ve sayfa hareketleri. Sözleşme: [`../arayuz-kabugu.md`](../arayuz-kabugu.md) (renkler, yerler,
 yapım kuralları). Onaylı tasarım: 14 Kas 2026 taslağı.
@@ -20,7 +20,7 @@ değiştirilmez (yapım kuralı 1).
 | `ayarlar.js` | `<idexya-ayarlar>`: ortak Ayarlar sayfasının içeriği (aşağıda "Ayarlar sayfası") | evet |
 | `kabuk.css` | Bütün stiller, renk değişkenleri, açık/koyu, hareketler, telefon düzeni | evet |
 | `README.md` | Bu belge | evet |
-| `katmanlar.json` | Dört katmanın ortak listesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); mega menü ve arama için | evet |
+| `katmanlar.json` | Sol menünün 11 maddesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); sol menü ve arama için | evet |
 | `kedi.webp` | Asistan düğmesinin kedisi (IDOS maskotu, Ankara kedisi; 200×200). `kabuk.css` göreli adresle (`url(kedi.webp)`) kullanır, ürünün paketleyicisi (Vite, Astro) dosyayı özetli adla yayar | evet |
 | `demo.html`, `demo.js`, `demo.css`, `demo-ayar.json` | Yerel deneme sayfası | hayır |
 | `test/` | Node birim testleri ve Playwright tarayıcı denemesi | hayır |
@@ -62,8 +62,9 @@ beklenmez. Örnek: idexya-platform `tools/panel-kabuk.mjs`. Tek sayfa uygulama (
 
 ### Sayfalar arası geçiş (çapraz belge View Transitions)
 
-`kabuk.css` çok sayfalı üründe aynı kökendeki geçişleri `@view-transition { navigation: auto }` ile açar: paket
-çubuğu (`ik-ust`), yan menü (`ik-yan`) ve sekme satırı (`ik-sekmeler`) adlandırılmış öğedir ve yerinde kalır, yalnız
+`kabuk.css` çok sayfalı üründe aynı kökendeki geçişleri `@view-transition { navigation: auto }` ile açar: yan
+menü (`ik-yan`) ve sekme satırı (`ik-sekmeler`) adlandırılmış öğedir ve yerinde kalır (üst alan adlandırılmaz, camı bozulur;
+her sayfada aynı olduğundan geçişte fark görünmez), yalnız
 içerik alanı (`ik-icerik`) 150 ms çapraz geçişle değişir. "Hareketi azalt" açıksa geçiş yoktur. Tek sayfa uygulamada
 etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boyamadan önce kurulmalıdır (yukarıdaki bölüm).
 
@@ -71,12 +72,14 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 
 ```jsonc
 {
-  "katman": "marketing",                 // geçerli katman: idos | marketing | website | creative
-  "katmanlar": [{ "anahtar": "idos", "ad": "IDOS", "simge": "ev", "url": "https://os.idexya.com/", "renk": "#C2510F", "renkKoyu": "#F07A23", "gruplar": [] }, {
-    "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // katman simgesi (simge adı, aşağıda)
-    "url": "https://marketing.idexya.com/", // katman ana sayfası (ilk sekme "Genel bakış" buraya gider)
-    "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada ve paket çubuğunda vurgu (#RRGGBB)
-    "aciklama": "Mega menünün solundaki açıklama",
+  "katman": "marketing",                 // ürünün varsayılan maddesi (adres menüde yoksa açık olan): genel | musteriler | gorevler |
+                                         // marketing | crm | web | creative | marketplace | ai | raporlar | ayarlar
+  "bayraklar": [],                       // isteğe bağlı: bayraklı maddeleri açar (ör. "marketplace"); verilmeyen bayraklı madde çizilmez
+  "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://os.idexya.com/", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
+    "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // madde simgesi (simge adı, aşağıda)
+    "url": "https://marketing.idexya.com/dashboard", // maddenin adresi (sol menüdeki satır buraya gider; ağaçta da olmalı)
+    "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada vurgu (#RRGGBB)
+    "aciklama": "Kısa açıklama",
     "gruplar": [{
       "baslik": "Reklam", "simge": "megafon", // simge adları aşağıda
       "moduller": [{ "ad": "Meta", "url": "/meta", "rozet": 3, // rozet isteğe bağlı: yeni iş sayısı
@@ -95,19 +98,22 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 }
 ```
 
-- IDOS katmanının (ana ekran) adresi tek adresin köküdür: `https://os.idexya.com/` (15 Kas 2026; önceden
-  `https://marketing.idexya.com/dashboard`). Ana ekranı IDOS uygulaması üretir, yönlendirici kökte yönlendirmesiz sunar
-  (`tek-adres-plani.md` "Ana ekran").
-- `idos` katmanının `gruplar` listesi boştur: ok düğmesi, yan menü ve sekmeler çizilmez; logo ("Idexya") ona gider.
-- Gruplar boşsa (ya da katman `idos` ise) yan menü ve sekme satırı çizilmez.
+- **Tek gezinme** (talimat 4.2): "katman" sol menünün bir maddesidir. Sol menüde bütün maddeler alt alta durur; **açık madde**
+  adresten bulunur (`etkinKatman`: önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri değilse `katman`). Yalnız açık
+  maddenin grupları ve sayfaları onun altında açılır. Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
+- Üst alanda modül sekmesi ve mega menü **yoktur**. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
+- Genel bakış maddesinin adresi tek adresin köküdür: `https://os.idexya.com/`. Ana ekranı IDOS uygulaması üretir,
+  yönlendirici kökte yönlendirmesiz sunar (`tek-adres-plani.md` "Ana ekran").
+- **Bayrak**: `bayrak` alanı olan madde (Marketplace: verisi yok) ürün `bayraklar` listesinde açmadıkça sessizce atılır;
+  açılsa da adresi yoksa çizilmez (çalışmayan ekran gösterilmez).
+- Madde listesi boşsa yan menü ve sekme satırı çizilmez.
 - **Rozet** (Muhittin, 14 Kas 2026): modül ve sayfada isteğe bağlı `rozet` (sayı). Yan menüde, daraltılmış
-  paneldeki modül satırında ve mega menüde turuncu küçük sayı olarak görünür; 0 ya da yoksa görünmez. Bağlantının
+  paneldeki modül satırında turuncu küçük sayı olarak görünür; kapalı maddenin satırında ve daraltılmış raydaki simgede
+  içindekilerin toplamı görünür (`katmanRozeti`). 0 ya da yoksa görünmez. Bağlantının
   erişilebilir adına "N yeni" eklenir. 99'dan büyükse "99+". Sonradan `rozetYap(url, sayi)` ile güncellenir.
-- **Katman simgesi** (Muhittin, 15 Kas 2026; 14 Kas'taki "modül simgesi yok" kararının katman için değişikliği): her katmanın
-  `simge` alanı (simge adı) `katmanlar.json`'da verilir; kabuk paket çubuğundaki katman sekmesinin solunda, mega menünün başlığında
-  ve ⌘K aramasında o katmanın sayfa satırlarında çizer. Simge, katmanın koyu tema rengiyle (`renkKoyu`) lacivert rozet içindedir
-  (renk kimliği turuncu çubukta da seçilir). Eksik ya da bilinmeyen ad anahtarın varsayılanına döner: IDOS `ev`, Marketing
-  `megafon`, Website ve CRM `dunya`, Creative `palet`. SVG yolu kabul edilmez (yalnız ad; dışarıdan çizim verisi alınmaz).
+- **Madde simgesi**: her maddenin `simge` alanı (simge adı) `katmanlar.json`'da verilir; kabuk sol menü satırında, daraltılmış
+  rayda, uçan panelin başlığında ve ⌘K aramasında o maddenin sayfa satırlarında çizer. Eksik ya da bilinmeyen ad anahtarın
+  varsayılanına döner (`KATMAN_SIMGE`). SVG yolu kabul edilmez (yalnız ad; dışarıdan çizim verisi alınmaz).
 - **Asistan kedisi** (Muhittin, 15 Kas 2026: "ben kediyi sevmiştim"): asistan düğmesinin görseli kabuğun parçasıdır
   (`kedi.webp`, eşitlemeyle gelir); üç üründe aynıdır. Ayardaki `asistan.gorsel` yok sayılır. Düğme yalnız ürün `asistan`
   verdiğinde (asistan paneli olan üründe) çizilir.
@@ -122,18 +128,20 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   `Eşitleme —` görünür (bilinmeyen değer 0 değil "—").
 
 Simge adları (grup ve katman): `ev`, `izgara`, `megafon`, `grafik`, `yildiz`, `belge`, `gelen`, `kisiler`, `dunya`, `esitle`,
-`takvim`, `gorsel`, `palet`, `ayrac`. Grupta bilinmeyen ad `izgara` olur.
+`takvim`, `gorsel`, `palet`, `ayrac`, `onay`, `huni`, `magaza`, `ayar`. Grupta bilinmeyen ad `izgara` olur.
 
-**Paket çubuğu rengi** (Muhittin, 15 Kas 2026: "üstteki lacivert bar turuncu olsun"): zemin Idexya turuncusu `--ik-paket`
-(idexya.com `--brand` `#F07A23`; koyu temada `#E2691A`), üstündeki yazı, simge, arama kutusu, durum kapsülü ve etkin katman
-çizgisi lacivert `--ik-paket-yazi` `#15202B` (karşıtlık açıkta 5,8:1, koyuda 4,9:1; WCAG AA, `test/yapim-kurallari.test.mjs`
-denetler). Beyaz yazı turuncuda 2,8:1 olduğu için kullanılmaz. Idexya X logosu ve katman simgeleri lacivert rozet içindedir;
-sabitleme düğmesi basılıyken lacivert dolgu alır. Arama kutusu açık temada beyaz, koyu temada lacivert; açılır menüler (mega,
-arama sonuçları, profil) koyu cam olarak kalır.
+**Üst alan** (talimat 4.2, "A, cam"): yarı saydam buzlu cam, temaya uyan (açıkta `rgba(255,255,255,.85)`, koyuda
+`rgba(21,32,43,.66)`; bulanıklık `.ik-ust::before` üzerinde). İçerik soldan sağa: IDOS kimliği, **ürün yuvası** (`ustYuva`;
+aktif müşteri seçimi ve tarih aralığı gibi ürünün denetimleri), arama, veri eşitleme durumu (1280 px altında yalnız saat),
+sabitleme, bildirimler, tema, kullanıcı menüsü. Turuncu (`--ik-turuncu`: açıkta `#DE681B`, koyuda `#F07A23`; yüzeyde en az
+3:1) yalnız X logosunda ve sol menüdeki açık maddenin 2 px çizgisindedir. `.ik-ust` adlandırılmış görünüm geçişi almaz
+(`view-transition-name` öğeyi "backdrop root" yapar, cam arkadaki sayfayı göremez). Açılır menüler (arama sonuçları, profil)
+koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satırdadır.
 
-**Tüm grupları aç / kapat** (Muhittin, 15 Kas 2026): yan menü başlığında ("Katman" satırı), daraltma düğmesinin solunda simge
-düğme. Hiç kapalı grup yoksa "Tüm grupları kapat", varsa "Tüm grupları aç" (`aria-label` ve `title`, simge de değişir). Seçim
-`idx-yan-kapali-<katman>` kaydında saklanır. Daraltılmış (dar) yan menüde ve tek gruplu katmanda çizilmez; telefonda çekmecede görünür.
+**Tüm grupları aç / kapat** (Muhittin, 15 Kas 2026): yan menü başlığında ("Menü" satırı), daraltma düğmesinin solunda simge
+düğme; açık maddenin gruplarına etki eder. Hiç kapalı grup yoksa "Tüm grupları kapat", varsa "Tüm grupları aç". Seçim
+`idx-yan-kapali-<madde>` kaydında saklanır; kayıt yoksa dörtten çok gruplu maddede yalnız etkin sayfanın grubu açık başlar.
+Daraltılmış (dar) yan menüde ve tek gruplu maddede çizilmez (tek gruplu maddede grup başlığı da çizilmez).
 
 **Üzerine gelince açılan grup** (Muhittin, 15 Kas 2026: "Sidebar açıkken modüllerin üzerine geldiğimde otomatik olarak açılsın
 alt menüleri"): geniş yan menüde fare kapalı bir grubun üzerinde 150 ms durunca grup geçici açılır (kayıt değişmez). Fare
@@ -144,22 +152,26 @@ sayfanın grubu ve odağı içeren grup açık kalır; geçici açık grup tıkl
 Açılıp kapanma yükseklik geçişiyledir (`grid-template-rows` 0fr ↔ 1fr), "hareketleri azalt"ta geçiş yoktur. Gruplar her zaman
 çizilir, kapalı olan CSS ile gizlenir (`visibility`, odak almaz); açıp kapamak ağacı yeniden kurmaz, kaydırma yerinde kalır.
 
-## Katman listesi (`katmanlar.json`)
+## Sol menü listesi (`katmanlar.json`)
 
-Üç ürün aynı katman listesini kullanır; böylece mega menüde ve aramada diğer katmanların **gerçek** modülleri
-görünür. Dosya `{ "surum": 1, "katmanlar": [...] }` biçimindedir; `katmanlar` ayar şemasındaki katman nesneleridir
-(adresler mutlak `https://`). Her ürün ayarını yazarken:
+Üç ürün aynı listeyi kullanır: sol menü her üründe aynıdır. Dosya `{ "surum": 2, "katmanlar": [...] }` biçimindedir;
+`katmanlar` ayar şemasındaki madde nesneleridir (adresler mutlak `https://`, sayfalar bulundukları uygulamanın kökeninde).
+Eşleme (talimat 4.2): Marketing → IDOS Meta ve Google Ads sayfaları; CRM → IDOS CRM ve satış hattı + Panel talep, teklif,
+belge ve finans sayfaları (Panel adresinde bağlantı); Web ve Commerce → Panel site yönetimi ve site analizi + IDOS GA4,
+Search Console, Tag Manager, Merchant ve İşletme profili; Creative → Creative uygulaması; AI Center → IDOS sabah masası,
+analizler, öneri döngüsü, gelen kutusu + Panel asistan sohbetleri; Raporlar → IDOS rapor sayfaları; Genel bakış, Müşteriler,
+Görevler ve onaylar → IDOS (+ Panel hesap envanteri, müşteri alanı, görevler ve bildirimler); Ayarlar → üç ürünün ayar
+sayfaları. Her ürün ayarını yazarken:
 
 1. `katmanlar.json` içindeki listeyi alır;
-2. **kendi katmanını kendi menüsünden ezer** (göreli adreslerle, yetkiye göre süzülmüş hâliyle);
+2. **kendi kökenindeki adresleri** göreli adrese (temel yol dahil) çevirir ve yetkiye göre süzer (kendi menüsünde olmayan ya da
+   oturumun göremeyeceği sayfa atılır; yalnız ona özel sayfaları kendisi ekler, ör. IDOS süper admin sayfaları);
 3. sonucu `katmanlar` alanına koyar.
 
-Liste elle güncellenir; kaynaklar: Marketing `idexya-agency-os/web/src/lib/moduller.ts` (`MODÜLLER`: modül → grup,
-bölüm → modül, öğe → sayfa; `yok` ve `süperAdmin` öğeleri konmaz), Website ve CRM `idexya-platform/src/data/panel-menu.js`
-(adressiz "Yakında" öğeleri konmaz), Creative `idexya-creative-os/web/src/lib/rotalar.ts` (`ANA_MENÜ` ve sekme listeleri;
-gruplar `web/src/lib/kabuk.ts` `KABUK_GRUPLARI`, hesap sahibine özel "Doğrula" sayfası konmaz; Creative'in testi bu listeyle
-kendi menüsünü karşılaştırır).
-Bir ürünün menüsü değişince bu dosya da güncellenir; `test/katmanlar.test.mjs` dosyanın doğrulamadan kayıpsız geçtiğini denetler.
+Liste elle güncellenir; kaynaklar: Marketing `idexya-agency-os/web/src/lib/moduller.ts` (`yok` ve `süperAdmin` öğeleri
+konmaz), Website ve CRM `idexya-platform/src/data/panel-menu.js` (adressiz "Yakında" öğeleri konmaz), Creative
+`idexya-creative-os/web/src/lib/rotalar.ts` (hesap sahibine özel "Doğrula" sayfası konmaz). Her ürünün testi bu listeyi kendi
+menüsüyle karşılaştırır. `test/katmanlar.test.mjs` sırayı, bayrağı, adres tekliğini ve eşlemeyi denetler.
 
 ## Olaylar ve yöntemler
 
@@ -190,12 +202,13 @@ orta tık tarayıcıya bırakılır (yeni sekme).
 | `durumYap({ baglanti, esitleme })` | Durum kapsülünü günceller |
 | `rozetYap(url, sayi)` | Modül ya da sayfa rozetini günceller (0 gizler) |
 | `kullaniciYap({ ad, rol, eposta })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
-| `kapat()` | Açık açılırı (mega, arama, profil) kapatır |
+| `kapat()` | Açık açılırı (arama, profil) kapatır |
+| `ustYuva` | Üst alandaki ürün yuvası (öğe): ürün aktif müşteri, tarih gibi denetimlerini içine koyar (React: `createPortal`); kabuğun genel öğe kuralları yuvaya karışmaz |
 | `gorunumYap({ tema?, zamanAcik?, zamanKoyu?, azHareket? })` | Görünümü değiştirir, kaydeder, uygular, `idexya-kabuk:gorunum` yayar |
 | `gorunum` | Geçerli görünüm `{ tema, zamanAcik, zamanKoyu, azHareket }` (kopya) |
 | `sabitle(acik)`, `darYap(dar)` | Üst çubuğu sabitler; yan menüyü daraltır (ikisi de kaydedilir) |
 | `aramaKaynagiEkle({ ad, ara })` | ⌘K aramasına ürünün kendi sonuçlarını ekler (aşağıda "Arama kaynağı"); kaldıran işlevi döndürür |
-| `konum` | `{ katman, grup, ad }` — ürünün konum yolu ve başlığı için |
+| `konum` | `{ katman, grup, ad }` — açık maddenin adı, grup ve sayfa adı (konum yolu ve başlık için) |
 
 ## Arama kaynağı (`aramaKaynagiEkle`)
 
@@ -250,7 +263,7 @@ ayarından okur. Bölümler (yalnız gerçekten çalışan ayarlar; karşılığ
 | Bölüm | Ne |
 |---|---|
 | Görünüm | Dört tema (radyo grubu, kart); Zaman seçiliyse "Açık tema başlar" ve "Koyu tema başlar" saatleri (aynı saat reddedilir) |
-| Arayüz | Üst çubuğu sabitle (`idx-ust-sabit`), yan menüyü daraltılmış göster (`idx-yan-dar`; yalnız yan menüsü olan katmanda), hareketleri azalt |
+| Arayüz | Üst çubuğu sabitle (`idx-ust-sabit`), yan menüyü daraltılmış göster (`idx-yan-dar`), hareketleri azalt |
 | Bölge | Tarayıcının saat dilimi ve tarih, saat, sayı, tutar, oran örnekleri (salt gösterim) |
 | Hesap | `kullanici` (ad, e-posta, rol) salt okuma; "Oturumu kapat" `cikisUrl`'ye (yoksa os.idexya.com'da `/cdn-cgi/access/logout`) |
 | Klavye kısayolları | Kabukta gerçekten olanlar: ⌘K / Ctrl K, ↑ ↓, Enter, Esc, → |
@@ -280,7 +293,7 @@ açılışı) oynamaz, kabuk ve içerik hemen son hâliyle çizilir. Sonraki `et
 hareketler yine oynar.
 
 Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuzey`, `--ik-gomuk`,
-`--ik-cizgi`, `--ik-metin`, `--ik-ikincil`, `--ik-paket`, `--ik-izgara`; katman vurgusu `--ik-vurgu`,
+`--ik-cizgi`, `--ik-metin`, `--ik-ikincil`, `--ik-turuncu`, `--ik-izgara`, üst alan `--ik-cu-*`; madde vurgusu `--ik-vurgu`,
 `--ik-vurgu-yazi`, `--ik-yumusak`. Yazı: `--ik-yazi` (aile), `--w-ince`, `--w-govde`, `--w-orta`,
 `--w-vurgu`. Bileşenlerde sabit kalınlık sayısı yazılmaz.
 
@@ -289,15 +302,15 @@ Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuz
 **Kural:** sekme adına ya da adresine ve menü adına müşteri ya da kişi adı konmaz (sekme adı menüdeki
 sayfa adından gelir; müşteri kartı gibi sayfalarda `etkin.ad` genel tutulur, ör. "Müşteri kartı"). Saklanan
 sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adresse geri yüklenir. Profil menüsündeki
-"Çıkış yap" `idx-sekme-*` ve `idx-yan-kapali-*` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
+"Çıkış yap" `idx-sekme*` ve `idx-yan-kapali-*` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
 anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
 |---|---|
 | `idx-gorunum` | `{ tema: acik\|koyu\|sistem\|zaman, zamanAcik: 420, zamanKoyu: 1140, azHareket: false }` (zaman: gün içindeki dakika) |
-| `idx-sekme-<katman>` | Açık sekmeler `[{ ad, url }]`, en çok 8 |
+| `idx-sekme` | Açık sekmeler `[{ ad, url }]`, en çok 8 (tek liste; ilk sekme ana ekran; adı bilinmeyen adres sekme olmaz) |
 | `idx-yan-dar` | Yan menü daraltılmış mı |
-| `idx-yan-kapali-<katman>` | Kapalı grup başlıkları |
+| `idx-yan-kapali-<madde>` | Açık maddenin kapalı grup başlıkları |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
 | `idx-acildi` (`sessionStorage`) | Bu sekmede kabuk daha önce açıldı mı (giriş hareketleri yalnız ilk açılışta) |
 

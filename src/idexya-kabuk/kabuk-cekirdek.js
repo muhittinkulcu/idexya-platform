@@ -1,8 +1,12 @@
 // Kabuğun saf işlevleri (DOM yok). Ayrıntı: README.md.
 
-export const KATMAN_ANAHTARLARI = ['idos', 'marketing', 'website', 'creative'];
-// Katman simgesi katmanlar.json'da (`simge`, SIMGE adı) verilir; yoksa ya da bilinmiyorsa bu varsayılan (Muhittin, 15 Kas 2026).
-export const KATMAN_SIMGE = { idos: 'ev', marketing: 'megafon', website: 'dunya', creative: 'palet' };
+// Tek gezinme (Muhittin, talimat 4.2): sol menü 11 maddedir; "katman" artık sol menünün bir maddesidir (modül). Sıra katmanlar.json'dadır.
+export const KATMAN_ANAHTARLARI = ['genel', 'musteriler', 'gorevler', 'marketing', 'crm', 'web', 'creative', 'marketplace', 'ai', 'raporlar', 'ayarlar'];
+// Madde simgesi katmanlar.json'da (`simge`, SIMGE adı) verilir; yoksa ya da bilinmiyorsa bu varsayılan.
+export const KATMAN_SIMGE = {
+  genel: 'ev', musteriler: 'kisiler', gorevler: 'onay', marketing: 'megafon', crm: 'huni', web: 'dunya', creative: 'palet',
+  marketplace: 'magaza', ai: 'yildiz', raporlar: 'belge', ayarlar: 'ayar'
+};
 export const SEKME_SINIRI = 8;
 export const ARAMA_SINIRI = 14;
 export const KAYNAK_SINIRI = 8, KAYNAK_GECIKME = 150;
@@ -22,7 +26,11 @@ export const SIMGE = {
   esitle: ['M21 12a9 9 0 0 1-15.5 6.2L3 16', 'M3 12a9 9 0 0 1 15.5-6.2L21 8', 'M21 3v5h-5', 'M3 21v-5h5'],
   takvim: ['M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', 'M16 2v4', 'M8 2v4', 'M3 10h18'],
   gorsel: ['M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z', 'M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z', 'M21 15l-5-5L5 21'],
-  ayrac: ['M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z']
+  ayrac: ['M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'],
+  onay: ['M9 11l3 3 8-8', 'M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9'],
+  huni: ['M3 4h18l-7 8v6l-4 2v-8z'],
+  magaza: ['M4 9l1.5-5h13L20 9', 'M4 9h16v2a3 3 0 0 1-5.3 1.9A3 3 0 0 1 12 14a3 3 0 0 1-2.7-1.1A3 3 0 0 1 4 11z', 'M5 13.5V20h14v-6.5', 'M10 20v-4h4v4'],
+  ayar: ['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1']
 };
 
 // Tema dört seçenek (Muhittin, 15 Kas 2026). Yazı tipi (Inter) ve kalınlık (Zarif: 300/350/400/500) sabittir, kabuk.css :root.
@@ -79,10 +87,16 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
   const a = ham && typeof ham === 'object' ? ham : (hatalar.push('ayar nesne değil'), {});
   const katmanlar = [], ham2 = Array.isArray(a.katmanlar) ? a.katmanlar : [];
   const O = (x) => osAdresi(x, alan);
-  const kokenler = ham2.map((k) => k && koken(O(k.url))).filter(Boolean);
+  // Bayraklı madde (Marketplace: verisi yok) yalnız ürün `bayraklar` listesinde açtıysa çizilir; kapalıyken sessizce atılır
+  // (çalışmayan ekran gösterilmez, talimat 4.2).
+  const bayraklar = metinListesi(a.bayraklar);
+  const acik = (k) => !(k && typeof k.bayrak === 'string' && !bayraklar.includes(k.bayrak));
+  const kokenler = ham2.filter(acik).map((k) => k && koken(O(k.url))).filter(Boolean);
   const U = (x) => guvenliUrl(O(x), kokenler);
   ham2.forEach((k, ki) => {
     if (!k || !KATMAN_ANAHTARLARI.includes(k.anahtar)) { hatalar.push('katman ' + ki + ': bilinmeyen anahtar'); return; }
+    if (!acik(k)) return;
+    if (katmanlar.some((x) => x.anahtar === k.anahtar)) { hatalar.push(k.anahtar + ': iki kez'); return; }
     const url = U(k.url);
     if (!url) { hatalar.push(k.anahtar + ': geçersiz url'); return; }
     const renk = renkGecerli(k.renk) ? k.renk : '#2F55D4';
@@ -121,7 +135,7 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
   return {
     hatalar,
     ayar: {
-      katman, katmanlar, eylemler, kokenler,
+      katman, katmanlar, eylemler, kokenler, bayraklar,
       etkin: { modulUrl: U(e.modulUrl), sayfaUrl: U(e.sayfaUrl), ad: metin(e.ad) },
       kullanici: { ad: metin(kul.ad) || 'Kullanıcı', rol: metin(kul.rol), eposta: metin(kul.eposta, 254) },
       durum: { baglanti: d.baglanti === true ? true : d.baglanti === false ? false : null, esitleme: metin(d.esitleme, 40) },
@@ -149,6 +163,24 @@ export function etkinBul(katman, etkin) {
   }));
   r.ad = (etkin && etkin.ad) || (r.sayfa ? r.modul.ad + ' › ' + r.sayfa.ad : r.modul ? r.modul.ad : '');
   return r;
+}
+
+// Etkin madde (sol menüde açık olan): adresin bulunduğu madde. Önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri
+// değilse ürünün varsayılan maddesi (`ayar.katman`). Aynı adres iki maddede olmamalı (katmanlar.test.mjs denetler).
+export function etkinKatman(katmanlar, etkin, varsayilan) {
+  const su = etkin && etkin.sayfaUrl, mu = etkin && etkin.modulUrl;
+  const bul = (f) => katmanlar.find((k) => k.gruplar.some((g) => g.moduller.some(f)));
+  return (su && bul((m) => m.sayfalar.some((s) => s.url === su)))
+    || bul((m) => (mu && m.url === mu) || (su && m.url === su))
+    || katmanlar.find((k) => (su && k.url === su) || (mu && k.url === mu))
+    || katmanlar.find((k) => k.anahtar === varsayilan) || katmanlar[0] || null;
+}
+// Maddenin rozeti: içindeki modül ve sayfa rozetlerinin toplamı (madde kapalıyken satırında görünür).
+export function katmanRozeti(katman, rozet) {
+  const u = new Set();
+  katman.gruplar.forEach((g) => g.moduller.forEach((m) => { u.add(m.url); m.sayfalar.forEach((s) => u.add(s.url)); }));
+  let n = 0; u.forEach((x) => { n += rozet[x] || 0; });
+  return n;
 }
 
 export function aramaHavuzu(ayar) {

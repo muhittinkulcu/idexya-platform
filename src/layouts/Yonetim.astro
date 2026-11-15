@@ -1,6 +1,6 @@
 ---
 // Yönetim paneli yerleşimi (Website ve CRM katmanı). İskelet idexya-ortak'taki ortak kabuk <idexya-kabuk>:
-// paket çubuğu, mega menü, arama, tema düğmesi, yan menü (altında Ayarlar bağlantısı), sayfa sekmeleri (src/idexya-kabuk, scripts/ortak_esitle.sh ile
+// üst alan (cam), tek sol menü (11 madde), arama, tema düğmesi, sayfa sekmeleri (src/idexya-kabuk, scripts/ortak_esitle.sh ile
 // eşitlenir; elle düzenlenmez). Bu dosya yalnız kabuğun ayarını yazar ve sayfa başlığını, eylem çubuğunu ve içeriği verir.
 // Sayfa verisi tarayıcıda /api/yonetim/* uçlarından okunur; sayfalar derlemede veri içermez.
 import { MENU, menuAdi } from '../data/panel-menu.js';
@@ -20,19 +20,12 @@ const modul = grup ? grup.ogeler.find((o) => o.k === aktif) : null;
 const grupAdi = grup && grup.ad !== 'Özet' ? grup.ad : yol;
 const modulYolda = modul && modul.href && modul.ad !== baslik;
 
-// Kabuk ayarı (idexya-ortak kabuk/README.md "Ayar şeması"). Katman listesi ortak (katmanlar.json); bu katman kendi menüsünden
-// ezilir: adresi olmayan ("Yakında") modül ve sayfa konmaz. Grup simgeleri: Muhittin, 14 Kas 2026.
-const GRUP_SIMGE = { 'Özet': 'izgara', 'Satış': 'kisiler', 'Pazarlama ve iletişim': 'megafon', 'Web sitesi': 'dunya', 'Analiz': 'grafik', 'Üyelik ve erişim': 'kisiler', 'Finans': 'belge', 'Sistem': 'esitle' };
-const gruplar = MENU.map((g) => ({
-  baslik: g.ad,
-  simge: GRUP_SIMGE[g.ad] || 'izgara',
-  moduller: g.ogeler.filter((o) => o.href).map((o) => ({
-    ad: o.ad,
-    url: o.href,
-    sayfalar: (o.altlar || []).filter((a) => a.href).map((a) => ({ ad: a.ad, url: a.href }))
-  }))
-}));
-const katmanlar = ORTAK.katmanlar.map((k) => (k.anahtar === 'website' ? { ...k, url: '/dashboard', gruplar } : k));
+// Kabuk ayarı (idexya-ortak kabuk/README.md "Ayar şeması"). Sol menü ortak katmanlar.json'dur (tek gezinme, talimat 4.2: 11 madde;
+// panel sayfaları CRM, Web ve Commerce, Görevler ve onaylar, Müşteriler, AI Center ve Ayarlar maddelerinde). Panelin kendi
+// sayfaları (panel.idexya.com) göreli adrese çevrilir; panel menüsünde (panel-menu.js) adresi olmayan sayfa atılır.
+// Öteki ürünlerin sayfaları kendi adreslerinde bağlantıdır. Eşleme denetimi: tools/test-panel-menu.mjs.
+import { ortakMenu } from '../data/ortak-menu.js';
+const katmanlar = ortakMenu(ORTAK.katmanlar, MENU);
 // "+ Yeni oluştur": sayfanın eylem çubuğunda menü, kabuk aramasında eylem olarak çıkar.
 const YENI = [
   { grup: 'Web sitesi', ad: 'Blog yazısı', eylem: 'Yeni blog yazısı', aciklama: 'Sitedeki blogda yayınlanır', url: '/site-content?file=posts&new=1' },
@@ -53,12 +46,12 @@ const AYAR_ACIKLAMA = { entegre: 'Bağlı hizmetler ve bağlantı durumu', esitl
 const AYAR_BAGLANTILARI = MENU.flatMap((g) => g.ogeler).filter((o) => o.href && AYAR_ACIKLAMA[o.k]).map((o) => ({ ad: o.ad, url: o.href, aciklama: AYAR_ACIKLAMA[o.k] }));
 // Etkin sayfa derlemede modül adresidir; gerçek adres (?tab= dahil) tarayıcıda kabuk kurulmadan önce yazılır (kabuk-bagla.js).
 const ayar = {
-  katman: 'website',
+  katman: 'web',
   katmanlar,
   etkin: { modulUrl: modul && modul.href ? modul.href : null, sayfaUrl: modul && modul.href ? modul.href : null, ad: '' },
   kullanici: { ad: 'Kullanıcı', rol: '' },
   durum: { baglanti: null, esitleme: '' },
-  eylemler: YENI.map((y) => ({ ad: y.eylem, url: y.url, katman: 'website' })),
+  eylemler: YENI.map((y) => ({ ad: y.eylem, url: y.url, katman: 'web' })),
   bildirimUrl: '/notifications',
   cikisUrl: '/cdn-cgi/access/logout',
   // Ayarlar sayfası (Muhittin, 15 Kas 2026): yan menünün altındaki Ayarlar buraya gider; sayfanın üstünde ortak <idexya-ayarlar>.

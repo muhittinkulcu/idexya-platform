@@ -9,7 +9,11 @@
 import { api, genelHata, sayacGuncelle, rozetSayilari, saklananVeri, tarih, yol, panelYolu, TEMEL } from './ortak.js';
 import { metaOku } from '../../data/temel-yol.js';
 
-let ayar = null, katman = null, sonUrl = null;
+let ayar = null, sonUrl = null;
+// Tek gezinme (talimat 4.2): panel sayfaları sol menünün birçok maddesinde (CRM, Web ve Commerce, Görevler, Ayarlar…). Panelin
+// kendi sayfaları göreli adreslidir (Yonetim.astro); öteki ürünlerin tam adresleri aynen kalır.
+const kendi = (u) => typeof u === 'string' && u.startsWith('/') && !u.startsWith('//');
+const herModul = (f) => ayar.katmanlar.forEach((k) => k.gruplar.forEach((g) => g.moduller.forEach(f)));
 // Menüdeki adresler ve menünün kullandığı adres seçenekleri (tab, file). Sekme ve vurgu yalnız menü adresine bağlanır:
 // ?id= gibi kayıt seçimleri yeni sekme açmaz (üye, yazı, teklif seçmek "Üyeler" sekmesinde kalır).
 const MENU_URL = new Set();
@@ -47,23 +51,24 @@ const durumOzet = (o) => { const son = o.reklam && o.reklam.son; return { baglan
 document.addEventListener('idexya-kabuk:kur', () => {
   const AYAR = document.getElementById('idexya-kabuk-ayar');
   try { ayar = JSON.parse(AYAR ? AYAR.textContent : 'null'); } catch (e) { ayar = null; }
-  katman = ayar && Array.isArray(ayar.katmanlar) ? ayar.katmanlar.find((k) => k.anahtar === ayar.katman) : null;
-  if (!ayar || !katman || !AYAR) return;
-  // Temel yol (os.idexya.com/website): bu katmanın kök göreli adresleri önekli olur. Diğer katmanların tam adresleri ve
+  if (!ayar || !Array.isArray(ayar.katmanlar) || !AYAR) { ayar = null; return; }
+  // Temel yol (os.idexya.com/website): panelin kök göreli adresleri önekli olur. Öteki ürünlerin tam adresleri ve
   // çıkış adresi (/cdn-cgi/access/logout, Access'in alan kökündeki ucu) aynen kalır. Önek boşsa hiçbir şey değişmez.
   if (TEMEL) {
-    katman.url = yol(katman.url);
-    katman.gruplar.forEach((g) => g.moduller.forEach((m) => { m.url = yol(m.url); m.sayfalar.forEach((s) => { s.url = yol(s.url); }); }));
+    const y = (u) => (kendi(u) ? yol(u) : u);
+    ayar.katmanlar.forEach((k) => { k.url = y(k.url); });
+    herModul((m) => { m.url = y(m.url); m.sayfalar.forEach((s) => { s.url = y(s.url); }); });
     (ayar.eylemler || []).forEach((e) => { if (e) e.url = yol(e.url); });
     if (ayar.bildirimUrl) ayar.bildirimUrl = yol(ayar.bildirimUrl);
     if (ayar.ayarlarUrl) ayar.ayarlarUrl = yol(ayar.ayarlarUrl);
     (ayar.ayarBaglantilari || []).forEach((b) => { if (b) b.url = yol(b.url); });
     if (ayar.etkin) ['modulUrl', 'sayfaUrl'].forEach((k) => { if (ayar.etkin[k]) ayar.etkin[k] = yol(ayar.etkin[k]); });
   }
-  katman.gruplar.forEach((g) => g.moduller.forEach((m) => {
+  herModul((m) => {
+    if (!kendi(m.url)) return;
     MENU_URL.add(m.url);
-    m.sayfalar.forEach((s) => { MENU_URL.add(s.url); if (s.url !== m.url) ALT_AD.set(s.url, s.ad); });
-  }));
+    m.sayfalar.forEach((s) => { if (kendi(s.url)) { MENU_URL.add(s.url); if (s.url !== m.url) ALT_AD.set(s.url, s.ad); } });
+  });
   MENU_URL.forEach((u) => new URL(u, location.origin).searchParams.forEach((v, k) => MENU_PARAM.add(k)));
   ayar.etkin = etkin();
   // Oturumdaki kullanıcı (Worker'ın yazdığı meta) ve bu oturumda son alınan özet: profil, rozetler ve durum ilk çizimde doğru.
@@ -73,7 +78,7 @@ document.addEventListener('idexya-kabuk:kur', () => {
   if (eski) {
     ayar.durum = durumOzet(eski);
     const rozet = new Map(rozetSayilari(eski));
-    katman.gruplar.forEach((g) => g.moduller.forEach((m) => { if (rozet.get(m.url)) m.rozet = rozet.get(m.url); }));
+    herModul((m) => { if (rozet.get(m.url)) m.rozet = rozet.get(m.url); });
   }
   AYAR.textContent = JSON.stringify(ayar).replace(/</g, '\\u003c');
   sonUrl = ayar.etkin.sayfaUrl;
@@ -82,7 +87,7 @@ document.addEventListener('idexya-kabuk:kur', () => {
 
 document.addEventListener('idexya-kabuk:hazir', (olay) => {
   const kabuk = olay.target;
-  if (!ayar || !katman) return;
+  if (!ayar) return;
   // Sayfa içi sekmeler adresi history.replaceState ile değiştirir: yan menü vurgusu ve sayfa sekmesi izler.
   const guncelle = () => {
     const e = etkin();
