@@ -56,6 +56,8 @@ document.addEventListener('idexya-kabuk:kur', () => {
     katman.gruplar.forEach((g) => g.moduller.forEach((m) => { m.url = yol(m.url); m.sayfalar.forEach((s) => { s.url = yol(s.url); }); }));
     (ayar.eylemler || []).forEach((e) => { if (e) e.url = yol(e.url); });
     if (ayar.bildirimUrl) ayar.bildirimUrl = yol(ayar.bildirimUrl);
+    if (ayar.ayarlarUrl) ayar.ayarlarUrl = yol(ayar.ayarlarUrl);
+    (ayar.ayarBaglantilari || []).forEach((b) => { if (b) b.url = yol(b.url); });
     if (ayar.etkin) ['modulUrl', 'sayfaUrl'].forEach((k) => { if (ayar.etkin[k]) ayar.etkin[k] = yol(ayar.etkin[k]); });
   }
   katman.gruplar.forEach((g) => g.moduller.forEach((m) => {
@@ -66,7 +68,7 @@ document.addEventListener('idexya-kabuk:kur', () => {
   ayar.etkin = etkin();
   // Oturumdaki kullanıcı (Worker'ın yazdığı meta) ve bu oturumda son alınan özet: profil, rozetler ve durum ilk çizimde doğru.
   const kim = metaOku('idexya-kullanici');
-  if (kim) ayar.kullanici = { ad: kim, rol: 'Panel yöneticisi' };
+  if (kim) ayar.kullanici = { ad: kim, rol: 'Panel yöneticisi', eposta: kim.includes('@') ? kim : '' };
   const eski = saklananVeri('ozet');
   if (eski) {
     ayar.durum = durumOzet(eski);
@@ -100,7 +102,7 @@ document.addEventListener('idexya-kabuk:hazir', (olay) => {
   // Alınamazsa eski değer taze gibi bırakılmaz: rozetler kalkar, durum "bağlantı yok/bilinmiyor" olur.
   api('ozet').then((o) => {
     sayacGuncelle(o);
-    if (o.kim) kabuk.kullaniciYap({ ad: o.kim, rol: 'Panel yöneticisi' });
+    if (o.kim) kabuk.kullaniciYap({ ad: o.kim, rol: 'Panel yöneticisi', eposta: String(o.kim).includes('@') ? o.kim : '' });
     kabuk.durumYap(durumOzet(o));
   }).catch((h) => {
     sayacGuncelle(null);

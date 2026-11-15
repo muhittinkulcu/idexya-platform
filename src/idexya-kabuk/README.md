@@ -1,7 +1,7 @@
 # `<idexya-kabuk>`: ortak arayüz kabuğu
 
 Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: paket çubuğu, mega menü, arama
-(komut paleti), Görünüm paneli, yan menü (geniş ve daraltılmış), sayfa sekmeleri, zemin ızgarası, asistan
+(komut paleti), tema düğmesi, Ayarlar sayfası (`<idexya-ayarlar>`), yan menü (geniş ve daraltılmış), sayfa sekmeleri, zemin ızgarası, asistan
 düğmesi ve sayfa hareketleri. Sözleşme: [`../arayuz-kabugu.md`](../arayuz-kabugu.md) (renkler, yerler,
 yapım kuralları). Onaylı tasarım: 14 Kas 2026 taslağı.
 
@@ -17,6 +17,7 @@ değiştirilmez (yapım kuralı 1).
 |---|---|---|
 | `kabuk.js` | Özel öğe (Custom Element), DOM ve olaylar | evet |
 | `kabuk-cekirdek.js` | DOM'a dokunmayan saf işlevler: ayar doğrulama, arama, sekme kuralları, görünüm | evet |
+| `ayarlar.js` | `<idexya-ayarlar>`: ortak Ayarlar sayfasının içeriği (aşağıda "Ayarlar sayfası") | evet |
 | `kabuk.css` | Bütün stiller, renk değişkenleri, açık/koyu, hareketler, telefon düzeni | evet |
 | `README.md` | Bu belge | evet |
 | `katmanlar.json` | Dört katmanın ortak listesi (ad, adres, renk, gruplar, modüller, sayfalar); mega menü ve arama için | evet |
@@ -44,8 +45,9 @@ değiştirilmez (yapım kuralı 1).
   `</script>` dizisi bloğu erken kapatır.
 - Kabuk, öğenin içindeki düğümleri `.ik-icerik` alanına taşır ve etrafını kurar. İçerik kabuktan önce
   yazılabilir; React gibi çatılar kendi kökünü öğenin içine koyar (`<idexya-kabuk><div id="kok"></div></idexya-kabuk>`).
-- Yazı tipi dosyalarını kabuk getirmez. Ürün kendi sunucusundan `@font-face` ile verir (Inter zorunlu,
-  diğerleri isteğe bağlı). Seçilen aile yüklü değilse tarayıcı Inter'e, o da yoksa sistem yazısına düşer.
+- Yazı tipi dosyalarını kabuk getirmez. Ürün kendi sunucusundan `@font-face` ile Inter'i verir. Yazı tipi ve
+  kalınlık seçimi yoktur (Muhittin, 15 Kas 2026): yazı Inter, kalınlık "Zarif" (`--w-ince` 300, `--w-govde` 350,
+  `--w-orta` 400, `--w-vurgu` 500; `kabuk.css` `:root`). Inter yüklü değilse sistem yazısı görünür.
 
 ### Çok sayfalı ürün: kabuk ilk boyamadan önce (önerilen)
 
@@ -81,12 +83,14 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
     }]
   }],
   "etkin": { "modulUrl": "/meta", "sayfaUrl": "/meta/kampanyalar", "ad": "" }, // ad isteğe bağlı (menüde olmayan sayfa için)
-  "kullanici": { "ad": "Muhittin", "rol": "süper admin" },
+  "kullanici": { "ad": "Muhittin", "rol": "süper admin", "eposta": "..." }, // eposta isteğe bağlı; Ayarlar > Hesap'ta görünür
   "durum": { "baglanti": true, "esitleme": "2026-11-14T10:39:00+03:00" }, // baglanti: true | false | null (bilinmiyor)
   "asistan": { "gorsel": "/img/kedi.webp", "etiket": "IDOS’a sor" },     // isteğe bağlı; yoksa düğme çizilmez
   "eylemler": [{ "ad": "Yeni öneri oluştur", "url": "/oneriler?yeni=1", "katman": "marketing" }], // isteğe bağlı, aramada çıkar
   "bildirimUrl": "/notifications",
-  "cikisUrl": "/cdn-cgi/access/logout"
+  "cikisUrl": "/cdn-cgi/access/logout",
+  "ayarlarUrl": "/settings",            // Ayarlar sayfası; yoksa yan menüde ve profil menüsünde Ayarlar bağlantısı çizilmez
+  "ayarBaglantilari": [{ "ad": "Profil", "url": "/profile", "aciklama": "Kişisel bilgiler" }] // isteğe bağlı, en çok 20
 }
 ```
 
@@ -135,7 +139,7 @@ Bir ürünün menüsü değişince bu dosya da güncellenir; `test/katmanlar.tes
 | `idexya-kabuk:hazir` | Kabuk kuruldu | `{ ayar }` (doğrulanmış) |
 | `idexya-kabuk:git` | Kabuktaki bir bağlantıya tıklandı ya da aramada Enter | `{ url }` — **iptal edilebilir** |
 | `idexya-kabuk:asistan` | Asistan düğmesine tıklandı | `{}` — paneli ürün açar |
-| `idexya-kabuk:gorunum` | Tema, kalınlık ya da yazı tipi değişti | `{ tema, kalinlik, yazi }` |
+| `idexya-kabuk:gorunum` | Tema, zaman sınırları ya da "hareketleri azalt" değişti (bu sekmede ya da başka sekmede) | `{ tema, zamanAcik, zamanKoyu, azHareket }` |
 
 Tek sayfa uygulama (IDOS `web/`) `idexya-kabuk:git` olayını `preventDefault()` ile durdurur, kendi
 yönlendiricisiyle gider, sonra kabuğa haber verir:
@@ -155,8 +159,11 @@ orta tık tarayıcıya bırakılır (yeni sekme).
 | `sahneOynat(kok?)` | `[data-ik-sahne]` hareketlerini ve sayaçları yeniden oynatır |
 | `durumYap({ baglanti, esitleme })` | Durum kapsülünü günceller |
 | `rozetYap(url, sayi)` | Modül ya da sayfa rozetini günceller (0 gizler) |
-| `kullaniciYap({ ad, rol })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
-| `kapat()` | Açık açılırı (mega, arama, görünüm, profil) kapatır |
+| `kullaniciYap({ ad, rol, eposta })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
+| `kapat()` | Açık açılırı (mega, arama, profil) kapatır |
+| `gorunumYap({ tema?, zamanAcik?, zamanKoyu?, azHareket? })` | Görünümü değiştirir, kaydeder, uygular, `idexya-kabuk:gorunum` yayar |
+| `gorunum` | Geçerli görünüm `{ tema, zamanAcik, zamanKoyu, azHareket }` (kopya) |
+| `sabitle(acik)`, `darYap(dar)` | Üst çubuğu sabitler; yan menüyü daraltır (ikisi de kaydedilir) |
 | `aramaKaynagiEkle({ ad, ara })` | ⌘K aramasına ürünün kendi sonuçlarını ekler (aşağıda "Arama kaynağı"); kaldıran işlevi döndürür |
 | `konum` | `{ katman, grup, ad }` — ürünün konum yolu ve başlığı için |
 
@@ -187,6 +194,40 @@ const kaldir = kabuk.aramaKaynagiEkle({
 - Aynı adla ikinci kez eklenen kaynak öncekinin yerini alır; "Sayfalar" ve "Eylemler" adları reddedilir. Kaldırma süren isteği iptal eder.
 - **Yetki ve kişisel veri ürünündür:** `ara` yalnız oturumdaki kullanıcının görebileceği kayıtları döndürür (sunucu
   süzgeci); sonuçta yalnız gereken ad bulunur (müşteri adı gibi), kişi adı, e-posta ya da telefon konmaz.
+
+## Tema ve Ayarlar sayfası
+
+Muhittin, 15 Kas 2026: "Ayarlara basınca bu pencere gelmesin. Ayarlar sayfası ayrı ve kapsamlı olsun, font vs seçimi
+olmasın, tema değiştirici 4'lü olsun: açık, koyu, sistem, zaman; açılır pencere gelmesin."
+
+- **Tema** dört seçenektir: `acik`, `koyu`, `sistem` (cihazın açık/koyu ayarı), `zaman` (gündüz açık, gece koyu;
+  varsayılan 07.00–19.00 açık, saatler Ayarlar sayfasından değişir, aralık gece yarısını aşabilir). Zaman seçiliyken kabuk
+  sonraki sınırda (en geç dakikada bir) ve sekme yeniden görünür olunca temayı yeniden hesaplar.
+- **Üst çubuktaki tema düğmesi açılır pencere açmaz**: her tıklamada açık → koyu → sistem → zaman → açık sırasıyla geçer;
+  simge seçimi gösterir (güneş, ay, ekran, saat), `aria-label` ve `title` "Tema: Koyu (değiştirmek için tıkla)".
+- **Yan menünün altındaki "Ayarlar"** ve profil menüsündeki "Ayarlar" gerçek bağlantıdır (`ayarlarUrl`); diğer menü
+  bağlantıları gibi `idexya-kabuk:git` yayar, etkin sayfa `ayarlarUrl` ise `aria-current="page"` ve vurgu alır, sekme adı
+  "Ayarlar" olur, ⌘K aramasında "Ayarlar" sayfası çıkar. `ayarlarUrl` yoksa bağlantı çizilmez. os.idexya.com'da öneke çevrilir.
+- **Eski kayıt göçü**: `idx-gorunum` içindeki `tema: "oto"` → `sistem`; `kalinlik` ve `yazi` okunur, atılır (kayıt yeni
+  biçimle yeniden yazılır). Hata vermez.
+- **Hareketleri azalt**: `azHareket: true` iken `<html data-hareket="az">`; kabuk ve içerik alanındaki bütün CSS hareketi,
+  sayaç ve sayfa geçişi kapanır (cihazın "hareketi azalt" ayarına ek).
+
+`ayarlar.js` ürünün Ayarlar sayfasında yüklenir ve içerik alanına `<idexya-ayarlar></idexya-ayarlar>` konur. Sayfa başlığını
+ürün çizer (ör. `ik-sayfa-bas`); bileşen yalnız bölümleri çizer. Ayarı içinde bulunduğu `<idexya-kabuk>` öğesinin doğrulanmış
+ayarından okur. Bölümler (yalnız gerçekten çalışan ayarlar; karşılığı olmayan alan uydurulmaz):
+
+| Bölüm | Ne |
+|---|---|
+| Görünüm | Dört tema (radyo grubu, kart); Zaman seçiliyse "Açık tema başlar" ve "Koyu tema başlar" saatleri (aynı saat reddedilir) |
+| Arayüz | Üst çubuğu sabitle (`idx-ust-sabit`), yan menüyü daraltılmış göster (`idx-yan-dar`; yalnız yan menüsü olan katmanda), hareketleri azalt |
+| Bölge | Tarayıcının saat dilimi ve tarih, saat, sayı, tutar, oran örnekleri (salt gösterim) |
+| Hesap | `kullanici` (ad, e-posta, rol) salt okuma; "Oturumu kapat" `cikisUrl`'ye (yoksa os.idexya.com'da `/cdn-cgi/access/logout`) |
+| Klavye kısayolları | Kabukta gerçekten olanlar: ⌘K / Ctrl K, ↑ ↓, Enter, Esc, → |
+| Modül ayarları | `ayarBaglantilari` (ürünün kendi ayar ve yönetim sayfaları; yetki süzgeci üründe). Liste boşsa bölüm çizilmez |
+
+Bağlantılar `idexya-kabuk:git` yayar (tek sayfa uygulama kendi yönlendiricisiyle gider). "Oturumu kapat" profil menüsündeki
+çıkışla aynı `idx-` kayıtlarını siler.
 
 ## Sayfa parçaları ve hareketler
 
@@ -223,14 +264,16 @@ anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
 |---|---|
-| `idx-gorunum` | `{ tema: acik\|koyu\|oto, kalinlik: ince\|zarif\|dengeli, yazi: inter\|manrope\|... }` |
+| `idx-gorunum` | `{ tema: acik\|koyu\|sistem\|zaman, zamanAcik: 420, zamanKoyu: 1140, azHareket: false }` (zaman: gün içindeki dakika) |
 | `idx-sekme-<katman>` | Açık sekmeler `[{ ad, url }]`, en çok 8 |
 | `idx-yan-dar` | Yan menü daraltılmış mı |
 | `idx-yan-kapali-<katman>` | Kapalı grup başlıkları |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
 | `idx-acildi` (`sessionStorage`) | Bu sekmede kabuk daha önce açıldı mı (giriş hareketleri yalnız ilk açılışta) |
 
-`<html>` üzerine `data-tema` (`acik`/`koyu`) ve `data-tema-secim` yazılır. localStorage alan adına bağlıdır:
+`<html>` üzerine `data-tema` (`acik`/`koyu`), `data-tema-secim` (`acik`/`koyu`/`sistem`/`zaman`) ve hareketleri azalt açıksa
+`data-hareket="az"` yazılır. Ürünün ilk boyama betiği (koyu temada açık zemin yanıp sönmesin diye) aynı kuralı uygular:
+`sistem` ve eski `oto` → cihaz ayarı, `zaman` → `zamanAcik`/`zamanKoyu` aralığı. localStorage alan adına bağlıdır:
 katmanlar ayrı alan adlarındayken seçim her birinde ayrı saklanır; tek adres (`os.idexya.com`, aşama 2)
 gelince ortak olur.
 
@@ -262,10 +305,10 @@ esbuild) kabuğu zaten küçülterek sunar; kaynaktaki yorumlar ve okunaklı yaz
 
 ```bash
 cd kabuk
-for f in kabuk.js kabuk-cekirdek.js kabuk.css; do echo "$f $(npx --yes esbuild@0.28.2 $f --minify --log-level=error | gzip -c | wc -c) (ham gzip $(gzip -c $f | wc -c))"; done
+for f in kabuk.js kabuk-cekirdek.js ayarlar.js kabuk.css; do echo "$f $(npx --yes esbuild@0.28.2 $f --minify --log-level=error | gzip -c | wc -c) (ham gzip $(gzip -c $f | wc -c))"; done
 ```
 
-Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 15 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
+Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 15 kB, `ayarlar.js` ≤ 5 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
 denetler ve ham gzip boyutunu bilgi olarak yazar (esbuild sürümü testte sabittir; ilk koşuda `npx` ağdan indirir).
 
 ## Deneme

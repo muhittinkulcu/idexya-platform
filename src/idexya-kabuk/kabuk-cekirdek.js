@@ -21,23 +21,10 @@ export const SIMGE = {
   ayrac: ['M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z']
 };
 
-// Kalınlık: 600 ve üstü yok; varsayılan Zarif.
-export const KALINLIK = {
-  ince: { ad: 'İnce', ince: 250, govde: 300, orta: 350, vurgu: 450, aciklama: 'Gövde 300, başlık 350' },
-  zarif: { ad: 'Zarif', ince: 300, govde: 350, orta: 400, vurgu: 500, aciklama: 'Gövde 350, başlık 400 (önerilen)' },
-  dengeli: { ad: 'Dengeli', ince: 350, govde: 400, orta: 450, vurgu: 550, aciklama: 'Gövde 400, başlık 450' }
-};
-
-export const YAZI_TIPI = {
-  inter: ['Inter', 'Dengeli, ekranda en okunaklı'], manrope: ['Manrope', 'Yuvarlak hatlı, modern'],
-  jakarta: ['Plus Jakarta Sans', 'Geniş, ferah'], dmsans: ['DM Sans', 'Sade, geometrik'],
-  figtree: ['Figtree', 'Sıcak, yumuşak'], outfit: ['Outfit', 'Geometrik, zarif'],
-  albert: ['Albert Sans', 'İskandinav, sakin'], onest: ['Onest', 'Net, kurumsal']
-};
-
-export const TEMA = { acik: 'Açık', koyu: 'Koyu', oto: 'Otomatik' };
-
-export const aile = (k) => "'" + YAZI_TIPI[Object.hasOwn(YAZI_TIPI, k) ? k : 'inter'][0] + "', 'Inter', system-ui, sans-serif";
+// Tema dört seçenek (Muhittin, 15 Kas 2026). Yazı tipi (Inter) ve kalınlık (Zarif: 300/350/400/500) sabittir, kabuk.css :root.
+export const TEMA = { acik: 'Açık', koyu: 'Koyu', sistem: 'Sistem', zaman: 'Zaman' };
+export const TEMA_SIRASI = ['acik', 'koyu', 'sistem', 'zaman'];
+export const ZAMAN_VARSAYILAN = { zamanAcik: 420, zamanKoyu: 1140 }; // 07.00 açık, 19.00 koyu (gün içindeki dakika)
 
 export const kucuk = (x) => String(x == null ? '' : x).toLocaleLowerCase('tr-TR');
 
@@ -130,11 +117,16 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
     ayar: {
       katman, katmanlar, eylemler, kokenler,
       etkin: { modulUrl: U(e.modulUrl), sayfaUrl: U(e.sayfaUrl), ad: metin(e.ad) },
-      kullanici: { ad: metin(kul.ad) || 'Kullanıcı', rol: metin(kul.rol) },
+      kullanici: { ad: metin(kul.ad) || 'Kullanıcı', rol: metin(kul.rol), eposta: metin(kul.eposta, 254) },
       durum: { baglanti: d.baglanti === true ? true : d.baglanti === false ? false : null, esitleme: metin(d.esitleme, 40) },
       asistan: as,
       bildirimUrl: U(a.bildirimUrl),
-      cikisUrl: U(a.cikisUrl)
+      cikisUrl: U(a.cikisUrl),
+      ayarlarUrl: U(a.ayarlarUrl),
+      // Ayarlar sayfasındaki "Modül ayarları" (ürünün kendi ayar ve yönetim sayfaları); yetki süzgeci üründe.
+      ayarBaglantilari: (Array.isArray(a.ayarBaglantilari) ? a.ayarBaglantilari : [])
+        .map((x) => ({ ad: metin(x && x.ad), url: U(x && x.url), aciklama: metin(x && x.aciklama, 200) }))
+        .filter((x) => x.ad && x.url).slice(0, 20)
     }
   };
 }
@@ -160,6 +152,8 @@ export function aramaHavuzu(ayar) {
     h.push({ tur: 'Sayfalar', ad: m.ad, yol, url: m.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0) });
     m.sayfalar.forEach((s) => h.push({ tur: 'Sayfalar', ad: m.ad + ' › ' + s.ad, yol, url: s.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0) }));
   })));
+  const ak = ayar.katmanlar.find((x) => x.anahtar === ayar.katman);
+  if (ayar.ayarlarUrl) h.push({ tur: 'Sayfalar', ad: 'Ayarlar', yol: (ak ? ak.ad + ' › ' : '') + 'Görünüm, arayüz, hesap', url: ayar.ayarlarUrl, katman: ayar.katman, renk: ak ? ak.renkKoyu : '#2F55D4', simge: 'A' });
   ayar.eylemler.forEach((e) => {
     const k = ayar.katmanlar.find((x) => x.anahtar === e.katman);
     h.push({ tur: 'Eylemler', ad: e.ad, yol: k ? k.ad : '', url: e.url, katman: e.katman, renk: '#FFA35C', simge: '+' });
@@ -223,13 +217,41 @@ export function sekmeKapat(liste, url, genel, etkinUrl, izinli) {
   return { liste: l, git };
 }
 
+// idx-gorunum kaydı. Eski `oto` → `sistem`; eski `kalinlik` ve `yazi` okunur, atılır (yazı tipi seçimi kalktı, 15 Kas 2026).
+const dakika = (x, v) => (Number.isInteger(x) && x >= 0 && x < 1440 ? x : v);
 export function gorunumCoz(ham) {
   const g = ham && typeof ham === 'object' ? ham : {};
-  return {
-    tema: has(TEMA, g.tema) ? g.tema : 'oto',
-    kalinlik: has(KALINLIK, g.kalinlik) ? g.kalinlik : 'zarif',
-    yazi: has(YAZI_TIPI, g.yazi) ? g.yazi : 'inter'
-  };
+  const tema = g.tema === 'oto' ? 'sistem' : has(TEMA, g.tema) ? g.tema : 'sistem';
+  let zamanAcik = dakika(g.zamanAcik, ZAMAN_VARSAYILAN.zamanAcik), zamanKoyu = dakika(g.zamanKoyu, ZAMAN_VARSAYILAN.zamanKoyu);
+  if (zamanAcik === zamanKoyu) ({ zamanAcik, zamanKoyu } = ZAMAN_VARSAYILAN);
+  return { tema, zamanAcik, zamanKoyu, azHareket: g.azHareket === true };
+}
+export const sonrakiTema = (t) => TEMA_SIRASI[(TEMA_SIRASI.indexOf(t) + 1) % TEMA_SIRASI.length];
+
+// Zamana göre: [zamanAcik, zamanKoyu) aralığında açık, dışında koyu (aralık gece yarısını aşabilir).
+export function zamanTemasi(simdi, acik, koyu) {
+  const m = simdi.getHours() * 60 + simdi.getMinutes();
+  const gunduz = acik < koyu ? m >= acik && m < koyu : m >= acik || m < koyu;
+  return gunduz ? 'acik' : 'koyu';
+}
+export function temaCoz(g, sistemKoyu, simdi = new Date()) {
+  if (g.tema === 'acik' || g.tema === 'koyu') return g.tema;
+  if (g.tema === 'zaman') return zamanTemasi(simdi, g.zamanAcik, g.zamanKoyu);
+  return sistemKoyu ? 'koyu' : 'acik';
+}
+// Sonraki sınıra kalan süre (ms); en çok bir dakika (uyku, saat değişimi kaçmasın).
+export function sinirBekle(simdi, acik, koyu) {
+  const m = simdi.getHours() * 60 + simdi.getMinutes(), s = simdi.getSeconds() * 1000 + simdi.getMilliseconds();
+  const kalan = Math.min(...[acik, koyu].map((x) => ((x - m + 1440) % 1440 || 1440) * 60000 - s));
+  return Math.max(250, Math.min(60000, kalan));
+}
+// 420 → "07.00" (TDK saat yazımı); "07:00" (input type=time) → 420, geçersizse null.
+export const saatMetni = (x) => String(Math.floor(x / 60)).padStart(2, '0') + '.' + String(x % 60).padStart(2, '0');
+export function saatOku(x) {
+  const m = /^(\d{1,2})[:.](\d{2})$/.exec(String(x || '').trim());
+  if (!m) return null;
+  const h = +m[1], d = +m[2];
+  return h < 24 && d < 60 ? h * 60 + d : null;
 }
 
 // Metindeki ilk sayıyı oranla çarpar: "49.586 TL", 0,5 → "24.793 TL".
