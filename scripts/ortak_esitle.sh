@@ -9,12 +9,13 @@
 # Bulut oturumunda kaynak depo yoktur; orada depodaki kopya zaten geçerlidir, betik koşulmaz.
 #
 # Kabuk (<idexya-kabuk>): projenin kökünde `.idexya-kabuk-hedef` dosyası varsa, ilk satırındaki klasöre
-# (depo köküne göre, ör. `public/kabuk`) kabuk.js, kabuk-cekirdek.js, ayarlar.js, kabuk.css, katmanlar.json ve README.md kopyalanır.
+# (depo köküne göre, ör. `public/kabuk`) kabuk.js, kabuk-cekirdek.js, ayarlar.js, kabuk.css, katmanlar.json, kedi.webp (asistan
+# düğmesinin kedisi, kabuk.css göreli adresle kullanır) ve README.md kopyalanır.
 # Dosya yoksa kabuk eşitlenmez. Demo ve testler projeye gitmez.
 set -euo pipefail
 
 DOSYALAR=(README.md ajan-sozlesmesi.md guvenlik-cekirdegi.md urun-ilkeleri.md yazim-cekirdegi.md arayuz-kabugu.md)
-KABUK_DOSYALAR=(kabuk.js kabuk-cekirdek.js ayarlar.js kabuk.css katmanlar.json README.md)
+KABUK_DOSYALAR=(kabuk.js kabuk-cekirdek.js ayarlar.js kabuk.css katmanlar.json kedi.webp README.md)
 KOK="$(git rev-parse --show-toplevel)"
 KONTROL=0
 [[ "${1:-}" == "--kontrol" ]] && KONTROL=1

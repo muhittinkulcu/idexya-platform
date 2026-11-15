@@ -1,12 +1,16 @@
 // Kabuğun saf işlevleri (DOM yok). Ayrıntı: README.md.
 
 export const KATMAN_ANAHTARLARI = ['idos', 'marketing', 'website', 'creative'];
+// Katman simgesi katmanlar.json'da (`simge`, SIMGE adı) verilir; yoksa ya da bilinmiyorsa bu varsayılan (Muhittin, 15 Kas 2026).
+export const KATMAN_SIMGE = { idos: 'ev', marketing: 'megafon', website: 'dunya', creative: 'palet' };
 export const SEKME_SINIRI = 8;
 export const ARAMA_SINIRI = 14;
 export const KAYNAK_SINIRI = 8, KAYNAK_GECIKME = 150;
 
-// Grup simgeleri; bilinmeyen ad `izgara` olur.
+// Grup ve katman simgeleri; bilinmeyen ad `izgara` olur (katmanda varsayılan KATMAN_SIMGE).
 export const SIMGE = {
+  ev: ['M3 11l9-8 9 8', 'M5 10v10h14V10', 'M10 20v-6h4v6'],
+  palet: ['M12 21a9 9 0 1 1 9-9c0 2.5-2 3.5-4 3.5h-2a2 2 0 0 0-1.5 3.3A1.5 1.5 0 0 1 12 21z', 'M7.5 11.5h.01', 'M10.5 7.5h.01', 'M15.5 8.5h.01'],
   izgara: ['M4 4h6v7H4z', 'M14 4h6v4h-6z', 'M14 12h6v8h-6z', 'M4 15h6v5H4z'],
   megafon: ['M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z', 'M15 9a4 4 0 0 1 0 6', 'M18 6a8 8 0 0 1 0 12'],
   grafik: ['M4 20V10', 'M10 20V4', 'M16 20v-7', 'M21 20H3'],
@@ -100,7 +104,8 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
       });
       if (metin(g && g.baslik)) gruplar.push({ baslik: metin(g.baslik), simge: has(SIMGE, g.simge) ? g.simge : 'izgara', moduller });
     });
-    katmanlar.push({ anahtar: k.anahtar, ad: metin(k.ad) || k.anahtar, url, renk, renkKoyu, aciklama: metin(k.aciklama, 400), gruplar });
+    const simge = has(SIMGE, k.simge) ? k.simge : KATMAN_SIMGE[k.anahtar];
+    katmanlar.push({ anahtar: k.anahtar, ad: metin(k.ad) || k.anahtar, simge, url, renk, renkKoyu, aciklama: metin(k.aciklama, 400), gruplar });
   });
   if (!katmanlar.length) hatalar.push('katman yok');
   let katman = a.katman;
@@ -108,7 +113,8 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
   const e = a.etkin || {};
   const kul = a.kullanici || {};
   const d = a.durum || {};
-  const as = a.asistan && guvenliUrl(a.asistan.gorsel) ? { gorsel: guvenliUrl(a.asistan.gorsel), etiket: metin(a.asistan.etiket) || 'IDOS’a sor' } : null;
+  // Asistan görseli kabuğun kendi kedisidir (kedi.webp, kabuk.css); ürün görsel vermez, `gorsel` alanı yok sayılır.
+  const as = a.asistan && typeof a.asistan === 'object' ? { etiket: metin(a.asistan.etiket) || 'IDOS’a sor' } : null;
   const eylemler = (Array.isArray(a.eylemler) ? a.eylemler : [])
     .map((x) => ({ ad: metin(x && x.ad), url: U(x && x.url), katman: x && x.katman }))
     .filter((x) => x.ad && x.url);
@@ -149,8 +155,8 @@ export function aramaHavuzu(ayar) {
   const h = [];
   ayar.katmanlar.forEach((k) => k.gruplar.forEach((g) => g.moduller.forEach((m) => {
     const yol = k.ad + ' › ' + g.baslik;
-    h.push({ tur: 'Sayfalar', ad: m.ad, yol, url: m.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0) });
-    m.sayfalar.forEach((s) => h.push({ tur: 'Sayfalar', ad: m.ad + ' › ' + s.ad, yol, url: s.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0) }));
+    h.push({ tur: 'Sayfalar', ad: m.ad, yol, url: m.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0), ksimge: k.simge });
+    m.sayfalar.forEach((s) => h.push({ tur: 'Sayfalar', ad: m.ad + ' › ' + s.ad, yol, url: s.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0), ksimge: k.simge }));
   })));
   const ak = ayar.katmanlar.find((x) => x.anahtar === ayar.katman);
   if (ayar.ayarlarUrl) h.push({ tur: 'Sayfalar', ad: 'Ayarlar', yol: (ak ? ak.ad + ' › ' : '') + 'Görünüm, arayüz, hesap', url: ayar.ayarlarUrl, katman: ayar.katman, renk: ak ? ak.renkKoyu : '#2F55D4', simge: 'A' });
@@ -160,6 +166,10 @@ export function aramaHavuzu(ayar) {
   });
   return h;
 }
+
+// Yan menüde "tüm grupları aç / kapat": hiç kapalı grup yoksa düğme kapatır, varsa hepsini açar. Sonuç yeni kapalı listesidir.
+export const hepsiAcik = (gruplar, kapali) => !gruplar.some((g) => kapali.includes(g.baslik));
+export const hepsiDegistir = (gruplar, kapali) => (hepsiAcik(gruplar, kapali) ? gruplar.map((g) => g.baslik) : []);
 
 // Boş sorgu: sık sayfalar + eylemler. Dolu: her sözcük ad ve yolda (Türkçe küçük harf).
 export function aramaSuz(havuz, sorgu, sikUrller = [], sinir = ARAMA_SINIRI) {
