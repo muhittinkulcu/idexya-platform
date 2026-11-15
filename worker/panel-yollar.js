@@ -39,6 +39,8 @@ export function eskiPanelOsHedefi(url, env, yontem = 'GET') {
   const kok = String((env && env.OS_YONLENDIRME_KOKU) || '').trim().replace(/\/+$/, '').toLowerCase();
   const temel = String((env && env.PANEL_TEMEL_YOL) || '').trim();
   if (!OS_KOK_DESEN.test(kok) || !/^(\/[a-z0-9-]+)+$/.test(temel)) return null;
+  // Os kapısı eksikse (os alanı, kapı anahtarı, Access) yönlendirme yok: kullanıcı os adresinde hataya düşmesin.
+  if (!String((env && env.PANEL_OS_ALAN) || '').trim() || !(env && env.KAPI_ANAHTARI_WEBSITE) || !(env && env.TEAM_DOMAIN) || !(env && env.POLICY_AUD)) return null;
   if (url.hostname !== PANEL_ALAN || (yontem !== 'GET' && yontem !== 'HEAD')) return null;
   const yol = url.pathname;
   let hedef = null;

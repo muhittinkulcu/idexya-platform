@@ -5,7 +5,7 @@ import { eskiPanelOsHedefi, SAYFALAR } from '../worker/panel-yollar.js';
 
 let kalan = 0, gecen = 0;
 const kontrol = (ad, kosul, ek = '') => { console.log((kosul ? 'GEÇTİ ' : 'KALDI ') + ad + (kosul ? '' : ' → ' + ek)); if (kosul) gecen++; else kalan++; };
-const ENV = { OS_YONLENDIRME_KOKU: 'https://os.idexya.com', PANEL_TEMEL_YOL: '/website' };
+const ENV = { OS_YONLENDIRME_KOKU: 'https://os.idexya.com', PANEL_TEMEL_YOL: '/website', PANEL_OS_ALAN: 'os.idexya.com', KAPI_ANAHTARI_WEBSITE: 'x'.repeat(40), TEAM_DOMAIN: 'https://t.cloudflareaccess.com', POLICY_AUD: 'a' };
 const h = (adres, env = ENV, y = 'GET') => eskiPanelOsHedefi(new URL(adres), env, y);
 
 // 1. Tablo: her eski yol → beklenen hedef (yol ve sorgu korunur)
@@ -37,6 +37,7 @@ for (const y of ['POST', 'PUT', 'PATCH', 'DELETE']) kontrol(`yazma yönlenmez: $
 
 // 3. Ayar kapalı ya da geçersizse hiçbir şey
 for (const env of [{}, { PANEL_TEMEL_YOL: '/website' }, { OS_YONLENDIRME_KOKU: 'https://os.idexya.com' },
+  { ...ENV, PANEL_OS_ALAN: '' }, { ...ENV, KAPI_ANAHTARI_WEBSITE: '' }, { ...ENV, TEAM_DOMAIN: '' }, { ...ENV, POLICY_AUD: '' },
   { ...ENV, OS_YONLENDIRME_KOKU: 'http://os.idexya.com' }, { ...ENV, OS_YONLENDIRME_KOKU: 'https://os.idexya.com/x' },
   { ...ENV, OS_YONLENDIRME_KOKU: 'https://a@os.idexya.com' }, { ...ENV, OS_YONLENDIRME_KOKU: '//os.idexya.com' },
   { ...ENV, PANEL_TEMEL_YOL: 'website' }, { ...ENV, PANEL_TEMEL_YOL: '/../x' }])
@@ -53,7 +54,7 @@ for (const adres of ['https://panel.idexya.com/leads?next=https://kotu.com', 'ht
 // 5. Worker bağlantısı: os isteği yönlenmez, kural isle() başında (kimlik kapısından önce)
 const kaynak = readFileSync(new URL('../worker/index.js', import.meta.url), 'utf8');
 kontrol('isle() kuralı os isteğinde çalışmaz', /const osHedef = os \? null : eskiPanelOsHedefi\(url, env, istek\.method\);/.test(kaynak));
-kontrol('301 ve kısa önbellek', kaynak.includes("status: 301, headers: { Location: osHedef, 'Cache-Control': 'public, max-age=3600'"));
+kontrol('301 ve kısa önbellek', kaynak.includes("status: 301, headers: { Location: osHedef, 'Cache-Control': 'public, max-age=300'"));
 kontrol('kural kimlik kapısından önce', kaynak.indexOf('eskiPanelOsHedefi(url') < kaynak.indexOf('const kim = await yonetici('));
 
 console.log(`\n${gecen} geçti, ${kalan} kaldı`);

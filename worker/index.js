@@ -314,7 +314,7 @@ async function isle(istek, env, ctx, os) {
     const panel = os ? true : panelAlani(url, env);
     // Tek adres: eski panel adresindeki yönetim arayüzü os.idexya.com/website'e 301 (ayar yoksa hiçbir şey; panel-yollar.js).
     const osHedef = os ? null : eskiPanelOsHedefi(url, env, istek.method);
-    if (osHedef) return new Response(null, { status: 301, headers: { Location: osHedef, 'Cache-Control': 'public, max-age=3600', ...GUVENLIK_BASLIKLARI } });
+    if (osHedef) return new Response(null, { status: 301, headers: { Location: osHedef, 'Cache-Control': 'public, max-age=300', ...GUVENLIK_BASLIKLARI } });
     if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) return Response.redirect(`${os ? url.origin : panelKoku(url, env)}${eskiYol(yol)}${eskiAramayiCevir(url.search) || url.search}`, 301);
     let panelSayfa = null;
     if (panel) {
