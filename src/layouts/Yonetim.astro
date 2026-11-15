@@ -1,6 +1,6 @@
 ---
 // Yönetim paneli yerleşimi (Website ve CRM katmanı). İskelet idexya-ortak'taki ortak kabuk <idexya-kabuk>:
-// paket çubuğu, mega menü, arama, Görünüm paneli, yan menü, sayfa sekmeleri (src/idexya-kabuk, scripts/ortak_esitle.sh ile
+// paket çubuğu, mega menü, arama, tema düğmesi, yan menü (altında Ayarlar bağlantısı), sayfa sekmeleri (src/idexya-kabuk, scripts/ortak_esitle.sh ile
 // eşitlenir; elle düzenlenmez). Bu dosya yalnız kabuğun ayarını yazar ve sayfa başlığını, eylem çubuğunu ve içeriği verir.
 // Sayfa verisi tarayıcıda /api/yonetim/* uçlarından okunur; sayfalar derlemede veri içermez.
 import { MENU, menuAdi } from '../data/panel-menu.js';
@@ -47,6 +47,10 @@ const YENI = [
   { grup: 'Satış ve iş', ad: 'Görev', eylem: 'Yeni görev', aciklama: 'Takvime görev ve hatırlatma', url: '/tasks?new=1' }
 ];
 const YENI_GRUP = [...new Set(YENI.map((y) => y.grup))];
+// Ayarlar sayfasındaki "Modül ayarları": panelin gerçekten var olan ayar ve yönetim sayfaları (ad ve adres menüden). Panelin
+// tamamı aynı kapının (Cloudflare Access) arkasında ve tek yetki düzeyinde olduğu için süzülecek ayrı yetki yoktur.
+const AYAR_ACIKLAMA = { entegre: 'Bağlı hizmetler ve bağlantı durumu', esitle: 'Reklam verisi çekimi ve IDOS eşleştirmesi', uyeler: 'Site üyeleri ve erişim yetkileri', yedek: 'Veri yedekleri', gecmis: 'Panelde yapılan değişikliklerin kaydı' };
+const AYAR_BAGLANTILARI = MENU.flatMap((g) => g.ogeler).filter((o) => o.href && AYAR_ACIKLAMA[o.k]).map((o) => ({ ad: o.ad, url: o.href, aciklama: AYAR_ACIKLAMA[o.k] }));
 // Etkin sayfa derlemede modül adresidir; gerçek adres (?tab= dahil) tarayıcıda kabuk kurulmadan önce yazılır (kabuk-bagla.js).
 const ayar = {
   katman: 'website',
@@ -56,7 +60,10 @@ const ayar = {
   durum: { baglanti: null, esitleme: '' },
   eylemler: YENI.map((y) => ({ ad: y.eylem, url: y.url, katman: 'website' })),
   bildirimUrl: '/notifications',
-  cikisUrl: '/cdn-cgi/access/logout'
+  cikisUrl: '/cdn-cgi/access/logout',
+  // Ayarlar sayfası (Muhittin, 15 Kas 2026): yan menünün altındaki Ayarlar buraya gider; sayfanın üstünde ortak <idexya-ayarlar>.
+  ayarlarUrl: '/settings',
+  ayarBaglantilari: AYAR_BAGLANTILARI
 };
 // Yapım kuralı 6: JSON içindeki her "<" < olarak yazılır; </script> bloğu erken kapatamaz.
 const ayarMetni = JSON.stringify(ayar).replace(/</g, '\\u003c');
@@ -88,8 +95,8 @@ const ayarMetni = JSON.stringify(ayar).replace(/</g, '\\u003c');
 <script is:inline src="/panel-kabuk.js"></script>
 {onYukle.map((v) => <link rel="preload" href={`/api/yonetim/${v}`} as="fetch" crossorigin="anonymous">)}
 <style is:global>
-/* Yazı tipleri depoda (public/fonts, SIL OFL: OFL-inter.txt); dış yazı tipi isteği yok. Yazı ailesi ve kalınlık ortak kabuğun
-   Görünüm panelinden gelir (--ik-yazi, --w-govde, --w-vurgu; idexya-ortak arayuz-kabugu.md "Ortak parçalar"). */
+/* Yazı tipleri depoda (public/fonts, SIL OFL: OFL-inter.txt); dış yazı tipi isteği yok. Yazı Inter, kalınlık ortak kabuğun sabit
+   "Zarif" değerleri (--w-govde, --w-vurgu; idexya-ortak arayuz-kabugu.md "Ortak parçalar"); seçim yoktur (15 Kas 2026). */
 @font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/inter-latin-ext-300-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Inter';font-style:normal;font-weight:300;font-display:swap;src:url(/fonts/inter-latin-300-normal.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url(/fonts/inter-latin-ext-400-normal.woff2) format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
@@ -99,7 +106,7 @@ const ayarMetni = JSON.stringify(ayar).replace(/</g, '\\u003c');
 body{margin:0}
 [hidden]{display:none!important}
 /* Renkler: zemin, yüzey, çizgi ve yazı ortak kabukla aynı; turuncu vurgular (--brand, --acc, --fill, --tint, --tintx, --btnline)
-   bu modülün rengi. Tema ortak kabuktan: <html data-tema="acik|koyu"> (Görünüm paneli, idx-gorunum). */
+   bu modülün rengi. Tema ortak kabuktan: <html data-tema="acik|koyu"> (tema düğmesi ve Ayarlar sayfası, idx-gorunum). */
 :root{--bg:#F2F4F7;--card:255 255 255;--panel:255 255 255;--card2:#F7F8FA;--line:220 225 232;--track:#E6EAF0;--tx:#17202B;--tx2:#56606E;--head:#15202B;--brand:#F07A23;--acc:#B84406;--fill:#B84406;--tint:#FDE9DB;--tintx:#A9420A;--ok:#176041;--okb:#E2F2E9;--info:#1F4E8C;--infob:#E3ECF8;--warn:#7A4E00;--warnb:#FCEFD3;--err:#8A1F2E;--errb:#FCE4E6;--shadow:rgba(0,37,89,.12);--btnline:#F5C7A6}
 /* Koyu zemin Marketing'in laciverti (Muhittin, 13 Kas 2026); turuncu vurgu, metin ve durum renkleri aynı. */
 html[data-tema=koyu]{--bg:#15202B;--card:28 39 51;--panel:25 39 52;--card2:#22303C;--line:47 61 74;--track:#22303C;--tx:#F1F3F5;--tx2:#B4BECB;--head:#F1F3F5;--brand:#F07A23;--acc:#F7894A;--fill:#B84406;--tint:rgba(240,122,35,.16);--tintx:#FFB58A;--ok:#7ADFB0;--okb:rgba(122,223,176,.13);--info:#9CC3FF;--infob:rgba(156,195,255,.14);--warn:#F3C56D;--warnb:rgba(243,197,109,.14);--err:#FF9AA6;--errb:rgba(255,122,138,.14);--shadow:rgba(0,0,0,.5);--btnline:rgba(247,137,74,.35)}
@@ -171,6 +178,9 @@ tr[data-sayfa-gizli]{display:none}
 .ik-sayfa-bas>div:first-child{flex:1 1 360px;min-width:0}
 .ik-sayfa-bas p{margin:4px 0 0;max-width:820px;color:var(--tx2)}
 @media print{.ik-eylemler{display:none!important}}
+/* Ayarlar sayfası (settings.astro): ortak <idexya-ayarlar> altında firma ayarları başlığı. */
+.firma-baslik{margin:12px 0 0;font-size:17px;font-weight:var(--w-orta);color:var(--head)}
+.firma-aciklama{margin:-12px 0 0;max-width:820px;font-size:14px;color:var(--tx2)}
 .yeni-menu{position:relative}
 .yeni-menu summary{list-style:none;cursor:pointer}.yeni-menu summary::-webkit-details-marker{display:none}
 .yeni-liste{position:absolute;right:0;top:calc(100% + 8px);z-index:60;width:320px;padding:8px;border-radius:16px;background:rgb(var(--card));border:1px solid rgb(var(--line));box-shadow:0 24px 60px var(--shadow);display:flex;flex-direction:column}

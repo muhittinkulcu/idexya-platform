@@ -1,19 +1,29 @@
 // Panel teması ilk boyamadan önce (src/layouts/Yonetim.astro <head>; satır içi betik değil, CSP script-src 'self').
-// Ortak kabuk (kabuk.js) modül olarak sonra yüklenir ve aynı kuralı uygular; bu dosya yalnız koyu temada açık zeminin
-// yanıp sönmesini önler. Eski panel tema seçimi (idx-tema-secim: acik | koyu | sistem | saat) bir kez kabuğun
-// idx-gorunum kaydına taşınır: sistem ve saat → oto. Eski kabuğun artık okunmayan anahtarları silinir.
+// Ortak kabuk (kabuk.js) sonra yüklenir ve aynı kuralı uygular (idx-gorunum: tema acik | koyu | sistem | zaman; kabuk
+// README "Tema ve Ayarlar sayfası"); bu dosya yalnız koyu temada açık zeminin yanıp sönmesini önler. Eski kabuğun `oto`
+// değeri `sistem` sayılır. Eski panel tema seçimi (idx-tema-secim: acik | koyu | sistem | saat) bir kez idx-gorunum kaydına
+// taşınır: sistem → sistem, saat → zaman. Eski kabuğun artık okunmayan anahtarları silinir.
 (function () {
   var d = document.documentElement, g = null;
   try {
     g = JSON.parse(localStorage.getItem('idx-gorunum') || 'null');
     var eski = localStorage.getItem('idx-tema-secim') || (localStorage.getItem('idx-tema') === 'koyu' ? 'koyu' : null);
     if (!g && eski) {
-      g = { tema: eski === 'acik' || eski === 'koyu' ? eski : 'oto' };
+      g = { tema: eski === 'acik' || eski === 'koyu' ? eski : eski === 'saat' ? 'zaman' : 'sistem' };
       localStorage.setItem('idx-gorunum', JSON.stringify(g));
     }
     ['idx-tema-secim', 'idx-panel', 'idx-sekmeler', 'idx-cam'].forEach(function (k) { localStorage.removeItem(k); });
   } catch (e) { /* gizli kip */ }
-  var t = g && (g.tema === 'acik' || g.tema === 'koyu') ? g.tema : 'oto';
+  g = g && typeof g === 'object' ? g : {};
+  var t = g.tema === 'acik' || g.tema === 'koyu' || g.tema === 'zaman' ? g.tema : 'sistem';
+  // Zamana göre: [zamanAcik, zamanKoyu) açık (gün içindeki dakika; varsayılan 07.00–19.00; aralık gece yarısını aşabilir).
+  var dk = function (x, v) { return typeof x === 'number' && x % 1 === 0 && x >= 0 && x < 1440 ? x : v; };
+  var a = dk(g.zamanAcik, 420), k = dk(g.zamanKoyu, 1140);
+  if (a === k) { a = 420; k = 1140; }
+  var s = new Date(), m = s.getHours() * 60 + s.getMinutes();
+  var sonuc = t === 'zaman' ? ((a < k ? m >= a && m < k : m >= a || m < k) ? 'acik' : 'koyu')
+    : t === 'sistem' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'koyu' : 'acik') : t;
   d.setAttribute('data-tema-secim', t);
-  d.setAttribute('data-tema', t === 'oto' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'koyu' : 'acik') : t);
+  d.setAttribute('data-tema', sonuc);
+  if (g.azHareket === true) d.setAttribute('data-hareket', 'az');
 })();

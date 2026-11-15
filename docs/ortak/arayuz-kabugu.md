@@ -45,17 +45,19 @@ Renk, modülün X işaretiyle aynı ailedendir.
 
 ## Ortak parçalar
 
-- Yazı: kullanıcı Görünüm panelinden (Ayarlar) yazı tipini ve kalınlığı seçer; seçim üç modülde birlikte geçerli olur.
-  Yazı tipleri (hepsi Türkçe karakter destekli, değişken ağırlıklı, kendi sunucumuzdan): Inter (varsayılan), Manrope,
-  Plus Jakarta Sans, DM Sans, Figtree, Outfit, Albert Sans, Onest. Kalınlık üç düzey: İnce (gövde 300, başlık 350),
-  **Zarif (varsayılan: gövde 350, başlık 400, büyük başlık ve sayı 300, en kalın 500)**, Dengeli (gövde 400, başlık 450).
+- Yazı: Inter (kendi sunucumuzdan), kalınlık sabit **Zarif: gövde 350, başlık 400, büyük başlık ve sayı 300, en kalın 500**.
+  Yazı tipi ve kalınlık seçimi yoktur (Muhittin, 15 Kas 2026: "font vs seçimi olmasın").
   Muhittin, 12 ve 14 Kas 2026: ince ve zarif, "incenin bir tık üstü"; aşırı ince ya da kalın değil; 600 ve üstü yok.
   Satır aralığı 1,6. Sayılar eşit genişlikte. Kabuk ağırlıkları CSS değişkeniyle verir (`--w-ince`, `--w-govde`,
   `--w-orta`, `--w-vurgu`); bileşenlerde sabit sayı yazılmaz.
 - Kart: başlık solda; i (açıklama) ve ⋮ (seçenekler) sağ üstte; tek ana eylem sağ altta. Köşe 12 px.
 - Düğme: köşe 8 px; ana düğme dolu vurgu rengi, diğerleri çerçeveli.
 - Durum etiketi: yazı ve nokta birlikte; renk tek başına anlatmaz. Onaylandı, uygulandı ve etkisi doğrulandı ayrı etiketlerdir.
-- Tema: açık, koyu, sistem, saate göre (dört seçenek) her modülde aynı yerde.
+- Tema: açık, koyu, sistem, zaman (gündüz açık, gece koyu; varsayılan 07.00–19.00 açık) dört seçenek. Üst çubuktaki tema
+  düğmesi açılır pencere açmaz, tıklayınca dört seçenek arasında sırayla geçer; simge seçimi gösterir (Muhittin, 15 Kas 2026).
+- Ayarlar: yan menünün altındaki "Ayarlar" ayrı bir sayfaya gider (her üründe temel yolun altında `/settings`); sayfanın
+  içeriği ortak `<idexya-ayarlar>` bileşenidir (görünüm, arayüz, bölge, hesap, klavye kısayolları, modül ayarları;
+  yalnız gerçekten çalışan ayarlar). Ayrıntı: `kabuk/README.md` "Tema ve Ayarlar sayfası".
 
 ## Aşamalar
 
@@ -67,7 +69,7 @@ Renk, modülün X işaretiyle aynı ailedendir.
 Kaynak: Muhittin, 14 Kas 2026: "IDOS'un eski versiyonlarındaki gibi yamalar şeklinde olmasın; güvenlik, hız ve
 performans en önemli hususlar."
 
-1. **Tek kaynak, üç kopya değil.** Kabuk (paket çubuğu, mega menü, sayfa sekmeleri, durum çubuğu, görünüm paneli,
+1. **Tek kaynak, üç kopya değil.** Kabuk (paket çubuğu, mega menü, sayfa sekmeleri, durum çubuğu, tema düğmesi, Ayarlar sayfası içeriği,
    asistan düğmesi) bir kez yazılır: çatıdan bağımsız, bağımlılıksız bir web bileşeni (`<idexya-kabuk>`) ve ona ait
    tek CSS dosyası. Bu depoda tutulur, `ortak_esitle.sh` ile üç projeye birebir kopyalanır; projede elle düzenlenmez.
    Var olan kabuk kodunun üstüne ek katman yapılmaz; eski parça yenisi gelince silinir.
@@ -95,7 +97,7 @@ yarı saydam buzlu camdır (arkadaki sayfa bulanık görünür). Solda modülün
 modüller. Bir modüle tıklayınca sayfaları akordeon gibi hemen altında açılır (aynı anda bir modül açık); ilk satır
 modülün ana sayfasıdır. Her sayfaya tek tıkla gidilir.
 Mega menü açıkken paket çubuğu etkin kalır (perde çubuğun altından başlar); başka bir modülün üzerine gelince mega
-menü o modüle geçer; Esc ve dışarı tıklama kapatır. Bir açılır panel (mega menü, arama, görünüm) açılınca diğerleri kapanır.
+menü o modüle geçer; Esc ve dışarı tıklama kapatır. Bir açılır panel (mega menü, arama, profil) açılınca diğerleri kapanır.
 
 ## Sayfa hareketleri (Muhittin, 14 Kas 2026)
 

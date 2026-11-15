@@ -1,27 +1,32 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
-  SIMGE, KALINLIK, YAZI_TIPI, TEMA, aile, ayarDogrula, etkinBul, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir, kaynakDurumu,
+  SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir, kaynakDurumu,
   sekmeListesi, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
 const MQ = matchMedia('(prefers-color-scheme: dark)');
 const TEL = matchMedia('(max-width: 860px)');
-const azHareket = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 const oku = (k, v) => { try { const x = localStorage.getItem(k); return x === null ? v : JSON.parse(x); } catch (e) { return v; } };
 const yaz = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* gizli kip */ } };
 
-let GOR = gorunumCoz(oku('idx-gorunum', null));
+// Görünüm (idx-gorunum): tema açık | koyu | sistem | zaman, zaman sınırları, hareketi azalt. Eski kayıt (oto, yazı, kalınlık)
+// okunurken yeni biçime çevrilip yazılır.
+const gorunumOku = () => { const ham = oku('idx-gorunum', null), g = gorunumCoz(ham); if (ham && JSON.stringify(ham) !== JSON.stringify(g)) yaz('idx-gorunum', g); return g; };
+let GOR = gorunumOku(), zZaman;
+const azHareket = () => GOR.azHareket || matchMedia('(prefers-reduced-motion: reduce)').matches;
 function gorunumUygula() {
-  const k = KALINLIK[GOR.kalinlik];
-  R.dataset.tema = GOR.tema === 'oto' ? (MQ.matches ? 'koyu' : 'acik') : GOR.tema;
+  R.dataset.tema = temaCoz(GOR, MQ.matches, new Date());
   R.dataset.temaSecim = GOR.tema;
-  R.style.setProperty('--ik-yazi', aile(GOR.yazi));
-  ['ince', 'govde', 'orta', 'vurgu'].forEach((x) => R.style.setProperty('--w-' + x, k[x]));
+  if (GOR.azHareket) R.dataset.hareket = 'az'; else delete R.dataset.hareket;
+  clearTimeout(zZaman);
+  if (GOR.tema === 'zaman') zZaman = setTimeout(gorunumUygula, sinirBekle(new Date(), GOR.zamanAcik, GOR.zamanKoyu));
 }
 gorunumUygula();
 MQ.addEventListener('change', gorunumUygula);
-addEventListener('storage', (e) => { if (e.key === 'idx-gorunum') { GOR = gorunumCoz(oku('idx-gorunum', null)); gorunumUygula(); } });
+D.addEventListener('visibilitychange', () => { if (!D.hidden) gorunumUygula(); });
+const gorunumYayinla = () => D.querySelectorAll('idexya-kabuk').forEach((k) => k.temaDugme && (k.temaCiz(), olay(k, 'gorunum', Object.assign({}, GOR))));
+addEventListener('storage', (e) => { if (e.key === 'idx-gorunum') { GOR = gorunumOku(); gorunumUygula(); gorunumYayinla(); } });
 
 function h(tag, a, ...c) {
   const e = D.createElement(tag);
@@ -48,7 +53,9 @@ const ASAGI = ['M6 9l6 6 6-6'], SAG = ['M9 6l6 6-6 6'];
 const I = {
   x: ['M5 5l14 14M19 5L5 19'], ara: ['M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z', 'M20 20l-3.5-3.5'],
   raptiye: ['M12 17v5M9 3h6l-1 6 4 4H6l4-4z'], zil: ['M6 16V11a6 6 0 0 1 12 0v5l2 2H4z', 'M10 20a2 2 0 0 0 4 0'],
-  ay: ['M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z'], menu: ['M4 6h16M4 12h16M4 18h16'],
+  acik: ['M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z', 'M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'],
+  koyu: ['M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z'], sistem: ['M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z', 'M8 21h8M12 17v4'],
+  zaman: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 7v5l3 2'], menu: ['M4 6h16M4 12h16M4 18h16'],
   daralt: ['M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', 'M9 4v16'],
   ayar: ['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1']
 };
@@ -113,11 +120,10 @@ class IdexyaKabuk extends HTMLElement {
     this.kDurum = h('div', { class: 'ik-ara-durum', role: 'status' });
     this.kapsul = h('div', { class: 'ik-kapsul' });
     this.sabitDugme = h('button', { type: 'button', class: 'ik-ikon ik-masa', onclick: () => this.sabitle(!this.sabit) }, svg(I.raptiye, 16, 1.9));
-    this.gorDugme = h('button', { type: 'button', class: 'ik-ikon', 'aria-haspopup': 'dialog', 'aria-expanded': 'false', 'aria-controls': 'ik-gorunum', onclick: (e) => this.degistir('gorunum', e.currentTarget) }, svg(I.ay, 17));
+    this.temaDugme = h('button', { type: 'button', class: 'ik-ikon ik-tema-dugme', onclick: () => this.gorunumYap({ tema: sonrakiTema(GOR.tema) }) });
     this.profilDugme = h('button', { type: 'button', class: 'ik-profil', 'aria-haspopup': 'true', 'aria-expanded': 'false', 'aria-controls': 'ik-profil-menu', onclick: (e) => this.degistir('profil', e.currentTarget) });
     this.profil = h('div', { id: 'ik-profil-menu', class: 'ik-acilir ik-profil-menu', hidden: true });
     this.mega = h('div', { id: 'ik-mega', class: 'ik-mega', role: 'dialog', hidden: true });
-    this.gorunum = h('div', { id: 'ik-gorunum', class: 'ik-acilir ik-gorunum', role: 'dialog', 'aria-label': 'Görünüm', hidden: true });
     this.perde = h('div', { class: 'ik-perde', hidden: true, onclick: () => { this.kapat(false); this.cekmece(false); } });
     this.katmanNav = h('nav', { class: 'ik-katmanlar', 'aria-label': 'Katmanlar' });
     this.menuDugme = menuVar ? h('button', { type: 'button', class: 'ik-ikon ik-tel', 'aria-label': 'Menüyü aç', 'aria-expanded': 'false', 'aria-controls': 'ik-yan', onclick: () => this.cekmece(!this.cekmeceAcik) }, svg(I.menu, 18)) : null;
@@ -133,9 +139,9 @@ class IdexyaKabuk extends HTMLElement {
       h('div', { class: 'ik-arac' },
         this.kapsul, this.sabitDugme,
         a.bildirimUrl ? h('a', { class: 'ik-ikon', href: a.bildirimUrl, 'data-ik-git': '', 'aria-label': 'Bildirimler', title: 'Bildirimler' }, svg(I.zil, 17)) : null,
-        this.gorDugme,
+        this.temaDugme,
         h('div', { class: 'ik-profil-kap' }, this.profilDugme, this.profil)),
-      this.perde, this.mega, this.gorunum);
+      this.perde, this.mega);
 
     this.icerik = h('div', { class: 'ik-icerik' }, icerik);
     const ana = h('main', { class: 'ik-ana' });
@@ -155,14 +161,14 @@ class IdexyaKabuk extends HTMLElement {
 
     this.addEventListener('click', (e) => this.tikla(e));
     this.addEventListener('keydown', (e) => this.tus(e));
-    [this.mega, this.gorunum, this.profil].forEach((p) => p.addEventListener('focusout', (e) => {
+    [this.mega, this.profil].forEach((p) => p.addEventListener('focusout', (e) => {
       const r = e.relatedTarget;
       if (r && !p.contains(r) && r !== this._donus) this.kapat(false);
     }));
     this.giris.addEventListener('blur', (e) => { const r = e.relatedTarget; if (r && !this.sonuc.contains(r) && this.acik === 'arama') this.kapat(false); });
     this.sabitle(oku('idx-ust-sabit', true));
     TEL.addEventListener('change', () => { if (this.yan) { this.cekmece(false); this.ucanKapat(); this.yanCiz(); } });
-    this.katmanCiz(); this.durumYap(a.durum); this.kullaniciYap(a.kullanici); this.gorunumCiz();
+    this.katmanCiz(); this.durumYap(a.durum); this.kullaniciYap(a.kullanici); this.temaCiz();
   }
 
   // `idexya-kabuk:git` iptal edilirse yönlendirmeyi ürün yapar.
@@ -187,23 +193,23 @@ class IdexyaKabuk extends HTMLElement {
     e.preventDefault();
   }
 
-  // Açılırlardan (mega, arama, görünüm, profil) yalnız biri açık.
+  // Açılırlardan (mega, arama, profil) yalnız biri açık.
   ac(tur, donus) {
     if (this.acik && this.acik !== tur) this.kapat(false);
     this.acik = tur; this._donus = donus;
     this.cekmece(false); this.ucanKapat();
     const r = this.ust.getBoundingClientRect();
     this.perde.style.setProperty('top', Math.max(0, r.bottom) + 'px');
-    this.perde.className = 'ik-perde' + (tur === 'gorunum' || tur === 'profil' ? ' ik-perde-saydam' : '');
+    this.perde.className = 'ik-perde' + (tur === 'profil' ? ' ik-perde-saydam' : '');
     this.perde.hidden = false;
     this.ust.style.setProperty('--ik-ust-alt', Math.max(0, r.bottom) + 'px');
   }
   degistir(tur, dugme) {
     if (this.acik === tur) return this.kapat(true);
     this.ac(tur, dugme);
-    const p = tur === 'gorunum' ? this.gorunum : this.profil;
+    const p = this.profil;
     p.hidden = false; dugme.setAttribute('aria-expanded', 'true');
-    const ilk = p.querySelector('[aria-pressed=true], a, button');
+    const ilk = p.querySelector('a, button');
     if (ilk) ilk.focus();
   }
   kapat(odak) {
@@ -212,7 +218,6 @@ class IdexyaKabuk extends HTMLElement {
     this.acik = null; this.perde.hidden = true;
     if (t === 'mega') { this.mega.hidden = true; this.megaKey = null; this.katmanGuncelle(); }
     if (t === 'arama') { this.sonuc.hidden = true; this.giris.setAttribute('aria-expanded', 'false'); this.giris.removeAttribute('aria-activedescendant'); this.ust.classList.remove('ik-arama-acik'); if (this.kIptal) this.kIptal(); this.kd.clear(); }
-    if (t === 'gorunum') { this.gorunum.hidden = true; this.gorDugme.setAttribute('aria-expanded', 'false'); }
     if (t === 'profil') { this.profil.hidden = true; this.profilDugme.setAttribute('aria-expanded', 'false'); }
     const d = this._donus; this._donus = null;
     if (odak && d && d.isConnected) d.focus();
@@ -249,11 +254,12 @@ class IdexyaKabuk extends HTMLElement {
   rozetYap(url, sayi) { this.rozet[url] = rozetSay(sayi); this.rozetTazele(this); }
 
   kullaniciYap(k) {
-    const kul = this.a.kullanici = { ad: String(k && k.ad || 'Kullanıcı').slice(0, 120), rol: String(k && k.rol || '').slice(0, 120) };
+    const kul = this.a.kullanici = { ad: String(k && k.ad || 'Kullanıcı').slice(0, 120), rol: String(k && k.rol || '').slice(0, 120), eposta: String(k && k.eposta || '').slice(0, 254) };
     const t = kul.ad + (kul.rol ? ', ' + kul.rol : '');
     this.profilDugme.setAttribute('aria-label', 'Profil: ' + t); this.profilDugme.title = t;
     this.profilDugme.textContent = kul.ad.charAt(0).toLocaleUpperCase('tr-TR');
     this.profil.replaceChildren(...[h('div', { class: 'ik-profil-ad' }, kul.ad), kul.rol ? h('div', { class: 'ik-soluk' }, kul.rol) : null,
+      this.a.ayarlarUrl ? h('a', { href: this.a.ayarlarUrl, 'data-ik-git': '', class: 'ik-profil-ayar' }, svg(I.ayar, 14), 'Ayarlar') : null,
       this.a.cikisUrl ? h('a', { href: this.a.cikisUrl, 'data-ik-git': '', class: 'ik-profil-cikis' }, 'Çıkış yap') : null].filter(Boolean));
   }
 
@@ -375,33 +381,18 @@ class IdexyaKabuk extends HTMLElement {
     }
   }
 
-  gorunumCiz() {
-    const sec = (alan, d, kapat) => () => {
-      GOR = Object.assign({}, GOR, { [alan]: d }); yaz('idx-gorunum', GOR); gorunumUygula(); this.gorunumCiz();
-      if (kapat) this.kapat(true); else { const b = this.gorunum.querySelector('[data-' + alan + '="' + d + '"]'); if (b) b.focus(); }
-      olay(this, 'gorunum', Object.assign({}, GOR));
-    };
-    const k = KALINLIK[GOR.kalinlik];
-    this.gorDugme.setAttribute('aria-label', 'Görünüm ve yazı: ' + TEMA[GOR.tema] + ', ' + YAZI_TIPI[GOR.yazi][0] + ', ' + k.ad);
-    this.gorunum.replaceChildren(
-      h('div', { class: 'ik-gor-baslik' }, 'Görünüm'),
-      h('div', { class: 'ik-gor-temalar', role: 'group', 'aria-label': 'Tema' }, Object.keys(TEMA).map((t) => h('button', {
-        type: 'button', class: 'ik-gor-tema', 'data-tema': t, 'aria-pressed': String(GOR.tema === t), onclick: sec('tema', t, true)
-      }, h('span', { class: 'ik-onizleme ik-oniz-' + t, 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i'), h('i'), h('i'), h('i')), h('span', null, TEMA[t])))),
-      h('p', { class: 'ik-gor-not' }, 'Otomatik, cihazının açık ya da koyu ayarını izler. Seçim bu tarayıcıda saklanır.'),
-      h('div', { class: 'ik-gor-ara' }),
-      h('div', { class: 'ik-gor-satir' }, h('div', { class: 'ik-gor-alt' }, 'Yazı kalınlığı'), h('div', { class: 'ik-soluk' }, k.aciklama)),
-      h('div', { class: 'ik-gor-kalinlik', role: 'group', 'aria-label': 'Yazı kalınlığı' }, Object.keys(KALINLIK).map((x) => h('button', {
-        type: 'button', 'data-kalinlik': x, 'aria-pressed': String(GOR.kalinlik === x), onclick: sec('kalinlik', x)
-      }, h('span', { class: 'ik-aa', css: { 'font-weight': KALINLIK[x].orta } }, 'Aa'), h('span', null, KALINLIK[x].ad)))),
-      h('div', { class: 'ik-gor-alt ik-ust-bosluk' }, 'Yazı tipi'),
-      h('div', { class: 'ik-soluk' }, 'Hepsi Türkçe karakterleri tam destekler; örnekler seçtiğin kalınlıkla gösterilir.'),
-      h('div', { class: 'ik-gor-yazilar', role: 'group', 'aria-label': 'Yazı tipi' }, Object.keys(YAZI_TIPI).map((y) => h('button', {
-        type: 'button', class: 'ik-yazi-kart', 'data-yazi': y, 'aria-pressed': String(GOR.yazi === y), css: { 'font-family': aile(y) }, onclick: sec('yazi', y)
-      }, h('span', { class: 'ik-yazi-ad' }, YAZI_TIPI[y][0], h('span', null, YAZI_TIPI[y][1])),
-      h('span', { class: 'ik-yazi-buyuk' }, 'Günaydın ' + this.a.kullanici.ad + '.'),
-      h('span', { class: 'ik-yazi-kucuk' }, '23 kritik konu · 18.000 TL · çğış ÇĞİŞ')))));
+  // Üst çubuktaki tema düğmesi açılır pencere açmaz: tıklayınca dört tema arasında sırayla geçer (Muhittin, 15 Kas 2026).
+  temaCiz() {
+    const ad = TEMA[GOR.tema], t = 'Tema: ' + ad + ' (değiştirmek için tıkla)';
+    this.temaDugme.setAttribute('aria-label', t); this.temaDugme.title = t;
+    this.temaDugme.replaceChildren(svg(I[GOR.tema], 17));
   }
+  // Görünümü değiştirir (tema düğmesi ve <idexya-ayarlar>): kaydeder, uygular, `idexya-kabuk:gorunum` yayar.
+  gorunumYap(p) {
+    GOR = gorunumCoz(Object.assign({}, GOR, p)); yaz('idx-gorunum', GOR); gorunumUygula(); gorunumYayinla();
+  }
+  get gorunum() { return Object.assign({}, GOR); }
+  darYap(v) { this.dar = !!v; yaz('idx-yan-dar', this.dar); this.ucanKapat(); if (this.yan) this.yanCiz(); }
 
   etkinYap(etkin) {
     const U = (x) => guvenliUrl(osAdresi(x), this.a.kokenler);
@@ -409,6 +400,8 @@ class IdexyaKabuk extends HTMLElement {
     etkin = etkin || {};
     this.a.etkin = { modulUrl: U(etkin.modulUrl), sayfaUrl: U(etkin.sayfaUrl), ad: String(etkin.ad || '').slice(0, 120) };
     this.e = etkinBul(this.k, this.a.etkin);
+    this.ayarda = !!this.a.ayarlarUrl && [this.a.etkin.sayfaUrl, this.a.etkin.modulUrl].includes(this.a.ayarlarUrl);
+    if (this.ayarda && !this.a.etkin.ad) this.e.ad = 'Ayarlar';
     if (this.yan) {
       const genel = { ad: 'Genel bakış', url: this.k.url };
       const anahtar = 'idx-sekme-' + this.k.anahtar;
@@ -448,11 +441,14 @@ class IdexyaKabuk extends HTMLElement {
     const dt = this.dar ? 'Menüyü genişlet' : 'Menüyü daralt';
     const daralt = h('button', {
       type: 'button', class: 'ik-ikon ik-cerceve ik-masa', 'aria-label': dt, title: dt,
-      onclick: () => { this.dar = !this.dar; yaz('idx-yan-dar', this.dar); this.ucanKapat(); this.yanCiz(); this.yan.querySelector('.ik-yan-bas button').focus(); }
+      onclick: () => { this.darYap(!this.dar); this.yan.querySelector('.ik-yan-bas button').focus(); }
     }, svg(I.daralt, 16));
     const bas = h('div', { class: 'ik-yan-bas' }, dar ? null : h('div', null, h('div', { class: 'ik-soluk ik-kucuk' }, 'Katman'), h('div', { class: 'ik-yan-ad' }, k.ad)), daralt);
-    const alt = h('div', { class: 'ik-yan-alt' }, h('button', { type: 'button', class: 'ik-yan-ayar', 'aria-label': 'Ayarlar: görünüm ve yazı', onclick: (ev) => this.degistir('gorunum', ev.currentTarget) },
-      svg(I.ayar, 15), dar ? null : h('span', null, 'Ayarlar')));
+    // Ayarlar ayrı bir sayfadır (ürünün `ayarlarUrl` adresi); adres yoksa bağlantı çizilmez.
+    const alt = this.a.ayarlarUrl ? h('div', { class: 'ik-yan-alt' }, h('a', {
+      href: this.a.ayarlarUrl, 'data-ik-git': '', class: 'ik-yan-ayar' + (this.ayarda ? ' ik-secili' : ''), 'aria-current': this.ayarda ? 'page' : null,
+      'aria-label': dar ? 'Ayarlar' : null, title: dar ? 'Ayarlar' : null
+    }, svg(I.ayar, 15), dar ? null : h('span', null, 'Ayarlar'))) : null;
     let govde;
     if (dar) {
       this.ucan = h('div', { id: 'ik-ucan', class: 'ik-ucan', role: 'dialog', hidden: true, onmouseenter: () => clearTimeout(this._ucanZ), onmouseleave: () => this.ucanBirak() });
@@ -487,7 +483,7 @@ class IdexyaKabuk extends HTMLElement {
           })));
       }));
     }
-    this.yan.replaceChildren(bas, ...[].concat(govde), alt);
+    this.yan.replaceChildren(...[bas].concat(govde, alt || []));
     this.rozetTazele(this.yan);
   }
   odakBul(sec, ad) { const b = [...this.yan.querySelectorAll(sec)].find((x) => (x.getAttribute('aria-label') || x.textContent).includes(ad)); if (b) b.focus(); }
