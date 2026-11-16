@@ -27,3 +27,28 @@ export function eskiYol(yol) {
 }
 // E-posta bağlantıları: panel yolu ise panel alan adı, değilse site
 export const panelYoluMu = (yol) => SAYFALAR.has(String(yol).replace(/^\//, '').replace(/[/?#].*$/, ''));
+
+// Tek adres (idexya-ortak tek-adres-plani.md adım 6, 15 Kas 2026): panel.idexya.com'daki YÖNETİM ARAYÜZÜ sayfaları
+// os.idexya.com/website/... adresine kalıcı (301) gider; yol ve sorgu korunur. Yalnız şu üçü birlikte tutarsa:
+// OS_YONLENDIRME_KOKU geçerli https kökü (ör. https://os.idexya.com), PANEL_TEMEL_YOL geçerli önek (/website) ve istek
+// TAM OLARAK panel.idexya.com'a gelen GET/HEAD. Hedefin kökü her zaman ayardaki sabit değerdir (açık yönlendirme yok).
+// Yönlenmeyenler: /api/* (yönetim API'si dahil: eski adresteki betikler ve dış çağıranlar), site sayfaları, üye alanı
+// (/uye, /icerik), bülten, varlıklar, /yonetim/veri/*, tema önizlemesi (/?tema=…) ve idexya.com'un tamamı.
+const OS_KOK_DESEN = /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+export function eskiPanelOsHedefi(url, env, yontem = 'GET') {
+  const kok = String((env && env.OS_YONLENDIRME_KOKU) || '').trim().replace(/\/+$/, '').toLowerCase();
+  const temel = String((env && env.PANEL_TEMEL_YOL) || '').trim();
+  if (!OS_KOK_DESEN.test(kok) || !/^(\/[a-z0-9-]+)+$/.test(temel)) return null;
+  // Os kapısı eksikse (os alanı, kapı anahtarı, Access) yönlendirme yok: kullanıcı os adresinde hataya düşmesin.
+  if (!String((env && env.PANEL_OS_ALAN) || '').trim() || !(env && env.KAPI_ANAHTARI_WEBSITE) || !(env && env.TEAM_DOMAIN) || !(env && env.POLICY_AUD)) return null;
+  if (url.hostname !== PANEL_ALAN || (yontem !== 'GET' && yontem !== 'HEAD')) return null;
+  const yol = url.pathname;
+  let hedef = null;
+  if (yol === '/') hedef = url.searchParams.has('tema') ? null : '/';
+  else if (yol === '/yonetim' || (yol.startsWith('/yonetim/') && !yol.startsWith('/yonetim/veri/'))) hedef = eskiYol(yol);
+  else {
+    const m = yol.match(/^\/([a-z-]+)\/?$/);
+    if (m && SAYFALAR.has(m[1])) hedef = '/' + m[1];
+  }
+  return hedef === null ? null : kok + temel + hedef + url.search;
+}
