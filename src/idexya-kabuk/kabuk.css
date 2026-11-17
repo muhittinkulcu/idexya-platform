@@ -119,8 +119,8 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 .ik-etkin>.ik-kok-satir::before{content:"";position:absolute;left:-8px;top:7px;bottom:7px;width:2px;border-radius:0 2px 2px 0;background:var(--ik-turuncu)}
 .ik-etkin>.ik-kok-satir .ik-kok-simge,.ik-kok-satir:hover .ik-kok-simge{color:var(--ik-vurgu)}
 .ik-kok-satir[aria-current=page]{background:var(--ik-yumusak);color:var(--ik-vurgu)}
-.ik-kok{position:relative}.ik-kok>.ik-kok-satir{padding-right:38px}
-.ik-kok-ac{position:absolute;right:2px;top:3px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:0;border-radius:var(--ik-yaricap);background:transparent;color:var(--ik-ikincil)!important}
+.ik-kok{position:relative}.ik-kok>.ik-kok-satir{gap:8px;padding-left:8px;padding-right:28px}
+.ik-kok-ac{position:absolute;right:1px;top:4px;width:26px;height:28px;display:flex;align-items:center;justify-content:center;border:0;border-radius:var(--ik-yaricap);background:transparent;color:var(--ik-ikincil)!important}
 .ik-kok-ac:hover,.ik-modul-ac:hover{background:var(--ik-gomuk);color:var(--ik-metin)!important}
 .ik-kok-ic{display:flex;flex-direction:column;gap:1px;margin:2px 0 8px 16px;padding-left:4px;border-left:1px solid var(--ik-cizgi)}
 .ik-yeni{animation:ik-sutun .3s cubic-bezier(.2,.85,.2,1) both}
