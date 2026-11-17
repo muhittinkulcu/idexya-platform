@@ -25,8 +25,8 @@ html[data-tema=koyu] .ik{--ik-vurgu:var(--ik-renk-koyu,#7F9AF2);--ik-vurgu-yazi:
 .ik-cerceve{width:32px;height:32px;border:1px solid var(--ik-cizgi);color:var(--ik-ikincil)}.ik-cerceve:hover{background:var(--ik-gomuk)}
 .ik-tel{display:none}
 
-/* Üst alan: yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; Muhittin, talimat 4.2). Turuncu yalnız X logosunda ve sol
-   menüdeki açık maddenin çizgisinde (--ik-turuncu; açık temada bir ton koyu #DE681B, beyazda 3,4:1, WCAG 1.4.11). Modül sekmesi
+/* Üst alan: yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; Muhittin, talimat 4.2). Turuncu yalnız X logosunun rozetinde
+   (#F07A23 zemin, beyaz X; favicon da aynı, 17 Kas 2026) ve sol menüdeki açık maddenin çizgisinde (--ik-turuncu; açık temada bir ton koyu #DE681B, beyazda 3,4:1, WCAG 1.4.11). Modül sekmesi
    ve mega menü yoktur: modül gezinmesi yalnız sol menüdedir. Cam ::before üzerindedir: .ik-ust kendisi backdrop-filter alırsa
    içindeki sabit perdenin bulanıklığı çubuğa hapsolur. Çubuğa view-transition-name verilmez: ad, öğeyi "backdrop root" yapar ve
    camın arkadaki sayfayı görmesini engeller (çubuk her sayfada aynı, geçişte fark görünmez). */
@@ -41,7 +41,7 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 .ik-ust.ik-sabit{position:sticky}
 .ik-ust :is(.ik-logo,.ik-ikon,.ik-profil):focus-visible{outline-color:var(--ik-cu-odak)}
 .ik-logo{display:flex;align-items:center;gap:10px;padding-right:4px}
-.ik-logo-x{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#15202B;color:#F07A23;box-shadow:0 0 0 1px var(--ik-cu-rozetkenar)}
+.ik-logo-x{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:8px;background:#F07A23;color:#FFFFFF;box-shadow:0 0 0 1px var(--ik-cu-rozetkenar)}
 .ik-logo-ad{font-weight:var(--w-vurgu);letter-spacing:.02em}
 /* Ürün yuvası (aktif müşteri, tarih aralığı): ürün doldurur; boşsa yer kaplamaz. */
 .ik-ust-yuva{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}.ik-ust-yuva:empty{display:none}

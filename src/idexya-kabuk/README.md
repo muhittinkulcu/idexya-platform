@@ -137,7 +137,7 @@ Simge adları (grup ve katman): `ev`, `izgara`, `megafon`, `grafik`, `yildiz`, `
 `rgba(21,32,43,.66)`; bulanıklık `.ik-ust::before` üzerinde). İçerik soldan sağa: IDOS kimliği, **ürün yuvası** (`ustYuva`;
 aktif müşteri seçimi ve tarih aralığı gibi ürünün denetimleri), arama, veri eşitleme durumu (1280 px altında yalnız saat),
 sabitleme, bildirimler, tema, kullanıcı menüsü. Turuncu (`--ik-turuncu`: açıkta `#DE681B`, koyuda `#F07A23`; yüzeyde en az
-3:1) yalnız X logosunda ve sol menüdeki açık maddenin 2 px çizgisindedir. `.ik-ust` adlandırılmış görünüm geçişi almaz
+3:1) yalnız X logosunun rozetinde (sabit `#F07A23` zemin, beyaz X) ve sol menüdeki açık maddenin 2 px çizgisindedir. `.ik-ust` adlandırılmış görünüm geçişi almaz
 (`view-transition-name` öğeyi "backdrop root" yapar, cam arkadaki sayfayı göremez). Açılır menüler (arama sonuçları, profil)
 koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satırdadır.
 
