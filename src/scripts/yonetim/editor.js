@@ -76,10 +76,10 @@ function stilEkle() {
   if (stilEklendi) return; stilEklendi = true;
   const st = document.createElement('style');
   st.textContent = `
-.ye{border:1px solid rgb(var(--line));border-radius:14px;background:rgb(var(--card));display:flex;flex-direction:column;min-width:0}
+.ye{border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));display:flex;flex-direction:column;min-width:0}
 .ye:focus-within{border-color:var(--brand)}
-.ye-cubuk{display:flex;flex-wrap:wrap;gap:2px;align-items:center;padding:6px;border-bottom:1px solid rgb(var(--line));position:sticky;top:0;z-index:2;background:rgb(var(--card));border-radius:14px 14px 0 0}
-.ye-cubuk button,.ye-cubuk select{min-height:34px;min-width:34px;padding:0 8px;border:0;border-radius:8px;background:transparent;color:var(--tx);font:inherit;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
+.ye-cubuk{display:flex;flex-wrap:wrap;gap:2px;align-items:center;padding:6px;border-bottom:1px solid rgb(var(--line));position:sticky;top:0;z-index:2;background:rgb(var(--card));border-radius:var(--ik-yaricap, 5px) var(--ik-yaricap, 5px) 0 0}
+.ye-cubuk button,.ye-cubuk select{min-height:34px;min-width:34px;padding:0 8px;border:0;border-radius:var(--ik-yaricap, 5px);background:transparent;color:var(--tx);font:inherit;font-size:13.5px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .ye-cubuk select{padding:0 6px;border:1px solid rgb(var(--line));min-width:120px}
 .ye-cubuk button:hover{background:var(--card2,var(--bg))}
 .ye-cubuk button[aria-pressed=true]{background:var(--tint);color:var(--tintx)}
@@ -91,19 +91,19 @@ function stilEkle() {
 .ye-alan h3{font-size:19px;line-height:1.3;margin:14px 0 6px;color:var(--head)}
 .ye-alan p{margin:0 0 12px}
 .ye-alan ul,.ye-alan ol{margin:0 0 12px;padding-left:24px}
-.ye-alan blockquote{margin:0 0 12px;padding:8px 16px;border-left:3px solid var(--brand);background:var(--tint);border-radius:0 10px 10px 0}
+.ye-alan blockquote{margin:0 0 12px;padding:8px 16px;border-left:3px solid var(--brand);background:var(--tint);border-radius:0 var(--ik-yaricap, 5px) var(--ik-yaricap, 5px) 0}
 .ye-alan blockquote p{margin:0}
 .ye-alan a{color:var(--acc)}
 .ye-kaynak{min-height:320px;max-height:70vh;padding:18px 22px;border:0;outline:none;resize:vertical;background:rgb(var(--card));color:var(--tx);font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace}
 .ye-bul{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;border-bottom:1px solid rgb(var(--line));background:var(--card2,var(--bg))}
-.ye-bul input{min-height:34px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--tx);font:inherit;font-size:14px;flex:1 1 160px}
-.ye-bul button{min-height:34px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
+.ye-bul input{min-height:34px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit;font-size:14px;flex:1 1 160px}
+.ye-bul button{min-height:34px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
 .ye-alt{display:flex;flex-wrap:wrap;gap:4px 16px;justify-content:space-between;padding:8px 12px;border-top:1px solid rgb(var(--line));font-size:12.5px;color:var(--tx2)}
 .ye-tam{position:fixed;inset:0;z-index:1000;border-radius:0;background:var(--bg)}
 .ye-tam .ye-alan,.ye-tam .ye-kaynak{max-height:none;flex:1;width:min(860px,100%);margin:0 auto;box-sizing:border-box;padding:32px 24px;font-size:18px}
 .ye-tam .ye-cubuk{border-radius:0}
 .ye-taslak{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid rgb(var(--line));background:var(--infob,var(--tint));color:var(--info,var(--tx));font-size:13.5px}
-.ye-taslak button{min-height:30px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:8px;background:rgb(var(--card));color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
+.ye-taslak button{min-height:30px;padding:0 10px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
 `;
   document.head.append(st);
 }

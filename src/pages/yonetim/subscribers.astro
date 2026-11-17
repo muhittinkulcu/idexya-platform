@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Bülten listesi" aktif="eposta" yol="Satış ve müşteri" aciklama="Sitedeki bülten kutusundan açık ticari ileti onayı vererek kaydolanlar. Gönderim servisi ve İYS kaydı hazır olunca bu listeye bülten gönderilir; listeden çıkanlara gönderilmez.">
 <div class="uyari bilgi">İYS yükümlülüğü: ticari ileti göndermeye başlamadan önce bu onayların İleti Yönetim Sistemi'ne (İYS) yüklenmesi gerekir. Listeden çıkan kişilerin kaydı 3 yıl sonra kendiliğinden silinir.</div>
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between">
-<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--track, var(--card2))"></div>
+<div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--track, var(--card2))"></div>
 <button type="button" class="dugme" data-csv>Aktif listeyi CSV indir</button>
 </div>
 <section class="kart" aria-label="Bülten kayıtları" data-liste style="overflow-x: auto"></section>

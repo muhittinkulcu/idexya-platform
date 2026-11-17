@@ -5,7 +5,7 @@ import { kurusOku } from './sablon-hesap.js';
 import { TANIMLAR, MUSTERI_ALANLARI, degerleriHazirla, varsayilan, vknDenetle } from './sablon-tanim.js';
 import { sayfaKosulu, degiskenleriBul, SINIR } from './sablon-metin.js';
 
-const GIRDI = 'min-height: 38px; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: var(--bg); color: var(--tx); font: inherit; box-sizing: border-box; width: 100%';
+const GIRDI = 'min-height: 38px; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: var(--bg); color: var(--tx); font: inherit; box-sizing: border-box; width: 100%';
 const insanAdi = (k) => { const s = k.replace(/_/g, ' '); return s.charAt(0).toLocaleUpperCase('tr') + s.slice(1); };
 
 // kutu: form alanlarının konacağı öğe. b: { tarih, belgeNo, musteri, ajans }. sayfalar: şablon sürümünün sayfaları.

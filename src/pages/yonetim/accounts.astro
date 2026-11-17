@@ -4,7 +4,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <Yonetim baslik="Hesap envanteri" aktif="hesaplar" yol="Satış" aciklama="Her müşterinin reklam, ölçüm ve satış hesapları; bu hesaplara kimin, hangi düzeyde ve ne zamandan beri eriştiği. Aynı hesap kimliği iki müşteriye yazılamaz.">
 <style is:global>
   .hs-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .hs-arac input,.hs-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:10px;background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
+  .hs-arac input,.hs-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
   .hs-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .hs-form .genis{grid-column:1/-1}
   .hs-grup{display:flex;flex-direction:column}
@@ -14,7 +14,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hs-tablo td{padding:10px 16px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
   .hs-kimlik{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px}
   .hs-uyari{display:flex;flex-direction:column;gap:6px}
-  .hs-uyari li{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:var(--card2)}
+  .hs-uyari li{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--ik-yaricap, 5px);background:var(--card2)}
 </style>
 <div class="uyari bilgi"><b>Şifre ve erişim anahtarı yazmayın.</b> Envanterde yalnız hesap adı, kimliği ve erişim bilgisi tutulur; şifreye ya da anahtara benzeyen metinler kaydedilmez. Müşteri çalışması bittiğinde (CRM aşaması “Kaybedildi”) açık erişimler bildirimlere düşer.</div>
 <section class="kart" data-uyarilar hidden style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px"></section>

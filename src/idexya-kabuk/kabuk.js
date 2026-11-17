@@ -85,9 +85,10 @@ class IdexyaKabuk extends HTMLElement {
     // Tek gezinme: sol menüde bütün maddeler; açık madde adrese göre bulunur (etkinYap), yoksa ürünün varsayılanı (`katman`).
     this.k = etkinKatman(ayar.katmanlar, ayar.etkin, ayar.katman);
     this.ana = ayar.katmanlar.find((x) => x.anahtar === 'genel') || ayar.katmanlar[0] || null;
-    this.acik = null; this.acikMod = {};
+    // Ağaç kaydı (Muhittin, 18 Kas 2026): madde ve modül oku sayfaya gitmeden açar / kapatır. idx-yan-acik { madde: bool },
+    // idx-yan-modul { modül adresi: bool }; kayıt yoksa açık sayfanın yolu açıktır.
+    this.acik = null; this.acikKok = oku('idx-yan-acik', {}) || {}; this.acikMod = oku('idx-yan-modul', {}) || {};
     this.dar = !!oku('idx-yan-dar', false);
-    this.kapaliOku();
     this.havuz = aramaHavuzu(ayar);
     this.rozet = {};
     this.gorulen = new Set(this.havuz.map((x) => x.url));
@@ -178,15 +179,15 @@ class IdexyaKabuk extends HTMLElement {
   // Ürünün denetimlerinin yuvası (üst alan). Ürün içine kendi öğelerini koyar (React: createPortal); kabuk içine dokunmaz.
   get ustYuva() { return this.yuva; }
   renkYap() { const k = this.k; if (k) { this.style.setProperty('--ik-renk', k.renk); this.style.setProperty('--ik-renk-koyu', k.renkKoyu); } }
-  // Kapalı gruplar madde başına saklanır (idx-yan-kapali-<madde>). Kayıt yoksa (null) çok gruplu maddede yalnız etkin sayfanın
-  // grubu açık başlar; kayıt kullanıcı bir grubu açıp kapatınca yazılır.
-  kapaliOku() { const x = this.k ? oku('idx-yan-kapali-' + this.k.anahtar, null) : null; this.kapali = Array.isArray(x) ? metinListesi(x) : null; }
-  kap() {
-    if (this.kapali) return this.kapali;
-    const g = this.k ? this.k.gruplar : [], eg = this.e ? this.e.grup : -1;
-    return g.length > 3 ? g.filter((x, i) => i !== eg).map((x) => x.baslik) : [];
+  // Kapalı gruplar madde başına saklanır (idx-yan-kapali-<madde>). Kayıt yoksa (null) çok gruplu (3'ten fazla) maddede yalnız
+  // etkin sayfanın grubu açık başlar; kayıt kullanıcı bir grubu açıp kapatınca yazılır.
+  kap(k = this.k) {
+    const x = k ? oku('idx-yan-kapali-' + k.anahtar, null) : null;
+    if (Array.isArray(x)) return metinListesi(x);
+    const g = k ? k.gruplar : [], eg = k === this.k && this.e ? this.e.grup : -1;
+    return g.length > 3 ? g.filter((y, i) => i !== eg).map((y) => y.baslik) : [];
   }
-  kapaliYaz(l) { this.kapali = l; yaz('idx-yan-kapali-' + this.k.anahtar, l); }
+  kapaliYaz(l, k = this.k) { yaz('idx-yan-kapali-' + k.anahtar, l); }
 
   // `idexya-kabuk:git` iptal edilirse yönlendirmeyi ürün yapar.
   tikla(e) {
@@ -195,7 +196,7 @@ class IdexyaKabuk extends HTMLElement {
     if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     if (this.sonuc.contains(l)) this.giris.value = '';
     this.kapat(false); this.cekmece(false); this.ucanKapat();
-    if (l.classList.contains('ik-profil-cikis')) try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-kapali)/.test(k) && localStorage.removeItem(k)); Object.keys(sessionStorage).forEach((k) => /^idx-/.test(k) && sessionStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
+    if (l.classList.contains('ik-profil-cikis')) try { Object.keys(localStorage).forEach((k) => /^idx-(sekme|yan-(kapali|acik|modul))/.test(k) && localStorage.removeItem(k)); Object.keys(sessionStorage).forEach((k) => /^idx-/.test(k) && sessionStorage.removeItem(k)); } catch (x) { /* gizli kip */ }
     const url = guvenliUrl(l.getAttribute('href'), this.a.kokenler);
     if (!url || !olay(this, 'git', { url }, true)) e.preventDefault();
   }
@@ -356,7 +357,8 @@ class IdexyaKabuk extends HTMLElement {
     etkin = etkin || {};
     this.a.etkin = { modulUrl: U(etkin.modulUrl), sayfaUrl: U(etkin.sayfaUrl), ad: String(etkin.ad || '').slice(0, 120) };
     const k = etkinKatman(this.a.katmanlar, this.a.etkin, this.a.katman);
-    if (k !== this.k) { this.k = k; this.gecici.clear(); this.kapaliOku(); this.renkYap(); }
+    // Başka maddeye geçince o maddenin yolu açılır (kullanıcı daha önce kapatmış olsa da).
+    if (k !== this.k) { this.k = k; this.gecici.clear(); this.renkYap(); if (k && this.acikKok[k.anahtar] === false) { delete this.acikKok[k.anahtar]; yaz('idx-yan-acik', this.acikKok); } }
     this.e = etkinBul(this.k, this.a.etkin);
     this.ayarda = !!this.a.ayarlarUrl && [this.a.etkin.sayfaUrl, this.a.etkin.modulUrl].includes(this.a.ayarlarUrl);
     if (this.ayarda && !this.e.ad) this.e.ad = 'Ayarlar';
@@ -395,19 +397,61 @@ class IdexyaKabuk extends HTMLElement {
       }, '×') : null)));
   }
 
-  // Sol menü (tek gezinme, talimat 4.2): bütün maddeler alt alta; yalnız açık maddenin (adresin bulunduğu) grupları ve
-  // sayfaları onun altında açılır. Tek gruplu maddede grup başlığı çizilmez.
+  // Sol menü (tek gezinme, talimat 4.2; oklu ağaç, Muhittin 18 Kas 2026): bütün maddeler alt alta; her madde, grup ve modülün
+  // oku sayfaya gitmeden alt düzeyi açar (madde › grup › modül › sayfa). Adın kendisi sayfaya gider. Tek gruplu maddede grup
+  // başlığı çizilmez. Hareket yalnız kullanıcının açtığı düzeyde (ik-yeni).
   modulCiz(m) {
-    const e = this.e, ic = e.modul === m, sec = ic && !e.sayfa;
-    const acik = m.sayfalar.length > 0 && (this.acikMod[m.url] === undefined ? ic : this.acikMod[m.url]);
+    const e = this.e, ic = e.modul === m, sec = ic && !e.sayfa, v = this.acikMod[m.url];
+    const acik = m.sayfalar.length > 0 && (v === undefined ? ic : v);
     return h('div', { class: 'ik-modul' },
       h('div', { class: 'ik-modul-satir' + (sec ? ' ik-secili' : '') + (ic ? ' ik-icinde' : '') },
-        h('a', { href: m.url, 'data-ik-git': '', 'aria-current': sec ? 'page' : null }, h('span', { class: 'ik-kare' }), h('span', null, m.ad), this.rz(m)),
+        h('a', { href: m.url, 'data-ik-git': '', 'data-ik-yol': m.url, 'aria-current': sec ? 'page' : null }, h('span', { class: 'ik-kare' }), h('span', null, m.ad), this.rz(m)),
         m.sayfalar.length ? h('button', {
           type: 'button', class: 'ik-modul-ac', 'aria-expanded': String(acik), 'aria-label': m.ad + ' sayfalarını ' + (acik ? 'gizle' : 'göster'),
-          onclick: () => { this.acikMod[m.url] = !acik; this.yanCiz(); this.odakBul('.ik-modul-ac', m.ad); }
+          onclick: () => this.agacAc(this.acikMod, 'idx-yan-modul', m.url, !acik)
         }, svg(SAG, 12, 2)) : null),
-      acik ? h('div', { class: this._sakin ? 'ik-sayfalar ik-sakin' : 'ik-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad, this.rz(s)))) : null);
+      acik ? h('div', { class: 'ik-sayfalar' + (this._yeni === m.url ? ' ik-yeni' : '') }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad, this.rz(s)))) : null);
+  }
+  // Maddenin alt ağacı. Fareyle geçici açma (grupUzerinde) yalnız açık sayfanın maddesinde.
+  kokIc(x) {
+    const et = x === this.k, tek = x.gruplar.length === 1;
+    const ic = h('div', { class: 'ik-kok-ic' + (this._yeni === x.anahtar ? ' ik-yeni' : ''), onpointerleave: et && !tek ? (ev) => this.agacCik(ev) : null }, tek
+      ? x.gruplar[0].moduller.map((m) => this.modulCiz(m))
+      : x.gruplar.map((g, gi) => {
+        const el = h('div', { class: 'ik-grup', onpointerenter: et ? (ev) => this.grupUzerinde(gi, ev, 1) : null, onpointerleave: et ? (ev) => this.grupUzerinde(gi, ev, 0) : null },
+          h('button', { type: 'button', class: 'ik-grup-bas', 'data-ik-yol': x.anahtar + '/' + gi, onclick: () => this.grupTikla(gi, x) },
+            h('span', null, svg(SIMGE[g.simge], 14), g.baslik), svg(ASAGI, 12, 2, 'ik-grup-ok')),
+          h('div', { class: 'ik-grup-kap' }, h('div', { class: 'ik-grup-ic' }, g.moduller.map((m) => this.modulCiz(m)))));
+        this.grupler.push([x, gi, el]);
+        return el;
+      }));
+    if (et && !tek) this.grupEl = this.grupler.filter((y) => y[0] === x).map((y) => y[2]);
+    return ic;
+  }
+  // Madde (kayıt acikKok) ya da modül (acikMod) açılır / kapanır; ağaç yeniden çizilir, odak aynı satırın okunda kalır.
+  agacAc(kayit, ad, id, v) {
+    kayit[id] = v; yaz(ad, kayit);
+    const f = this.yan.contains(D.activeElement);
+    this._yeni = v && id; this.yanCiz(); this._yeni = null;
+    const r = this.yan.querySelector('[data-ik-yol="' + CSS.escape(id) + '"]');
+    if (f && r) r.nextElementSibling.focus();
+  }
+  // Klavye (ağaç gibi): ↑ ↓ görünen satırlar arasında, → açar ya da ilk alt satıra iner, ← kapatır ya da üst satıra çıkar.
+  // Enter bağlantıda sayfaya gider, okta (Enter, Space) açar / kapatır.
+  agacTus(ev) {
+    const y = ev.key, t = ev.target;
+    if (!/^Arrow(Up|Down|Left|Right)$/.test(y) || ev.altKey || ev.metaKey || ev.ctrlKey) return;
+    const sat = t.matches('.ik-kok-ac,.ik-modul-ac') ? t.previousElementSibling : t;
+    const v = [...this.yan.querySelectorAll('.ik-agac a,.ik-grup-bas')].filter((x) => !x.closest('.ik-kapali>.ik-grup-kap')), i = v.indexOf(sat);
+    if (i < 0) return;
+    ev.preventDefault();
+    if (y === 'ArrowUp' || y === 'ArrowDown') return (v[i + (y === 'ArrowDown' ? 1 : -1)] || sat).focus();
+    const n = sat.nextElementSibling, ac = sat.matches('.ik-grup-bas') ? sat : n && n.matches('button') ? n : null;
+    const acik = ac && ac.getAttribute('aria-expanded') === 'true', yol = sat.dataset.ikYol;
+    const kap = (x) => x.closest('.ik-modul,.ik-grup,.ik-kok'), bas = (c) => c.querySelector('.ik-kok-satir,.ik-grup-bas,.ik-modul-satir>a');
+    if (y === 'ArrowRight' ? ac && !acik : acik) { ac.click(); const r = this.yan.querySelector('[data-ik-yol="' + CSS.escape(yol) + '"]'); if (r) r.focus(); }
+    else if (y === 'ArrowRight') { if (acik) (v[i + 1] || sat).focus(); }
+    else { let c = kap(sat); if (c && bas(c) === sat) c = kap(c.parentElement); if (c) bas(c).focus(); }
   }
   kokRozet(k) { return h('span', { class: 'ik-rozet', 'aria-hidden': 'true', 'data-k': k.anahtar, 'data-ad': k.ad }); }
 
@@ -434,7 +478,7 @@ class IdexyaKabuk extends HTMLElement {
       'aria-label': dar ? 'Ayarlar' : null, title: dar ? 'Ayarlar' : null
     }, svg(I.ayar, 15), dar ? null : h('span', null, 'Ayarlar')));
     let govde;
-    this.grupEl = null;
+    this.grupEl = null; this.grupler = [];
     if (dar) {
       this.ucan = h('div', { id: 'ik-ucan', class: 'ik-ucan', role: 'dialog', hidden: true, onmouseenter: () => clearTimeout(this._ucanZ), onmouseleave: () => this.ucanBirak() });
       this.ucan.addEventListener('focusout', (ev) => { const r = ev.relatedTarget; if (r && !this.ucan.contains(r) && !(this.rayDugmeleri || []).includes(r)) this.ucanKapat(); });
@@ -448,22 +492,19 @@ class IdexyaKabuk extends HTMLElement {
       this.gecici.clear();
     } else {
       this.rayDugmeleri = null; this.ucan = null;
-      // Açık maddenin grupları her zaman çizilir, kapalı grup CSS ile (yükseklik geçişi) gizlenir: açıp kapamak ağacı yeniden
-      // kurmaz, kaydırma yerinde kalır. Fareyle üzerine gelince kapalı grup geçici açılır (grupUzerinde).
-      const tek = k && k.gruplar.length === 1;
-      const ic = !k || !k.gruplar.length ? null : tek
-        ? h('div', { class: 'ik-kok-ic' }, k.gruplar[0].moduller.map((m) => this.modulCiz(m)))
-        : h('div', { class: 'ik-kok-ic', onpointerleave: (ev) => this.agacCik(ev) }, this.grupEl = k.gruplar.map((g, gi) =>
-          h('div', { class: 'ik-grup', onpointerenter: (ev) => this.grupUzerinde(gi, ev, 1), onpointerleave: (ev) => this.grupUzerinde(gi, ev, 0) },
-            h('button', { type: 'button', class: 'ik-grup-bas', onclick: () => this.grupTikla(gi) },
-              h('span', null, svg(SIMGE[g.simge], 14), g.baslik), svg(ASAGI, 12, 2, 'ik-grup-ok')),
-            h('div', { class: 'ik-grup-kap' }, h('div', { class: 'ik-grup-ic' }, g.moduller.map((m) => this.modulCiz(m)))))));
-      govde = h('nav', { class: 'ik-agac', 'aria-label': 'IDOS menüsü' }, kl.map((x) => {
+      // Açık maddelerin grupları her zaman çizilir, kapalı grup CSS ile (yükseklik geçişi) gizlenir: grubu açıp kapamak ağacı
+      // yeniden kurmaz, kaydırma yerinde kalır. Fareyle üzerine gelince kapalı grup geçici açılır (grupUzerinde).
+      govde = h('nav', { class: 'ik-agac', 'aria-label': 'IDOS menüsü', onkeydown: (ev) => this.agacTus(ev) }, kl.map((x) => {
         const etkin = x === k, burada = etkin && !e.modul && [this.a.etkin.sayfaUrl, this.a.etkin.modulUrl].includes(x.url);
+        const v = this.acikKok[x.anahtar], acik = x.gruplar.length > 0 && (v === undefined ? etkin : v);
         return h('div', { class: 'ik-kok' + (etkin ? ' ik-etkin' : '') },
-          h('a', { href: x.url, 'data-ik-git': '', class: 'ik-kok-satir', 'aria-current': burada ? 'page' : null },
-            h('span', { class: 'ik-kok-simge' }, svg(SIMGE[x.simge], 17, 1.8)), h('span', { class: 'ik-kok-ad' }, x.ad), etkin ? null : this.kokRozet(x)),
-          etkin ? ic : null);
+          h('a', { href: x.url, 'data-ik-git': '', 'data-ik-yol': x.anahtar, class: 'ik-kok-satir', 'aria-current': burada ? 'page' : null },
+            h('span', { class: 'ik-kok-simge' }, svg(SIMGE[x.simge], 17, 1.8)), h('span', { class: 'ik-kok-ad' }, x.ad), acik ? null : this.kokRozet(x)),
+          x.gruplar.length ? h('button', {
+            type: 'button', class: 'ik-kok-ac', 'aria-expanded': String(acik), 'aria-label': x.ad + ' alt menüsünü ' + (acik ? 'kapat' : 'aç'),
+            onclick: () => this.agacAc(this.acikKok, 'idx-yan-acik', x.anahtar, !acik)
+          }, svg(SAG, 12, 2)) : null,
+          acik ? this.kokIc(x) : null);
       }));
     }
     const eski = this.yan.querySelector('.ik-agac'), kaydir = eski ? eski.scrollTop : 0;
@@ -477,10 +518,10 @@ class IdexyaKabuk extends HTMLElement {
   // Grupların açık / kapalı hâli ve "tümünü aç / kapat" düğmesi yerinde güncellenir (ağaç yeniden kurulmaz).
   grupDurum() {
     const k = this.k, kap = this.kap();
-    (this.grupEl || []).forEach((el, gi) => {
-      const acik = !kap.includes(k.gruplar[gi].baslik) || this.gecici.has(gi);
+    (this.grupler || []).forEach(([x, gi, el]) => {
+      const g = x === k && this.gecici.has(gi), acik = !(x === k ? kap : this.kap(x)).includes(x.gruplar[gi].baslik) || g;
       el.classList.toggle('ik-kapali', !acik);
-      el.classList.toggle('ik-gecici', this.gecici.has(gi));
+      el.classList.toggle('ik-gecici', g);
       el.firstChild.setAttribute('aria-expanded', String(acik));
     });
     const b = this.hepsiDugme;
@@ -490,11 +531,11 @@ class IdexyaKabuk extends HTMLElement {
     }
   }
   // Tıklama kaydı değiştirir. Fareyle geçici açılmış grup (görünüşte açık) tıklanınca açık kalır ve kaydedilir.
-  grupTikla(gi) {
-    const b = this.k.gruplar[gi].baslik, kap = this.kap();
+  grupTikla(gi, k = this.k) {
+    const b = k.gruplar[gi].baslik, kap = this.kap(k);
     clearTimeout(this._grupAc);
-    if (this.gecici.delete(gi)) this.kapaliYaz(kap.filter((x) => x !== b));
-    else this.kapaliYaz(kap.includes(b) ? kap.filter((x) => x !== b) : kap.concat(b));
+    if (k === this.k && this.gecici.delete(gi)) this.kapaliYaz(kap.filter((x) => x !== b));
+    else this.kapaliYaz(kap.includes(b) ? kap.filter((x) => x !== b) : kap.concat(b), k);
     this.grupDurum();
   }
   // Fare (dokunmatik ve kalem değil) kapalı grubun üzerinde 150 ms durunca grup geçici açılır; yukarı ya da yana çıkınca
@@ -518,28 +559,31 @@ class IdexyaKabuk extends HTMLElement {
       this.gecici.delete(gi); this.grupDurum();
     }, 300));
   }
-  odakBul(sec, ad) { const b = [...this.yan.querySelectorAll(sec)].find((x) => (x.getAttribute('aria-label') || x.textContent).includes(ad)); if (b) b.focus(); }
 
   // Daraltılmış menü: rayda madde simgeleri; üzerine gelince ya da odakta maddenin sayfaları uçan panelde.
   ucanAc(ki) {
     clearTimeout(this._ucanZ);
     if (this.acik) this.kapat(false);
-    const b = this.rayDugmeleri[ki], k = this.a.katmanlar[ki], e = this.e, coklu = k.gruplar.length > 1;
+    const b = this.rayDugmeleri[ki], k = this.a.katmanlar[ki], e = this.e, u = this.ucan;
     this.rayDugmeleri.forEach((x, i) => x.setAttribute('aria-expanded', String(i === ki)));
-    this.ucan.style.setProperty('top', Math.max(8, b.offsetTop - 10) + 'px');
-    if (this.ucanGrup === ki && !this.ucan.hidden) return;
-    this.ucanGrup = ki;
-    this.ucan.setAttribute('aria-label', k.ad);
-    let u = 1;
-    const modul = (m) => h('div', { class: 'ik-u-oge', css: { '--u': u++ } },
-      h('a', { href: m.url, 'data-ik-git': '', class: 'ik-ucan-modul', 'aria-current': e.modul === m && !e.sayfa ? 'page' : null },
-        h('span', { class: 'ik-oge-nokta' }), h('span', { class: 'ik-oge-ad' }, m.ad), this.rz(m), svg(SAG, 13, 2.2, 'ik-oge-ok')),
-      m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', class: 'ik-ucan-sayfa', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad))) : null);
-    this.ucan.replaceChildren(h('div', { class: 'ik-ucan-ic' },
-      h('a', { href: k.url, 'data-ik-git': '', class: 'ik-u-oge ik-ucan-bas', css: { '--u': 0 } }, svg(SIMGE[k.simge], 18, 1.7), h('span', null, k.ad), svg(SAG, 13, 2.2, 'ik-oge-ok')),
-      k.gruplar.map((g) => [coklu ? h('div', { class: 'ik-ucan-grup' }, g.baslik) : null, g.moduller.map(modul)])));
-    this.ucan.hidden = false;
-    this.rozetTazele(this.ucan);
+    if (this.ucanGrup !== ki || u.hidden) {
+      this.ucanGrup = ki;
+      u.setAttribute('aria-label', k.ad);
+      // Sıkı liste, ağaçla aynı yapı: grup başlığı (simgeli) › modül › sayfalar.
+      let n = 1;
+      const modul = (m) => h('div', { class: 'ik-u-oge', css: { '--u': Math.min(n++, 8) } },
+        h('a', { href: m.url, 'data-ik-git': '', class: 'ik-ucan-modul', 'aria-current': e.modul === m && !e.sayfa ? 'page' : null }, h('span', { class: 'ik-oge-ad' }, m.ad), this.rz(m)),
+        m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', class: 'ik-ucan-sayfa', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad))) : null);
+      u.replaceChildren(h('div', { class: 'ik-ucan-ic' },
+        h('a', { href: k.url, 'data-ik-git': '', class: 'ik-u-oge ik-ucan-bas', css: { '--u': 0 } }, svg(SIMGE[k.simge], 18, 1.7), h('span', null, k.ad), svg(SAG, 13, 2.2, 'ik-oge-ok')),
+        k.gruplar.map((g) => [k.gruplar.length > 1 ? h('div', { class: 'ik-ucan-grup' }, svg(SIMGE[g.simge], 13), g.baslik) : null, g.moduller.map(modul)])));
+      u.hidden = false;
+      this.rozetTazele(u);
+    }
+    // Pencere hep görünür alanda (Muhittin, 18 Kas 2026): üst çubuğun altıyla ekranın altı arasına sığar, gerekirse yalnız içi kayar.
+    const yt = this.yan.getBoundingClientRect().top, ust = Math.max(0, this.ust.getBoundingClientRect().bottom) + 8, alt = innerHeight - 8;
+    u.style.setProperty('max-height', alt - ust + 'px');
+    u.style.setProperty('top', Math.max(ust, Math.min(b.getBoundingClientRect().top - 10, alt - u.offsetHeight)) - yt + 'px');
   }
   ucanOdak() { const l = this.ucan && this.ucan.querySelector('a'); if (l) l.focus(); }
   ucanBirak() { clearTimeout(this._ucanZ); this._ucanZ = setTimeout(() => { if (!this.ucan || !this.ucan.contains(D.activeElement)) this.ucanKapat(); }, 180); }

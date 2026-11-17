@@ -2,7 +2,7 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Müşteri alanı" aktif="portal" yol="Üyelik" aciklama="Üyeleri CRM’deki müşteri kartına bağlayın ve müşterilerinizi davetle üye yapın. Davetli kişi davetin gönderildiği e-postayla kaydolunca üyeliği onaylı açılır, seçtiğiniz bölümler verilir ve müşteriye bağlanır.">
-<div role="tablist" aria-label="Müşteri alanı" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line)); align-self: flex-start; flex-wrap: wrap"></div>
+<div role="tablist" aria-label="Müşteri alanı" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); border: 1px solid rgb(var(--line)); align-self: flex-start; flex-wrap: wrap"></div>
 <div data-mesaj></div>
 <div data-alan style="display: flex; flex-direction: column; gap: 14px"></div>
 <script>
@@ -12,7 +12,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const SEKME = [['erisim', 'Erişimler'], ['davet', 'Davetler']];
   let sekme = prm('sekme') === 'davet' ? 'davet' : 'erisim';
   const bildir = (metin, tur = 'ok') => mesaj.replaceChildren(metin ? el('div', { class: 'uyari ' + tur, role: 'status' }, metin) : '');
-  const secStil = 'min-height: 36px; min-width: 0; max-width: 100%; border: 1px solid rgb(var(--line)); border-radius: 8px; background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 13px';
+  const secStil = 'min-height: 36px; min-width: 0; max-width: 100%; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 13px';
   const musteriSecenek = (liste, secili, bosMetin) => [el('option', { value: '' }, bosMetin), ...liste.map((m) => el('option', { value: m.id, selected: m.id === secili }, m.alt ? `${m.ad} · ${m.alt}` : m.ad))];
 
   function sekmeCiz() {
@@ -90,7 +90,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       try {
         const r = await api('portal/davetler', istek);
         const adres = location.origin + r.yol;
-        const kutu = el('input', { readonly: true, value: adres, 'aria-label': 'Davet bağlantısı', style: 'flex: 1 1 260px; min-width: 0; min-height: 36px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: var(--bg); color: var(--tx); font: inherit; font-size: 12px' });
+        const kutu = el('input', { readonly: true, value: adres, 'aria-label': 'Davet bağlantısı', style: 'flex: 1 1 260px; min-width: 0; min-height: 36px; padding: 0 10px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: var(--bg); color: var(--tx); font: inherit; font-size: 12px' });
         sonuc.replaceChildren(el('div', { class: 'uyari ok', style: 'display: flex; flex-direction: column; gap: 8px' },
           el('strong', {}, `Davet oluşturuldu: ${istek.eposta}`),
           el('div', { style: 'display: flex; gap: 8px; flex-wrap: wrap; align-items: center' }, kutu, el('button', { type: 'button', class: 'dugme kucuk', onclick: async () => { try { await navigator.clipboard.writeText(adres); bildir('Bağlantı kopyalandı.'); } catch (e) { kutu.select(); } } }, 'Kopyala')),

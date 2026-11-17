@@ -37,7 +37,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try {
       const s = await api('destek/' + encodeURIComponent(id)); genelHata('');
       const t = s.talep, uye = s.uye || {};
-      const metin = el('textarea', { rows: '5', maxlength: '4000', required: true, placeholder: 'Yanıtınız üyeye görünür.', style: 'width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit; resize: vertical' });
+      const metin = el('textarea', { rows: '5', maxlength: '4000', required: true, placeholder: 'Yanıtınız üyeye görünür.', style: 'width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit; resize: vertical' });
       const gonder = async (kapat, d) => {
         if (!metin.value.trim()) { metin.focus(); return; }
         d.disabled = true;
@@ -82,7 +82,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 .ds-satir{display:flex;flex-direction:column;gap:4px;text-align:left;padding:12px 14px;border:0;border-bottom:1px solid rgb(var(--line));background:transparent;color:var(--tx);font:inherit;cursor:pointer}
 .ds-satir:hover{background:var(--card2)}
 .ds-satir.secili{background:var(--tint)}
-.ds-mesaj{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:12px;border:1px solid rgb(var(--line));background:var(--card2);max-width:92%}
+.ds-mesaj{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:var(--ik-yaricap, 5px);border:1px solid rgb(var(--line));background:var(--card2);max-width:92%}
 .ds-mesaj.ekip{align-self:flex-end;background:var(--tint);border-color:transparent}
 </style>
 </Yonetim>

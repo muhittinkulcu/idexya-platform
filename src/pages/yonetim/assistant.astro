@@ -27,7 +27,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
         const ek = (() => { try { return JSON.parse(m.ek || 'null'); } catch (e) { return null; } })();
         return el('div', { style: `align-self: ${m.rol === 'ziyaretci' ? 'flex-end' : 'flex-start'}; max-width: 85%; display: flex; flex-direction: column; gap: 4px` },
           el('span', { style: 'font-size: 11px; color: var(--tx2)' }, (m.rol === 'ziyaretci' ? 'Ziyaretçi' : 'Asistan') + ' · ' + tarih(m.zaman)),
-          el('div', { style: `padding: 10px 12px; border-radius: 12px; white-space: pre-wrap; overflow-wrap: anywhere; ${m.rol === 'ziyaretci' ? 'background: var(--tint); color: var(--tintx)' : 'background: var(--card2)'}` }, m.metin),
+          el('div', { style: `padding: 10px 12px; border-radius: var(--ik-yaricap, 5px); white-space: pre-wrap; overflow-wrap: anywhere; ${m.rol === 'ziyaretci' ? 'background: var(--tint); color: var(--tintx)' : 'background: var(--card2)'}` }, m.metin),
           ek && ek.kart ? el('div', { class: 'uyari bilgi', style: 'font-size: 13px' }, 'Talep kartı gösterildi: ' + [ek.kart.ad, ek.kart.eposta, ek.kart.telefon, ek.kart.konu].filter(Boolean).join(' · ')) : null);
       }));
     } catch (h) { alan.replaceChildren(el('div', { class: 'uyari hata' }, 'Sohbet yüklenemedi: ' + h.message)); }
