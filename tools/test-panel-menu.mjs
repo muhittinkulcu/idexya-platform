@@ -46,5 +46,19 @@ for (const ad of ESKI) {
   const bul = panelDosya.filter((p) => readFileSync(p, 'utf8').includes(ad)).filter((p) => !(ad === 'Haftalık Bülten' && /haftalik-bulten\.js$|bulten-kreatif\.js$/.test(p)));
   kontrol(`eski ad "${ad}" panelde yok` + (bul.length ? ': ' + bul.map((p) => p.slice(kok.length)).join(', ') : ''), bul.length === 0);
 }
+// 5. Tek gezinme (talimat 4.2): sol menü ortak katmanlar.json'dur; panel menüsündeki her adres sol menüde bir yerde, panel
+// sayfaları göreli, öteki ürünlerinki tam adres; Marketplace bayrakla gizli (verisi yok).
+const ORTAK = JSON.parse(readFileSync(join(kok, 'src/idexya-kabuk/katmanlar.json'), 'utf8'));
+const { ortakMenu, eksikAdresler, PANEL_KOKEN } = await import(join(kok, 'src/data/ortak-menu.js'));
+const sol = ortakMenu(ORTAK.katmanlar, MENU);
+const eksik = eksikAdresler(ORTAK.katmanlar, MENU);
+kontrol('panel menüsündeki her adres sol menüde' + (eksik.length ? ': eksik ' + eksik.join(', ') : ''), eksik.length === 0);
+kontrol('sol menü 11 madde (Marketplace bayraklı)', sol.map((k) => k.anahtar).join() === 'genel,musteriler,gorevler,marketing,crm,web,creative,marketplace,ai,raporlar,ayarlar' && sol.find((k) => k.anahtar === 'marketplace').bayrak === 'marketplace');
+const adr = sol.flatMap((k) => k.gruplar.flatMap((g) => g.moduller.flatMap((m) => [m.url, ...m.sayfalar.map((x) => x.url)])));
+kontrol('panel sayfaları göreli, panel kökeninde tam adres kalmadı', !adr.some((u) => u.startsWith(PANEL_KOKEN)) && adr.some((u) => u === '/leads'));
+kontrol('öteki ürünlerin sayfaları tam adres (Marketing, Creative)', adr.includes('https://marketing.idexya.com/crm') && adr.includes('https://creative.idexya.com/calendar'));
+kontrol('Web ve Commerce maddesinin adresi panelin genel bakışı', sol.find((k) => k.anahtar === 'web').url === '/dashboard');
+const lay = readFileSync(join(kok, 'src/layouts/Yonetim.astro'), 'utf8');
+kontrol('Yonetim.astro: ayar katmanı web, katmanlar ortak menüden', lay.includes("katman: 'web'") && lay.includes('ortakMenu(ORTAK.katmanlar, MENU)'));
 console.log(kalan ? kalan + ' KALDI' : 'hepsi geçti');
 process.exit(kalan ? 1 : 0);
