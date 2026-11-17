@@ -15,6 +15,11 @@
      "simge": "izgara",
      "moduller": [
       {
+       "ad": "Modüller",
+       "url": "https://marketing.idexya.com/modules",
+       "sayfalar": []
+      },
+      {
        "ad": "Özet",
        "url": "https://marketing.idexya.com/overview",
        "sayfalar": [
@@ -234,22 +239,11 @@
    "anahtar": "marketing",
    "ad": "Marketing",
    "simge": "megafon",
-   "url": "https://marketing.idexya.com/dashboard",
+   "url": "https://marketing.idexya.com/meta",
    "renk": "#2F55D4",
    "renkKoyu": "#7F9AF2",
    "aciklama": "Meta ve Google Ads reklam yönetimi",
    "gruplar": [
-    {
-     "baslik": "Özet",
-     "simge": "izgara",
-     "moduller": [
-      {
-       "ad": "Genel merkez",
-       "url": "https://marketing.idexya.com/dashboard",
-       "sayfalar": []
-      }
-     ]
-    },
     {
      "baslik": "Meta",
      "simge": "megafon",

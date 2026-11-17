@@ -77,7 +77,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   "bayraklar": [],                       // isteğe bağlı: bayraklı maddeleri açar (ör. "marketplace"); verilmeyen bayraklı madde çizilmez
   "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://os.idexya.com/", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
     "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // madde simgesi (simge adı, aşağıda)
-    "url": "https://marketing.idexya.com/dashboard", // maddenin adresi (sol menüdeki satır buraya gider; ağaçta da olmalı)
+    "url": "https://marketing.idexya.com/meta", // maddenin adresi (sol menüdeki satır buraya gider; ağaçta da olmalı)
     "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada vurgu (#RRGGBB)
     "aciklama": "Kısa açıklama",
     "gruplar": [{
