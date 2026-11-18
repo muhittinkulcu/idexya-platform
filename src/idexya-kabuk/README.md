@@ -106,7 +106,9 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   maddenin yolu varsayılan açıktır. Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
 - Üst alanda modül sekmesi ve mega menü **yoktur**. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
 - Genel bakış maddesinin adresi tek adresin köküdür: `https://os.idexya.com/`. Ana ekranı IDOS uygulaması üretir,
-  yönlendirici kökte yönlendirmesiz sunar (`tek-adres-plani.md` "Ana ekran").
+  yönlendirici kökte yönlendirmesiz sunar (`tek-adres-plani.md` "Ana ekran"). Kökte karşılama ekranı (Modüller) açılır;
+  Genel bakış grubunun ilk modülü "Operasyon merkezi" `https://os.idexya.com/dashboard` (Muhittin, 18 Kas 2026). Tek adresin
+  kendi ekranları (`os.idexya.com/<yol>`) yalnız Genel bakış maddesinde olur; öteki adresler ürün kökenlerindedir.
 - **Bayrak**: `bayrak` alanı olan madde (Marketplace: verisi yok) ürün `bayraklar` listesinde açmadıkça sessizce atılır;
   açılsa da adresi yoksa çizilmez (çalışmayan ekran gösterilmez).
 - Madde listesi boşsa yan menü ve sekme satırı çizilmez.
