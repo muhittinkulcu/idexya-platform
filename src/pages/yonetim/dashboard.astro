@@ -28,14 +28,14 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .bk-ic small{font-size:12px;color:var(--tx2)}
   .bk-halka:hover .bk-ic b{color:var(--acc)}
   .bk-yan{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:14px}
-  .bk-durum{margin:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;background:var(--card2);font-size:14px;color:var(--tx)}
+  .bk-durum{margin:0;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--ik-yaricap, 5px);background:var(--card2);font-size:14px;color:var(--tx)}
   .bk-durum i{width:8px;height:8px;border-radius:50%;flex:none;background:var(--brand)}
   .bk-durum[data-tur=iyi] i{background:var(--ok)}.bk-durum[data-tur=gec]{background:var(--warnb,var(--card2));color:var(--warn,var(--tx))}.bk-durum[data-tur=gec] i{background:#E0A100}
   .bk-sayilar{margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
   .bk-sayilar div:first-child{grid-column:1 / -1;flex-direction:row;flex-wrap:wrap;align-items:baseline;column-gap:10px}
   .bk-sayilar div:first-child dt{flex-basis:100%}
   .bk-sayilar div:first-child dd{font-size:26px}
-  .bk-sayilar div{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:12px;border:1px solid rgb(var(--line));min-width:0}
+  .bk-sayilar div{display:flex;flex-direction:column;gap:2px;padding:12px;border-radius:var(--ik-yaricap, 5px);border:1px solid rgb(var(--line));min-width:0}
   .bk-sayilar dt{font-size:12px;color:var(--tx2)}
   .bk-sayilar dd{margin:0;font-size:20px;font-weight:500;color:var(--head);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .bk-sayilar small{font-size:11px;color:var(--tx2)}
@@ -44,8 +44,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hn-satir{display:grid;grid-template-columns:minmax(110px,150px) minmax(0,1fr) 64px;align-items:center;gap:14px}
   .hn-ad{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--tx)}
   .hn-ad i{width:10px;height:10px;border-radius:3px;flex:none;background:var(--brand);opacity:var(--o)}
-  .hn-iz{height:10px;border-radius:999px;background:var(--track,rgb(var(--line)));overflow:hidden}
-  .hn-iz span{display:block;height:100%;border-radius:999px;background:var(--brand);opacity:var(--o);transition:width .6s ease}
+  .hn-iz{height:10px;border-radius:var(--ik-yaricap, 5px);background:var(--track,rgb(var(--line)));overflow:hidden}
+  .hn-iz span{display:block;height:100%;border-radius:var(--ik-yaricap, 5px);background:var(--brand);opacity:var(--o);transition:width .6s ease}
   .hn-kaz .hn-ad i,.hn-kaz .hn-iz span{background:var(--ok);opacity:1}
   .hn-kay .hn-ad i,.hn-kay .hn-iz span{background:var(--tx2);opacity:.55}
   .hn-kaz{margin-top:6px;padding-top:12px;border-top:1px dashed rgb(var(--line))}
@@ -54,18 +54,18 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .hn-bos{font-size:13px;color:var(--tx2);padding-top:4px}
   @media (prefers-reduced-motion:reduce){.bk-halka circle,.hn-iz span{transition:none}}
   .modul-arac{display:flex;gap:6px}
-  .modul-arac button{min-width:36px;height:36px;border-radius:10px;border:1px solid rgb(var(--line));background:rgb(var(--card));color:var(--head);cursor:pointer;font:inherit;font-size:12px}
-  .kart.kpi,.kpi{border-radius:18px;background:var(--card2);border:1px solid rgb(var(--line));padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
+  .modul-arac button{min-width:36px;height:36px;border-radius:var(--ik-yaricap, 5px);border:1px solid rgb(var(--line));background:rgb(var(--card));color:var(--head);cursor:pointer;font:inherit;font-size:12px}
+  .kart.kpi,.kpi{border-radius:var(--ik-yaricap, 5px);background:var(--card2);border:1px solid rgb(var(--line));padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
   .kpi:hover{border-color:var(--btnline);color:inherit}
   .kpi b{font-size:28px;font-weight:400;letter-spacing:-.01em;color:var(--head);line-height:1.15}
   .kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
   .degisim{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
   .degisim .ok-u,.degisim-tablo .ok-u{color:var(--ok);font-weight:500}.degisim .ok-a,.degisim-tablo .ok-a{color:var(--err);font-weight:500}
   .kivilcim{display:block;width:100%;height:34px;margin-top:4px}
-  .uyari-serit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:16px;background:var(--warnb);color:var(--tx);border:1px solid rgb(var(--line))}
-  .uyari-serit .simge{width:26px;height:26px;border-radius:8px;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:var(--warn);color:#FFFFFF;font-weight:500}
-  .segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:10px;background:var(--bg)}
-  .segment-kucuk button{height:30px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--tx2);font:inherit;font-size:12px;font-weight:500;cursor:pointer}
+  .uyari-serit{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:var(--ik-yaricap, 5px);background:var(--warnb);color:var(--tx);border:1px solid rgb(var(--line))}
+  .uyari-serit .simge{width:26px;height:26px;border-radius:var(--ik-yaricap, 5px);flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;background:var(--warn);color:#FFFFFF;font-weight:500}
+  .segment-kucuk{display:inline-flex;gap:2px;padding:3px;border-radius:var(--ik-yaricap, 5px);background:var(--bg)}
+  .segment-kucuk button{height:30px;padding:0 10px;border:0;border-radius:var(--ik-yaricap, 5px);background:transparent;color:var(--tx2);font:inherit;font-size:12px;font-weight:500;cursor:pointer}
   .segment-kucuk button[aria-pressed=true]{background:rgb(var(--card));color:var(--head);box-shadow:0 1px 3px var(--shadow)}
   .lejant{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--tx)}
   .lejant span{display:inline-flex;align-items:center;gap:6px}
@@ -79,7 +79,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .cubuk{flex:1 1 0;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;cursor:default;outline-offset:0}
   .cubuk:hover .yigin,.cubuk:focus-visible .yigin{filter:brightness(1.08)}
   .cubuk:hover{background:color-mix(in oklab,var(--track) 55%,transparent)}
-  .yigin{display:flex;flex-direction:column-reverse;gap:2px;min-height:2px;border-radius:4px 4px 0 0;overflow:hidden}
+  .yigin{display:flex;flex-direction:column-reverse;gap:2px;min-height:2px;border-radius:var(--ik-yaricap, 5px) var(--ik-yaricap, 5px) 0 0;overflow:hidden}
   .onceki-cizgi{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
   .x-eksen{position:relative;height:18px;margin-left:34px;font-size:11px;color:var(--tx2)}
   .x-eksen span{position:absolute;transform:translateX(-50%);white-space:nowrap}
@@ -92,16 +92,16 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .yatay-sat{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,2fr) auto;gap:10px;align-items:center;font-size:13px}
   .yatay-sat .ad{display:flex;align-items:center;gap:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .yatay-sat .ad i{width:10px;height:10px;border-radius:3px;flex:0 0 auto}
-  .yatay-iz{height:12px;border-radius:0 4px 4px 0;background:var(--track);overflow:hidden}
-  .yatay-iz div{height:100%;border-radius:0 4px 4px 0}
+  .yatay-iz{height:12px;border-radius:0 var(--ik-yaricap, 5px) var(--ik-yaricap, 5px) 0;background:var(--track);overflow:hidden}
+  .yatay-iz div{height:100%;border-radius:0 var(--ik-yaricap, 5px) var(--ik-yaricap, 5px) 0}
   .yatay-sat b{color:var(--head);font-variant-numeric:tabular-nums}
-  .tablo-sar{overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid rgb(var(--line));border-radius:14px}
+  .tablo-sar{overflow-x:auto;max-height:280px;overflow-y:auto;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px)}
   .tablo-sar table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
   .tablo-sar th,.tablo-sar td{padding:7px 10px;text-align:right;border-bottom:1px solid rgb(var(--line));white-space:nowrap}
   .tablo-sar th:first-child,.tablo-sar td:first-child{text-align:left}
   .tablo-sar thead th{position:sticky;top:0;background:var(--card2);color:var(--tx2);font-weight:500}
-  .ipucu{position:fixed;z-index:50;pointer-events:none;background:var(--head);color:var(--bg);padding:8px 10px;border-radius:10px;font-size:12px;line-height:1.45;white-space:pre-line;box-shadow:0 10px 30px -12px var(--shadow);max-width:240px}
-  .bekleyen-kutu{flex:1;min-height:120px;border:2px dashed rgb(var(--line));border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;color:var(--tx2)}
+  .ipucu{position:fixed;z-index:50;pointer-events:none;background:var(--head);color:var(--bg);padding:8px 10px;border-radius:var(--ik-yaricap, 5px);font-size:12px;line-height:1.45;white-space:pre-line;box-shadow:0 10px 30px -12px var(--shadow);max-width:240px}
+  .bekleyen-kutu{flex:1;min-height:120px;border:2px dashed rgb(var(--line));border-radius:var(--ik-yaricap, 5px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:20px;color:var(--tx2)}
   @media (max-width:900px){.pano{grid-template-columns:minmax(0,1fr)}.pano>.modul,.pano>.modul.tam{grid-column:auto}}
   @media (max-width:600px){.isi{grid-template-columns:30px repeat(24,minmax(0,1fr));gap:1px}.cubuk-alan,.x-eksen{margin-left:28px}}
 </style>
@@ -205,7 +205,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   </section>
 </div>
 
-<div data-gizliler hidden style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 16px; border-radius: 18px; border: 1px dashed rgb(var(--line))"></div>
+<div data-gizliler hidden style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 16px; border-radius: var(--ik-yaricap, 5px); border: 1px dashed rgb(var(--line))"></div>
 <div class="ipucu" data-ipucu hidden></div>
 
 <script>

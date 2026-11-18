@@ -102,8 +102,8 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 ```
 
 - **Tek gezinme** (talimat 4.2): "katman" sol menünün bir maddesidir. Sol menüde bütün maddeler alt alta durur; **açık madde**
-  adresten bulunur (`etkinKatman`: önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri değilse `katman`). Yalnız açık
-  maddenin grupları ve sayfaları onun altında açılır. Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
+  adresten bulunur (`etkinKatman`: önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri değilse `katman`). Açık
+  maddenin yolu varsayılan açıktır. Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
 - Üst alanda modül sekmesi ve mega menü **yoktur**. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
 - Genel bakış maddesinin adresi tek adresin köküdür: `https://os.idexya.com/`. Ana ekranı IDOS uygulaması üretir,
   yönlendirici kökte yönlendirmesiz sunar (`tek-adres-plani.md` "Ana ekran").
@@ -140,6 +140,17 @@ sabitleme, bildirimler, tema, kullanıcı menüsü. Turuncu (`--ik-turuncu`: aç
 3:1) yalnız X logosunun rozetinde (sabit `#F07A23` zemin, beyaz X) ve sol menüdeki açık maddenin 2 px çizgisindedir. `.ik-ust` adlandırılmış görünüm geçişi almaz
 (`view-transition-name` öğeyi "backdrop root" yapar, cam arkadaki sayfayı göremez). Açılır menüler (arama sonuçları, profil)
 koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satırdadır.
+
+**Oklu ağaç** (Muhittin, 18 Kas 2026): geniş yan menü madde › grup › modül › sayfa ağacıdır. Grubu olan her maddenin, her
+grubun ve sayfası olan her modülün yanında ok vardır; oka basmak sayfaya gitmeden alt düzeyi açar / kapatır, adın kendisi
+sayfaya gider (madde adı maddenin ilk sayfasına). Açık sayfanın yolu varsayılan açıktır; başka maddeye geçince o maddenin yolu
+açılır. Kayıt: `idx-yan-acik` (madde), `idx-yan-modul` (modül), `idx-yan-kapali-<madde>` (grup); açık olmayan maddede kayıt
+yoksa üçten çok grup kapalı başlar. Klavye: ↑ ↓ görünen satırlar arasında, → açar ya da ilk alt satıra iner, ← kapatır ya da
+üst satıra çıkar; okta Enter ve Space açar / kapatır. Açılan düzey yalnız kullanıcı açınca hareketlenir (`ik-yeni`).
+
+**Daraltılmış menüdeki pencere** (uçan panel; 18 Kas 2026): sıkı liste, ağaçla aynı yapı (simgeli grup başlığı, modül,
+sayfalar). Pencere hep görünür alanda kalır: üst çubuğun altı ile ekranın altı arasına sığacak biçimde yukarı kayar,
+`max-height` bu aralıktır, gerekirse yalnız pencerenin içi kayar. Fareyle pencereye geçerken kapanmaz.
 
 **Tüm grupları aç / kapat** (Muhittin, 15 Kas 2026): yan menü başlığında ("Menü" satırı), daraltma düğmesinin solunda simge
 düğme; açık maddenin gruplarına etki eder. Hiç kapalı grup yoksa "Tüm grupları kapat", varsa "Tüm grupları aç". Seçim
@@ -305,7 +316,7 @@ Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuz
 **Kural:** sekme adına ya da adresine ve menü adına müşteri ya da kişi adı konmaz (sekme adı menüdeki
 sayfa adından gelir; müşteri kartı gibi sayfalarda `etkin.ad` genel tutulur, ör. "Müşteri kartı"). Saklanan
 sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adresse geri yüklenir. Profil menüsündeki
-"Çıkış yap" `idx-sekme*` ve `idx-yan-kapali-*` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
+"Çıkış yap" `idx-sekme*`, `idx-yan-kapali-*`, `idx-yan-acik` ve `idx-yan-modul` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
 anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
@@ -313,7 +324,9 @@ anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 | `idx-gorunum` | `{ tema: acik\|koyu\|sistem\|zaman, zamanAcik: 420, zamanKoyu: 1140, azHareket: false }` (zaman: gün içindeki dakika) |
 | `idx-sekme` | Açık sekmeler `[{ ad, url }]`, en çok 8 (tek liste; ilk sekme ana ekran; adı bilinmeyen adres sekme olmaz) |
 | `idx-yan-dar` | Yan menü daraltılmış mı |
-| `idx-yan-kapali-<madde>` | Açık maddenin kapalı grup başlıkları |
+| `idx-yan-kapali-<madde>` | Maddenin kapalı grup başlıkları |
+| `idx-yan-acik` | Ağaçta açık / kapalı maddeler `{ madde: true\|false }` |
+| `idx-yan-modul` | Ağaçta açık / kapalı modüller `{ modül adresi: true\|false }` |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
 | `idx-acildi` (`sessionStorage`) | Bu sekmede kabuk daha önce açıldı mı (giriş hareketleri yalnız ilk açılışta) |
 
@@ -342,7 +355,11 @@ gelince ortak olur.
 Gerçek `a` ve `button`; `aria-expanded`, `aria-current="page"`, `aria-pressed`, `role="dialog"`,
 `role="combobox"` + `listbox`/`option` + `aria-activedescendant`. Her açılır klavyeyle kullanılır; Esc kapatır
 ve odak açan düğmeye döner; odak açılırdan çıkınca açılır kapanır. Daraltılmış menüde simgeye odaklanınca
-panel açılır, → ile panele girilir.
+panel açılır, → ile panele girilir. Yan menü ağacı ok tuşlarıyla gezilir (yukarıda "Oklu ağaç").
+
+**Köşe yuvarlaması** (Muhittin, 18 Kas 2026): tek değişken `--ik-yaricap: 5px` (`:root`); kart, düğme, girdi, açılır liste,
+rozet, sekme ve açılır pencere bunu kullanır. Yalnız daireler (avatar, nokta, asistan) ve açma kapama anahtarı yuvarlaktır.
+Ürünler kendi köşe ölçeğini bu değişkene bağlar (IDOS: Tailwind `borderRadius`).
 
 ## Bütçe (yapım kuralı 3)
 

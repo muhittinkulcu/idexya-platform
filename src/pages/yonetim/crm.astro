@@ -3,8 +3,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="CRM" aktif="crm" veri={['musteriler', 'etiketler?tur=musteri']} yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
-<label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: 10px; background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
-<div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
+<label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
+<div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
 <button type="button" class="dugme kucuk" data-arsiv aria-pressed="false">Arşivi göster</button>
 <button type="button" class="dugme ana" data-yeni-ac>+ Yeni müşteri</button>
 </div>
@@ -32,7 +32,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try { await api(`musteriler/${encodeURIComponent(m.id)}/asama`, { asama: yeni }); m.asama = yeni; m.guncelleme = new Date().toISOString(); ciz(); }
     catch (h) { sec.value = m.asama; sec.disabled = false; genelHata('Aşama değiştirilemedi: ' + h.message); }
   }
-  const asamaSec = (m) => el('select', { 'aria-label': baslik(m) + ' aşaması', style: 'min-height: 32px; border: 1px solid rgb(var(--line)); border-radius: 8px; background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 12px; max-width: 100%', onchange: (o) => asamaDegis(m, o.currentTarget.value, o.currentTarget) },
+  const asamaSec = (m) => el('select', { 'aria-label': baslik(m) + ' aşaması', style: 'min-height: 32px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 12px; max-width: 100%', onchange: (o) => asamaDegis(m, o.currentTarget.value, o.currentTarget) },
     ASAMALAR.map((a) => el('option', { value: a.k, selected: a.k === m.asama }, a.ad)));
 
   function ciz() {
@@ -71,9 +71,9 @@ import Yonetim from '../../layouts/Yonetim.astro';
       ASAMALAR.map((a) => {
         const ms = gor.filter((m) => m.asama === a.k);
         const top = ms.reduce((s, m) => s + (m.deger || 0), 0);
-        return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid rgb(var(--line)); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
+        return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
           el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px' }, el('strong', { style: 'color: var(--head)' }, a.ad + ' · ' + ms.length), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ms.some((m) => m.deger) ? para(top) : '')),
-          ms.length ? ms.map((m) => el('article', { class: 'kart', style: 'padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-radius: 12px' },
+          ms.length ? ms.map((m) => el('article', { class: 'kart', style: 'padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-radius: var(--ik-yaricap, 5px)' },
             el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none' }, baslik(m)),
             el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.paket].filter(Boolean).join(' · ') || (m.eposta || m.telefon || '')),
             el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; align-items: center; flex-wrap: wrap' }, asamaSec(m), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, once(m.guncelleme)))))

@@ -51,8 +51,8 @@ Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünü
   Muhittin, 12 ve 14 Kas 2026: ince ve zarif, "incenin bir tık üstü"; aşırı ince ya da kalın değil; 600 ve üstü yok.
   Satır aralığı 1,6. Sayılar eşit genişlikte. Kabuk ağırlıkları CSS değişkeniyle verir (`--w-ince`, `--w-govde`,
   `--w-orta`, `--w-vurgu`); bileşenlerde sabit sayı yazılmaz.
-- Kart: başlık solda; i (açıklama) ve ⋮ (seçenekler) sağ üstte; tek ana eylem sağ altta. Köşe 12 px.
-- Düğme: köşe 8 px; ana düğme dolu vurgu rengi, diğerleri çerçeveli.
+- Kart: başlık solda; i (açıklama) ve ⋮ (seçenekler) sağ üstte; tek ana eylem sağ altta. Köşe 5 px (`--ik-yaricap`; Muhittin, 18 Kas 2026).
+- Düğme: köşe 5 px (girdi, açılır liste, rozet, sekme ve açılır pencere de 5 px; yalnız daireler yuvarlak); ana düğme dolu vurgu rengi, diğerleri çerçeveli.
 - Durum etiketi: yazı ve nokta birlikte; renk tek başına anlatmaz. Onaylandı, uygulandı ve etkisi doğrulandı ayrı etiketlerdir.
 - Tema: açık, koyu, sistem, zaman (gündüz açık, gece koyu; varsayılan 07.00–19.00 açık) dört seçenek. Üst çubuktaki tema
   düğmesi açılır pencere açmaz, tıklayınca dört seçenek arasında sırayla geçer; simge seçimi gösterir (Muhittin, 15 Kas 2026).

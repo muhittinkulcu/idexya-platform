@@ -21,7 +21,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   function ozetCiz() {
     const s = veri.sayilar;
-    const kutu = (etiket, sayi, aciklama) => el('div', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 120px; padding: 10px 12px; border-radius: 12px; background: var(--card2)' },
+    const kutu = (etiket, sayi, aciklama) => el('div', { style: 'display: flex; flex-direction: column; gap: 2px; min-width: 120px; padding: 10px 12px; border-radius: var(--ik-yaricap, 5px); background: var(--card2)' },
       el('strong', { style: 'font-size: 20px; color: var(--head)' }, String(sayi)), el('span', { style: 'font-size: 13px' }, etiket), aciklama ? el('small', { style: 'color: var(--tx2)' }, aciklama) : '');
     const secili = [...kararlar.values()];
     const gidecek = { esle: secili.filter((k) => k.karar === 'esle').length, yeni: secili.filter((k) => k.karar === 'yeni').length, atla: secili.filter((k) => k.karar === 'atla').length };

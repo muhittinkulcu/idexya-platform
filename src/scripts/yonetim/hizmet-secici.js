@@ -64,13 +64,13 @@ export function hizmetSecici({ katalog = [], secim = null, etiket = 'Hizmet / ü
   const girdi = el('input', { id: kimlikAd, type: 'text', role: 'combobox', autocomplete: 'off', spellcheck: 'false', 'aria-autocomplete': 'list', 'aria-expanded': 'false', 'aria-controls': listeId, 'data-hizmet-secici': '', placeholder: 'Hizmet seçin ya da arayın…' });
   girdi.value = metin();
   const liste = el('ul', { id: listeId, role: 'listbox', 'aria-label': etiket, hidden: true,
-    style: 'position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 4px; list-style: none; max-height: 280px; overflow-y: auto; background: rgb(var(--card)); border: 1px solid rgb(var(--line)); border-radius: 12px; box-shadow: 0 8px 24px var(--shadow)' });
+    style: 'position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin: 4px 0 0; padding: 4px; list-style: none; max-height: 280px; overflow-y: auto; background: rgb(var(--card)); border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); box-shadow: 0 8px 24px var(--shadow)' });
   const kutu = el('div', { class: 'alan', style: 'position: relative; flex: 3 1 220px; min-width: 0' }, el('label', { for: kimlikAd }, etiket), girdi, liste);
 
   function secenekler() {
     gosterilen = [...hizmetSuz(katalog, girdi.value === metin() ? '' : girdi.value), DISI];
     const satirlar = gosterilen.map((h, i) => el('li', { id: `${listeId}-${i}`, role: 'option', 'aria-selected': String(i === etkin), 'data-secenek': h.disi ? 'disi' : h.id,
-      style: 'display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-weight: 400' + (h.disi ? '; border-top: 1px solid rgb(var(--line)); margin-top: 2px' : '') + (i === etkin ? '; background: var(--card2); outline: 2px solid var(--accent, rgb(var(--line)))' : ''),
+      style: 'display: flex; justify-content: space-between; gap: 10px; padding: 8px 10px; border-radius: var(--ik-yaricap, 5px); cursor: pointer; font-weight: 400' + (h.disi ? '; border-top: 1px solid rgb(var(--line)); margin-top: 2px' : '') + (i === etkin ? '; background: var(--card2); outline: 2px solid var(--accent, rgb(var(--line)))' : ''),
       onmousedown: (o) => o.preventDefault(), onclick: () => sec(h) },
     h.disi ? el('span', {}, DISI.ad, el('small', { style: 'display: block; color: var(--tx2)' }, 'Adı ve fiyatı elle yazın')) : el('span', {}, h.ad, h.tur ? el('small', { style: 'display: block; color: var(--tx2)' }, TUR_ADI[h.tur]) : ''),
     h.disi ? '' : el('span', { style: 'white-space: nowrap; color: var(--tx2); font-variant-numeric: tabular-nums' }, fiyatMetni(h.varsayilan_fiyat_kurus))));

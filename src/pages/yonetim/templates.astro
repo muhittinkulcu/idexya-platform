@@ -3,7 +3,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Belge şablonları" aktif="sablonlar" yol="Satış ve müşteri" aciklama="Şablonu bir kez hazırlayın; her müşteri için panel doldurur, PDF’i müşteri kartına kaydeder. Panel hiçbir belgeyi müşteriye göndermez, gönderimi siz yaparsınız.">
 <style is:global>
-  .sb-sekmeler{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:12px;background:var(--track,var(--card2));max-width:100%;width:max-content}
+  .sb-sekmeler{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:var(--ik-yaricap, 5px);background:var(--track,var(--card2));max-width:100%;width:max-content}
   .sb-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:14px}
   .sb-kart{padding:16px;display:flex;flex-direction:column;gap:8px}
   .sb-kart h3{margin:0;font-size:16px;color:var(--head)}
@@ -14,22 +14,22 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .sb-tablo th{padding:8px 10px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2);border-bottom:1px solid rgb(var(--line))}
   .sb-tablo td{padding:8px 10px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
   .sb-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-  .sb-tablo input[type=text],.sb-tablo select{min-height:36px;padding:4px 10px;border:1px solid rgb(var(--line));border-radius:10px;background:var(--bg);color:var(--tx);font:inherit;box-sizing:border-box;max-width:100%}
+  .sb-tablo input[type=text],.sb-tablo select{min-height:36px;padding:4px 10px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:var(--bg);color:var(--tx);font:inherit;box-sizing:border-box;max-width:100%}
   .sb-tablo input.sb-fiyat{width:140px;text-align:right}
   .sb-tablo input[aria-invalid=true]{border-color:var(--err)}
   .sb-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .sb-form .genis{grid-column:1/-1}
   .sb-duzen{display:grid;grid-template-columns:220px minmax(0,1fr) 320px;gap:16px;align-items:start}
   .sb-sayfalar{display:flex;flex-direction:column;gap:8px}
-  .sb-sk{border:2px solid rgb(var(--line));border-radius:12px;padding:6px;background:rgb(var(--card));cursor:pointer;display:flex;gap:8px;align-items:center;text-align:left;font:inherit;color:var(--tx)}
+  .sb-sk{border:2px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);padding:6px;background:rgb(var(--card));cursor:pointer;display:flex;gap:8px;align-items:center;text-align:left;font:inherit;color:var(--tx)}
   .sb-sk[aria-current=true]{border-color:var(--brand)}
-  .sb-sk img{width:52px;aspect-ratio:210/297;object-fit:cover;border-radius:4px;border:1px solid rgb(var(--line));background:#fff}
+  .sb-sk img{width:52px;aspect-ratio:210/297;object-fit:cover;border-radius:var(--ik-yaricap, 5px);border:1px solid rgb(var(--line));background:#fff}
   .sb-sk b{display:block;font-size:13px;color:var(--head)}.sb-sk small{font-size:12px;color:var(--tx2)}
-  .sb-onizleme{background:var(--card2);border-radius:16px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
-  .sb-metin{width:100%;min-height:420px;padding:10px 12px;border:1px solid rgb(var(--line));border-radius:10px;background:var(--bg);color:var(--tx);font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;box-sizing:border-box;resize:vertical}
+  .sb-onizleme{background:var(--card2);border-radius:var(--ik-yaricap, 5px);padding:16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+  .sb-metin{width:100%;min-height:420px;padding:10px 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:var(--bg);color:var(--tx);font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace;box-sizing:border-box;resize:vertical}
   .sb-yardim{margin:0;padding-left:18px;font-size:12px;color:var(--tx2);display:flex;flex-direction:column;gap:2px}
   .sb-yardim code{font-size:12px}
-  .sb-sk .sb-metin-simge{width:52px;aspect-ratio:210/297;border-radius:4px;border:1px solid rgb(var(--line));background:#fff;display:flex;flex-direction:column;gap:4px;padding:8px 6px;box-sizing:border-box}
+  .sb-sk .sb-metin-simge{width:52px;aspect-ratio:210/297;border-radius:var(--ik-yaricap, 5px);border:1px solid rgb(var(--line));background:#fff;display:flex;flex-direction:column;gap:4px;padding:8px 6px;box-sizing:border-box}
   .sb-sk .sb-metin-simge i{display:block;height:2px;background:var(--tx2);opacity:.45;border-radius:1px}.sb-sk .sb-metin-simge i:first-child{background:var(--brand);opacity:1}
   .sb-a4{width:min(100%,520px);aspect-ratio:1654/2339;background:#fff;position:relative;box-shadow:0 10px 30px var(--shadow);overflow:hidden}
   .sb-a4 img,.sb-a4 canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
@@ -40,7 +40,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .sb-adimlar b{background:var(--fill);color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px}
   .sb-onizle-izgara{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(220px,100%),1fr));gap:12px}
   .sb-onizle-izgara figure{margin:0;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--tx2)}
-  .sb-onizle-izgara img{width:100%;aspect-ratio:1654/2339;border:1px solid rgb(var(--line));border-radius:6px;background:#fff}
+  .sb-onizle-izgara img{width:100%;aspect-ratio:1654/2339;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:#fff}
   .sb-toplam{display:flex;gap:8px 16px;flex-wrap:wrap;align-items:center;font-size:14px}
   .sb-gizli{position:absolute;left:-10000px}
   @media (max-width:1100px){.sb-duzen{grid-template-columns:180px minmax(0,1fr)}.sb-duzen .sb-yan{grid-column:1/-1}}
@@ -75,7 +75,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div data-s="duzen" hidden style="display: flex; flex-direction: column; gap: 14px">
   <div data-duzen-uyari style="display: flex; flex-direction: column; gap: 8px"></div>
   <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: space-between">
-    <label style="display: flex; gap: 8px; align-items: center; font-size: 14px">Sürüm <select data-surum style="min-height: 36px; border-radius: 10px; border: 1px solid rgb(var(--line)); background: var(--bg); color: var(--tx); padding: 0 8px; font: inherit"></select></label>
+    <label style="display: flex; gap: 8px; align-items: center; font-size: 14px">Sürüm <select data-surum style="min-height: 36px; border-radius: var(--ik-yaricap, 5px); border: 1px solid rgb(var(--line)); background: var(--bg); color: var(--tx); padding: 0 8px; font: inherit"></select></label>
     <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
       <span role="status" data-duzen-durum style="font-size: 14px"></span>
       <button type="button" class="dugme" data-ornek>Örnek veriyle göster</button>

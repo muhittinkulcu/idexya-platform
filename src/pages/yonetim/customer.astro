@@ -54,19 +54,19 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </form>
 </dialog>
 <style is:global>
-.tk-pencere{max-width:560px;width:calc(100% - 32px);padding:22px;border:1px solid rgb(var(--line));border-radius:18px;background:rgb(var(--card));color:var(--tx);box-sizing:border-box}
+.tk-pencere{max-width:560px;width:calc(100% - 32px);padding:22px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);box-sizing:border-box}
 .tk-pencere::backdrop{background:rgba(0,37,89,.35)}
-.tk-birak{position:relative;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;padding:22px;border:2px dashed rgb(var(--line));border-radius:14px;background:var(--card2);color:var(--tx2);cursor:pointer}
+.tk-birak{position:relative;display:flex;flex-direction:column;gap:4px;align-items:center;text-align:center;padding:22px;border:2px dashed rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:var(--card2);color:var(--tx2);cursor:pointer}
 .tk-birak b{color:var(--head)}.tk-birak[data-ustunde]{border-color:var(--brand);background:var(--tint)}.tk-birak:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 .tk-iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
 .tk-tablo{width:100%;min-width:720px;border-collapse:collapse;font-size:13.5px}
 .tk-tablo th{text-align:left;color:var(--tx2);font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid rgb(var(--line))}
 .tk-tablo td{padding:10px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
 .tk-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.tk-kaynak{font-size:11.5px;color:var(--tx2);border:1px solid rgb(var(--line));border-radius:6px;padding:1px 6px;white-space:nowrap}
+.tk-kaynak{font-size:11.5px;color:var(--tx2);border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);padding:1px 6px;white-space:nowrap}
 .tk-menu{position:relative;display:inline-block}.tk-menu summary{list-style:none}.tk-menu summary::-webkit-details-marker{display:none}
-.tk-menu-ic{position:absolute;right:0;top:calc(100% + 4px);z-index:20;min-width:200px;display:flex;flex-direction:column;gap:2px;padding:6px;background:rgb(var(--card));border:1px solid rgb(var(--line));border-radius:12px;box-shadow:0 20px 40px -18px var(--shadow)}
-.tk-menu-ic button{text-align:left;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
+.tk-menu-ic{position:absolute;right:0;top:calc(100% + 4px);z-index:20;min-width:200px;display:flex;flex-direction:column;gap:2px;padding:6px;background:rgb(var(--card));border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);box-shadow:0 20px 40px -18px var(--shadow)}
+.tk-menu-ic button{text-align:left;padding:8px 10px;border:0;border-radius:var(--ik-yaricap, 5px);background:transparent;color:var(--tx);font:inherit;font-size:13px;cursor:pointer}
 .tk-menu-ic button:hover{background:var(--card2)}.tk-menu-ic button.tk-sil{color:var(--err)}
 .cip.taslak{background:var(--card2);color:var(--tx2)}.cip.gonderildi{background:var(--infob);color:var(--info)}
 </style>
@@ -267,7 +267,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
           el('small', { class: 'kart-alt' }, `Bu müşteri · son ${r.gun} gün, bugün hariç · para birimleri ayrı`)),
         el('a', { href: '/crm-sync', style: 'font-size: 13px' }, 'Eşleşmeleri yönet')),
       r.ozet.length
-        ? el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px' }, r.ozet.map((o) => el('div', { style: 'padding: 10px 12px; border-radius: 12px; background: var(--card2); display: flex; flex-direction: column; gap: 2px; min-width: 0' },
+        ? el('div', { style: 'display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px' }, r.ozet.map((o) => el('div', { style: 'padding: 10px 12px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); display: flex; flex-direction: column; gap: 2px; min-width: 0' },
             el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${PLATFORM[o.platform] || o.platform} · ${o.para}`),
             el('strong', { style: 'font-size: 18px; color: var(--head)' }, paraYaz(o.harcama, o.para)),
             el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${sayi(o.gosterim)} gösterim · ${sayi(o.tiklama)} tıklama`))))
@@ -286,7 +286,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('a', { href: '/accounts?customer=' + encodeURIComponent(id), style: 'font-size: 13px' }, r.kayitlar.length ? 'Envanterde yönet' : '+ Hesap ekle'));
     const CIP = { aktif: 'kazanildi', bekliyor: 'teklif', kaldirildi: 'kaybedildi' };
     kutu.replaceChildren(...[bas, r.kayitlar.length
-      ? el('div', { style: 'display: flex; flex-wrap: wrap; gap: 8px' }, r.kayitlar.map((k) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: 10px; font-size: 13px' },
+      ? el('div', { style: 'display: flex; flex-wrap: wrap; gap: 8px' }, r.kayitlar.map((k) => el('span', { style: 'display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); font-size: 13px' },
           el('b', {}, r.platformlar[k.platform] || k.platform), el('span', { style: 'color: var(--tx2); font-family: ui-monospace, monospace' }, k.hesap_kimligi || k.hesap_adi || ''),
           el('span', { class: 'cip ' + (CIP[k.durum] || '') }, r.durumlar[k.durum] || k.durum))))
       : el('span', { style: 'font-size: 13px; color: var(--tx2)' }, 'Bu müşteri için henüz hesap kaydı yok. Google Ads, Meta, GA4, GTM gibi hesaplarını ve erişimlerinizi envantere ekleyin.')]);
@@ -328,7 +328,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       if (g && g.durum === 'bekliyor') {
         satirlar.push(el('div', { class: 'uyari hata', role: 'status', 'data-idos-bekliyor': '' }, `IDOS'a gönderilemedi — bekliyor. ${g.son_hata || ''} Son deneme: ${tarih(g.son_deneme)} · ${g.deneme} deneme. Kart panelde duruyor; sorun giderilince yeniden deneyin.`));
       }
-      satirlar.push(el('div', { style: 'display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 12px; background: var(--card2)' },
+      satirlar.push(el('div', { style: 'display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: var(--ik-yaricap, 5px); background: var(--card2)' },
         el('span', { style: 'font-size: 13px' }, 'Kart IDOS\'ta “aday” olarak açılır; aday reklam raporlarına ve portföye girmez. Marka, sektör, sorumlu, kaynak ve iletişim kişisi gönderilir. TC kimlik, kart ve IBAN numarası gönderilmez.'),
         idosGonder(g ? 'Yeniden dene' : 'IDOS\'a aday olarak gönder')));
     } else if (r.yok && g && g.durum === 'gonderildi') {
