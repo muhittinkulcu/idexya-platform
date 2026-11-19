@@ -4,6 +4,7 @@
 // form gönderilmez. GA4 ve piksel GTM içinden yükleniyorsa kaynakta görünmez; bu durumda hata değil bilgi notu verilir.
 // Cloudflare ücretsiz planında çalıştırma başına alt istek sınırı (50) olduğu için zamanlayıcıda en çok 15 site kontrol edilir (Instagram ve IDOS çekimleri de aynı çalıştırmada).
 import { json, hata, simdi, kimlik, kirp, islemYaz } from './ortak.js';
+import { anaParam } from '../src/data/musteri-secim.js';
 
 const EN_COK_SITE = 15, SAKLANAN = 30, ZAMAN_ASIMI = 15000, EN_COK_BAYT = 3 * 1024 * 1024;
 const AJAN = 'IdexyaSiteKontrol/1.0 (+https://idexya.com)';
@@ -111,16 +112,20 @@ export async function yonetimSiteSaglikApi(db, env, yontem, yol, govde, kim, url
   if (!(yol === 'site-saglik' || yol.startsWith('site-saglik/'))) return null;
   if (yol === 'site-saglik' && yontem === 'GET') {
     const arsiv = url && url.searchParams.get('arsiv') === '1';
+    // Üst alandaki ortak müşteri seçimi (?ana=<IDOS client_id>): yalnız o ana kayda bağlı CRM kartlarının siteleri.
+    // Ekleme formundaki kart listesi de aynı müşteriye daralır.
+    const ana = anaParam(url), p = ana ? [ana] : [];
+    const kosul = ana ? ' AND h.musteri_id IN (SELECT id FROM musteriler WHERE ana_kayit_id = ?)' : '';
     const [h, s, m, n] = await db.batch([
-      db.prepare(`SELECT h.*, m.firma AS musteri_firma, m.ad AS musteri_ad FROM site_saglik_hedef h LEFT JOIN musteriler m ON m.id = h.musteri_id WHERE h.arsiv IS ${arsiv ? 'NOT ' : ''}NULL ORDER BY COALESCE(m.firma, m.ad), h.adres`),
+      db.prepare(`SELECT h.*, m.firma AS musteri_firma, m.ad AS musteri_ad FROM site_saglik_hedef h LEFT JOIN musteriler m ON m.id = h.musteri_id WHERE h.arsiv IS ${arsiv ? 'NOT ' : ''}NULL${kosul} ORDER BY COALESCE(m.firma, m.ad), h.adres`).bind(...p),
       db.prepare(`SELECT s.* FROM site_saglik_sonuc s JOIN (SELECT hedef_id, MAX(zaman) AS z FROM site_saglik_sonuc GROUP BY hedef_id) x ON x.hedef_id = s.hedef_id AND x.z = s.zaman`),
-      db.prepare('SELECT id, firma, ad FROM musteriler WHERE arsiv IS NULL ORDER BY COALESCE(firma, ad, eposta)'),
-      db.prepare('SELECT COUNT(*) AS n FROM site_saglik_hedef WHERE arsiv IS NOT NULL')
+      db.prepare(`SELECT id, firma, ad FROM musteriler WHERE arsiv IS NULL${ana ? ' AND ana_kayit_id = ?' : ''} ORDER BY COALESCE(firma, ad, eposta)`).bind(...p),
+      db.prepare(`SELECT COUNT(*) AS n FROM site_saglik_hedef h WHERE h.arsiv IS NOT NULL${kosul}`).bind(...p)
     ]);
     const son = new Map(s.results.map((x) => [x.hedef_id, { ...x, bulunan: JSON.parse(x.bulunan || '{}'), sorunlar: JSON.parse(x.sorunlar || '[]'), notlar: JSON.parse(x.notlar || '[]') }]));
     const hedefler = [];
     for (const x of h.results) hedefler.push({ ...x, son: son.get(x.id) || null, beklenen: await beklenenler(db, x.musteri_id) });
-    return json({ ok: true, hedefler, musteriler: m.results, sinir: EN_COK_SITE, arsivde: n.results[0].n });
+    return json({ ok: true, hedefler, musteriler: m.results, sinir: EN_COK_SITE, arsivde: n.results[0].n, ana: ana || null });
   }
   if (yol === 'site-saglik' && yontem === 'POST') {
     const adres = gecerliSite(kirp(govde.adres, 500));

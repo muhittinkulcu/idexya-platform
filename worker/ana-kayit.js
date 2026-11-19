@@ -253,6 +253,12 @@ export async function yonetimAnaKayitApi(db, env, yontem, yol, kim, govde) {
     const [hs, ab] = await Promise.all([db.prepare('SELECT COUNT(*) AS n FROM ana_hesap_esleme').first(), db.prepare("SELECT COUNT(*) AS n FROM ana_kayit_aday WHERE durum = 'bekliyor'").first()]);
     return json({ ok: true, kurulu: anaKayitKurulu(env), onbellek: n.n, bagli_kart: b.n, hesap_esleme: hs.n, belirsiz_hesap: ayar[A.belirsiz] === undefined ? null : Number(ayar[A.belirsiz]), bekleyen_aday: ab.n, son_esitleme: ayar[A.esitleme] || null, son_tam: ayar[A.tam] || null, son_hata: ayar[A.hata] || null });
   }
+  // Üst alandaki ortak müşteri seçicisinin listesi (1.3): yalnız önbellekten okunur, IDOS'a istek gitmez. Alanlar en az
+  // düzeyde: kimlik, görünen ad (marka, yoksa unvan) ve durum. Seçicide varsayılan yalnız aktifler görünür.
+  if (yol === 'ana-kayit/musteriler' && yontem === 'GET') {
+    const r = await db.prepare("SELECT musteri_id AS id, COALESCE(marka, json_extract(veri, '$.unvan')) AS ad, durum FROM ana_musteri ORDER BY marka LIMIT 3000").all();
+    return json({ ok: true, kurulu: anaKayitKurulu(env), musteriler: r.results.map((x) => ({ id: x.id, ad: x.ad || '—', durum: x.durum || null })) });
+  }
   if (yol === 'ana-kayit/esitle' && yontem === 'POST') {
     if (!anaKayitKurulu(env)) return hata('IDOS bağlantısı kurulu değil (IDOS_ORTAK_URL ve IDOS_ORTAK_JETON)', 409);
     const r = await anaKayitEsitle(env, kim.eposta, { tam: govde && govde.tam === true });

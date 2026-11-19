@@ -103,6 +103,15 @@ Plan: idexya-ortak `tek-adres-plani.md`. Önek Astro derlemesine konmaz (site ay
 - Yerel deneme: `.dev.vars` içinde `YEREL_GIRIS=evet` (yalnız localhost'ta geçerli, repoya girmez), `npm run build && npx wrangler dev`,
   sonra boş veritabanıyla `node tools/test-yonetim.mjs http://127.0.0.1:8787 <ekran-klasörü>` (uçtan uca: form → talep → CRM → kart).
 
+## Tek müşteri seçimi (1.3, 19 Kas 2026)
+
+- Üst alanda (kabuğun `ustYuva` yuvası) müşteri seçici: liste `ana_musteri` önbelleğinden (`GET /api/yonetim/ana-kayit/musteriler`;
+  IDOS'a istek gitmez, yalnız kimlik, ad, durum). Varsayılan yalnız aktifler, aranabilir. Seçim ortak `idx-musteri` anahtarına
+  (IDOS `client_id`) yazılır; Marketing ve Creative aynı anahtarı okur. Listede olmayan kimlik temizlenir; başka sekme `storage` ile izlenir.
+- Seçim varken (seçenek A) yalnız o müşteriye bağlı veri: `musteriler?ana=<id>` (`ana_kayit_id`), `site-saglik?ana=<id>`.
+  Süzen sayfalar `Yonetim.astro` `musteriSuzgec` ile işaretlidir (CRM, Müşteri siteleri); ötekilerde seçici "Bu sayfa müşteriye
+  göre süzülmez" der. Bağsız kartlar gizlenir, silinmez. Kural `src/data/musteri-secim.js`, test `node tools/test-musteri-secimi.mjs`.
+
 ## Panel sayfa geçişi hızı (14 Kas 2026)
 
 - **Kabuk ilk boyamadan önce:** `tools/panel-kabuk.mjs` kabuk bağlantısını ve ortak kabuğu (`src/scripts/yonetim/kabuk-giris.js`) tek

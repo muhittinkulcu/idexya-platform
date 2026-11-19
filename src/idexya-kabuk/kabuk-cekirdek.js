@@ -38,6 +38,18 @@ export const TEMA = { acik: 'Açık', koyu: 'Koyu', sistem: 'Sistem', zaman: 'Za
 export const TEMA_SIRASI = ['acik', 'koyu', 'sistem', 'zaman'];
 export const ZAMAN_VARSAYILAN = { zamanAcik: 420, zamanKoyu: 1140 }; // 07.00 açık, 19.00 koyu (gün içindeki dakika)
 
+// Ortak aktif müşteri (1.3, Muhittin 18 Kas 2026): üç modül aynı seçimi `idx-musteri` anahtarında paylaşır (tek köken
+// os.idexya.com). Değer IDOS `client_id` (düz metin); Creative markayı `idos_client_id` ile çevirir, Website/CRM kartları
+// `ana_kayit_id` ile süzer. Ad değil yalnız kimlik saklanır. Geçersiz kayıt yok sayılır. Çıkış yap anahtarı siler.
+export const MUSTERI_ANAHTARI = 'idx-musteri';
+export const musteriKimligi = (x) => (typeof x === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(x) ? x : '');
+export function musteriOku(depo) { try { return musteriKimligi(depo && depo.getItem(MUSTERI_ANAHTARI)); } catch (e) { return ''; } }
+export function musteriYaz(depo, id) {
+  const k = musteriKimligi(id);
+  try { if (k) depo.setItem(MUSTERI_ANAHTARI, k); else depo.removeItem(MUSTERI_ANAHTARI); } catch (e) { /* gizli kip */ }
+  return k;
+}
+
 export const kucuk = (x) => String(x == null ? '' : x).toLocaleLowerCase('tr-TR');
 
 const TABAN = typeof location !== 'undefined' && /^https?:$/.test(location.protocol) ? location.origin : 'http://yerel.invalid';
