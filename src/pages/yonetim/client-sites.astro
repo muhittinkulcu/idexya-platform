@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="Müşteri siteleri" aktif="siteler" yol="Analiz" aciklama="Müşteri sitelerinin günlük sağlık kontrolü: site açılıyor mu, hesap envanterindeki GTM, GA4 ve Meta piksel kimlikleri sayfada mı, alan adının süresi doluyor mu.">
+<Yonetim baslik="Müşteri siteleri" aktif="siteler" musteriSuzgec yol="Analiz" aciklama="Müşteri sitelerinin günlük sağlık kontrolü: site açılıyor mu, hesap envanterindeki GTM, GA4 ve Meta piksel kimlikleri sayfada mı, alan adının süresi doluyor mu.">
 <style is:global>
   .ss-form{padding:16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto;gap:10px;align-items:end}
   @media (max-width:760px){.ss-form{grid-template-columns:1fr}}
@@ -22,6 +22,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
   import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
+  import { seciliMusteri, suzulmusYol, musteriDegisince, secimBosDurumu } from '../../scripts/yonetim/musteri-suzgec.js';
   let arsivMod = false, etiketler = {}, tumEtiket = [], sonVeri = null;
   const arsivDugme = document.querySelector('[data-arsiv]');
   const liste = document.querySelector('[data-liste]'), form = document.querySelector('[data-form]'), fdurum = document.querySelector('[data-form-durum]');
@@ -45,6 +46,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
     sonVeri = v;
     arsivDugme.setAttribute('aria-pressed', String(arsivMod));
     arsivDugme.textContent = arsivMod ? 'Arşivden çık' : `Arşivi göster (${v.arsivde || 0})`;
+    // Üst alanda müşteri seçiliyse sunucu yalnız o müşteriye bağlı kartların sitelerini verir.
+    if (!v.hedefler.length && seciliMusteri()) { liste.replaceChildren(secimBosDurumu(arsivMod ? 'Arşivde bu müşterinin sitesi yok.' : 'Bu müşteriye bağlı CRM kartlarının izlenen sitesi yok.')); return; }
     if (!v.hedefler.length && arsivMod) { liste.replaceChildren(el('div', { class: 'kart bos' }, 'Arşivde site yok.')); return; }
     if (!v.hedefler.length) { liste.replaceChildren(el('div', { class: 'kart bos' }, 'Henüz site eklenmedi. Yukarıdan müşteri seçip sitesinin adresini ekleyin; ilk kontrolü “Şimdi kontrol et” ile hemen yapabilirsiniz.')); return; }
     liste.replaceChildren(...v.hedefler.map((h) => {
@@ -88,7 +91,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   });
   async function yukle() {
     try {
-      const [v, e] = await Promise.all([api('site-saglik' + (arsivMod ? '?arsiv=1' : '')), api('etiketler?tur=site')]); genelHata('');
+      const [v, e] = await Promise.all([api(suzulmusYol('site-saglik' + (arsivMod ? '?arsiv=1' : ''))), api('etiketler?tur=site')]); genelHata('');
       etiketler = e.etiketler; tumEtiket = e.tumu;
       const s = form.musteri_id, d = s.value;
       s.replaceChildren(el('option', { value: '' }, 'Müşteri seçin'), ...v.musteriler.map((m) => el('option', { value: m.id }, m.firma || m.ad || 'Adsız müşteri'))); s.value = d;
@@ -105,6 +108,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     } catch (h) { genelHata('Siteler yüklenemedi: ' + h.message); }
   }
   arsivDugme.addEventListener('click', () => { arsivMod = !arsivMod; yukle(); });
+  musteriDegisince(() => yukle());
   yukle();
 </script>
 </Yonetim>

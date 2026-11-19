@@ -1,7 +1,7 @@
 ---
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
-<Yonetim baslik="CRM" aktif="crm" veri={['musteriler', 'etiketler?tur=musteri']} yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
+<Yonetim baslik="CRM" aktif="crm" musteriSuzgec veri={['musteriler', 'etiketler?tur=musteri']} yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
 <label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
 <div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
@@ -20,6 +20,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <script>
   import { api, el, ASAMALAR, asamaAdi, once, para, genelHata, git } from '../../scripts/yonetim/ortak.js';
   import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
+  import { seciliMusteri, suzulmusYol, musteriDegisince, secimBosDurumu } from '../../scripts/yonetim/musteri-suzgec.js';
   const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
   let tum = [], gorunum = 'pano', arsivMod = false, etiketler = {}, tumEtiket = [], arsivde = 0;
   const arsivDugme = document.querySelector('[data-arsiv]');
@@ -42,6 +43,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
     arsivDugme.setAttribute('aria-pressed', String(arsivMod));
     arsivDugme.textContent = arsivMod ? 'Arşivden çık' : `Arşivi göster (${arsivde})`;
     topluTemizle('crm');
+    // Üst alanda müşteri seçiliyse sunucu yalnız o ana kayda bağlı kartları verir; boşsa nedeni ve seçimi kaldırma yolu.
+    if (!tum.length && seciliMusteri()) { alan.replaceChildren(secimBosDurumu(arsivMod ? 'Arşivde bu müşteriye bağlı CRM kartı yok.' : 'Bu müşteriye bağlı CRM kartı yok.')); return; }
     if (!tum.length) { alan.replaceChildren(el('div', { class: 'kart bos' }, arsivMod ? 'Arşivde müşteri yok.' : 'CRM’de henüz müşteri yok. Talepler sayfasından bir talebi CRM’e alın veya “Yeni müşteri” ile elle ekleyin.')); return; }
     // Arşiv yalnız liste görünümünde gösterilir; toplu seçim de liste tablosundadır.
     if (gorunum === 'liste' || arsivMod) {
@@ -93,11 +96,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
   });
   async function yukle() {
     try {
-      const [v, e] = await Promise.all([api('musteriler' + (arsivMod ? '?arsiv=1' : '')), api('etiketler?tur=musteri')]);
+      const [v, e] = await Promise.all([api(suzulmusYol('musteriler' + (arsivMod ? '?arsiv=1' : ''))), api('etiketler?tur=musteri')]);
       tum = v.musteriler; arsivde = v.arsivde || 0; etiketler = e.etiketler; tumEtiket = e.tumu; ciz();
     } catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
   }
   arsivDugme.addEventListener('click', () => { arsivMod = !arsivMod; yukle(); });
+  musteriDegisince(() => yukle());
   yukle();
 </script>
 </Yonetim>

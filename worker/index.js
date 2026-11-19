@@ -40,6 +40,7 @@ import { yonetimMuhasebeApi } from './muhasebe.js';
 import { referansSayfasi } from './referans.js';
 import { panelAlani, panelKoku, eskiYol, SAYFALAR, eskiPanelOsHedefi } from './panel-yollar.js';
 import { eskiAramayiCevir } from '../src/data/panel-parametre.js';
+import { anaParam } from '../src/data/musteri-secim.js';
 
 const ASAMA_ADI = { yeni: 'Yeni', gorusme: 'Görüşülüyor', teklif: 'Teklif gönderildi', goruldu: 'Teklif görüldü', kazanildi: 'Kazanıldı', kaybedildi: 'Kaybedildi' };
 const ASAMALAR = Object.keys(ASAMA_ADI);
@@ -202,12 +203,14 @@ async function yonetimApi(istek, env, yol, kim, izinli = []) {
     return json({ ok: true, musteri_id: mid, mevcut: !!mus, idos });
   }
   if (yol === 'musteriler' && yontem === 'GET') {
-    const arsiv = new URL(istek.url).searchParams.get('arsiv') === '1';
+    const u = new URL(istek.url), arsiv = u.searchParams.get('arsiv') === '1';
+    // Üst alandaki ortak müşteri seçimi (?ana=<IDOS client_id>, src/data/musteri-secim.js): yalnız o ana kayda bağlı kartlar.
+    const ana = anaParam(u), kosul = ana ? ' AND ana_kayit_id = ?' : '', p = ana ? [ana] : [];
     const [r, n] = await db.batch([
-      db.prepare(`SELECT id, firma, ad, eposta, telefon, asama, deger, paket, kaynak, guncelleme, arsiv FROM musteriler WHERE arsiv IS ${arsiv ? 'NOT ' : ''}NULL ORDER BY guncelleme DESC LIMIT 500`),
-      db.prepare('SELECT COUNT(*) AS n FROM musteriler WHERE arsiv IS NOT NULL')
+      db.prepare(`SELECT id, firma, ad, eposta, telefon, asama, deger, paket, kaynak, guncelleme, arsiv, ana_kayit_id FROM musteriler WHERE arsiv IS ${arsiv ? 'NOT ' : ''}NULL${kosul} ORDER BY guncelleme DESC LIMIT 500`).bind(...p),
+      db.prepare(`SELECT COUNT(*) AS n FROM musteriler WHERE arsiv IS NOT NULL${kosul}`).bind(...p)
     ]);
-    return json({ ok: true, musteriler: r.results, arsivde: n.results[0].n });
+    return json({ ok: true, musteriler: r.results, arsivde: n.results[0].n, ana: ana || null });
   }
   // Toplu işlem (toplu seçim kuralı): aşama değiştir, arşivle, arşivden çıkar. Silme yoktur; her kart günlüğüne işlenir.
   if (yol === 'musteriler/toplu' && yontem === 'POST') {

@@ -3,3 +3,5 @@
 // yükler. Betik yüklenemezse (ör. astro dev) Yonetim.astro'nun modül betiği bu dosyayı sonradan içe aktarır.
 import './kabuk-bagla.js';
 import '../../idexya-kabuk/kabuk.js';
+// Üst alandaki ortak müşteri seçicisi (1.3): kabuğun ürün yuvasına konur.
+import './musteri-secici.js';

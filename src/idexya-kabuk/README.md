@@ -318,7 +318,7 @@ Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuz
 **Kural:** sekme adına ya da adresine ve menü adına müşteri ya da kişi adı konmaz (sekme adı menüdeki
 sayfa adından gelir; müşteri kartı gibi sayfalarda `etkin.ad` genel tutulur, ör. "Müşteri kartı"). Saklanan
 sekme yalnız aynı kökende ve menüde ya da bu oturumda açılmış bir adresse geri yüklenir. Profil menüsündeki
-"Çıkış yap" `idx-sekme*`, `idx-yan-kapali-*`, `idx-yan-acik` ve `idx-yan-modul` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
+"Çıkış yap" `idx-sekme*`, `idx-musteri`, `idx-yan-kapali-*`, `idx-yan-acik` ve `idx-yan-modul` anahtarlarını ve `sessionStorage` içindeki bütün `idx-*`
 anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
@@ -330,6 +330,7 @@ anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 | `idx-yan-acik` | Ağaçta açık / kapalı maddeler `{ madde: true\|false }` |
 | `idx-yan-modul` | Ağaçta açık / kapalı modüller `{ modül adresi: true\|false }` |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
+| `idx-musteri` | Ortak aktif müşteri: IDOS `client_id` (düz metin, ad değil). Üç modül aynı seçimi okur ve yazar; `kabuk-cekirdek.js` `musteriOku(localStorage)` / `musteriYaz(localStorage, id)`. Başka sekmedeki değişiklik `storage` olayıyla gelir. Ürün kendi kimliğini (Creative marka, Website/CRM kartı) IDOS kimliğine çevirir; eşi olmayan kayıt anahtara yazılmaz |
 | `idx-acildi` (`sessionStorage`) | Bu sekmede kabuk daha önce açıldı mı (giriş hareketleri yalnız ilk açılışta) |
 
 `<html>` üzerine `data-tema` (`acik`/`koyu`), `data-tema-secim` (`acik`/`koyu`/`sistem`/`zaman`) ve hareketleri azalt açıksa
