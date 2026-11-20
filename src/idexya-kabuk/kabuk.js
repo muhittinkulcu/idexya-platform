@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, etkinKatman, katmanRozeti, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir,
-  kaynakDurumu, sekmeEkle, sekmeKapat, hepsiAcik, hepsiDegistir, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz
+  kaynakDurumu, sekmeEkle, sekmeKapat, hepsiAcik, hepsiDegistir, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -574,9 +574,18 @@ class IdexyaKabuk extends HTMLElement {
       const modul = (m) => h('div', { class: 'ik-u-oge', css: { '--u': Math.min(n++, 8) } },
         h('a', { href: m.url, 'data-ik-git': '', class: 'ik-ucan-modul', 'aria-current': e.modul === m && !e.sayfa ? 'page' : null }, h('span', { class: 'ik-oge-ad' }, m.ad), this.rz(m)),
         m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', class: 'ik-ucan-sayfa', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad))) : null);
-      u.replaceChildren(h('div', { class: 'ik-ucan-ic' },
-        h('a', { href: k.url, 'data-ik-git': '', class: 'ik-u-oge ik-ucan-bas', css: { '--u': 0 } }, svg(SIMGE[k.simge], 18, 1.7), h('span', null, k.ad), svg(SAG, 13, 2.2, 'ik-oge-ok')),
-        k.gruplar.map((g) => [k.gruplar.length > 1 ? h('div', { class: 'ik-ucan-grup' }, svg(SIMGE[g.simge], 13), g.baslik) : null, g.moduller.map(modul)])));
+      // Mega menü (Muhittin, 20 Kas 2026; "tüm modüller için"): birden çok grup (Meta, Google Ads, …) yan yana sütun;
+      // tek grupta modüller sayfa sayısına göre dengeli en çok 3 sütuna (sutunBol); 1-2 modüllük madde tek sütun.
+      const sütunlar = k.gruplar.length > 1
+        ? k.gruplar.map((g) => ({ g, moduller: g.moduller }))
+        : sutunBol(k.gruplar.flatMap((g) => g.moduller), 3).map((m) => ({ g: null, moduller: m }));
+      const sütunlu = sütunlar.length > 1;
+      u.classList.toggle('ik-ucan-genis', sütunlu);
+      const baş = h('a', { href: k.url, 'data-ik-git': '', class: 'ik-u-oge ik-ucan-bas', css: { '--u': 0 } }, svg(SIMGE[k.simge], 18, 1.7), h('span', null, k.ad), svg(SAG, 13, 2.2, 'ik-oge-ok'));
+      u.replaceChildren(h('div', { class: 'ik-ucan-ic' }, baş, sütunlu
+        ? h('div', { class: 'ik-ucan-sutunlar', css: { '--sutun': sütunlar.length } }, sütunlar.map(({ g, moduller }) => h('div', { class: 'ik-ucan-sutun', role: 'group', 'aria-label': g ? g.baslik : null },
+          g ? h('div', { class: 'ik-ucan-grup' }, svg(SIMGE[g.simge], 13), g.baslik) : null, moduller.map(modul))))
+        : sütunlar[0].moduller.map(modul)));
       u.hidden = false;
       this.rozetTazele(u);
     }
