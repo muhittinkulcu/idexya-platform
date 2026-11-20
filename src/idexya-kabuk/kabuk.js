@@ -58,6 +58,7 @@ const I = {
   zaman: ['M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z', 'M12 7v5l3 2'], menu: ['M4 6h16M4 12h16M4 18h16'],
   hepsiAc: ['M7 15l5 5 5-5', 'M7 9l5-5 5 5'], hepsiKapat: ['M7 20l5-5 5 5', 'M7 4l5 5 5-5'],
   daralt: ['M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z', 'M9 4v16'],
+  cikis: ['M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3', 'M10 17l5-5-5-5', 'M15 12H4'],
   ayar: ['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1']
 };
 const olay = (el, ad, detail, iptal) => el.dispatchEvent(new CustomEvent('idexya-kabuk:' + ad, { detail, bubbles: true, cancelable: !!iptal }));
@@ -282,6 +283,21 @@ class IdexyaKabuk extends HTMLElement {
     this.profil.replaceChildren(...[h('div', { class: 'ik-profil-ad' }, kul.ad), kul.rol ? h('div', { class: 'ik-soluk' }, kul.rol) : null,
       this.a.ayarlarUrl ? h('a', { href: this.a.ayarlarUrl, 'data-ik-git': '', class: 'ik-profil-ayar' }, svg(I.ayar, 14), 'Ayarlar') : null,
       this.a.cikisUrl ? h('a', { href: this.a.cikisUrl, 'data-ik-git': '', class: 'ik-profil-cikis' }, 'Çıkış yap') : null].filter(Boolean));
+    this.hesapCiz();
+  }
+
+  // Hesap sol menünün altında (Muhittin, 20 Kas 2026): baş harf + ad + rol, yanında Çıkış. Daraltılmış menüde alt alta iki
+  // simge. Üst çubuktaki profil düğmesi telefonda kalır (menü orada çekmece); masaüstünde CSS ile gizlenir.
+  hesapCiz() {
+    if (!this.hesapKap) return;
+    const kul = this.a.kullanici || { ad: 'Kullanıcı', rol: '' }, dar = this.yan.classList.contains('ik-dar');
+    const t = kul.ad + (kul.rol ? ', ' + kul.rol : '');
+    const kim = h('div', { class: 'ik-hesap-kim', title: dar ? t : null, 'aria-label': dar ? t : null, role: dar ? 'img' : null },
+      h('span', { class: 'ik-hesap-harf', 'aria-hidden': 'true' }, kul.ad.charAt(0).toLocaleUpperCase('tr-TR')),
+      dar ? null : h('span', { class: 'ik-hesap-yazi' }, h('span', { class: 'ik-hesap-ad' }, kul.ad), kul.rol ? h('span', { class: 'ik-hesap-rol' }, kul.rol) : null));
+    const çıkış = this.a.cikisUrl ? h('a', { href: this.a.cikisUrl, 'data-ik-git': '', class: 'ik-profil-cikis ik-hesap-cikis', 'aria-label': 'Çıkış yap', title: 'Çıkış yap' },
+      svg(I.cikis, 16)) : null;
+    this.hesapKap.replaceChildren(...[kim, çıkış].filter(Boolean));
   }
 
   aramaAc() {
@@ -508,7 +524,9 @@ class IdexyaKabuk extends HTMLElement {
       }));
     }
     const eski = this.yan.querySelector('.ik-agac'), kaydir = eski ? eski.scrollTop : 0;
-    this.yan.replaceChildren(...[bas].concat(govde, alt || []));
+    this.hesapKap = h('div', { class: 'ik-yan-hesap' });
+    this.yan.replaceChildren(...[bas].concat(govde, alt || [], this.hesapKap));
+    this.hesapCiz();
     const yeni = this.yan.querySelector('.ik-agac');
     if (yeni && kaydir) yeni.scrollTop = kaydir;
     this.grupDurum();
