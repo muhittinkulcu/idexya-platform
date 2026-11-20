@@ -130,6 +130,8 @@ class IdexyaKabuk extends HTMLElement {
     this.perde = h('div', { class: 'ik-perde', hidden: true, onclick: () => { this.kapat(false); this.cekmece(false); } });
     // Üst alandaki ürün yuvası (aktif müşteri seçimi, tarih aralığı): ürün kendi denetimlerini buraya koyar (README "Üst alan").
     this.yuva = h('div', { class: 'ik-ust-yuva' });
+    // Sağ yuva (Muhittin, 20 Kas 2026): tarih aralığı aramanın sağında; sol yuvada müşteri ve platform kalır.
+    this.yuvaSag = h('div', { class: 'ik-ust-yuva ik-ust-yuva-sag' });
     this.menuDugme = menuVar ? h('button', { type: 'button', class: 'ik-ikon ik-tel', 'aria-label': 'Menüyü aç', 'aria-expanded': 'false', 'aria-controls': 'ik-yan', onclick: () => this.cekmece(!this.cekmeceAcik) }, svg(I.menu, 18)) : null;
 
     // Üst alan (talimat 4.2): IDOS kimliği, ürün yuvası (müşteri, tarih), arama, eşitleme durumu, bildirimler, tema, kullanıcı.
@@ -142,6 +144,7 @@ class IdexyaKabuk extends HTMLElement {
       h('div', { class: 'ik-ara-kap' }, h('div', { class: 'ik-ara-alan' },
         h('label', { class: 'ik-ara' }, svg(I.ara, 15, 2), this.giris, h('kbd', { class: 'ik-masa' }, /Mac|iP/.test(navigator.platform) ? '⌘K' : 'Ctrl K')),
         this.sonuc)),
+      this.yuvaSag,
       h('div', { class: 'ik-arac' },
         this.kapsul, this.sabitDugme,
         a.bildirimUrl ? h('a', { class: 'ik-ikon', href: a.bildirimUrl, 'data-ik-git': '', 'aria-label': 'Bildirimler', title: 'Bildirimler' }, svg(I.zil, 17)) : null,
@@ -209,6 +212,7 @@ class IdexyaKabuk extends HTMLElement {
   }
   // Ürünün denetimlerinin yuvası (üst alan). Ürün içine kendi öğelerini koyar (React: createPortal); kabuk içine dokunmaz.
   get ustYuva() { return this.yuva; }
+  get ustYuvaSag() { return this.yuvaSag; }
   renkYap() { const k = this.k; if (k) { this.style.setProperty('--ik-renk', k.renk); this.style.setProperty('--ik-renk-koyu', k.renkKoyu); } }
   // Kapalı gruplar madde başına saklanır (idx-yan-kapali-<madde>). Kayıt yoksa (null) çok gruplu (3'ten fazla) maddede yalnız
   // etkin sayfanın grubu açık başlar; kayıt kullanıcı bir grubu açıp kapatınca yazılır.
