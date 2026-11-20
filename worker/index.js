@@ -135,17 +135,26 @@ async function yonetimApi(istek, env, yol, kim, izinli = []) {
   }
 
   if (yol === 'ozet' && yontem === 'GET') {
+    // Ortak müşteri seçimi (?ana=<IDOS client_id>, src/data/musteri-secim.js): CRM kartına bağlı sayılar yalnız o ana kayda
+    // bağlı kartlardan (musteriler.ana_kayit_id) hesaplanır. Müşteriye bağı olmayan alanlar (site talepleri, üyeler,
+    // yorumlar, reklam çekimi) ajans geneli kalır; hangisinin süzüldüğü yanıttaki `suzgec` alanında yazar. Geçersiz değer = süzgeçsiz.
+    const ana = anaParam(new URL(istek.url)), kosul = ana ? ' AND ana_kayit_id = ?' : '', p = ana ? [ana] : [];
     const [t, m, a, k, u, yo, de, rc] = await db.batch([
       db.prepare("SELECT durum, COUNT(*) AS n FROM talepler GROUP BY durum"),
-      db.prepare("SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler WHERE arsiv IS NULL"),
-      db.prepare("SELECT asama, COUNT(*) AS n FROM musteriler WHERE arsiv IS NULL GROUP BY asama"),
-      db.prepare("SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id ORDER BY k.zaman DESC LIMIT 12"),
+      db.prepare(`SELECT COUNT(*) AS n, SUM(CASE WHEN asama NOT IN ('kazanildi','kaybedildi') THEN COALESCE(deger,0) ELSE 0 END) AS hat FROM musteriler WHERE arsiv IS NULL${kosul}`).bind(...p),
+      db.prepare(`SELECT asama, COUNT(*) AS n FROM musteriler WHERE arsiv IS NULL${kosul} GROUP BY asama`).bind(...p),
+      db.prepare(`SELECT k.zaman, k.tur, k.baslik, k.kim, m.firma, m.ad, m.id AS musteri_id FROM kayitlar k JOIN musteriler m ON m.id = k.musteri_id${ana ? ' WHERE m.ana_kayit_id = ?' : ''} ORDER BY k.zaman DESC LIMIT 12`).bind(...p),
       db.prepare("SELECT durum, COUNT(*) AS n FROM uyeler GROUP BY durum"),
       db.prepare("SELECT COUNT(*) AS n FROM yorumlar WHERE durum = 'bekliyor'"),
-      db.prepare("SELECT COUNT(*) AS n FROM destek_talepleri WHERE durum = 'acik'"),
+      ana
+        ? db.prepare("SELECT COUNT(*) AS n FROM destek_talepleri d JOIN musteriler m ON m.id = d.musteri_id WHERE d.durum = 'acik' AND m.ana_kayit_id = ?").bind(ana)
+        : db.prepare("SELECT COUNT(*) AS n FROM destek_talepleri WHERE durum = 'acik'"),
       db.prepare('SELECT zaman, durum FROM reklam_cekim ORDER BY zaman DESC LIMIT 1')
     ]);
-    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n, bekleyenDestek: de.results[0].n, reklam: { kurulu: reklamKurulu(env), son: rc.results[0] || null } });
+    const TUM = ['talepler', 'musteri', 'asamalar', 'sonKayitlar', 'uyeler', 'bekleyenYorum', 'bekleyenDestek', 'reklam'];
+    const SUZULEN = ['musteri', 'asamalar', 'sonKayitlar', 'bekleyenDestek'];
+    const suzgec = ana ? { ana, suzulen: SUZULEN, suzulmeyen: TUM.filter((x) => !SUZULEN.includes(x)) } : { ana: null, suzulen: [], suzulmeyen: TUM };
+    return json({ ok: true, kim: kim.eposta, talepler: t.results, musteri: m.results[0], asamalar: a.results, sonKayitlar: k.results, uyeler: u.results, bekleyenYorum: yo.results[0].n, bekleyenDestek: de.results[0].n, reklam: { kurulu: reklamKurulu(env), son: rc.results[0] || null }, suzgec });
   }
   if (yol === 'grafik' && yontem === 'GET') {
     // Genel bakış grafikleri; yalnız okuma. Gün ve saatler İstanbul saatine göre (UTC+3, Türkiye yaz saati uygulamıyor). Spam sayılmaz.
