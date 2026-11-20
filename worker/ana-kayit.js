@@ -33,10 +33,12 @@ export function taban(env) {
   return u.origin;
 }
 
-async function idosIstek(env, yol) {
+// zamanAsimi: kimlik kararı gibi bekletilmemesi gereken isteklerde daha kısa verilir. ekBaslik: adrese yazılmaması
+// gereken değerler (ör. kişi e-postası, worker/kisi-rol.js) başlıkta gider; yetki başlığı ezilemez.
+export async function idosIstek(env, yol, zamanAsimi = ZAMAN_ASIMI_MS, ekBaslik = {}) {
   const r = await fetch(taban(env) + yol, {
-    headers: { Authorization: 'Bearer ' + String(env.IDOS_ORTAK_JETON).trim(), Accept: 'application/json' },
-    signal: AbortSignal.timeout(ZAMAN_ASIMI_MS)
+    headers: { ...ekBaslik, Authorization: 'Bearer ' + String(env.IDOS_ORTAK_JETON).trim(), Accept: 'application/json' },
+    signal: AbortSignal.timeout(zamanAsimi)
   });
   if (r.status === 404) return { yok: true };
   if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? 'IDOS jetonu kabul etmedi (' + r.status + ')' : 'IDOS yanıt vermedi (' + r.status + ')');
