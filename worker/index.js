@@ -2,7 +2,8 @@
 // Statik sayfalar Workers Static Assets'ten gelir; bu dosya yalnız /api/* ve /yonetim* için çalışır.
 import { createRemoteJWKSet } from 'jose';
 import { ONYUKLEME_YOL, onyuklemeYaniti, onyuklemeBasligi } from './onyukleme.js';
-import { jetonDogrula, kaynakIzinli, yerelGiris } from './erisim.js';
+import { jetonDogrula, jetonEposta, kaynakIzinli, yerelGiris } from './erisim.js';
+import { kisiRolAcik, kisiYetki } from './kisi-rol.js';
 import { temelAyar, osAlaniMi, istekAyir, yanitOnekle, osYoluIzinli, kapiDenetle, siteKoku } from './temel-yol.js';
 import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
@@ -61,7 +62,9 @@ async function yonetici(istek, env) {
   } catch (e) {
     return null;
   }
-  return await jetonDogrula(jeton, env, jwks);
+  // KISI_ROL_IDOS kapalı (varsayılan): yalnız YONETICILER listesi. Açık: rol IDOS'tan (worker/kisi-rol.js), liste acil yedek.
+  if (!kisiRolAcik(env)) return await jetonDogrula(jeton, env, jwks);
+  return await kisiYetki(env, await jetonEposta(jeton, env, jwks));
 }
 
 // --- Herkese açık: talep formu ---

@@ -8,21 +8,30 @@ const liste = (v) => String(v || '').split(',').map((x) => x.trim()).filter(Bool
 // uygulaması). Jetonun aud değerlerinden biri listedekilerden biriyle tam eşleşmelidir (jose audience dizisi).
 export const audListesi = (env) => liste(env && env.POLICY_AUD);
 
-// Jetonu doğrular; geçerli ve izinli yöneticiyse { eposta } döner, değilse null. anahtarlar: jose anahtar kümesi.
-export async function jetonDogrula(jeton, env, anahtarlar) {
+// YONETICILER ortam değişkenindeki e-posta listesi (küçük harf). KISI_ROL_IDOS açıkken acil giriş yedeğidir.
+export const yoneticiListesi = (env) => liste(env && env.YONETICILER).map((x) => x.toLowerCase());
+
+// Yalnız imzayı doğrular; geçerliyse jetondaki küçük harfli e-postayı, değilse null döner. Yetki kararı vermez.
+export async function jetonEposta(jeton, env, anahtarlar) {
   const aud = audListesi(env);
   if (!env || !env.TEAM_DOMAIN || !aud.length || !jeton || !anahtarlar) return null;
   try {
     // Yalnız RS256 (Access imzası); süresi (exp) ve veriliş zamanı (iat) olmayan jeton kabul edilmez.
     const { payload } = await jwtVerify(jeton, anahtarlar, { issuer: env.TEAM_DOMAIN, audience: aud, algorithms: ['RS256'], requiredClaims: ['exp', 'iat'] });
-    const izinli = liste(env.YONETICILER).map((x) => x.toLowerCase());
-    const e = String(payload.email || '').toLowerCase();
-    // İzinli yönetici listesi boşsa panel kapalıdır (Access politikası geniş olsa bile).
-    if (!izinli.length || !e || !izinli.includes(e)) return null;
-    return { eposta: e };
+    return String(payload.email || '').toLowerCase() || null;
   } catch (h) {
     return null;
   }
+}
+
+// Jetonu doğrular; geçerli ve izinli yöneticiyse { eposta } döner, değilse null. anahtarlar: jose anahtar kümesi.
+// KISI_ROL_IDOS kapalıyken (varsayılan) yönetim girişinin tek kararıdır.
+export async function jetonDogrula(jeton, env, anahtarlar) {
+  const e = await jetonEposta(jeton, env, anahtarlar);
+  const izinli = yoneticiListesi(env);
+  // İzinli yönetici listesi boşsa panel kapalıdır (Access politikası geniş olsa bile).
+  if (!izinli.length || !e || !izinli.includes(e)) return null;
+  return { eposta: e };
 }
 
 // Yerel geliştirme girişi (YEREL_GIRIS=evet): yalnız yerel makine adları. os.idexya.com, panel.idexya.com ya da başka
