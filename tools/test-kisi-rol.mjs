@@ -116,23 +116,19 @@ k('istek: yol yalnız /api/ortak/kisi (e-posta adreste yok)', ist && ist.url ===
 k('istek: e-posta X-Idexya-Eposta başlığında, küçük harf', ist && ist.eposta === 'yon@idexya.com');
 k('istek: Authorization: Bearer <IDOS_ORTAK_JETON>', ist && ist.yetki === 'Bearer ' + JETON);
 k('önbellek: 5 dk içinde ikinci istek IDOS\'a gitmez', idos.istekler.length === 1);
-k('açık: hesap_yoneticisi → 200', (await iste(ac, 'hy@idexya.com')).durum === 200);
-k('açık: hesap_yoneticisi yazabilir', gecti(await iste(ac, 'hy@idexya.com', 'POST', '/api/yonetim/yok')));
-k('açık: izleyici GET → 200', (await iste(ac, 'izle@idexya.com')).durum === 200);
-const saltRet = (r) => r.durum === 403 && /salt okuma/.test(r.govde && r.govde.hata);
-for (const m of ['POST', 'PUT', 'PATCH', 'DELETE']) k(`açık: izleyici ${m} → 403 (salt okuma)`, saltRet(await iste(ac, 'izle@idexya.com', m, '/api/yonetim/musteriler')));
-k('açık: musteri → 401', (await iste(ac, 'mus@ornek.com')).durum === 401);
-k('açık: IDOS\'ta kaydı yok (rol null) → 401', (await iste(ac, 'yabanci@ornek.com')).durum === 401);
+// Yalnız yonetici girer: hesap_yoneticisi (müşteri süzmesi yok), izleyici (salt okuma kapısı yok), musteri, null → 401.
+for (const [e, ad] of [['hy@idexya.com', 'hesap_yoneticisi'], ['izle@idexya.com', 'izleyici'], ['mus@ornek.com', 'musteri'], ['yabanci@ornek.com', 'kayıt yok (rol null)']]) {
+  k(`açık: ${ad} GET → 401`, (await iste(ac, e)).durum === 401);
+  k(`açık: ${ad} POST → 401`, (await iste(ac, e, 'POST', '/api/yonetim/musteriler')).durum === 401);
+}
+k('açık: izleyici yedek indiremez → 401', (await iste(ac, 'izle@idexya.com', 'GET', '/api/yonetim/yedek/indir')).durum === 401);
 k('açık: YONETICILER yedeği → 200, IDOS\'a sorulmaz', await (async () => { const n = idos.istekler.length; const r = await iste(ac, 'acil@idexya.com'); return r.durum === 200 && idos.istekler.length === n; })());
 k('açık: Access jetonu yoksa → 401', (await worker.fetch(new Request(PANEL + '/api/yonetim/ozet'), ac, { waitUntil() {} })).status === 401);
 
-// kim nesnesi (birim): müşteri kapsamı yalnız taşınır
 KR.onbellekTemizle();
-const kimHy = await KR.kisiYetki(ac, 'HY@idexya.com');
-k('kim: hesap_yoneticisi musteri_idleri taşınır', kimHy && kimHy.rol === 'hesap_yoneticisi' && JSON.stringify(kimHy.musteri_idleri) === '["c-1","c-2"]' && kimHy.salt_okuma === false);
-const kimIz = await KR.kisiYetki(ac, 'izle@idexya.com');
-k('kim: izleyici salt_okuma', kimIz && kimIz.salt_okuma === true && kimIz.rol === 'izleyici');
-k('yöntem: salt okuma yalnız GET/HEAD', KR.yontemIzinli(kimIz, 'GET') && KR.yontemIzinli(kimIz, 'HEAD') && !KR.yontemIzinli(kimIz, 'POST') && KR.yontemIzinli(kimHy, 'DELETE'));
+const kimY = await KR.kisiYetki(ac, 'YON@idexya.com');
+k('kim: yonetici, süper bayrağı taşınır, müşteri listesi yok', kimY && kimY.rol === 'yonetici' && kimY.super_admin === true && !('musteri_idleri' in kimY));
+k('birim: hesap_yoneticisi → null', (await KR.kisiYetki(ac, 'hy@idexya.com')) === null);
 k('kapalı: kisiYetki listede olmayanı IDOS\'a sormaz', (await KR.kisiYetki(temelEnv, 'yon@idexya.com')) === null);
 k('açık ama IDOS ayarı yok → ret', (await KR.kisiYetki({ KISI_ROL_IDOS: '1', YONETICILER: '' }, 'yon@idexya.com')) === null);
 
@@ -145,13 +141,29 @@ k('503: taze önbellek (yonetici) → 200', (await iste(ac, 'yon@idexya.com')).d
 kayma = 6 * 60 * 1000; // taze süre geçti, IDOS düşük → son geçerli kayıt
 const n503 = idos.istekler.length;
 k('503: 6 dk sonra son geçerli kayıt kullanılır → 200', (await iste(ac, 'yon@idexya.com')).durum === 200 && idos.istekler.length === n503 + 1);
-k('503: önbellekteki izleyici yine salt okuma', saltRet(await iste(ac, 'izle@idexya.com', 'POST', '/api/yonetim/musteriler')));
 k('503: önbellekte olmayan kişi → 401', (await iste(ac, 'hy2@idexya.com')).durum === 401);
 k('503: YONETICILER yedeği → 200', (await iste(ac, 'acil@idexya.com')).durum === 200);
-kayma = 13 * 60 * 60 * 1000;
-k('503: 12 saatten eski kayıt kullanılmaz → 401', (await iste(ac, 'yon@idexya.com')).durum === 401);
+kayma = 59 * 60 * 1000;
+k('503: 59 dk sonra son geçerli kayıt hâlâ kullanılır → 200', (await iste(ac, 'yon@idexya.com')).durum === 200);
+kayma = 61 * 60 * 1000;
+k('503: 1 saatten eski kayıt kullanılmaz → 401', (await iste(ac, 'yon@idexya.com')).durum === 401);
 idos.kip = 'acik';
 k('IDOS düzelince → 200', (await iste(ac, 'yon@idexya.com')).durum === 200);
+// 404 ve rol: null eski kayda düşmez: önce yonetici olarak önbelleğe girer, taze süre geçer, sonra IDOS 404 / null der.
+ROLLER['degisen@idexya.com'] = { rol: 'yonetici', super_admin: false, musteri_idleri: null };
+k('değişen: önce yonetici → 200', (await iste(ac, 'degisen@idexya.com')).durum === 200);
+kayma += 6 * 60 * 1000;
+idos.kip = '404';
+k('değişen: IDOS 404 → eski kayda düşmeden 401', (await iste(ac, 'degisen@idexya.com')).durum === 401);
+idos.kip = 'acik';
+k('değişen: IDOS düzelince yine yonetici → 200', (await iste(ac, 'degisen@idexya.com')).durum === 200);
+kayma += 6 * 60 * 1000;
+delete ROLLER['degisen@idexya.com'];
+k('değişen: rol null → eski kayda düşmeden 401', (await iste(ac, 'degisen@idexya.com')).durum === 401);
+kayma += 6 * 60 * 1000;
+idos.kip = '503';
+k('değişen: rol null sonrası 503 → eski yonetici kaydına dönülmez, 401', (await iste(ac, 'degisen@idexya.com')).durum === 401);
+idos.kip = 'acik';
 Date.now = asilSimdi;
 kayma = 0;
 for (const [kip, ad] of [['404', 'uç yok (404)'], ['yanlis-eposta', 'başka kişinin yanıtı'], ['bilinmeyen-rol', 'bilinmeyen rol']]) {

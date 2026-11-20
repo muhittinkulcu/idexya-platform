@@ -3,7 +3,7 @@
 import { createRemoteJWKSet } from 'jose';
 import { ONYUKLEME_YOL, onyuklemeYaniti, onyuklemeBasligi } from './onyukleme.js';
 import { jetonDogrula, jetonEposta, kaynakIzinli, yerelGiris } from './erisim.js';
-import { kisiRolAcik, kisiYetki, yontemIzinli } from './kisi-rol.js';
+import { kisiRolAcik, kisiYetki } from './kisi-rol.js';
 import { temelAyar, osAlaniMi, istekAyir, yanitOnekle, osYoluIzinli, kapiDenetle, siteKoku } from './temel-yol.js';
 import { uyeApi, yonetimUyeApi } from './uye.js';
 import { icerikApi, icerikSayfasi, yonetimIcerikApi } from './icerik.js';
@@ -380,8 +380,6 @@ async function isle(istek, env, ctx, os) {
         if (yol.startsWith('/api/')) return hata('Giriş gerekli', 401);
         return new Response('Bu sayfa için giriş gerekli.', { status: 401, headers: { 'Content-Type': 'text/plain; charset=utf-8', ...GUVENLIK_BASLIKLARI } });
       }
-      // İzleyici (IDOS rolü) salt okumadır: yazma isteği hiçbir yönetim ucuna ulaşmaz.
-      if (!yontemIzinli(kim, istek.method)) return hata('Bu işlem için yetkiniz yok (salt okuma)', 403);
       if (yol.startsWith('/api/yonetim/')) return await yonetimApi(istek, env, yol.slice('/api/yonetim/'.length).replace(/\/$/, ''), kim, os ? os.izinli : []);
       const yanit = await env.ASSETS.fetch(panelSayfa ? new Request(new URL(`/yonetim/${panelSayfa}/`, url), istek) : istek);
       let y = new Response(yanit.body, yanit);
