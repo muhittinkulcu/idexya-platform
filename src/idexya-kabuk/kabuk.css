@@ -46,7 +46,7 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 /* Ürün yuvası (aktif müşteri, tarih aralığı): ürün doldurur; boşsa yer kaplamaz. */
 .ik-ust-yuva{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}.ik-ust-yuva:empty{display:none}
 .ik-ara-kap{position:relative;flex:1 1 200px;display:flex;justify-content:center}
-.ik-ara-alan{position:relative;width:100%;max-width:480px}
+.ik-ara-alan{position:relative;width:100%;max-width:400px}
 .ik-ara{display:flex;align-items:center;gap:8px;height:34px;padding:0 10px;border-radius:var(--ik-yaricap);background:var(--ik-cu-araz);border:1px solid var(--ik-cu-arakenar);color:var(--ik-cu-ikincil);transition:background .2s,border-color .2s,box-shadow .2s}
 .ik-arama-acik .ik-ara,.ik-ara:focus-within{border-color:var(--ik-cu-araodak);box-shadow:0 0 0 1px var(--ik-cu-araodak)}
 .ik-ara input{flex:1;min-width:0;border:0;background:transparent;color:var(--ik-paket-yazi);font:inherit;outline:none}
@@ -336,7 +336,7 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
   .ik-logo{padding-right:0;margin-right:auto}
   .ik-kapsul{padding:0 10px;margin-right:0}
   .ik-ara-kap{order:9;flex:1 0 100%;padding-bottom:8px}.ik-ara-alan{max-width:none}
-  .ik-ust-yuva{order:10;flex:1 0 100%;padding-bottom:8px}
+  .ik-ust-yuva{order:10;flex:1 0 100%;padding-bottom:8px}.ik-ust-yuva-sag{order:11}
   /* Telefonda üst alan üç-dört satıra çıkabilir (arama, müşteri, tarih): sabitlenmez, içerik alanını kapatmasın. */
   .ik-ust.ik-sabit{position:relative}
   .ik-tema-secici{grid-template-columns:repeat(2,minmax(0,1fr))}

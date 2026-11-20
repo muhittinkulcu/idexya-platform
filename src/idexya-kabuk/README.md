@@ -219,7 +219,8 @@ orta tık tarayıcıya bırakılır (yeni sekme).
 | `rozetYap(url, sayi)` | Modül ya da sayfa rozetini günceller (0 gizler) |
 | `kullaniciYap({ ad, rol, eposta })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
 | `kapat()` | Açık açılırı (arama, profil) kapatır |
-| `ustYuva` | Üst alandaki ürün yuvası (öğe): ürün aktif müşteri, tarih gibi denetimlerini içine koyar (React: `createPortal`); kabuğun genel öğe kuralları yuvaya karışmaz |
+| `ustYuva` | Üst alandaki ürün yuvası (öğe): ürün aktif müşteri ve platform gibi denetimlerini içine koyar (React: `createPortal`); kabuğun genel öğe kuralları yuvaya karışmaz |
+| `ustYuvaSag` | Aramanın sağındaki ürün yuvası (20 Kas 2026): tarih aralığı ve karşılaştırma buraya konur; sıra: müşteri, platform, arama (ortada, en çok 400 px), tarih |
 | `gorunumYap({ tema?, zamanAcik?, zamanKoyu?, azHareket? })` | Görünümü değiştirir, kaydeder, uygular, `idexya-kabuk:gorunum` yayar |
 | `gorunum` | Geçerli görünüm `{ tema, zamanAcik, zamanKoyu, azHareket }` (kopya) |
 | `sabitle(acik)`, `darYap(dar)` | Üst çubuğu sabitler; yan menüyü daraltır (ikisi de kaydedilir) |
