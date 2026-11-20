@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, etkinKatman, katmanRozeti, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir,
-  kaynakDurumu, sekmeEkle, sekmeKapat, hepsiAcik, hepsiDegistir, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol
+  kaynakDurumu, sekmeEkle, sekmeKapat, hepsiAcik, hepsiDegistir, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -159,11 +159,41 @@ class IdexyaKabuk extends HTMLElement {
     ana.append(this.icerik);
     this.replaceChildren(this.ust, h('div', { class: 'ik-govde' }, this.yan, ana));
     if (a.asistan) {
-      this.append(h('div', { class: 'ik-asistan-kap' },
-        h('span', { class: 'ik-asistan-ipucu', 'aria-hidden': 'true' }, a.asistan.etiket),
-        // Görsel kabuğun kedisidir (kabuk.css .ik-kedi → kedi.webp); üç üründe aynı.
-        h('button', { type: 'button', class: 'ik-asistan', 'aria-label': a.asistan.etiket + ': asistanı aç', 'aria-haspopup': 'dialog', onclick: () => olay(this, 'asistan', {}) },
-          h('span', { class: 'ik-kedi', 'aria-hidden': 'true' }))));
+      // Görsel kabuğun kedisidir (kabuk.css .ik-kedi → kedi.webp); üç üründe aynı.
+      // Sürükle bırak (Muhittin, 20 Kas 2026): kedi bırakıldığı yere yapışır (idx-asistan-konum, ekran oranı olarak);
+      // 5 px'ten az kayma tıklamadır. Çift tık eski yerine (sağ alt) döndürür.
+      const düğme = h('button', { type: 'button', class: 'ik-asistan', 'aria-label': a.asistan.etiket + ': asistanı aç (sürükleyerek taşıyabilirsin)', 'aria-haspopup': 'dialog' },
+        h('span', { class: 'ik-kedi', 'aria-hidden': 'true' }));
+      this.asistanKap = h('div', { class: 'ik-asistan-kap' }, h('span', { class: 'ik-asistan-ipucu', 'aria-hidden': 'true' }, a.asistan.etiket), düğme);
+      this.append(this.asistanKap);
+      this.kediYerlestir(oku('idx-asistan-konum', null));
+      let baş = null, sürüklendi = false;
+      düğme.addEventListener('pointerdown', (e) => {
+        if (e.button) return;
+        const r = this.asistanKap.getBoundingClientRect(), k = düğme.getBoundingClientRect();
+        baş = { x: e.clientX, y: e.clientY, dx: e.clientX - k.left, dy: e.clientY - k.top, w: k.width, h: k.height, sol: r.left };
+        sürüklendi = false;
+        düğme.setPointerCapture(e.pointerId);
+      });
+      düğme.addEventListener('pointermove', (e) => {
+        if (!baş) return;
+        if (!sürüklendi && Math.hypot(e.clientX - baş.x, e.clientY - baş.y) < 5) return;
+        sürüklendi = true;
+        this.asistanKap.classList.add('ik-suruklen');
+        const p = kediKonum(e.clientX - baş.dx, e.clientY - baş.dy, baş.w, baş.h, innerWidth, innerHeight);
+        this.kediYerlestir({ x: p.x / innerWidth, y: p.y / innerHeight }, true);
+      });
+      const bitir = (e) => {
+        if (!baş) return;
+        baş = null;
+        this.asistanKap.classList.remove('ik-suruklen');
+        if (sürüklendi) { yaz('idx-asistan-konum', this._kediKonum); e.preventDefault(); }
+      };
+      düğme.addEventListener('pointerup', bitir);
+      düğme.addEventListener('pointercancel', bitir);
+      düğme.addEventListener('click', (e) => { if (sürüklendi) { sürüklendi = false; e.preventDefault(); return; } olay(this, 'asistan', {}); });
+      düğme.addEventListener('dblclick', () => { yaz('idx-asistan-konum', null); this.kediYerlestir(null); });
+      addEventListener('resize', () => this.kediYerlestir(this._kediKonum));
     }
 
     this.addEventListener('click', (e) => this.tikla(e));
@@ -288,6 +318,22 @@ class IdexyaKabuk extends HTMLElement {
 
   // Hesap sol menünün altında (Muhittin, 20 Kas 2026): baş harf + ad + rol, yanında Çıkış. Daraltılmış menüde alt alta iki
   // simge. Üst çubuktaki profil düğmesi telefonda kalır (menü orada çekmece); masaüstünde CSS ile gizlenir.
+  // Kedinin yeri: null = varsayılan (sağ alt, kenara yarı gizli); {x, y} = ekran oranı. İpucu boş tarafa açılır.
+  kediYerlestir(o, sürüklerken = false) {
+    const kap = this.asistanKap;
+    if (!kap) return;
+    this._kediKonum = o && Number.isFinite(o.x) && Number.isFinite(o.y) ? { x: o.x, y: o.y } : null;
+    kap.classList.toggle('ik-serbest', !!this._kediKonum);
+    if (!this._kediKonum) { kap.style.removeProperty('left'); kap.style.removeProperty('top'); kap.classList.remove('ik-ipucu-sag'); return; }
+    const d = kap.querySelector('.ik-asistan'), w = d.offsetWidth || 52, hh = d.offsetHeight || 52;
+    const p = kediKonum(this._kediKonum.x * innerWidth, this._kediKonum.y * innerHeight, w, hh, innerWidth, innerHeight);
+    const sağa = p.x < innerWidth / 2;
+    kap.classList.toggle('ik-ipucu-sag', sağa);
+    const ipucu = sağa ? 0 : (kap.querySelector('.ik-asistan-ipucu').offsetWidth + 10);
+    kap.style.left = (p.x - ipucu) + 'px'; kap.style.top = p.y + 'px';
+    if (!sürüklerken) this._kediKonum = { x: p.x / innerWidth, y: p.y / innerHeight };
+  }
+
   hesapCiz() {
     if (!this.hesapKap) return;
     const kul = this.a.kullanici || { ad: 'Kullanıcı', rol: '' }, dar = this.yan.classList.contains('ik-dar');

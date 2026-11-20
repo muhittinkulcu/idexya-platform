@@ -10,7 +10,7 @@ import { api, genelHata, sayacGuncelle, rozetSayilari, saklananVeri, tarih, yol,
 import { metaOku } from '../../data/temel-yol.js';
 
 let ayar = null, sonUrl = null;
-// Tek gezinme (talimat 4.2): panel sayfaları sol menünün birçok maddesinde (CRM, Web ve Commerce, Görevler, Ayarlar…). Panelin
+// Tek gezinme (talimat 4.2): panel sayfaları sol menünün birçok maddesinde (CRM, Web Site Yönetimi, E-Ticaret, Görevler, Ayarlar…). Panelin
 // kendi sayfaları göreli adreslidir (Yonetim.astro); öteki ürünlerin tam adresleri aynen kalır.
 const kendi = (u) => typeof u === 'string' && u.startsWith('/') && !u.startsWith('//');
 const herModul = (f) => ayar.katmanlar.forEach((k) => k.gruplar.forEach((g) => g.moduller.forEach(f)));

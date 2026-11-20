@@ -202,6 +202,11 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 .ik-asistan-kap:hover .ik-asistan,.ik-asistan:focus-visible{transform:translateX(-10px) scale(1.06)}
 .ik-asistan-ipucu{padding:6px 12px;border-radius:var(--ik-yaricap);background:#15202B;color:#FFFFFF;font-size:13px;font-weight:var(--w-orta);box-shadow:0 8px 20px -8px rgba(0,0,0,.5);opacity:0;transform:translateX(6px);transition:opacity .2s,transform .2s;pointer-events:none}
 .ik-asistan-kap:hover .ik-asistan-ipucu,.ik-asistan-kap:focus-within .ik-asistan-ipucu{opacity:1;transform:none}
+.ik-asistan{touch-action:none;cursor:grab}.ik-asistan-kap.ik-serbest{right:auto;bottom:auto}.ik-serbest .ik-asistan,.ik-serbest:hover .ik-asistan{transform:none}.ik-serbest:hover .ik-asistan{scale:1.06}
+.ik-asistan-kap.ik-ipucu-sag{flex-direction:row-reverse}.ik-ipucu-sag .ik-asistan-ipucu{transform:translateX(-6px)}
+.ik-suruklen .ik-asistan{cursor:grabbing;animation:none;box-shadow:0 18px 40px -8px rgba(240,122,35,.7)}.ik-suruklen .ik-asistan-ipucu{opacity:0!important}
+/* Ürün asistan penceresi açıkken kedi gizlenir (pencerenin alt köşesini kapatmasın): <html data-ik-asistan-acik> */
+:root[data-ik-asistan-acik] .ik-asistan-kap{opacity:0;pointer-events:none}
 
 /* Sayfa parçaları (ürün içerikte kullanır): başlık ve eylem çubuğu, süzgeç, kart, tablo, durum etiketi */
 .ik-sayi,.ik-tablo td.ik-sayi{font-variant-numeric:tabular-nums}

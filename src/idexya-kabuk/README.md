@@ -1,6 +1,6 @@
 # `<idexya-kabuk>`: ortak arayüz kabuğu
 
-Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: üst alan (cam), tek sol menü (11 madde), arama
+Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: üst alan (cam), tek sol menü (12 madde), arama
 (komut paleti), tema düğmesi, Ayarlar sayfası (`<idexya-ayarlar>`), yan menü (geniş ve daraltılmış), sayfa sekmeleri, zemin ızgarası, asistan
 düğmesi ve sayfa hareketleri. Sözleşme: [`../arayuz-kabugu.md`](../arayuz-kabugu.md) (renkler, yerler,
 yapım kuralları). Onaylı tasarım: 14 Kas 2026 taslağı.
@@ -20,7 +20,7 @@ değiştirilmez (yapım kuralı 1).
 | `ayarlar.js` | `<idexya-ayarlar>`: ortak Ayarlar sayfasının içeriği (aşağıda "Ayarlar sayfası") | evet |
 | `kabuk.css` | Bütün stiller, renk değişkenleri, açık/koyu, hareketler, telefon düzeni | evet |
 | `README.md` | Bu belge | evet |
-| `katmanlar.json` | Sol menünün 11 maddesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); sol menü ve arama için | evet |
+| `katmanlar.json` | Sol menünün 12 maddesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); sol menü ve arama için | evet |
 | `kedi.webp` | Asistan düğmesinin kedisi (IDOS maskotu, Ankara kedisi; 200×200). `kabuk.css` göreli adresle (`url(kedi.webp)`) kullanır, ürünün paketleyicisi (Vite, Astro) dosyayı özetli adla yayar | evet |
 | `demo.html`, `demo.js`, `demo.css`, `demo-ayar.json` | Yerel deneme sayfası | hayır |
 | `test/` | Node birim testleri ve Playwright tarayıcı denemesi | hayır |
@@ -374,7 +374,7 @@ cd kabuk
 for f in kabuk.js kabuk-cekirdek.js ayarlar.js kabuk.css; do echo "$f $(npx --yes esbuild@0.28.2 $f --minify --log-level=error | gzip -c | wc -c) (ham gzip $(gzip -c $f | wc -c))"; done
 ```
 
-Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 15 kB, `ayarlar.js` ≤ 5 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
+Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 17 kB (20 Kas 2026: mega menü + sol menüde hesap + sürüklenen asistan ile 15 kB'tan yükseltildi), `ayarlar.js` ≤ 5 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
 denetler ve ham gzip boyutunu bilgi olarak yazar (esbuild sürümü testte sabittir; ilk koşuda `npx` ağdan indirir).
 
 ## Deneme
