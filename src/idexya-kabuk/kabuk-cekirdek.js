@@ -41,6 +41,22 @@ export const ZAMAN_VARSAYILAN = { zamanAcik: 420, zamanKoyu: 1140 }; // 07.00 a�
 // Ortak aktif müşteri (1.3, Muhittin 18 Kas 2026): üç modül aynı seçimi `idx-musteri` anahtarında paylaşır (tek köken
 // os.idexya.com). Değer IDOS `client_id` (düz metin); Creative markayı `idos_client_id` ile çevirir, Website/CRM kartları
 // `ana_kayit_id` ile süzer. Ad değil yalnız kimlik saklanır. Geçersiz kayıt yok sayılır. Çıkış yap anahtarı siler.
+// Mega menü sütunları (20 Kas 2026): modüller sırası bozulmadan en çok `en` sütuna, ağırlık (1 + sayfa sayısı) dengeli.
+// 3'ten az modülde bölünmez (tek sütun).
+export function sutunBol(moduller, en = 3) {
+  const l = Array.isArray(moduller) ? moduller : [];
+  if (l.length < 3) return [l];
+  const n = Math.min(en, l.length), ağırlık = (m) => 1 + ((m && m.sayfalar) || []).length;
+  const toplam = l.reduce((t, m) => t + ağırlık(m), 0), hedef = toplam / n, çıktı = [[]];
+  let birikim = 0;
+  l.forEach((m, i) => {
+    const kalan = l.length - i, açılacak = n - çıktı.length;
+    if (çıktı[çıktı.length - 1].length && açılacak > 0 && (birikim >= hedef * çıktı.length || kalan <= açılacak)) çıktı.push([]);
+    çıktı[çıktı.length - 1].push(m); birikim += ağırlık(m);
+  });
+  return çıktı;
+}
+
 export const MUSTERI_ANAHTARI = 'idx-musteri';
 export const musteriKimligi = (x) => (typeof x === 'string' && /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/.test(x) ? x : '');
 export function musteriOku(depo) { try { return musteriKimligi(depo && depo.getItem(MUSTERI_ANAHTARI)); } catch (e) { return ''; } }

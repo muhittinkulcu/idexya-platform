@@ -163,6 +163,7 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 .ik-u-oge{padding:0;animation:ik-u .35s cubic-bezier(.2,.85,.2,1) both;animation-delay:calc(var(--u) * 40ms)}
 .ik-ucan-bas{display:flex;align-items:center;gap:10px;margin-bottom:2px;padding:6px 8px;border-radius:var(--ik-yaricap);color:var(--ik-vurgu);font-size:15px;font-weight:var(--w-orta)}
 .ik-ucan-bas:hover,.ik-ucan-bas:focus-visible{background:rgba(127,127,127,.1)}.ik-ucan-bas .ik-oge-ok{margin-left:auto}
+.ik-ucan.ik-ucan-genis{width:auto;max-width:calc(100vw - 82px)}.ik-ucan-sutunlar{display:grid;grid-template-columns:repeat(var(--sutun),minmax(200px,240px));gap:0}.ik-ucan-sutun{min-width:0;padding:0 8px;border-left:1px solid var(--ik-cizgi)}.ik-ucan-sutun:first-child{padding-left:0;border-left:0}.ik-ucan-sutun .ik-ucan-grup{margin-top:2px;border-top:0;padding-top:4px;font-weight:var(--w-orta);color:var(--ik-metin)}
 .ik-ucan-grup{display:flex;align-items:center;gap:7px;margin-top:4px;padding:6px 8px 2px;border-top:1px solid var(--ik-cizgi);font-size:12px;color:var(--ik-ikincil)}
 .ik-ucan-modul{display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:var(--ik-yaricap);transition:background .2s,padding .25s cubic-bezier(.2,.85,.2,1)}
 .ik-ucan-modul:hover,.ik-ucan-modul:focus-visible{background:rgba(127,127,127,.1);padding-left:12px}
