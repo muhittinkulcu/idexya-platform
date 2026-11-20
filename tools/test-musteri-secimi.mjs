@@ -121,6 +121,41 @@ k('siteler: seçim c1 + arşiv', JSON.stringify(v.hedefler.map((x) => x.id)) ===
 v = await istek('site-saglik?ana=c99');
 k('siteler: bilinmeyen müşteri boş', v.hedefler.length === 0 && v.arsivde === 0);
 
+// Genel bakış özeti (IDOS karşılama kartı da okur): ?ana= ile CRM sayıları süzülür, bağsız alanlar ajans geneli kalır.
+db.ham.exec("UPDATE musteriler SET deger = 1000, asama = 'teklif' WHERE id = 'k1'");
+db.ham.exec("UPDATE musteriler SET deger = 500 WHERE id = 'k2'");
+db.ham.exec("UPDATE musteriler SET deger = 300, asama = 'kazanildi' WHERE id = 'k3'");
+const talep = (id, durum, mid) => db.ham.prepare("INSERT INTO talepler (id, olusturma, kaynak, dogrulama, durum, musteri_id) VALUES (?, ?, 'form', 'tamam', ?, ?)").run(id, z, durum, mid);
+talep('t1', 'yeni', null); talep('t2', 'yeni', null); talep('t3', 'crm', 'k1');
+const kayit = (id, mid) => db.ham.prepare("INSERT INTO kayitlar (id, musteri_id, zaman, tur, baslik, kim) VALUES (?, ?, ?, 'not', 'Not', 'test')").run(id, mid, z);
+kayit('r1', 'k1'); kayit('r2', 'k2'); kayit('r3', 'k3');
+const destek = (id, mid, durum = 'acik') => db.ham.prepare("INSERT INTO destek_talepleri (id, no, uye_id, musteri_id, konu, durum, olusturma, guncelleme, son_yazan) VALUES (?, ?, 'u1', ?, 'Konu', ?, ?, ?, 'uye')").run(id, 'D-' + id, mid, durum, z, z);
+destek('d1', 'k1'); destek('d2', null); destek('d3', 'k3'); destek('d4', 'k1', 'kapali');
+const ALANLAR = ['talepler', 'musteri', 'asamalar', 'sonKayitlar', 'uyeler', 'bekleyenYorum', 'bekleyenDestek', 'reklam'];
+const yeniTalep = (o) => (o.talepler.find((x) => x.durum === 'yeni') || {}).n;
+v = await istek('ozet');
+k('özet: seçim yok, ajans geneli (3 kart, hat 1500, 3 açık destek)', v.d === 200 && v.musteri.n === 3 && v.musteri.hat === 1500 && v.bekleyenDestek === 3 && v.sonKayitlar.length === 3);
+k('özet: seçim yok, eski alan adları duruyor', ALANLAR.every((a) => a in v) && v.ok === true);
+k('özet: seçim yok, suzgec boş', v.suzgec.ana === null && v.suzgec.suzulen.length === 0 && JSON.stringify(v.suzgec.suzulmeyen) === JSON.stringify(ALANLAR));
+const genelTalep = yeniTalep(v);
+v = await istek('ozet?ana=c1');
+k('özet c1: yalnız c1 kartı (arşivli k4 hariç), hat 1000', v.musteri.n === 1 && v.musteri.hat === 1000);
+k('özet c1: aşamalar yalnız c1', JSON.stringify(v.asamalar) === JSON.stringify([{ asama: 'teklif', n: 1 }]));
+k('özet c1: son kayıtlar yalnız c1 kartından', JSON.stringify(v.sonKayitlar.map((x) => x.musteri_id)) === '["k1"]');
+k('özet c1: açık destek yalnız c1 kartına bağlı olan', v.bekleyenDestek === 1);
+k('özet c1: site talepleri süzülmez (ajans geneli)', yeniTalep(v) === genelTalep && genelTalep === 2);
+k('özet c1: suzgec alanı', v.suzgec.ana === 'c1' && JSON.stringify(v.suzgec.suzulen) === '["musteri","asamalar","sonKayitlar","bekleyenDestek"]'
+  && JSON.stringify(v.suzgec.suzulmeyen) === '["talepler","uyeler","bekleyenYorum","reklam"]');
+k('özet c1: eski alan adları duruyor', ALANLAR.every((a) => a in v));
+v = await istek('ozet?ana=c2');
+k('özet c2: kazanılan kart hatta sayılmaz', v.musteri.n === 1 && v.musteri.hat === 0 && v.bekleyenDestek === 1);
+v = await istek('ozet?ana=c99');
+k('özet bilinmeyen müşteri: sıfır kart, değer yok (null), hata yok', v.d === 200 && v.musteri.n === 0 && v.musteri.hat === null && v.asamalar.length === 0 && v.sonKayitlar.length === 0 && v.bekleyenDestek === 0);
+for (const kotu of ["x' OR 1=1 --", '../c1', '', 'a'.repeat(65)]) {
+  v = await istek('ozet?ana=' + encodeURIComponent(kotu));
+  k(`özet geçersiz kimlik (${kotu.slice(0, 12) || 'boş'}): süzgeçsiz`, v.d === 200 && v.musteri.n === 3 && v.suzgec.ana === null);
+}
+
 // Seçici listesi: ana_musteri önbelleğinden, IDOS'a istek gitmez (env'de IDOS ayarı yok).
 const am = (id, marka, durum, veri) => db.ham.prepare('INSERT INTO ana_musteri (musteri_id, marka, durum, veri, guncelleme, cekim, parti) VALUES (?, ?, ?, ?, ?, ?, ?)').run(id, marka, durum, JSON.stringify(veri), z, z, 'p1');
 am('c1', 'Işık Mobilya', 'aktif', { musteri_id: 'c1', marka: 'Işık Mobilya', unvan: 'Işık Mobilya A.Ş.' });
