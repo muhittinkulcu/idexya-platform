@@ -157,7 +157,7 @@ altına gezgin açılır; arkası perdeyle kararır, sol menü önde kalır. Sü
    ve eğri; altta **Aç ↵** (aynı sekme), **Yeni sekmede** (`target=_blank`, `rel=noopener`) ve **Sabitle** (sayfayı sekme
    satırına ekler; eklenmişse "Sekmede").
 
-İlk sütunun başlığı maddenin kendi adresine gider (Marketing: Marketing ana ekranı `/marketing`, 22 Kas 2026; Ayarlar: Ayarlar sayfası).
+İlk sütunun başlığı maddenin kendi adresine gider (Marketing: Marketing ana ekranı `/marketing-overview`; `/marketing` olamaz, os temel yol önekiyle çakışır; 22 Kas 2026; Ayarlar: Ayarlar sayfası).
 Bölüm ve sayfa satırı bağlantıdır: tık sayfaya gider ve gezgini kapatır. Fareyle bir satırda 120 ms durmak (niyet gecikmesi)
 ya da klavye odağı o satırı seçer; sağdaki sütun ve kart yenilenir. Seçim aynı grupta değişince yalnız işaret, "içinde"
 listesi ve kart yenilenir; üzerinde durulan satır yerinde kalır, tık kaybolmaz. Dokunmatikte üzerinde durma yoktur: sayfaları
