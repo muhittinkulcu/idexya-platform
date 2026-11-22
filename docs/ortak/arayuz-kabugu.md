@@ -52,6 +52,11 @@ Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünü
   Satır aralığı 1,6. Sayılar eşit genişlikte. Kabuk ağırlıkları CSS değişkeniyle verir (`--w-ince`, `--w-govde`,
   `--w-orta`, `--w-vurgu`); bileşenlerde sabit sayı yazılmaz.
 - Kart: başlık solda; i (açıklama) ve ⋮ (seçenekler) sağ üstte; tek ana eylem sağ altta. Köşe 5 px (`--ik-yaricap`; Muhittin, 18 Kas 2026).
+- İmzalı görünüm, 1. adım (Muhittin, 22 Kas 2026; tasarım tuvali 8. tur): kart, tablo ve ayar kartında yumuşak gölge
+  (`--ik-golge`); sol menüde açık madde ve bulunulan sayfa dolu mavi değil, yumuşak vurgu zemini ve vurgu renginde yazı
+  (turuncu çizgi yerinde); mega menüsü açık madde açık gri; menüdeki sayı rozeti yumuşak turuncu (`--ik-rozet-z`,
+  `--ik-rozet-y`), çünkü turuncu karar bekleyen işi gösterir; sayfa sekmeleri beyaz şeritte, seçili sekmenin altında vurgu
+  çizgisi; eşitleme uyarısı yumuşak sarı zeminli. Turuncu çizgi, zemin ızgarası ve 5 px köşe kararları değişmedi.
 - Düğme: köşe 5 px (girdi, açılır liste, rozet, sekme ve açılır pencere de 5 px; yalnız daireler yuvarlak); ana düğme dolu vurgu rengi, diğerleri çerçeveli.
 - Durum etiketi: yazı ve nokta birlikte; renk tek başına anlatmaz. Onaylandı, uygulandı ve etkisi doğrulandı ayrı etiketlerdir.
 - Tema: açık, koyu, sistem, zaman (gündüz açık, gece koyu; varsayılan 07.00–19.00 açık) dört seçenek. Üst çubuktaki tema
