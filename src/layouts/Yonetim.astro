@@ -157,6 +157,13 @@ tr[data-sayfa-gizli]{display:none}
 .alan{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:400;color:var(--head)}
 .alan input,.alan select,.alan textarea{min-height:42px;padding:8px 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:var(--bg);color:var(--tx);font:inherit;font-weight:300;box-sizing:border-box;width:100%}
 .bos{padding:28px 18px;text-align:center;color:var(--tx2)}
+/* Özet kutusu (imzalı görünüm 3. adım, IDOS ile aynı): sayfanın tek cümlelik özeti, solda simge, sağda tek ana eylem. Karar gerektiren sayı turuncu (--acc). */
+.ozet-kutusu{display:flex;flex-wrap:wrap;align-items:center;gap:16px;padding:16px 20px}
+.ozet-simge{flex:0 0 auto;width:36px;height:36px;display:grid;place-items:center;border-radius:8px;background:var(--infob);color:var(--info)}
+.ozet-govde{flex:1 1 420px;min-width:0}
+.ozet-etiket{margin:0;font-size:12px;color:var(--tx2)}
+.ozet-cumle{margin:2px 0 0;font-size:15px;font-weight:500;line-height:1.6;color:var(--tx)}
+.ozet-karar{font-weight:500;color:var(--acc)}
 .uyari{padding:12px 14px;border-radius:var(--ik-yaricap, 5px);font-size:14px}
 .uyari.hata{background:var(--errb);color:var(--err)}.uyari.bilgi{background:var(--infob);color:var(--info)}.uyari.ok{background:var(--okb);color:var(--ok)}
 /* Site bileşeni IcerikStil "R G B" değişkenlerine uyarlanır. */

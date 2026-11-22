@@ -2,6 +2,7 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Talepler" aktif="talepler" veri={['talepler']} aciklama="Siteden gelen her talep önce burada ayıklanır. Gerçek talep tek tıkla CRM'e geçer; aynı e-posta veya telefonla kayıtlı müşteri varsa yeni kart açılmaz, mevcut karta eklenir.">
+<section class="kart ozet-kutusu" data-ozet-kutusu hidden></section>
 <div role="tablist" aria-label="Talep durumu" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); border: 1px solid rgb(var(--line)); align-self: flex-start; flex-wrap: wrap"></div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="Talep listesi" class="kart" data-liste style="flex: 2 1 380px; overflow: hidden"></section>
@@ -9,11 +10,39 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 <script>
   import { api, el, tarih, once, KAYNAK, TALEP_DURUM, genelHata, prm, adresMetni } from '../../scripts/yonetim/ortak.js';
+  import { ozetCiz, karar } from '../../scripts/yonetim/ozet-kutusu.js';
   const liste = document.querySelector('[data-liste]'), ayr = document.querySelector('[data-ayrinti]'), sekmeler = document.querySelector('[data-sekmeler]');
   let tum = [], sekme = (['yeni', 'crm', 'spam', 'hepsi'].includes(prm('sekme')) ? prm('sekme') : 'yeni'), secili = null, sabit = null, mesaj = null;
   const BOLUM = [['yeni', 'Yeni'], ['crm', 'CRM’e alınan'], ['spam', 'Spam'], ['hepsi', 'Tümü']];
 
+  // Özet kutusu: liste en yeni 200 talebi getirir; liste bu sınıra ulaştıysa sayılar eksik olabilir, o zaman
+  // "en az" denir ve en eski bekleyenin yaşı yazılmaz (listede olmayan daha eski talep olabilir).
+  const SINIR = 200;
+  function ozet() {
+    const kesik = tum.length >= SINIR;
+    const yeni = tum.filter((t) => t.durum === 'yeni');
+    const ay = Date.now() - 30 * 86400000;
+    const son30 = tum.filter((t) => t.durum !== 'spam' && new Date(t.olusturma).getTime() >= ay);
+    const crm30 = son30.filter((t) => t.durum === 'crm').length;
+    const p = [];
+    if (yeni.length) {
+      p.push(karar(`${kesik ? 'En az ' : ''}${yeni.length} talep`), ' yanıt bekliyor');
+      const enEski = yeni.reduce((a, b) => (new Date(a.olusturma) < new Date(b.olusturma) ? a : b));
+      p.push(kesik ? '.' : `, en eskisi ${once(enEski.olusturma)} geldi.`);
+    } else if (tum.length) p.push('Yanıt bekleyen talep yok.');
+    // Liste kesikse son 30 gün ancak listedeki en eski talep 30 günden eskiyse tam sayılır.
+    const otuzTam = !kesik || tum.some((t) => new Date(t.olusturma).getTime() < ay);
+    if (son30.length && otuzTam) p.push(` Son 30 günde spam dışında ${son30.length} talep geldi${crm30 ? `, ${crm30} tanesi CRM’e alındı` : ''}.`);
+    let eylem = null;
+    if (yeni.length && !kesik) {
+      const enEski = yeni.reduce((a, b) => (new Date(a.olusturma) < new Date(b.olusturma) ? a : b));
+      eylem = el('button', { type: 'button', class: 'dugme ikincil', onclick: () => { sekme = 'yeni'; secili = enEski.id; sabit = null; mesaj = null; try { history.replaceState(null, '', adresMetni({ sekme: 'yeni' })); } catch (e) {} ciz(); } }, 'En eskisini aç');
+    }
+    ozetCiz(document.querySelector('[data-ozet-kutusu]'), { etiket: 'Bu sayfanın özeti · ' + (kesik ? 'en yeni ' + SINIR + ' talep' : 'tüm talepler'), parcalar: p, eylem });
+  }
+
   function ciz() {
+    ozet();
     sekmeler.replaceChildren(...BOLUM.map(([k, ad]) => {
       const n = k === 'hepsi' ? tum.length : tum.filter((t) => t.durum === k).length;
       const s = k === sekme;
