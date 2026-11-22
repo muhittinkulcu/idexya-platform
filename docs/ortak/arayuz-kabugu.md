@@ -9,7 +9,7 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 | Sıra | Parça | İçerik |
 |---|---|---|
 | 1 | Üst alan | En üst, tam genişlik, ~52 px, yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; talimat 4.2). Soldan sağa: IDOS kimliği (turuncu `#F07A23` rozet içinde beyaz X; favicon da aynı görünüm ve "IDOS", ana ekrana döner), ürün yuvası (aktif müşteri seçimi, tarih aralığı), global arama (⌘K), veri eşitleme durumu, üst çubuğu sabitle, bildirimler, tema, kullanıcı menüsü. **Modül sekmesi ve mega menü yoktur**: modül gezinmesi yalnız sol menüdedir. Turuncu yalnız X logosunun rozetinde ve sol menüdeki açık maddenin çizgisinde. |
-| 2 | Sol menü | Tek menü, 11 madde (talimat 4.2): Genel bakış, Müşteriler, Görevler ve onaylar, Marketing, CRM, Web ve Commerce, Creative, Marketplace (verisi yok; bayrakla açılır, bugün gizli), AI Center, Raporlar, Ayarlar. Yalnız açık maddenin (adresin bulunduğu) grupları ve sayfaları onun altında açılır: madde › grup › modül › sayfa. Tek gruplu maddede grup başlığı çizilmez; çok gruplu maddede başta yalnız etkin sayfanın grubu açıktır. Daraltılabilir; daraltınca madde simgeleri kalır. Başlıkta "tüm grupları aç / kapat"; geniş menüde fareyle üzerine gelince kapalı grup açılır. Veri almayan öğe menüye konmaz. Sayfalar bulundukları uygulamada kalır; bağlantı os.idexya.com'da yol önekine çevrilir. |
+| 2 | Sol menü | Tek menü, 12 madde (talimat 4.2; 20 Kas 2026'da Web ve Commerce ikiye ayrıldı): Genel bakış, Müşteriler, Görevler ve onaylar, Marketing (Meta, Google Ads, Google Analytics, Search Console, Tag Manager), CRM, Web Site Yönetimi (idexya.com), E-Ticaret, Creative, Marketplace (verisi yok; bayrakla açılır, bugün gizli), AI Center, Raporlar, Ayarlar. Sol menüde yalnız maddeler durur; maddeye tıklayınca **sütun gezgini** açılır (22 Kas 2026, aşağıda): grup › bölüm ve "içinde" sayfaları › önizleme kartı. Daraltılabilir; daraltınca madde simgeleri kalır ve simgenin üzerinde sütunlu mega menü açılır. Veri almayan öğe menüye konmaz. Sayfalar bulundukları uygulamada kalır; bağlantı os.idexya.com'da yol önekine çevrilir. |
 | 3 | Sayfa sekmeleri | Açılan her sayfa sekme olur (en çok 8). Genel bakış ilk sırada ve kapatılamaz. × ile kapanır. |
 | 4 | Sayfa başlığı ve eylem çubuğu | Solda konum yolu ve başlık; sağda sırayla Yenile, Dışa aktar, Yazdır ve tek ana eylem (vurgu renginde). |
 | 5 | Süzgeç satırı | Müşteri, marka ya da site seçimi; dönem; süzgeç. Üst süzgeç sayfadaki her kartı etkiler. |
@@ -40,7 +40,7 @@ menü öğesi, sekme çizgisi). Creative kendi kırmızısını korur (`#DC2626`
 başına yazılır.
 
 Madde simgeleri (`katmanlar.json` `simge`): Genel bakış `ev`, Müşteriler `kisiler`, Görevler ve onaylar `onay`, Marketing
-`megafon`, CRM `huni`, Web ve Commerce `dunya`, Creative `palet`, Marketplace `magaza`, AI Center `yildiz`, Raporlar `belge`,
+`megafon`, CRM `huni`, Web Site Yönetimi `dunya`, E-Ticaret `sepet`, Creative `palet`, Marketplace `magaza`, AI Center `yildiz`, Raporlar `belge`,
 Ayarlar `ayar`.
 Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünür; görsel kabuğun parçasıdır, üç üründe aynıdır.
 
@@ -78,7 +78,7 @@ performans en önemli hususlar."
    betik ya da görsel yüklenmez: Inter ve görseller her projede kendi sunucusundan gelir. Kullanıcıya görünen her veri
    metin olarak basılır (`innerHTML` yok). Kabuk yetki kararı vermez; menüde ne görüneceğini sunucunun döndürdüğü yetki
    belirler.
-3. **Hız bütçesi.** Kabuğun JS'i küçültülmüş ve sıkıştırılmış (minify + gzip; ürünlerin sunduğu boyut) hâlde 15 kB'ı,
+3. **Hız bütçesi.** Kabuğun JS'i küçültülmüş ve sıkıştırılmış (minify + gzip; ürünlerin sunduğu boyut) hâlde 17 kB'ı (20 Kas 2026'ya kadar 15 kB),
    CSS'i 10 kB'ı geçmez. Kaynaktaki yorumlar bütçeye sayılmaz (karar 14 Kas 2026). Ana ekran telefonda
    Lighthouse performans puanı en az 90; ilk boyama 1,5 sn altında. Galaksi arka planı sayfa içeriği çizildikten
    sonra, boşta kalan zamanda bir kez çizilir; ekran dışındayken çizim ve animasyon durur.
@@ -95,6 +95,16 @@ performans en önemli hususlar."
 
 14 Kas 2026'da gelen mega menü ve üst çubuktaki modül sekmeleri tek gezinme kararıyla (talimat 4.2) kaldırıldı: modüller
 yalnız sol menüdedir. Açılır paneller (arama, profil) birbirini kapatır; Esc ve dışarı tıklama kapatır.
+
+## Sütun gezgini (Muhittin, 22 Kas 2026)
+
+Onaylı çizim: "IDOS menü ve mega menü yeni tasarım önizlemeleri" tuvalinin 4. satırı (F2); karar IDOS
+`docs/kararlar/2026-11-22-yeni-arayuz-sutun-gezgini.md`. Oklu ağacın (18 Kas) ve "tüm grupları aç / kapat" düğmesinin yerini
+alır. Geniş sol menüde madde satırına tıklayınca menünün sağında, sayfanın üstünde açılır; arkası karartılır, menü önde
+kalır. Sütunlar: gruplar ("N bölüm · M sayfa", kaynak uyarısı) › seçili grubun bölümleri ve "<bölüm> içinde" sayfaları ›
+önizleme kartı (ad, açıklama, ürünün verdiği uyarı, en çok 4 sayı ve eğri; Aç, Yeni sekmede, Sabitle). Fareyle üzerinde durmak
+ya da klavye odağı seçer, tık sayfaya gider. Telefonda tam ekran, yana kayan sütunlar. Ayrıntı ve ürün arayüzü:
+`kabuk/README.md` "Sütun gezgini".
 
 ## Sayfa hareketleri (Muhittin, 14 Kas 2026)
 

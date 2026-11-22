@@ -146,10 +146,10 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
         const sayfalar = [];
         (Array.isArray(m.sayfalar) ? m.sayfalar : []).forEach((s) => {
           const su = U(s && s.url);
-          if (su && metin(s.ad)) sayfalar.push({ ad: metin(s.ad), url: su, rozet: rozetSay(s.rozet) });
+          if (su && metin(s.ad)) sayfalar.push({ ad: metin(s.ad), url: su, rozet: rozetSay(s.rozet), aciklama: metin(s.aciklama, 200) });
           else hatalar.push(k.anahtar + ': sayfa atlandı (' + metin(s && s.ad) + ')');
         });
-        moduller.push({ ad: metin(m.ad), url: mu, rozet: rozetSay(m.rozet), sayfalar });
+        moduller.push({ ad: metin(m.ad), url: mu, rozet: rozetSay(m.rozet), aciklama: metin(m.aciklama, 200), sayfalar });
       });
       if (metin(g && g.baslik)) gruplar.push({ baslik: metin(g.baslik), simge: has(SIMGE, g.simge) ? g.simge : 'izgara', moduller });
     });
@@ -242,9 +242,30 @@ export function aramaHavuzu(ayar) {
   return h;
 }
 
-// Yan menüde "tüm grupları aç / kapat": hiç kapalı grup yoksa düğme kapatır, varsa hepsini açar. Sonuç yeni kapalı listesidir.
-export const hepsiAcik = (gruplar, kapali) => !gruplar.some((g) => kapali.includes(g.baslik));
-export const hepsiDegistir = (gruplar, kapali) => (hepsiAcik(gruplar, kapali) ? gruplar.map((g) => g.baslik) : []);
+// Sütun gezgini (F2): grubun alt satırı. Sayfası olan modül "bölüm"dür; sayfasız modül tek sayfa sayılır.
+// Hiç bölüm yoksa yalnız sayfa sayısı ("6 sayfa"), varsa "5 bölüm · 21 sayfa".
+export function grupOzet(g) {
+  const m = g.moduller, b = m.filter((x) => x.sayfalar.length).length, s = m.reduce((t, x) => t + (x.sayfalar.length || 1), 0);
+  return (b ? m.length + ' bölüm · ' : '') + s + ' sayfa';
+}
+
+// Gezginin önizleme kartı için ürünün verdiği veri (README "Sütun gezgini"). Metinler kısaltılır, en çok 4 sayı ve 60 noktalık
+// eğri; geçersiz değer atılır. iyi: true (yeşil) | false (kırmızı) | yok (nötr); renk tek başına anlatmaz, değişim metni yazılır.
+export function onizlemeCoz(x) {
+  x = x && typeof x === 'object' ? x : {};
+  const sayilar = (Array.isArray(x.sayilar) ? x.sayilar : []).map((y) => y && typeof y === 'object' ? {
+    ad: metin(y.ad, 40), deger: metin(y.deger, 24) || '—', degisim: metin(y.degisim, 16), iyi: y.iyi === true || y.iyi === false ? y.iyi : null
+  } : null).filter((y) => y && y.ad).slice(0, 4);
+  const egri = (Array.isArray(x.egri) ? x.egri : []).filter((n) => typeof n === 'number' && Number.isFinite(n)).slice(-60);
+  return { uyari: metin(x.uyari, 120), sayilar, egri: egri.length > 1 ? egri : [], not: metin(x.not, 120) };
+}
+
+// Eğri: seri, w × h kutusuna ölçeklenmiş SVG yol verisi (üstte 2 px pay). Düz seri ortada yatay çizgidir.
+export function egriYol(seri, w = 100, h = 40) {
+  if (!seri || seri.length < 2) return '';
+  const en = Math.min(...seri), ek = Math.max(...seri), a = ek - en, y = (v) => (a ? h - 2 - ((v - en) / a) * (h - 4) : h / 2);
+  return seri.map((v, i) => (i ? 'L' : 'M') + +(i * w / (seri.length - 1)).toFixed(2) + ' ' + +y(v).toFixed(2)).join('');
+}
 
 // Boş sorgu: sık sayfalar + eylemler. Dolu: her sözcük ad ve yolda (Türkçe küçük harf).
 export function aramaSuz(havuz, sorgu, sikUrller = [], sinir = ARAMA_SINIRI) {
