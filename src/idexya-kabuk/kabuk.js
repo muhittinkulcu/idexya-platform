@@ -552,10 +552,12 @@ class IdexyaKabuk extends HTMLElement {
       u.hidden = false;
       this.rozetTazele(u);
     }
-    // Büyük mega menü (22 Kas 2026): menünün sağından ekranın sağına, üst çubuğun altından; ekrana sığar, gerekirse yalnız içi kayar.
+    // Büyük mega menü (22 Kas 2026): menünün sağından, üst çubuğun altından; genişlik içeriğe göre, en çok ekranın sağ kenarına
+    // kadar; ekrana sığar, gerekirse yalnız içi kayar.
     if (TEL.matches) return;
-    const ust = Math.max(0, this.ust.getBoundingClientRect().bottom) + 8;
-    u.style.setProperty('left', this.yan.getBoundingClientRect().right + 8 + 'px');
+    const ust = Math.max(0, this.ust.getBoundingClientRect().bottom) + 8, sol = this.yan.getBoundingClientRect().right + 8;
+    u.style.setProperty('left', sol + 'px');
+    u.style.setProperty('max-width', innerWidth - sol - 16 + 'px');
     u.style.setProperty('top', ust + 'px');
     u.style.setProperty('max-height', innerHeight - ust - 16 + 'px');
   }

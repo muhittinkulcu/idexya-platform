@@ -144,14 +144,15 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 .ik-ray-dugme .ik-rozet{position:absolute;top:2px;right:0;min-width:16px;height:16px;padding:0 4px;font-size:10px;line-height:16px}
 .ik-ucan{position:fixed;z-index:42;width:340px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;box-sizing:border-box;padding:18px 22px 20px;border-radius:var(--ik-yaricap);background:color-mix(in srgb,var(--ik-yuzey) 97%,transparent);-webkit-backdrop-filter:blur(22px) saturate(150%);backdrop-filter:blur(22px) saturate(150%);
   border:1px solid var(--ik-cizgi);box-shadow:0 24px 60px -20px rgba(0,0,0,.35);animation:ik-ucan .28s cubic-bezier(.2,.85,.2,1) both;transform-origin:left top}
-/* Büyük mega menü (Muhittin, 22 Kas 2026): çok sütunlu madde menünün sağından ekranın sağına uzanır; sütunlar eşit ve geniş. */
-.ik-ucan.ik-ucan-genis{width:auto;right:16px}
+/* Büyük mega menü (Muhittin, 22 Kas 2026): menünün sağından açılır, genişliği içeriğe göredir ("içeriğe uygun"); en çok ekranın
+   sağ kenarına kadar (max-width JS'te). Sütun içeriği kadar, en çok 280 px; sığmazsa sütunlar 150 px'e kadar daralır. */
+.ik-ucan.ik-ucan-genis{width:max-content}
 .ik-ucan-kapat{position:absolute;top:10px;right:10px}
 .ik-uyari-nokta{flex:none;display:inline-block;width:7px;height:7px;margin-left:6px;border-radius:50%;background:var(--ik-hata)}
 .ik-u-oge{padding:0;animation:ik-u .35s cubic-bezier(.2,.85,.2,1) both;animation-delay:calc(var(--u) * 40ms)}
 .ik-ucan-bas{display:flex;align-items:center;gap:10px;width:max-content;max-width:calc(100% - 40px);margin-bottom:14px;padding:6px 8px;border-radius:var(--ik-yaricap);color:var(--ik-vurgu);font-size:17px;font-weight:var(--w-orta)}
 .ik-ucan-bas:hover,.ik-ucan-bas:focus-visible{background:rgba(127,127,127,.1)}.ik-ucan-bas .ik-oge-ok{margin-left:auto}
-.ik-ucan-sutunlar{display:grid;grid-template-columns:repeat(var(--sutun),minmax(0,1fr));gap:0}.ik-ucan-sutun{min-width:0;padding:0 16px;border-left:1px solid var(--ik-cizgi)}.ik-ucan-sutun:first-child{padding-left:0;border-left:0}.ik-ucan-sutun .ik-ucan-grup{margin-top:2px;border-top:0;padding-top:4px;font-weight:var(--w-orta);color:var(--ik-metin)}
+.ik-ucan-sutunlar{display:grid;grid-template-columns:repeat(var(--sutun),minmax(150px,max-content));gap:0}.ik-ucan-sutun{min-width:0;max-width:280px;padding:0 16px;border-left:1px solid var(--ik-cizgi)}.ik-ucan-sutun:first-child{padding-left:0;border-left:0}.ik-ucan-sutun .ik-ucan-grup{margin-top:2px;border-top:0;padding-top:4px;font-weight:var(--w-orta);color:var(--ik-metin)}
 .ik-ucan-grup{display:flex;align-items:center;gap:7px;margin-top:4px;padding:6px 8px 2px;border-top:1px solid var(--ik-cizgi);font-size:12px;color:var(--ik-ikincil)}
 .ik-ucan-modul{display:flex;align-items:center;gap:10px;padding:4px 8px;border-radius:var(--ik-yaricap);transition:background .2s,padding .25s cubic-bezier(.2,.85,.2,1)}
 .ik-ucan-modul:hover,.ik-ucan-modul:focus-visible{background:rgba(127,127,127,.1);padding-left:12px}
@@ -312,7 +313,7 @@ html[data-tema=koyu]{--ik-cu-ikincil:#A3AFBB;--ik-cu-hover:rgba(255,255,255,.06)
 @media (max-width:860px){
   .ik-masa{display:none!important}.ik-tel{display:inline-flex}
   /* Telefonda mega menü tam ekran; sütunlar alt alta. */
-  .ik-ucan,.ik-ucan.ik-ucan-genis{inset:0;width:auto;max-height:none;z-index:55;border-radius:0;padding-top:52px}
+  .ik-ucan,.ik-ucan.ik-ucan-genis{inset:0;width:auto;max-width:none;max-height:none;z-index:55;border-radius:0;padding-top:52px}
   .ik-ucan-sutunlar{grid-template-columns:minmax(0,1fr)}.ik-ucan-sutun{padding:12px 0 0;border-left:0;border-top:1px solid var(--ik-cizgi)}.ik-ucan-sutun:first-child{border-top:0}
   .ik-ust{gap:6px 8px;padding:0 8px}
   .ik-logo{padding-right:0;margin-right:auto}
