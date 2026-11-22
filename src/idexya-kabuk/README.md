@@ -77,13 +77,13 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   "bayraklar": [],                       // isteğe bağlı: bayraklı maddeleri açar (ör. "marketplace"); verilmeyen bayraklı madde çizilmez
   "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://os.idexya.com/", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
     "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // madde simgesi (simge adı, aşağıda)
-    "url": "https://marketing.idexya.com/meta", // maddenin adresi (gezginin önizleme kartı ve grupsuz maddede satır buraya gider)
+    "url": "https://marketing.idexya.com/meta", // maddenin adresi (madde satırı ve mega menü başlığı buraya gider)
     "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada vurgu (#RRGGBB)
     "aciklama": "Kısa açıklama",
     "gruplar": [{
       "baslik": "Reklam", "simge": "megafon", // simge adları aşağıda
       "moduller": [{ "ad": "Meta", "url": "/meta", "rozet": 3, // rozet isteğe bağlı: yeni iş sayısı
-                     "aciklama": "Kampanya, reklam seti ve reklamlar", // isteğe bağlı, en çok 200: gezginin önizleme kartında
+                     "aciklama": "Kampanya, reklam seti ve reklamlar", // isteğe bağlı, en çok 200 (22 Kas 2026'dan beri menüde gösterilmez)
                      "sayfalar": [{ "ad": "Kampanyalar", "url": "/meta/kampanyalar", "rozet": 0, "aciklama": "" }] }]
     }]
   }],
@@ -104,8 +104,8 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 
 - **Tek gezinme** (talimat 4.2): "katman" sol menünün bir maddesidir. Sol menüde bütün maddeler alt alta durur; **açık madde**
   adresten bulunur (`etkinKatman`: önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri değilse `katman`). Madde
-  sütun gezginini açar (aşağıda "Sütun gezgini"). Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
-- Üst alanda modül sekmesi ve mega menü **yoktur**. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
+  satırı maddenin adresine bağlantıdır; üzerine gelince mega menü açılır (aşağıda "Mega menü"). Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
+- Üst alanda modül sekmesi **yoktur**; mega menü sol menüden açılır. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
 - Genel bakış maddesinin adresi tek adresin köküdür: `https://os.idexya.com/`. Ana ekranı IDOS uygulaması üretir,
   yönlendirici kökte yönlendirmesiz sunar (`tek-adres-plani.md` "Ana ekran"). Kökte karşılama ekranı (Modüller) açılır;
   Genel bakış grubunun ilk modülü "Operasyon merkezi" `https://os.idexya.com/dashboard` (Muhittin, 18 Kas 2026). Tek adresin
@@ -144,50 +144,26 @@ sabitleme, bildirimler, tema, kullanıcı menüsü. Turuncu (`--ik-turuncu`: aç
 (`view-transition-name` öğeyi "backdrop root" yapar, cam arkadaki sayfayı göremez). Açılır menüler (arama sonuçları, profil)
 koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satırdadır.
 
-**Sütun gezgini** (F2; Muhittin, 22 Kas 2026; onaylı çizim: "IDOS menü ve mega menü yeni tasarım önizlemeleri" tuvalinin
-4. satırı; karar IDOS `docs/kararlar/2026-11-22-yeni-arayuz-sutun-gezgini.md`). Geniş sol menüde yalnız madde satırları
-durur (simge, ad, içindekilerin rozet toplamı, ok). Grubu olan maddeye tıklayınca menünün sağında, üst çubuğun altından ekranın
-altına gezgin açılır; arkası perdeyle kararır, sol menü önde kalır. Sütunlar:
+**Mega menü** (Muhittin, 22 Kas 2026: "Sidebar hover durumunda megamenü gibi açılsın; en üstte katman adı, alttaki sütunlarda
+modüller ve alt sayfalar"). Aynı 22 Kas'ta canlıya çıkan sütun gezgininin (F2) ve önizleme kartının yerini alır. Geniş ve
+daraltılmış menüde aynıdır: madde satırının (daraltılmışta simgenin) üzerine gelince ya da klavye odağında açılır.
 
-1. Gruplar (Marketing'de platformlar). Alt satırda `grupOzet`: sayfası olan modül "bölüm"dür, sayfasız modül tek sayfadır
-   ("5 bölüm · 21 sayfa"; hiç bölüm yoksa "6 sayfa"). Ürünün kaynak uyarısı varsa "· eşitlenemedi" ve kırmızı nokta
-   (renk tek başına anlatmaz). Tek gruplu maddede bu sütun yoktur.
-2. Seçili grubun bölümleri (modüller); seçili bölümün sayfaları altta "<Bölüm> içinde" başlığıyla.
-3. Önizleme kartı: seçili sayfa ya da bölümün adı, `aciklama`sı (yoksa maddenin), ürünün verdiği uyarı bandı, en çok 4 sayı
-   ve eğri; altta **Aç ↵** (aynı sekme), **Yeni sekmede** (`target=_blank`, `rel=noopener`) ve **Sabitle** (sayfayı sekme
-   satırına ekler; eklenmişse "Sekmede").
-
-İlk sütunun başlığı maddenin kendi adresine gider (Marketing: Marketing ana ekranı `/marketing-overview`; `/marketing` olamaz, os temel yol önekiyle çakışır; 22 Kas 2026; Ayarlar: Ayarlar sayfası).
-Bölüm ve sayfa satırı bağlantıdır: tık sayfaya gider ve gezgini kapatır. Fareyle bir satırda 120 ms durmak (niyet gecikmesi)
-ya da klavye odağı o satırı seçer; sağdaki sütun ve kart yenilenir. Seçim aynı grupta değişince yalnız işaret, "içinde"
-listesi ve kart yenilenir; üzerinde durulan satır yerinde kalır, tık kaybolmaz. Dokunmatikte üzerinde durma yoktur: sayfaları
-olan bölüme ilk dokunuş seçer, ikincisi sayfaya gider. Açılışta açık sayfanın grubu, bölümü ve sayfası seçilidir; başka
-maddede ilk grup. Klavye: sol menüde ↑ ↓ maddeler arasında, Enter ya da → gezgini açıp seçili satıra girer; gezginde ↑ ↓
-sütun içinde, → sonraki sütun, ← önceki sütun (ilk sütunda gezgini kapatıp maddeye döner), Esc kapatır ve odak maddeye döner.
-Perdeye ya da × düğmesine tıklamak kapatır. Telefonda gezgin tam ekrandır: her sütun ekran genişliğinde, yana kayarak
-geçilir; ‹ önceki sütuna döner, kart yoktur. "Hareketleri azalt"ta açılış hareketi yoktur. Gezginin durumu saklanmaz.
-
-Önizleme verisi isteğe bağlıdır; ürün bir işlev verir, kabuk her adres için bir kez çağırır ve önbelleğe alır. **Müşteri
-ayrımı:** veri sunucuda seçili müşterinin kapsamıyla süzülür; önbellek ve uyarılar müşteriye özeldir. Müşteri değişince ürün
-`kabuk.onizlemeSifirla()` çağırır (başka sekmedeki değişiklikte, `idx-musteri` `storage` olayıyla, kabuk kendisi çağırır);
-yoldaki eski yanıt önbelleğe yazılmaz.
+- **Yer:** menünün sağından ekranın sağına (16 px pay), üst çubuğun altından; yüksekliği içeriğe göre, ekrana sığmazsa
+  yalnız içi kayar. Tek grupta (ya da 1-2 modülde) dar pencere kalır.
+- **İçerik:** en üstte maddenin simgesi ve adı (maddenin adresine bağlantı); altında her grup eşit genişlikte bir sütun
+  (simgeli grup başlığı › modüller › sayfaları). Tek gruplu madde, modülleri sayfa sayısına göre en çok 3 sütuna böler (`sutunBol`).
+- **Kaynak uyarısı:** ürün `uyariYap(url, metin)` ile verir; grup başlığında ve modül satırında kırmızı nokta, metin ipucunda
+  ve erişilebilir adda (renk tek başına anlatmaz). Uyarı **ajans geneli** olmalıdır (ör. eşitleme özeti): kabuk müşteri
+  değişince uyarıları silmez; müşteriye özel metin verilmez (müşteri ayrımı).
+- **Tık:** madde satırı maddenin sayfasına, menüdeki satır sayfasına gider ve menüyü kapatır. Dokunmatikte ve telefonda
+  maddeye ilk dokunuş menüyü açar, ikincisi sayfaya gider.
+- **Kapanma:** fare menüden ve satırdan ayrılınca 180 ms sonra; satırdan menüye geçerken kapanmaz. Esc ve × kapatır, odak
+  maddeye döner. Klavye: sol menüde ↑ ↓ maddeler arasında (odak menüyü o maddeye geçirir), → menüye girer, Tab menüde ilerler.
+- Telefonda tam ekrandır, sütunlar alt alta. "Hareketleri azalt"ta açılış hareketi yoktur. Menünün durumu saklanmaz.
 
 ```js
-kabuk.onizlemeKaynagi = async (url) => ({
-  uyari: 'Eşitleme başarısız · son veri 18 Kas',            // isteğe bağlı, en çok 120 karakter
-  sayilar: [{ ad: 'Tıklama', deger: '12.480', degisim: '↑ %8,2', iyi: true }], // en çok 4; iyi: true | false | yok
-  egri: [12, 15, 14, 18],                                   // en çok 60 sayı; 2'den azsa çizilmez
-  not: 'Son 28 gün'                                         // isteğe bağlı
-});
-kabuk.uyariYap('https://marketing.idexya.com/search-console', 'Eşitleme başarısız'); // boş metin kaldırır
+kabuk.uyariYap('https://marketing.idexya.com/search-console', 'Eşitleme başarısız · son veri 18 Kas'); // boş metin kaldırır
 ```
-
-Biçimlendirme üründedir (binlik ayraç, %, TL); kabuk metni olduğu gibi `textContent` ile basar (`onizlemeCoz` doğrular,
-bilinmeyen değer "—"). İşlev hata verirse kart yalnız ad ve açıklamayla kalır. Veri yoksa sayı uydurulmaz.
-
-**Daraltılmış menüdeki pencere** (uçan panel; 18 Kas 2026; 20 Kas'tan beri sütunlu mega menü): sıkı liste (simgeli grup
-başlığı, modül, sayfalar); gezginin yerine daraltılmış menüde kullanılır. Pencere hep görünür alanda kalır: üst çubuğun altı ile ekranın altı arasına sığacak biçimde yukarı kayar,
-`max-height` bu aralıktır, gerekirse yalnız pencerenin içi kayar. Fareyle pencereye geçerken kapanmaz.
 
 ## Olaylar ve yöntemler
 
@@ -213,15 +189,13 @@ orta tık tarayıcıya bırakılır (yeni sekme).
 
 | Yöntem / alan | Ne yapar |
 |---|---|
-| `etkinYap({ modulUrl, sayfaUrl, ad })` | Etkin sayfayı değiştirir: sol menüde açık madde, gezginde bulunulan sayfa, sekme ekleme, sahne hareketi |
+| `etkinYap({ modulUrl, sayfaUrl, ad })` | Etkin sayfayı değiştirir: sol menüde açık madde, mega menüde bulunulan sayfa, sekme ekleme, sahne hareketi |
 | `sahneOynat(kok?)` | `[data-ik-sahne]` hareketlerini ve sayaçları yeniden oynatır |
 | `durumYap({ baglanti, esitleme })` | Durum kapsülünü günceller |
 | `rozetYap(url, sayi)` | Modül ya da sayfa rozetini günceller (0 gizler) |
-| `onizlemeKaynagi` | İsteğe bağlı işlev `(url) => Promise<{ uyari, sayilar, egri, not }>`: gezginin önizleme kartı (yukarıda "Sütun gezgini") |
-| `onizlemeSifirla()` | Önizleme önbelleğini ve kaynak uyarılarını boşaltır; müşteri değişince ürün çağırır (müşteri ayrımı) |
-| `uyariYap(url, metin)` | Menü adresine kaynak uyarısı koyar (gezginde grup ve bölümde nokta, kartta bant); boş metin kaldırır |
+| `uyariYap(url, metin)` | Menü adresine kaynak uyarısı koyar (mega menüde grup başlığında ve modülde nokta); boş metin kaldırır |
 | `kullaniciYap({ ad, rol, eposta })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
-| `kapat()` | Açık açılırı (gezgin, arama, profil) kapatır |
+| `kapat()` | Açık açılırı (arama, profil) kapatır |
 | `ustYuva` | Üst alandaki ürün yuvası (öğe): ürün aktif müşteri ve platform gibi denetimlerini içine koyar (React: `createPortal`); kabuğun genel öğe kuralları yuvaya karışmaz |
 | `ustYuvaSag` | Aramanın sağındaki ürün yuvası (20 Kas 2026): tarih aralığı ve karşılaştırma buraya konur; sıra: müşteri, platform, arama (ortada, en çok 400 px), tarih |
 | `gorunumYap({ tema?, zamanAcik?, zamanKoyu?, azHareket? })` | Görünümü değiştirir, kaydeder, uygular, `idexya-kabuk:gorunum` yayar |
@@ -358,8 +332,8 @@ gelince ortak olur.
 
 Gerçek `a` ve `button`; `aria-expanded`, `aria-current="page"`, `aria-pressed`, `role="dialog"`,
 `role="combobox"` + `listbox`/`option` + `aria-activedescendant`. Her açılır klavyeyle kullanılır; Esc kapatır
-ve odak açan düğmeye döner; odak açılırdan çıkınca açılır kapanır. Daraltılmış menüde simgeye odaklanınca
-panel açılır, → ile panele girilir. Geniş menüde madde ve sütun gezgini ok tuşlarıyla gezilir (yukarıda "Sütun gezgini").
+ve odak açan düğmeye döner; odak açılırdan çıkınca açılır kapanır. Sol menüde maddeye (daraltılmışta simgeye) odaklanınca
+mega menü açılır, → ile menüye girilir (yukarıda "Mega menü").
 
 **Köşe yuvarlaması** (Muhittin, 18 Kas 2026): tek değişken `--ik-yaricap: 5px` (`:root`); kart, düğme, girdi, açılır liste,
 rozet, sekme ve açılır pencere bunu kullanır. Yalnız daireler (avatar, nokta, asistan) ve açma kapama anahtarı yuvarlaktır.
@@ -375,7 +349,7 @@ cd kabuk
 for f in kabuk.js kabuk-cekirdek.js ayarlar.js kabuk.css; do echo "$f $(npx --yes esbuild@0.28.2 $f --minify --log-level=error | gzip -c | wc -c) (ham gzip $(gzip -c $f | wc -c))"; done
 ```
 
-Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 17 kB (20 Kas 2026: mega menü + sol menüde hesap + sürüklenen asistan ile 15 kB'tan yükseltildi; 22 Kas 2026 sütun gezgini oklu ağacın yerine geldi, sınır değişmedi: 17.036 / 17.408 bayt), `ayarlar.js` ≤ 5 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
+Sınır: `kabuk.js` + `kabuk-cekirdek.js` toplam ≤ 17 kB (20 Kas 2026: mega menü + sol menüde hesap + sürüklenen asistan ile 15 kB'tan yükseltildi; 22 Kas 2026 mega menü sütun gezgininin ve önizleme kartının yerine geldi: 14.762 / 17.408 bayt), `ayarlar.js` ≤ 5 kB, `kabuk.css` ≤ 10 kB (küçültülmüş + gzip). Test bu sınırı
 denetler ve ham gzip boyutunu bilgi olarak yazar (esbuild sürümü testte sabittir; ilk koşuda `npx` ağdan indirir).
 
 ## Deneme

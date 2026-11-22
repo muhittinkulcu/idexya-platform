@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, etkinKatman, katmanRozeti, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir,
-  kaynakDurumu, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum, grupOzet, onizlemeCoz, egriYol
+  kaynakDurumu, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -63,7 +63,7 @@ const I = {
 const olay = (el, ad, detail, iptal) => el.dispatchEvent(new CustomEvent('idexya-kabuk:' + ad, { detail, bubbles: true, cancelable: !!iptal }));
 
 class IdexyaKabuk extends HTMLElement {
-  kaynaklar = []; kd = new Map(); uyari = {}; oz = new Map(); _oz = 0;
+  kaynaklar = []; kd = new Map(); uyari = {};
   connectedCallback() {
     if (this._kuruldu) return;
     // Ayrıştırılırken: öğe kapanınca, ilk boyamadan önce kurulur (README).
@@ -100,7 +100,6 @@ class IdexyaKabuk extends HTMLElement {
       if (t !== this.giris && t.closest && t.closest('input,textarea,select,[contenteditable]:not([contenteditable=false])')) return;
       e.preventDefault(); this.giris.focus(); this.aramaAc();
     });
-    addEventListener('storage', (e) => { if (e.key === 'idx-musteri') this.onizlemeSifirla(); });
     olay(this, 'hazir', { ayar });
   }
 
@@ -155,11 +154,10 @@ class IdexyaKabuk extends HTMLElement {
     if (menuVar) {
       this.sekmeNav = h('nav', { class: 'ik-sekmeler', 'aria-label': 'Açık sayfalar' });
       this.yan = h('aside', { id: 'ik-yan', class: 'ik-yan', 'aria-label': 'IDOS menüsü' });
-      this.gez = h('div', { id: 'ik-gez', class: 'ik-gez', role: 'dialog', 'aria-label': 'Sayfa gezgini', hidden: true, onkeydown: (ev) => this.gezTus(ev) });
       ana.append(this.sekmeNav);
     }
     ana.append(this.icerik);
-    this.replaceChildren(this.ust, h('div', { class: 'ik-govde' }, this.yan, ana), this.gez || []);
+    this.replaceChildren(this.ust, h('div', { class: 'ik-govde' }, this.yan, ana));
     if (a.asistan) {
       // Görsel kabuğun kedisidir (kabuk.css .ik-kedi → kedi.webp); üç üründe aynı.
       // Sürükle bırak (Muhittin, 20 Kas 2026): kedi bırakıldığı yere yapışır (idx-asistan-konum, ekran oranı olarak);
@@ -236,14 +234,14 @@ class IdexyaKabuk extends HTMLElement {
     e.preventDefault();
   }
 
-  // Açılırlardan (gezgin, arama, profil) yalnız biri açık.
+  // Açılırlardan (arama, profil) yalnız biri açık.
   ac(tur, donus) {
     if (this.acik && this.acik !== tur) this.kapat(false);
     this.acik = tur; this._donus = donus;
     this.cekmece(false); this.ucanKapat();
     const r = this.ust.getBoundingClientRect();
     this.perde.style.setProperty('top', Math.max(0, r.bottom) + 'px');
-    this.perde.className = 'ik-perde' + (tur === 'profil' ? ' ik-perde-saydam' : tur === 'gezgin' ? ' ik-perde-gez' : '');
+    this.perde.className = 'ik-perde' + (tur === 'profil' ? ' ik-perde-saydam' : '');
     this.perde.hidden = false;
   }
   degistir(tur, dugme) {
@@ -260,7 +258,6 @@ class IdexyaKabuk extends HTMLElement {
     this.acik = null; this.perde.hidden = true;
     if (t === 'arama') { this.sonuc.hidden = true; this.giris.setAttribute('aria-expanded', 'false'); this.giris.removeAttribute('aria-activedescendant'); this.ust.classList.remove('ik-arama-acik'); if (this.kIptal) this.kIptal(); this.kd.clear(); }
     if (t === 'profil') { this.profil.hidden = true; this.profilDugme.setAttribute('aria-expanded', 'false'); }
-    if (t === 'gezgin') { clearTimeout(this._gz); this.gez.hidden = true; this.classList.remove('ik-gez-acik'); this.kokDurum(); }
     const d = this._donus; this._donus = null;
     if (odak && d && d.isConnected) d.focus();
   }
@@ -474,32 +471,32 @@ class IdexyaKabuk extends HTMLElement {
       'aria-label': dar ? 'Ayarlar' : null, title: dar ? 'Ayarlar' : null
     }, svg(I.ayar, 15), dar ? null : h('span', null, 'Ayarlar')));
     let govde;
-    if (this.acik === 'gezgin') this.kapat(false);
-    this.kokDugmeleri = [];
+    // Mega menü (Muhittin, 22 Kas 2026: "Sidebar hover durumunda megamenü gibi açılsın"): geniş ve daraltılmış menüde maddenin
+    // üzerine gelince ya da odakta açılır. Geniş menüde madde satırı maddenin kendi sayfasına bağlantıdır (tık gider);
+    // dokunmatikte ve telefonda ilk dokunuş menüyü açar, ikincisi gider.
+    this.ucan = h('div', { id: 'ik-ucan', class: 'ik-ucan', role: 'dialog', hidden: true, onmouseenter: () => clearTimeout(this._ucanZ), onmouseleave: () => this.ucanBirak() });
+    this.ucan.addEventListener('focusout', (ev) => { const r = ev.relatedTarget; if (r && !this.ucan.contains(r) && !(this.rayDugmeleri || []).includes(r)) this.ucanKapat(); });
+    const tetik = (ki) => ({
+      'aria-expanded': 'false', 'aria-controls': 'ik-ucan', 'aria-haspopup': 'dialog',
+      onmouseenter: () => this.ucanAc(ki), onfocus: () => { if (!this._sessiz) this.ucanAc(ki); }, onmouseleave: () => this.ucanBirak(),
+      onpointerdown: (ev) => { this._dokun = ev.pointerType !== 'mouse' && this.ucanGrup !== ki; },
+      onkeydown: (ev) => { if (ev.key === 'ArrowRight') { ev.preventDefault(); this.ucanAc(ki); this.ucanOdak(); } }
+    });
     if (dar) {
-      this.ucan = h('div', { id: 'ik-ucan', class: 'ik-ucan', role: 'dialog', hidden: true, onmouseenter: () => clearTimeout(this._ucanZ), onmouseleave: () => this.ucanBirak() });
-      this.ucan.addEventListener('focusout', (ev) => { const r = ev.relatedTarget; if (r && !this.ucan.contains(r) && !(this.rayDugmeleri || []).includes(r)) this.ucanKapat(); });
       this.rayDugmeleri = kl.map((x, ki) => h('button', {
-          type: 'button', class: 'ik-ray-dugme' + (x === k ? ' ik-icinde' : ''), 'aria-expanded': 'false', 'aria-controls': 'ik-ucan', 'aria-label': x.ad + ': sayfaları göster',
-          onmouseenter: () => this.ucanAc(ki), onfocus: () => { if (!this._sessiz) this.ucanAc(ki); }, onmouseleave: () => this.ucanBirak(),
-          onclick: (ev) => { this.ucanAc(ki); if (!ev.detail) this.ucanOdak(); },
-          onkeydown: (ev) => { if (ev.key === 'ArrowRight') { ev.preventDefault(); this.ucanOdak(); } }
+          type: 'button', class: 'ik-ray-dugme' + (x === k ? ' ik-icinde' : ''), 'aria-label': x.ad + ': sayfaları göster', ...tetik(ki),
+          onclick: (ev) => { this.ucanAc(ki); if (!ev.detail) this.ucanOdak(); }
         }, svg(SIMGE[x.simge], 20, 1.7), h('span', { class: 'ik-ray-isaret' }), this.kokRozet(x)));
       govde = [h('nav', { class: 'ik-ray', 'aria-label': 'IDOS menüsü' }, this.rayDugmeleri), this.ucan];
     } else {
-      this.rayDugmeleri = null; this.ucan = null;
-      // Geniş menü: yalnız madde satırları (F2). Grubu olan madde gezgini açar; grupsuz madde (Ayarlar) doğrudan bağlantıdır.
-      govde = h('nav', { class: 'ik-agac', 'aria-label': 'IDOS menüsü', onkeydown: (ev) => this.kokTus(ev) }, kl.map((x) => {
-        const ic = [h('span', { class: 'ik-kok-simge' }, svg(SIMGE[x.simge], 17, 1.8)), h('span', { class: 'ik-kok-ad' }, x.ad), this.kokRozet(x)];
-        const sinif = 'ik-kok-satir' + (x === k ? ' ik-etkin' : '');
-        if (!x.gruplar.length) return h('a', { href: x.url, 'data-ik-git': '', class: sinif, 'aria-current': [this.a.etkin.sayfaUrl, this.a.etkin.modulUrl].includes(x.url) ? 'page' : null }, ic);
-        const ki = kl.indexOf(x), b = h('button', {
-          type: 'button', class: sinif, 'aria-haspopup': 'dialog', 'aria-expanded': 'false', 'aria-controls': 'ik-gez', 'data-ik-yol': x.anahtar,
-          onclick: (ev) => this.gezAc(ki, !ev.detail)
-        }, ic, svg(SAG, 13, 2, 'ik-kok-ok'));
-        this.kokDugmeleri[ki] = b;
-        return b;
-      }));
+      // Geniş menü: madde satırları; grupsuz madde (ör. bayrakla açılan) yalnız bağlantı.
+      this.rayDugmeleri = kl.map((x, ki) => h('a', {
+        href: x.url, 'data-ik-git': '', class: 'ik-kok-satir' + (x === k ? ' ik-etkin' : ''), 'data-ik-yol': x.anahtar,
+        'aria-current': [this.a.etkin.sayfaUrl, this.a.etkin.modulUrl].includes(x.url) ? 'page' : null,
+        ...(x.gruplar.length ? tetik(ki) : {}),
+        onclick: (ev) => { if (x.gruplar.length && (this._dokun || TEL.matches && this.ucanGrup !== ki)) { this._dokun = 0; ev.preventDefault(); ev.stopPropagation(); this.ucanAc(ki); } }
+      }, h('span', { class: 'ik-kok-simge' }, svg(SIMGE[x.simge], 17, 1.8)), h('span', { class: 'ik-kok-ad' }, x.ad), this.kokRozet(x), x.gruplar.length ? svg(SAG, 13, 2, 'ik-kok-ok') : null));
+      govde = [h('nav', { class: 'ik-agac', 'aria-label': 'IDOS menüsü', onkeydown: (ev) => this.kokTus(ev) }, this.rayDugmeleri), this.ucan];
     }
     const eski = this.yan.querySelector('.ik-agac'), kaydir = eski ? eski.scrollTop : 0;
     this.hesapKap = h('div', { class: 'ik-yan-hesap' });
@@ -510,162 +507,35 @@ class IdexyaKabuk extends HTMLElement {
     this.rozetTazele(this.yan);
   }
 
-  // Sütun gezgini (F2; Muhittin, 22 Kas 2026; karar IDOS docs/kararlar/2026-11-22-yeni-arayuz-sutun-gezgini.md). Geniş menüde
-  // maddeye tıklayınca sayfanın üstünde açılır: gruplar (tek gruplu maddede yok) › bölümler ve "<bölüm> içinde" sayfaları ›
-  // önizleme kartı. Bölüm ve sayfa satırı bağlantıdır (tık sayfaya gider); fareyle üzerinde durmak ya da odak seçer, sağdaki
-  // sütun ve kart yenilenir. Klavye: ↑ ↓ sütunda, → sonraki sütun, ← önceki sütun ya da menü, Esc kapatır.
-  gezAc(ki, odak) {
-    const k = this.a.katmanlar[ki];
-    if (this.acik === 'gezgin' && this.gk === k && !odak) return this.kapat(true);
-    this.ac('gezgin', this.kokDugmeleri[ki]);
-    const e = k === this.k ? this.e : { grup: -1, modul: null, sayfa: null };
-    this.gk = k; this.gs = { g: Math.max(0, e.grup), m: e.modul, s: e.sayfa };
-    this.classList.add('ik-gez-acik'); this.kokDurum(ki);
-    const yt = Math.max(0, this.ust.getBoundingClientRect().bottom);
-    this.gez.style.setProperty('top', yt + 'px'); this.gez.style.setProperty('left', this.yan.getBoundingClientRect().right + 'px');
-    this.gez.hidden = false; this.gezCiz(1);
-    if (odak) { const l = this.gez.querySelector('.ik-secili,.ik-gez-oge'); if (l) l.focus(); }
-  }
-  kokDurum(ki) { (this.kokDugmeleri || []).forEach((b, i) => b.setAttribute('aria-expanded', String(i === ki))); }
-  gezSec(y, gecikme) {
-    clearTimeout(this._gz);
-    if (gecikme) return this._gz = setTimeout(() => this.gezSec(y), gecikme);
-    const s = this.gs;
-    if (s.g === y.g && s.m === y.m && s.s === y.s) return;
-    this.gs = y; this.gezCiz();
-  }
-  gezBag(x, sec, y, ok) {
-    const e = this.e, su = x === e.sayfa || (x === e.modul && !e.sayfa);
-    const a = h('a', {
-      href: x.url, 'data-ik-git': '', 'data-ik-yol': x.url, class: 'ik-gez-oge' + (sec ? ' ik-secili' : ''), 'aria-current': su ? 'page' : null,
-      onpointerenter: (ev) => ev.pointerType === 'mouse' && this.gezSec(y, 120), onpointerleave: () => clearTimeout(this._gz),
-      onfocus: () => this._sessiz || this.gezSec(y),
-      // Dokunmatikte üzerinde durmak yok: sayfaları olan bölüme ilk dokunuş seçer ("içinde" listesi), ikincisi sayfaya gider.
-      // Seçili olup olmadığı dokunuşun başında okunur (odak olayı tıklamadan önce seçebilir).
-      onpointerdown: (ev) => { a._d = ok && ev.pointerType !== 'mouse' && !a.classList.contains('ik-secili'); },
-      onclick: (ev) => { if (a._d) { a._d = 0; ev.preventDefault(); this.gezSec(y); } }
-    }, h('span', { class: 'ik-oge-ad' }, x.ad), this.rz(x), this.uyari[x.url] ? h('span', { class: 'ik-gez-nokta', title: this.uyari[x.url] }) : null, ok ? svg(SAG, 13, 2) : null);
-    a._y = y;
-    return a;
-  }
-  gezCiz(tam) {
-    const k = this.gk, s = this.gs, gr = k.gruplar, cok = gr.length > 1, g = gr[s.g] || gr[0];
-    const m = g && g.moduller.includes(s.m) ? s.m : null;
-    const onz = this.onizleme(m && m.sayfalar.includes(s.s) ? s.s : m || { ad: k.ad, url: k.url, aciklama: k.aciklama });
-    // Aynı grupta seçim değişince yalnız işaret, "içinde" listesi ve kart yenilenir: üzerindeki satır yerinde kalır, tık kaybolmaz.
-    if (!tam && this._gk === k && this._gg === s.g) {
-      this.gez.querySelectorAll('.ik-gez-oge').forEach((el) => {
-        const y = el._y, x = y.s ? y.s === s.s : y.m ? y.m === m : y.g === s.g;
-        el.classList.toggle('ik-secili', x); if (!y.m) el.setAttribute('aria-pressed', String(x));
-      });
-      if (this._gm !== m) { const ic = this.icinde(m); this._ic.replaceWith(ic); this._ic = ic; this._gm = m; }
-      this._onz.replaceWith(onz); this._onz = onz;
-      return this.rozetTazele(this.gez);
-    }
-    this._gk = k; this._gg = s.g; this._gm = m;
-    const odak = this.gez.contains(D.activeElement) && D.activeElement.dataset.ikYol;
-    // İlk sütunun başlığı maddenin kendi sayfasına bağlantıdır (ör. Ayarlar sayfası hiçbir bölümün adresi değildir; telefonda kart yoktur).
-    const sutun = (bas, ...ic) => h('div', { class: 'ik-gez-sutun', role: 'group', 'aria-label': bas },
-      kol.length ? h('div', { class: 'ik-gez-bas' }, bas) : h('a', { href: k.url, 'data-ik-git': '', class: 'ik-gez-bas ik-gez-bas-bag' }, bas, svg(SAG, 11, 2)), ic);
-    const kol = [];
-    if (cok) kol.push(sutun(k.ad, gr.map((x, i) => {
-      const y = { g: i, m: null, s: null }, uy = x.moduller.some((z) => [z].concat(z.sayfalar).some((w) => this.uyari[w.url]));
-      const b = h('button', {
-        type: 'button', class: 'ik-gez-oge ik-gez-grup' + (i === s.g ? ' ik-secili' : ''), 'data-ik-yol': 'g' + i, 'aria-pressed': String(i === s.g),
-        onclick: () => this.gezSec(y), onfocus: () => this._sessiz || this.gezSec(y),
-        onpointerenter: (ev) => ev.pointerType === 'mouse' && this.gezSec(y, 120), onpointerleave: () => clearTimeout(this._gz)
-      }, h('span', { class: 'ik-gez-simge' }, svg(SIMGE[x.simge], 15)),
-      h('span', { class: 'ik-oge-ad' }, x.baslik, h('small', null, grupOzet(x) + (uy ? ' · eşitlenemedi' : ''))), uy ? h('span', { class: 'ik-gez-nokta' }) : null, svg(SAG, 13, 2));
-      b._y = y;
-      return b;
-    })));
-    this._ic = this.icinde(m);
-    if (g) kol.push(sutun(cok ? g.baslik : k.ad, g.moduller.map((x) => this.gezBag(x, x === m, { g: s.g, m: x, s: null }, x.sayfalar.length)), this._ic));
-    kol.push(this._onz = onz);
-    this.gez.replaceChildren(...kol, h('button', { type: 'button', class: 'ik-ikon ik-gez-geri ik-tel', 'aria-label': 'Önceki sütun', onclick: () => this.gez.scrollBy({ left: -innerWidth }) }, svg(['M15 6l-6 6 6 6'], 18)),
-      h('button', { type: 'button', class: 'ik-ikon ik-gez-kapat', 'aria-label': 'Gezgini kapat', title: 'Kapat (Esc)', onclick: () => this.kapat(true) }, svg(I.x, 15)));
-    this.rozetTazele(this.gez);
-    const r = odak && this.gez.querySelector('[data-ik-yol="' + CSS.escape(odak) + '"]');
-    if (r) { this._sessiz = 1; r.focus(); this._sessiz = 0; }
-    // Telefonda açılışta ilk sütun, grup seçilince bölümler.
-    if (TEL.matches) kol[tam || !cok ? 0 : 1].scrollIntoView({ inline: 'start', block: 'nearest' });
-  }
-  icinde(m) {
-    const s = this.gs;
-    return h('div', { class: 'ik-gez-icinde' }, m && m.sayfalar.length ? [h('div', { class: 'ik-gez-bas ik-gez-ic' }, m.ad + ' içinde'), m.sayfalar.map((y) => this.gezBag(y, y === s.s, { g: s.g, m, s: y }))] : null);
-  }
-  // Önizleme kartı: ad, açıklama; ürün `onizleme(url)` işlevini verdiyse uyarı, en çok 4 sayı ve eğri (README "Sütun gezgini").
-  onizleme(x) {
-    const u = x.url;
-    if (typeof this.onizlemeKaynagi === 'function' && !this.oz.has(u)) {
-      // Sürüm: müşteri değişince (onizlemeSifirla) yoldaki eski yanıt önbelleğe yazılmaz.
-      const n = this._oz, koy = (v) => n === this._oz && this.oz.set(u, onizlemeCoz(v));
-      this.oz.set(u, null);
-      Promise.resolve().then(() => this.onizlemeKaynagi(u)).then(koy, () => koy({}))
-        .then(() => { if (this.acik === 'gezgin' && this.gez.querySelector('.ik-onz[data-u="' + CSS.escape(u) + '"]')) this.gezCiz(); });
-    }
-    const v = this.oz.get(u), uy = (v && v.uyari) || this.uyari[u], sab = this.sekmeler.some((t) => t.url === u);
-    const yol = v && egriYol(v.egri, 300, 64), e = yol ? D.createElementNS(NS, 'svg') : null;
-    if (e) {
-      [['viewBox', '0 0 300 64'], ['preserveAspectRatio', 'none'], ['class', 'ik-onz-egri'], ['aria-hidden', 'true']].forEach((a) => e.setAttribute(a[0], a[1]));
-      [yol + 'L300 64L0 64Z', yol].forEach((d) => { const p = D.createElementNS(NS, 'path'); p.setAttribute('d', d); e.append(p); });
-    }
-    return h('section', { class: 'ik-onz', 'data-u': u, 'aria-label': 'Önizleme: ' + x.ad },
-      h('div', { class: 'ik-gez-bas' }, 'Önizleme'), h('h2', null, x.ad), x.aciklama ? h('p', { class: 'ik-soluk' }, x.aciklama) : null,
-      uy ? h('div', { class: 'ik-onz-uyari', role: 'note' }, uy) : null,
-      v === null ? h('div', { class: 'ik-soluk ik-kucuk' }, 'Özet yükleniyor…') : null,
-      v && v.sayilar.length ? h('div', { class: 'ik-onz-sayilar' }, v.sayilar.map((y) => h('div', { class: 'ik-onz-sayi' }, h('span', { class: 'ik-soluk' }, y.ad),
-        h('b', null, y.deger, y.degisim ? h('small', { class: y.iyi === true ? 'ik-iyi' : y.iyi === false ? 'ik-kotu' : null }, y.degisim) : null)))) : null,
-      e, v && v.not ? h('div', { class: 'ik-soluk ik-kucuk' }, v.not) : null,
-      h('div', { class: 'ik-onz-eylem' },
-        h('a', { href: u, 'data-ik-git': '', class: 'ik-dugme ik-dugme-ana' }, 'Aç ↵'),
-        h('a', { href: u, target: '_blank', rel: 'noopener', class: 'ik-dugme' }, 'Yeni sekmede'),
-        h('button', { type: 'button', class: 'ik-dugme', disabled: sab, onclick: () => this.sabitleSekme(x) }, svg(I.raptiye, 14), sab ? 'Sekmede' : 'Sabitle')));
-  }
-  // Sabitle: sayfa sekme satırına eklenir (sekme listesi kuralları, en çok 8).
-  sabitleSekme(x) {
-    this.gorulen.add(x.url);
-    this.sekmeler = sekmeEkle(this.sekmeler, { ad: x.ad, url: x.url }, this.genelSekme(), 8, this.gorulen);
-    yaz('idx-sekme', this.sekmeler); this.sekmeCiz(); this.gezCiz();
-  }
-  // Önizleme ve uyarılar müşteriye özeldir (müşteri ayrımı): müşteri değişince önbellek boşalır. Başka sekmedeki değişiklik
-  // (idx-musteri, storage olayı) kendiliğinden; aynı sekmede ürün çağırır.
-  onizlemeSifirla() { this.oz.clear(); this.uyari = {}; this._oz++; if (this.acik === 'gezgin') this.gezCiz(1); }
   // Ürünün kaynak uyarısı (ör. Search Console eşitlenemedi): menü adresine kısa metin; boş metin kaldırır.
-  uyariYap(url, m) { url = guvenliUrl(osAdresi(url), this.a.kokenler); if (!url) return; if (m) this.uyari[url] = String(m).slice(0, 120); else delete this.uyari[url]; this.oz.delete(url); if (this.acik === 'gezgin') this.gezCiz(1); }
-  gezTus(ev) {
-    const y = ev.key;
-    if (!/^Arrow(Up|Down|Left|Right)$/.test(y) || ev.altKey || ev.metaKey || ev.ctrlKey) return;
-    const sut = [...this.gez.querySelectorAll('.ik-gez-sutun')], t = ev.target, si = sut.findIndex((c) => c.contains(t));
-    if (si < 0) return;
-    ev.preventDefault();
-    const og = (c) => [...c.querySelectorAll('.ik-gez-oge')], l = og(sut[si]), i = l.indexOf(t);
-    if (y === 'ArrowUp' || y === 'ArrowDown') return (l[i + (y === 'ArrowDown' ? 1 : -1)] || t).focus();
-    if (y === 'ArrowRight') { const c = sut[si + 1]; if (c) (c.querySelector('.ik-secili') || og(c)[0]).focus(); return; }
-    if (si) (sut[si - 1].querySelector('.ik-secili') || og(sut[si - 1])[0]).focus(); else this.kapat(true);
+  // Mega menüde grup başlığında ve bölüm satırında kırmızı nokta (metin ipucu ve erişilebilir adda; renk tek başına anlatmaz).
+  uyariYap(url, m) {
+    url = guvenliUrl(osAdresi(url), this.a.kokenler); if (!url) return;
+    if (m) this.uyari[url] = String(m).slice(0, 120); else delete this.uyari[url];
+    if (this.ucanGrup != null && this.ucan && !this.ucan.hidden) { const g = this.ucanGrup; this.ucanGrup = -1; this.ucanAc(g); }
   }
-  // Menü satırları arasında ↑ ↓; → gezgini açıp içine girer.
+  // Menü satırları arasında ↑ ↓ (odak mega menüyü o maddeye geçirir); → mega menüye girer (tetik).
   kokTus(ev) {
     const y = ev.key, l = [...this.yan.querySelectorAll('.ik-kok-satir')], i = l.indexOf(ev.target);
-    if (i < 0) return;
-    if (y === 'ArrowUp' || y === 'ArrowDown') { ev.preventDefault(); (l[i + (y === 'ArrowDown' ? 1 : -1)] || ev.target).focus(); }
-    else if (y === 'ArrowRight' && this.kokDugmeleri.includes(ev.target)) { ev.preventDefault(); this.gezAc(this.kokDugmeleri.indexOf(ev.target), 1); }
+    if (i < 0 || (y !== 'ArrowUp' && y !== 'ArrowDown')) return;
+    ev.preventDefault(); (l[i + (y === 'ArrowDown' ? 1 : -1)] || ev.target).focus();
   }
 
-  // Daraltılmış menü: rayda madde simgeleri; üzerine gelince ya da odakta maddenin sayfaları uçan panelde.
+  // Mega menü: madde adı (bağlantı), altında gruplar sütun sütun, bölümler ve sayfalar. Geniş ve daraltılmış menüde aynı.
   ucanAc(ki) {
     clearTimeout(this._ucanZ);
     if (this.acik) this.kapat(false);
-    const b = this.rayDugmeleri[ki], k = this.a.katmanlar[ki], e = this.e, u = this.ucan;
+    const k = this.a.katmanlar[ki], e = this.e, u = this.ucan;
     this.rayDugmeleri.forEach((x, i) => x.setAttribute('aria-expanded', String(i === ki)));
     if (this.ucanGrup !== ki || u.hidden) {
       this.ucanGrup = ki;
       u.setAttribute('aria-label', k.ad);
       // Sıkı liste, ağaçla aynı yapı: grup başlığı (simgeli) › modül › sayfalar.
       let n = 1;
+      const nokta = (u) => (u ? h('span', { class: 'ik-uyari-nokta', title: u, 'aria-label': u, role: 'img' }) : null);
       const modul = (m) => h('div', { class: 'ik-u-oge', css: { '--u': Math.min(n++, 8) } },
-        h('a', { href: m.url, 'data-ik-git': '', class: 'ik-ucan-modul', 'aria-current': e.modul === m && !e.sayfa ? 'page' : null }, h('span', { class: 'ik-oge-ad' }, m.ad), this.rz(m)),
-        m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', class: 'ik-ucan-sayfa', 'aria-current': e.sayfa === s ? 'page' : null }, s.ad))) : null);
+        h('a', { href: m.url, 'data-ik-git': '', class: 'ik-ucan-modul', 'aria-current': e.modul === m && !e.sayfa ? 'page' : null }, h('span', { class: 'ik-oge-ad' }, m.ad), this.rz(m), nokta(this.uyari[m.url])),
+        m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => h('a', { href: s.url, 'data-ik-git': '', class: 'ik-ucan-sayfa', 'aria-current': e.sayfa === s ? 'page' : null }, h('span', { class: 'ik-oge-ad' }, s.ad), this.rz(s), nokta(this.uyari[s.url])))) : null);
       // Mega menü (Muhittin, 20 Kas 2026; "tüm modüller için"): birden çok grup (Meta, Google Ads, …) yan yana sütun;
       // tek grupta modüller sayfa sayısına göre dengeli en çok 3 sütuna (sutunBol); 1-2 modüllük madde tek sütun.
       const sütunlar = k.gruplar.length > 1
@@ -674,17 +544,22 @@ class IdexyaKabuk extends HTMLElement {
       const sütunlu = sütunlar.length > 1;
       u.classList.toggle('ik-ucan-genis', sütunlu);
       const baş = h('a', { href: k.url, 'data-ik-git': '', class: 'ik-u-oge ik-ucan-bas', css: { '--u': 0 } }, svg(SIMGE[k.simge], 18, 1.7), h('span', null, k.ad), svg(SAG, 13, 2.2, 'ik-oge-ok'));
-      u.replaceChildren(h('div', { class: 'ik-ucan-ic' }, baş, sütunlu
+      const kapat = h('button', { type: 'button', class: 'ik-ikon ik-ucan-kapat', 'aria-label': 'Menüyü kapat', title: 'Kapat (Esc)', onclick: () => this.ucanKapat() }, svg(I.x, 15));
+      u.replaceChildren(kapat, h('div', { class: 'ik-ucan-ic' }, baş, sütunlu
         ? h('div', { class: 'ik-ucan-sutunlar', css: { '--sutun': sütunlar.length } }, sütunlar.map(({ g, moduller }) => h('div', { class: 'ik-ucan-sutun', role: 'group', 'aria-label': g ? g.baslik : null },
-          g ? h('div', { class: 'ik-ucan-grup' }, svg(SIMGE[g.simge], 13), g.baslik) : null, moduller.map(modul))))
+          g ? h('div', { class: 'ik-ucan-grup' }, svg(SIMGE[g.simge], 13), g.baslik, nokta(g.moduller.map((m) => [m].concat(m.sayfalar).map((x) => this.uyari[x.url]).find(Boolean)).find(Boolean))) : null, moduller.map(modul))))
         : sütunlar[0].moduller.map(modul)));
       u.hidden = false;
       this.rozetTazele(u);
     }
-    // Pencere hep görünür alanda (Muhittin, 18 Kas 2026): üst çubuğun altıyla ekranın altı arasına sığar, gerekirse yalnız içi kayar.
-    const yt = this.yan.getBoundingClientRect().top, ust = Math.max(0, this.ust.getBoundingClientRect().bottom) + 8, alt = innerHeight - 8;
-    u.style.setProperty('max-height', alt - ust + 'px');
-    u.style.setProperty('top', Math.max(ust, Math.min(b.getBoundingClientRect().top - 10, alt - u.offsetHeight)) - yt + 'px');
+    // Büyük mega menü (22 Kas 2026): menünün sağından, üst çubuğun altından; genişlik içeriğe göre, en çok ekranın sağ kenarına
+    // kadar; ekrana sığar, gerekirse yalnız içi kayar.
+    if (TEL.matches) return;
+    const ust = Math.max(0, this.ust.getBoundingClientRect().bottom) + 8, sol = this.yan.getBoundingClientRect().right + 8;
+    u.style.setProperty('left', sol + 'px');
+    u.style.setProperty('max-width', innerWidth - sol - 16 + 'px');
+    u.style.setProperty('top', ust + 'px');
+    u.style.setProperty('max-height', innerHeight - ust - 16 + 'px');
   }
   ucanOdak() { const l = this.ucan && this.ucan.querySelector('a'); if (l) l.focus(); }
   ucanBirak() { clearTimeout(this._ucanZ); this._ucanZ = setTimeout(() => { if (!this.ucan || !this.ucan.contains(D.activeElement)) this.ucanKapat(); }, 180); }
@@ -705,7 +580,8 @@ class IdexyaKabuk extends HTMLElement {
       this.perde.hidden = !v; this.perde.className = 'ik-perde ik-perde-cekmece';
       this.perde.style.setProperty('top', '0px');
     }
-    if (v) { const l = this.yan.querySelector('a, button'); if (l) l.focus(); }
+    // Çekmece açılınca odak ilk satıra gelir; bu odak mega menüyü açmaz (_sessiz).
+    if (v) { const l = this.yan.querySelector('a, button'); if (l) { this._sessiz = 1; l.focus(); this._sessiz = 0; } }
   }
 
   sahneOynat(kok) {
