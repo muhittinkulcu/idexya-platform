@@ -114,21 +114,39 @@ s.on('response', async (r) => {
   else kotu.push(r.status() + ' ' + u.pathname);
 });
 
+// Kabuk menüsü (sütun gezgini, 22 Kas 2026): bölüm ve sayfa bağlantıları gezginde, açılınca çizilir; her madde ve grup açılıp toplanır.
+const gezginBaglari = async () => {
+  const hepsi = await s.$$eval('idexya-kabuk .ik-yan a[href]', (l) => l.map((a) => a.getAttribute('href')));
+  const n = await s.$$eval('.ik-yan button.ik-kok-satir', (l) => l.length);
+  for (let i = 0; i < n; i++) {
+    await s.click(`.ik-yan button.ik-kok-satir >> nth=${i}`); await s.waitForSelector('#ik-gez:not([hidden])');
+    const g = await s.$$eval('#ik-gez .ik-gez-grup', (l) => l.length);
+    for (let j = 0; j < Math.max(g, 1); j++) {
+      if (g) await s.click(`#ik-gez .ik-gez-grup >> nth=${j}`);
+      hepsi.push(...await s.$$eval('#ik-gez a[href]', (l) => l.map((a) => a.getAttribute('href'))));
+    }
+    await s.keyboard.press('Escape');
+  }
+  return hepsi;
+};
+const talepler = async () => { await s.click('.ik-yan .ik-kok-satir:has-text("CRM")'); await s.click('#ik-gez .ik-gez-grup:has-text("Talep ve teklif")'); };
+
 await s.goto(OS + '/website/dashboard');
-await s.waitForFunction(() => document.querySelector('idexya-kabuk .ik-yan a'), null, { timeout: 10000 });
+await s.waitForFunction(() => document.querySelector('idexya-kabuk .ik-yan .ik-kok-satir'), null, { timeout: 10000 });
 await s.waitForTimeout(1200);
 kontrol('os genel bakış açıldı', (await s.title()).includes('Website Yönetim'));
 kontrol('API çağrısı önekli (/website/api/yonetim/ozet)', istekler.includes('/website/api/yonetim/ozet'));
 const oneksiz = istekler.filter((u) => !u.startsWith('/website/') && !u.startsWith('/cdn-cgi/'));
 kontrol('tüm istekler önekli' + (oneksiz.length ? ': ' + oneksiz.slice(0, 5).join(', ') : ''), oneksiz.length === 0);
-const menu = await s.$$eval('idexya-kabuk a[href]', (l) => l.map((a) => a.getAttribute('href')));
+const menu = (await gezginBaglari()).concat(await s.$$eval('idexya-kabuk a[href]', (l) => l.map((a) => a.getAttribute('href'))));
 const menuKotu = menu.filter((h) => h.startsWith('/') && !h.startsWith('/website/') && !h.startsWith('/cdn-cgi/'));
 kontrol(`kabuk menüsünde ${menu.length} bağlantı, öneksiz kök adres yok` + (menuKotu.length ? ': ' + menuKotu.slice(0, 5).join(', ') : ''), menu.length > 10 && menuKotu.length === 0);
 kontrol('çıkış öneksiz /cdn-cgi/access/logout', (await s.$$eval('idexya-kabuk a.ik-profil-cikis, idexya-kabuk a[href*="logout"]', (l) => l.map((a) => a.getAttribute('href')))).every((h) => h === '/cdn-cgi/access/logout'));
-kontrol('menü rozeti önekli adreste (Talepler ≥ 1)', !!(await s.waitForFunction(() => { const r = document.querySelector('.ik-yan .ik-rozet[data-r="/website/leads"]'); return r && !r.hidden && Number(r.textContent) >= 1; }, null, { timeout: 5000 }).catch(() => null)));
+await talepler();
+kontrol('menü rozeti önekli adreste (Talepler ≥ 1)', !!(await s.waitForFunction(() => { const r = document.querySelector('#ik-gez .ik-rozet[data-r="/website/leads"]'); return r && !r.hidden && Number(r.textContent) >= 1; }, null, { timeout: 5000 }).catch(() => null)));
 await s.screenshot({ path: SS + '/os-dashboard.png' });
 
-await s.click('.ik-yan a[href="/website/leads"]');
+await s.click('#ik-gez a[href="/website/leads"]');
 await s.waitForURL(OS + '/website/leads', { timeout: 8000 }).catch(() => {});
 kontrol('menüden Talepler: /website/leads', s.url() === OS + '/website/leads');
 await s.waitForSelector('[data-ayrinti] strong', { timeout: 8000 }).catch(() => {});
@@ -168,10 +186,10 @@ hatalar.length = 0;
 const pIstek = [];
 s.on('request', (r) => { const u = new URL(r.url()); if (u.origin === PANEL) pIstek.push(u.pathname); });
 await s.goto(PANEL + '/dashboard');
-await s.waitForFunction(() => document.querySelector('idexya-kabuk .ik-yan a'), null, { timeout: 10000 });
+await s.waitForFunction(() => document.querySelector('idexya-kabuk .ik-yan .ik-kok-satir'), null, { timeout: 10000 });
 await s.waitForTimeout(800);
 kontrol('panel: API öneksiz /api/yonetim/ozet', pIstek.includes('/api/yonetim/ozet') && !pIstek.some((u) => u.startsWith('/website')));
-kontrol('panel: menü bağlantıları öneksiz', (await s.$$eval('.ik-yan a[href]', (l) => l.map((a) => a.getAttribute('href')))).every((h) => !h.startsWith('/website')));
+kontrol('panel: menü bağlantıları öneksiz', (await gezginBaglari()).every((h) => !h.startsWith('/website')));
 await s.goto(PANEL + '/theme');
 await s.waitForTimeout(3000);
 kontrol('panel: tema önizlemesi çalışıyor (çerçeve açık, öneksiz)', ((await s.$eval('[data-iframe]', (f) => f.getAttribute('src')).catch(() => '')) || '').startsWith('/?tema=onizleme'));
