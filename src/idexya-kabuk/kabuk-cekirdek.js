@@ -126,7 +126,7 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
   // (çalışmayan ekran gösterilmez, talimat 4.2).
   const bayraklar = metinListesi(a.bayraklar);
   const acik = (k) => !(k && typeof k.bayrak === 'string' && !bayraklar.includes(k.bayrak));
-  const kokenler = ham2.filter(acik).map((k) => k && koken(O(k.url))).filter(Boolean);
+  const kokenler = ham2.filter(acik).map((k) => k && koken(O(k.url))).filter(Boolean).concat(OS_ALANLARI.map((x) => 'https://' + x));
   const U = (x) => guvenliUrl(O(x), kokenler);
   ham2.forEach((k, ki) => {
     if (!k || !KATMAN_ANAHTARLARI.includes(k.anahtar)) { hatalar.push('katman ' + ki + ': bilinmeyen anahtar'); return; }
@@ -136,6 +136,8 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
     if (!url) { hatalar.push(k.anahtar + ': geçersiz url'); return; }
     const renk = renkGecerli(k.renk) ? k.renk : '#2F55D4';
     const renkKoyu = renkGecerli(k.renkKoyu) ? k.renkKoyu : renk;
+    // Ton: maddenin kendi rengi (menü karesi, mega menü başlığı, sayfa bandı); verilmezse vurgu rengi.
+    const ton = renkGecerli(k.ton) ? k.ton : renk;
     if (!renkGecerli(k.renk)) hatalar.push(k.anahtar + ': renk geçersiz');
     const gruplar = [];
     (Array.isArray(k.gruplar) ? k.gruplar : []).forEach((g) => {
@@ -154,7 +156,7 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
       if (metin(g && g.baslik)) gruplar.push({ baslik: metin(g.baslik), simge: has(SIMGE, g.simge) ? g.simge : 'izgara', moduller });
     });
     const simge = has(SIMGE, k.simge) ? k.simge : KATMAN_SIMGE[k.anahtar];
-    katmanlar.push({ anahtar: k.anahtar, ad: metin(k.ad) || k.anahtar, simge, url, renk, renkKoyu, aciklama: metin(k.aciklama, 400), gruplar });
+    katmanlar.push({ anahtar: k.anahtar, ad: metin(k.ad) || k.anahtar, simge, url, renk, renkKoyu, ton, aciklama: metin(k.aciklama, 400), gruplar });
   });
   if (!katmanlar.length) hatalar.push('katman yok');
   let katman = a.katman;
@@ -240,6 +242,30 @@ export function aramaHavuzu(ayar) {
     h.push({ tur: 'Eylemler', ad: e.ad, yol: k ? k.ad : '', url: e.url, katman: e.katman, renk: '#FFA35C', simge: '+' });
   });
   return h;
+}
+
+// Mega menüde grup listesinin alt satırı: sayfası olan modül "bölüm"dür, sayfasız modül tek sayfadır.
+export function grupOzet(g) {
+  const m = g.moduller, b = m.filter((x) => x.sayfalar.length).length, s = m.reduce((t, x) => t + (x.sayfalar.length || 1), 0);
+  return (b ? m.length + ' bölüm, ' : '') + s + ' sayfa';
+}
+
+// Önizleme kartı için ürünün verdiği veri (README "Mega menü"). Metinler kısaltılır, en çok 4 sayı ve 60 noktalık eğri; geçersiz
+// değer atılır, bilinmeyen değer "—". iyi: true (yeşil) | false (kırmızı) | yok; renk tek başına anlatmaz, değişim metni yazılır.
+export function onizlemeCoz(x) {
+  x = x && typeof x === 'object' ? x : {};
+  const sayilar = (Array.isArray(x.sayilar) ? x.sayilar : []).map((y) => y && typeof y === 'object' ? {
+    ad: metin(y.ad, 40), deger: metin(y.deger, 24) || '—', degisim: metin(y.degisim, 16), iyi: y.iyi === true || y.iyi === false ? y.iyi : null
+  } : null).filter((y) => y && y.ad).slice(0, 4);
+  const egri = (Array.isArray(x.egri) ? x.egri : []).filter((n) => typeof n === 'number' && Number.isFinite(n)).slice(-60);
+  return { uyari: metin(x.uyari, 120), sayilar, egri: egri.length > 1 ? egri : [], not: metin(x.not, 120) };
+}
+
+// Eğri: seri, w × h kutusuna ölçeklenmiş SVG yol verisi (üstte 2 px pay). Düz seri ortada yatay çizgidir.
+export function egriYol(seri, w = 100, h = 40) {
+  if (!seri || seri.length < 2) return '';
+  const en = Math.min(...seri), ek = Math.max(...seri), a = ek - en, y = (v) => (a ? h - 2 - ((v - en) / a) * (h - 4) : h / 2);
+  return seri.map((v, i) => (i ? 'L' : 'M') + +(i * w / (seri.length - 1)).toFixed(2) + ' ' + +y(v).toFixed(2)).join('');
 }
 
 // Boş sorgu: sık sayfalar + eylemler. Dolu: her sözcük ad ve yolda (Türkçe küçük harf).
