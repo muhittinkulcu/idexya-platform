@@ -2,6 +2,7 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="CRM" aktif="crm" musteriSuzgec veri={['musteriler', 'etiketler?tur=musteri']} yol="Müşteri ilişkileri" aciklama="Her müşteri bir aşamadadır. Aşama değişikliği, not ve görüşmeler müşteri kartının günlüğüne tarih ve kişiyle işlenir.">
+<section class="kart ozet-kutusu" data-ozet-kutusu hidden></section>
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
 <label style="flex: 1 1 260px; display: flex"><span class="gizli" style="position: absolute; left: -10000px">Müşteri ara</span><input type="search" data-ara placeholder="Firma, kişi, e-posta veya telefon ara…" style="flex: 1; min-width: 0; min-height: 40px; padding: 0 12px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit"></label>
 <div role="group" aria-label="Görünüm" style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); border: 1px solid rgb(var(--line))"><button type="button" class="dugme kucuk" data-gorunum="pano">Pano</button><button type="button" class="dugme kucuk" data-gorunum="liste">Liste</button></div>
@@ -21,6 +22,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   import { api, el, ASAMALAR, asamaAdi, once, para, genelHata, git } from '../../scripts/yonetim/ortak.js';
   import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
   import { seciliMusteri, suzulmusYol, musteriDegisince, secimBosDurumu } from '../../scripts/yonetim/musteri-suzgec.js';
+  import { ozetCiz, karar } from '../../scripts/yonetim/ozet-kutusu.js';
   const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
   let tum = [], gorunum = 'pano', arsivMod = false, etiketler = {}, tumEtiket = [], arsivde = 0;
   const arsivDugme = document.querySelector('[data-arsiv]');
@@ -36,7 +38,34 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const asamaSec = (m) => el('select', { 'aria-label': baslik(m) + ' aşaması', style: 'min-height: 32px; border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); background: rgb(var(--card)); color: var(--tx); font: inherit; font-size: 12px; max-width: 100%', onchange: (o) => asamaDegis(m, o.currentTarget.value, o.currentTarget) },
     ASAMALAR.map((a) => el('option', { value: a.k, selected: a.k === m.asama }, a.ad)));
 
+  // Özet kutusu: yalnız bu sayfanın listesinden (arşiv dışı; üstte müşteri seçiliyse ona bağlı kartlar) ve
+  // ajans genelindeki bekleyen talep sayısından kurulur. Talep sayısı müşteriye bağlı değildir; müşteri seçiliyken yazılmaz.
+  let bekleyenTalep = null;
+  function ozet() {
+    const kap = document.querySelector('[data-ozet-kutusu]');
+    if (arsivMod) { ozetCiz(kap, { parcalar: [] }); return; }
+    const acik = tum.filter((m) => !['kazanildi', 'kaybedildi'].includes(m.asama));
+    const degerli = acik.filter((m) => m.deger);
+    const hat = degerli.reduce((s, m) => s + m.deger, 0);
+    const teklifte = acik.filter((m) => m.asama === 'teklif' || m.asama === 'goruldu').length;
+    const kaz = tum.filter((m) => m.asama === 'kazanildi');
+    const p = [];
+    if (acik.length) {
+      p.push(`Hatta ${acik.length} açık fırsat var`);
+      if (degerli.length) p.push(`; ${degerli.length === acik.length ? '' : 'değeri girilen ' + degerli.length + ' tanesinin '}tahmini aylık toplamı ${para(hat)}`);
+      p.push(teklifte ? `, ${teklifte} tanesine teklif gönderildi.` : '.');
+    } else if (tum.length) p.push('Hatta açık fırsat yok.');
+    if (kaz.length) p.push(` Kazanılan müşteri ${kaz.length}${kaz.some((m) => m.deger) ? ', tahmini aylık ' + para(kaz.reduce((s, m) => s + (m.deger || 0), 0)) : ''}.`);
+    let eylem = null;
+    if (!seciliMusteri() && bekleyenTalep) {
+      p.push(' ', karar(`${bekleyenTalep} talep`), ' yanıt bekliyor.');
+      eylem = el('a', { class: 'dugme ikincil', href: '/leads?tab=new' }, 'Taleplere git');
+    }
+    ozetCiz(kap, { etiket: 'Bu sayfanın özeti · CRM kartları ve bekleyen talepler', parcalar: p, eylem });
+  }
+
   function ciz() {
+    ozet();
     document.querySelectorAll('[data-gorunum]').forEach((d) => { const s = d.dataset.gorunum === gorunum; d.setAttribute('aria-pressed', String(s)); d.style.cssText = s ? 'background: rgb(var(--card)); box-shadow: 0 1px 3px var(--shadow)' : 'border-color: transparent; background: transparent'; });
     const q = ara.value.trim().toLocaleLowerCase('tr-TR');
     const gor = tum.filter((m) => !q || [m.firma, m.ad, m.eposta, m.telefon].some((x) => x && x.toLocaleLowerCase('tr-TR').includes(q)));
@@ -98,6 +127,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
     try {
       const [v, e] = await Promise.all([api(suzulmusYol('musteriler' + (arsivMod ? '?arsiv=1' : ''))), api('etiketler?tur=musteri')]);
       tum = v.musteriler; arsivde = v.arsivde || 0; etiketler = e.etiketler; tumEtiket = e.tumu; ciz();
+      // Bekleyen talep sayısı (Genel bakışla aynı özet; aynı anda giden istek bir kez gönderilir). Alınamazsa cümleye girmez.
+      if (!seciliMusteri()) api('ozet').then((o) => { const y = (o.talepler || []).find((x) => x.durum === 'yeni'); bekleyenTalep = y ? y.n : 0; ozet(); }).catch(() => { bekleyenTalep = null; ozet(); });
     } catch (h) { genelHata('Müşteriler yüklenemedi: ' + h.message); alan.replaceChildren(el('div', { class: 'kart bos' }, 'Veri alınamadı.')); }
   }
   arsivDugme.addEventListener('click', () => { arsivMod = !arsivMod; yukle(); });
