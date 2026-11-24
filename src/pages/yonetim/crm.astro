@@ -23,6 +23,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
   import { topluSecim, topluTemizle } from '../../scripts/yonetim/toplu-secim.js';
   import { seciliMusteri, suzulmusYol, musteriDegisince, secimBosDurumu } from '../../scripts/yonetim/musteri-suzgec.js';
   import { ozetCiz, karar } from '../../scripts/yonetim/ozet-kutusu.js';
+  import { basHarfler } from '../../scripts/yonetim/gorsel.js';
+  const ASAMA_RENK = { yeni: 'mavi', gorusme: 'turkuaz', teklif: 'mor', goruldu: 'altin', kazanildi: 'yesil', kaybedildi: 'kirmizi' };
   const alan = document.querySelector('[data-alan]'), ara = document.querySelector('[data-ara]');
   let tum = [], gorunum = 'pano', arsivMod = false, etiketler = {}, tumEtiket = [], arsivde = 0;
   const arsivDugme = document.querySelector('[data-arsiv]');
@@ -99,16 +101,18 @@ import Yonetim from '../../layouts/Yonetim.astro';
       });
       return;
     }
-    alan.replaceChildren(el('div', { style: 'display: grid; grid-auto-flow: column; grid-auto-columns: minmax(250px, 1fr); gap: 12px; overflow-x: auto; padding-bottom: 6px' },
+    alan.replaceChildren(el('div', { class: 'asama-pano' },
       ASAMALAR.map((a) => {
         const ms = gor.filter((m) => m.asama === a.k);
         const top = ms.reduce((s, m) => s + (m.deger || 0), 0);
-        return el('section', { 'aria-label': a.ad, style: 'background: var(--card2); border: 1px solid rgb(var(--line)); border-radius: var(--ik-yaricap, 5px); padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0' },
-          el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; padding: 2px 4px' }, el('strong', { style: 'color: var(--head)' }, a.ad + ' · ' + ms.length), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ms.some((m) => m.deger) ? para(top) : '')),
-          ms.length ? ms.map((m) => el('article', { class: 'kart', style: 'padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; border-radius: var(--ik-yaricap, 5px)' },
-            el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none' }, baslik(m)),
-            el('span', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.paket].filter(Boolean).join(' · ') || (m.eposta || m.telefon || '')),
-            el('div', { style: 'display: flex; justify-content: space-between; gap: 6px; align-items: center; flex-wrap: wrap' }, asamaSec(m), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, once(m.guncelleme)))))
+        return el('section', { 'aria-label': a.ad, class: 'asama-sutun renkli', 'data-renk': ASAMA_RENK[a.k] || 'gri' },
+          el('div', { class: 'asama-bas' }, el('strong', {}, a.ad + ' · ' + ms.length), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, ms.some((m) => m.deger) ? para(top) : '')),
+          ms.length ? ms.map((m) => el('article', { class: 'kart asama-kart' },
+            el('span', { class: 'avatar', 'aria-hidden': 'true' }, basHarfler(baslik(m))),
+            el('div', { style: 'min-width: 0' },
+              el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none; overflow-wrap: anywhere' }, baslik(m)),
+              el('div', { style: 'font-size: 12px; color: var(--tx2); overflow-wrap: anywhere' }, [m.firma ? m.ad : null, m.paket].filter(Boolean).join(' · ') || (m.eposta || m.telefon || ''))),
+            el('div', { style: 'grid-column: 1 / -1; display: flex; justify-content: space-between; gap: 6px; align-items: center; flex-wrap: wrap' }, asamaSec(m), el('span', { style: 'font-size: 12px; color: var(--tx2)' }, once(m.guncelleme)))))
             : el('span', { style: 'font-size: 12px; color: var(--tx2); padding: 6px 4px' }, 'Bu aşamada müşteri yok.'));
       })));
   }

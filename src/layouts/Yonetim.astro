@@ -27,7 +27,9 @@ const modulYolda = modul && modul.href && modul.ad !== baslik;
 // sayfaları (panel.idexya.com) göreli adrese çevrilir; panel menüsünde (panel-menu.js) adresi olmayan sayfa atılır.
 // Öteki ürünlerin sayfaları kendi adreslerinde bağlantıdır. Eşleme denetimi: tools/test-panel-menu.mjs.
 import { ortakMenu } from '../data/ortak-menu.js';
+import { modulGorseli } from '../data/modul-gorsel.js';
 const katmanlar = ortakMenu(ORTAK.katmanlar, MENU);
+const gorsel = modulGorseli(ORTAK.katmanlar, modul && modul.href ? modul.href.replace(/[?#].*$/, '') : null);
 // "+ Yeni oluştur": sayfanın eylem çubuğunda menü, kabuk aramasında eylem olarak çıkar.
 const YENI = [
   { grup: 'Web sitesi', ad: 'Blog yazısı', eylem: 'Yeni blog yazısı', aciklama: 'Sitedeki blogda yayınlanır', url: '/site-content?file=posts&new=1' },
@@ -158,6 +160,33 @@ tr[data-sayfa-gizli]{display:none}
 .alan input,.alan select,.alan textarea{min-height:42px;padding:8px 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap);background:rgb(var(--card));color:var(--tx);font:inherit;box-sizing:border-box;width:100%}
 .bos{padding:36px 20px;text-align:center;color:var(--tx2)}
 /* Özet kutusu (imzalı görünüm 3. adım, IDOS ile aynı): sayfanın tek cümlelik özeti, solda simge, sağda tek ana eylem. Karar gerektiren sayı turuncu (--karar). */
+/* Zengin görünüm (9. tur, 25 Kas 2026; IDOS index.css ile aynı): --k modülün ya da konunun rengi (üçlü). Bant rengi ortak menüden
+   gelir (src/data/modul-gorsel.js); simge ve çizim src/scripts/yonetim/gorsel.js. Renkler beyaz yazıyla en az 4,5:1. */
+:root{--beyaz:255 255 255;--siyah:0 0 0;--turuncu:240 122 35;--k-mavi:26 111 224;--k-yesil:20 125 76;--k-turkuaz:11 122 116;--k-mor:107 75 216;--k-pembe:192 47 109;--k-kirmizi:184 50 63;--k-altin:140 92 0;--k-gri:92 102 117}
+[data-renk=mavi]{--k:var(--k-mavi)}[data-renk=yesil]{--k:var(--k-yesil)}[data-renk=turkuaz]{--k:var(--k-turkuaz)}[data-renk=mor]{--k:var(--k-mor)}[data-renk=pembe]{--k:var(--k-pembe)}[data-renk=kirmizi]{--k:var(--k-kirmizi)}[data-renk=altin]{--k:var(--k-altin)}[data-renk=gri]{--k:var(--k-gri)}
+.kare,.avatar,.bant,.renkli{--kz:color-mix(in srgb,rgb(var(--k,var(--k-mavi))) 12%,rgb(var(--card)));--ky:color-mix(in srgb,rgb(var(--k,var(--k-mavi))) 88%,rgb(var(--siyah)))}
+html[data-tema=koyu] :is(.kare,.avatar,.bant,.renkli){--kz:color-mix(in srgb,rgb(var(--k,var(--k-mavi))) 24%,rgb(var(--card)));--ky:color-mix(in srgb,rgb(var(--k,var(--k-mavi))) 50%,rgb(var(--beyaz)))}
+.kare{display:grid;place-items:center;flex:0 0 auto;width:36px;height:36px;border-radius:var(--ik-yaricap);background:var(--kz);color:var(--ky)}
+.kare svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.kare-kucuk{width:28px;height:28px}.kare-kucuk svg{width:15px;height:15px}
+.kare-buyuk{width:48px;height:48px;border-radius:14px}.kare-buyuk svg{width:25px;height:25px}
+.kare-dolu,html[data-tema=koyu] .kare-dolu{background:rgb(var(--k,var(--k-mavi)));color:rgb(var(--beyaz))}
+.avatar{display:grid;place-items:center;flex:0 0 auto;width:34px;height:34px;border-radius:50%;background:rgb(var(--k,var(--k-mavi)));color:rgb(var(--beyaz));font-size:11.5px;font-weight:var(--w-vurgu);box-shadow:0 0 0 2px rgb(var(--card))}
+.ik-sayfa-bas.bant{justify-content:flex-start;margin:20px clamp(16px,3vw,32px) 0;padding:22px 26px;border:1px solid color-mix(in srgb,rgb(var(--k)) 22%,rgb(var(--line)));border-radius:var(--ik-yaricap-kart);background:linear-gradient(100deg,color-mix(in srgb,rgb(var(--k)) 18%,rgb(var(--card))),color-mix(in srgb,rgb(var(--k)) 6%,rgb(var(--card))))}
+.bant-yuva{flex:1 1 100%;min-width:0}.bant-yuva:not(:has(>:not([hidden]))){display:none}
+.bant-yuva .ozet-kutusu{padding:4px 0 0}.bant-yuva .ozet-cumle{max-width:none;margin:2px 0 0;font-size:16px;color:var(--head)}.bant-yuva .ozet-simge{display:none}
+.bas-simgeli{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;align-items:center}.bas-simgeli>.kare{grid-row:1/span 4}.bas-simgeli>:not(.kare){grid-column:2}
+.bos-cizim{display:block;width:120px;height:96px;margin:0 auto 12px}
+.bos-cizim .cz1{fill:rgb(var(--k)/.14)}.bos-cizim .cz2{fill:rgb(var(--k)/.32)}.bos-cizim .cz3{fill:rgb(var(--k)/.85)}.bos-cizim .cz-vurgu{fill:rgb(var(--turuncu))}
+.bos-cizim .cz-kutu{fill:rgb(var(--card));stroke:rgb(var(--k));stroke-width:5}.bos-cizim .cz-cizgi{fill:none;stroke:rgb(var(--k));stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.bos-cizim .cz-ince{fill:none;stroke:rgb(var(--k)/.45);stroke-width:5;stroke-linecap:round}.bos-cizim .cz-beyaz{fill:none;stroke:rgb(var(--beyaz));stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
+.yonetim .kart.kpi,.yonetim .kpi{background:rgb(var(--card));border-radius:var(--ik-yaricap-kart);padding:18px 20px}.kpi>.kare{margin-bottom:6px}.yonetim .kpi b{font-weight:var(--w-vurgu)}
+.asama-pano{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(250px,1fr);gap:12px;overflow-x:auto;padding-bottom:6px;align-items:start}
+.asama-bas{display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:2px 4px}.asama-bas strong{color:var(--ky)}
+.asama-sutun{background:var(--kz);border:1px solid color-mix(in srgb,rgb(var(--k)) 18%,rgb(var(--line)));border-radius:var(--ik-yaricap-kart);padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.asama-kart{padding:12px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;align-items:center}
+@media (max-width:640px){.ik-sayfa-bas.bant{padding:18px}}
+@media print{.ik-sayfa-bas.bant{background:none}.bos-cizim{display:none}}
 .ozet-kutusu{display:flex;flex-wrap:wrap;align-items:center;gap:20px;padding:22px 24px}
 .ozet-simge{flex:0 0 auto;width:40px;height:40px;display:grid;place-items:center;border-radius:var(--ik-yaricap);background:var(--tint);color:var(--acc)}
 .ozet-govde{flex:1 1 420px;min-width:0}
@@ -177,7 +206,7 @@ tr[data-sayfa-gizli]{display:none}
 /* Sayfa başlığı (ortak kabuk ik-sayfa-bas): konum yolu, başlık ve eylem çubuğu. */
 .ik-konum a{color:inherit;text-decoration:none}.ik-konum a:hover,.ik-konum a:focus-visible{color:var(--acc);text-decoration:underline;text-underline-offset:3px}
 .ik-sayfa-bas h1 .alt-baslik{color:var(--tx2);font-weight:var(--w-govde)}
-.ik-sayfa-bas>div:first-child{flex:1 1 360px;min-width:0}
+.ik-sayfa-bas .bas-govde{flex:1 1 300px;min-width:0}
 .ik-sayfa-bas p{margin:4px 0 0;max-width:820px;color:var(--tx2)}
 @media print{.ik-eylemler{display:none!important}}
 /* Üst alandaki ortak müşteri seçicisi (src/scripts/yonetim/musteri-secici.js; kabuğun ürün yuvasında). */
@@ -215,8 +244,9 @@ tr[data-sayfa-gizli]{display:none}
 <script is:inline type="application/json" id="idexya-kabuk-ayar" set:html={ayarMetni}></script>
 <idexya-kabuk>
   <div class="yonetim" data-sayfa-adi={baslik} data-musteri-suzgec={musteriSuzgec ? 'evet' : undefined}>
-    <header class="ik-sayfa-bas">
-      <div>
+    <header class="ik-sayfa-bas bant" style={`--k: ${gorsel.ton}`} data-bant={gorsel.anahtar}>
+      <span class="kare kare-buyuk kare-dolu" aria-hidden="true"><svg viewBox="0 0 24 24">{gorsel.yollar.map((d) => <path d={d}></path>)}</svg></span>
+      <div class="bas-govde">
         <nav class="ik-konum" aria-label="Konum" data-konum>
           <span>Website ve CRM</span>{grupAdi && <> › <span>{grupAdi}</span></>}{modulYolda && <> › <a href={modul.href}>{modul.ad}</a></>}
         </nav>
@@ -239,6 +269,7 @@ tr[data-sayfa-gizli]{display:none}
           </div>
         </details>
       </div>
+      <div class="bant-yuva" data-bant-yuva></div>
     </header>
     <div class="sayfa">
       <div data-genel-hata hidden class="uyari hata" role="alert"></div>
@@ -251,7 +282,9 @@ tr[data-sayfa-gizli]{display:none}
   if (!customElements.get('idexya-kabuk')) import('../scripts/yonetim/kabuk-giris.js');
   import { tabloSayfalama } from '../scripts/yonetim/tablo-sayfa.js';
   import { kartBilgi } from '../scripts/yonetim/kart-bilgi.js';
+  import { gorsel } from '../scripts/yonetim/gorsel.js';
   tabloSayfalama();
+  gorsel();
   kartBilgi();
 </script>
 </body>

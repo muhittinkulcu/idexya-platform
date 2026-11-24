@@ -75,15 +75,16 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   "katman": "marketing",                 // ürünün varsayılan maddesi (adres menüde yoksa açık olan): genel | musteriler | gorevler |
                                          // marketing | crm | web | creative | marketplace | ai | raporlar | ayarlar
   "bayraklar": [],                       // isteğe bağlı: bayraklı maddeleri açar (ör. "marketplace"); verilmeyen bayraklı madde çizilmez
-  "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://os.idexya.com/", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
+  "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://marketing.idexya.com/welcome", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
     "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // madde simgesi (simge adı, aşağıda)
     "url": "https://marketing.idexya.com/meta", // maddenin adresi (madde satırı ve mega menü başlığı buraya gider)
     "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada vurgu (#RRGGBB)
+    "ton": "#5B46E0", // maddenin kendi rengi (menü karesi, mega menü bandı, sayfa bandı); isteğe bağlı, beyaz yazıyla en az 4,5:1
     "aciklama": "Kısa açıklama",
     "gruplar": [{
       "baslik": "Reklam", "simge": "megafon", // simge adları aşağıda
       "moduller": [{ "ad": "Meta", "url": "/meta", "rozet": 3, // rozet isteğe bağlı: yeni iş sayısı
-                     "aciklama": "Kampanya, reklam seti ve reklamlar", // isteğe bağlı, en çok 200 (22 Kas 2026'dan beri menüde gösterilmez)
+                     "aciklama": "Kampanya, reklam seti ve reklamlar", // isteğe bağlı, en çok 200 (mega menünün önizleme kartında)
                      "sayfalar": [{ "ad": "Kampanyalar", "url": "/meta/kampanyalar", "rozet": 0, "aciklama": "" }] }]
     }]
   }],
@@ -106,10 +107,9 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   adresten bulunur (`etkinKatman`: önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri değilse `katman`). Madde
   satırı maddenin adresine bağlantıdır; üzerine gelince mega menü açılır (aşağıda "Mega menü"). Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
 - Üst alanda modül sekmesi **yoktur**; mega menü sol menüden açılır. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
-- Genel bakış maddesinin adresi tek adresin köküdür: `https://os.idexya.com/`. Ana ekranı IDOS uygulaması üretir,
-  yönlendirici kökte yönlendirmesiz sunar (`tek-adres-plani.md` "Ana ekran"). Kök açılınca operasyon merkezine geçilir
-  (Muhittin, 24 Kas 2026; 18 Kas'ta kökte karşılama ekranı açılırdı). Genel bakış grubunun ilk modülü "Operasyon merkezi"
-  `https://os.idexya.com/dashboard`, ikincisi "Karşılama ekranı" (küreli Modüller) `https://marketing.idexya.com/welcome`. Tek adresin
+- Genel bakış maddesi, ilk sekme ve logo karşılama ekranına (küreli Modüller) gider: `https://marketing.idexya.com/welcome`.
+  os.idexya.com kökü açılınca operasyon merkezine geçilir (Muhittin, 24 ve 25 Kas 2026); Genel bakış grubunun ilk modülü
+  "Operasyon merkezi" `https://os.idexya.com/dashboard`. Tek adresin
   kendi ekranları (`os.idexya.com/<yol>`) yalnız Genel bakış maddesinde olur; öteki adresler ürün kökenlerindedir.
 - **Bayrak**: `bayrak` alanı olan madde (Marketplace: verisi yok) ürün `bayraklar` listesinde açmadıkça sessizce atılır;
   açılsa da adresi yoksa çizilmez (çalışmayan ekran gösterilmez).
@@ -147,13 +147,20 @@ işte; açık maddenin 3 px çizgisi vurgu rengindedir (24 Kas 2026). `.ik-ust` 
 koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satırdadır.
 
 **Mega menü** (Muhittin, 22 Kas 2026: "Sidebar hover durumunda megamenü gibi açılsın; en üstte katman adı, alttaki sütunlarda
-modüller ve alt sayfalar"). Aynı 22 Kas'ta canlıya çıkan sütun gezgininin (F2) ve önizleme kartının yerini alır. Geniş ve
+modüller ve alt sayfalar"; 25 Kas 2026, 9. tur: "başlıklar renkli, aralıklar ferah, en sonda önizleme"). Geniş ve
 daraltılmış menüde aynıdır: madde satırının (daraltılmışta simgenin) üzerine gelince ya da klavye odağında açılır.
 
 - **Yer:** menünün sağından ekranın sağına (16 px pay), üst çubuğun altından; yüksekliği içeriğe göre, ekrana sığmazsa
   yalnız içi kayar. Tek grupta (ya da 1-2 modülde) dar pencere kalır.
-- **İçerik:** en üstte maddenin simgesi ve adı (maddenin adresine bağlantı); altında her grup eşit genişlikte bir sütun
-  (simgeli grup başlığı › modüller › sayfaları). Tek gruplu madde, modülleri sayfa sayısına göre en çok 3 sütuna böler (`sutunBol`).
+- **İçerik:** en üstte maddenin renginde bant: simge, ad ve açıklama (maddenin adresine bağlantı). Altında gruplar sütun sütun
+  (renkli simgeli başlık › modüller › sayfaları); tek gruplu madde modülleri en çok 3 sütuna böler (`sutunBol`). Üçten çok gruplu
+  maddede (Marketing) gruplar solda liste (`grupOzet` alt satırıyla), üzerine gelinen ya da odaklanan grubun bölümleri yanında.
+- **Renk:** maddenin `ton`u, gruplarda sırayla `GRUP_TON`; öğe rengini `--t` ile taşır, açık zemin ve yazı rengi ondan türer.
+- **Önizleme kartı** (pencerenin sağında; 1180 px altında ve telefonda yok): üzerinde 90 ms durulan ya da odaklanan sayfanın adı,
+  `aciklama`sı, ürünün verdiği uyarı, en çok 4 sayı ve eğri; altta **Aç**, **Yeni sekmede**, **Sabitle** (sayfayı sekmeye ekler).
+  Veri isteğe bağlıdır: ürün `kabuk.onizlemeKaynagi = async (url) => ({ uyari, sayilar: [{ ad, deger, degisim, iyi }], egri, not })`
+  verir; kabuk her adresi bir kez sorar, bilinmeyen değer "—". **Müşteri ayrımı:** veri sunucuda seçili müşteriye süzülür; müşteri
+  ya da dönem değişince ürün `onizlemeSifirla()` çağırır (başka sekmede `idx-musteri` `storage` olayıyla kendiliğinden).
 - **Kaynak uyarısı:** ürün `uyariYap(url, metin)` ile verir; grup başlığında ve modül satırında kırmızı nokta, metin ipucunda
   ve erişilebilir adda (renk tek başına anlatmaz). Uyarı **ajans geneli** olmalıdır (ör. eşitleme özeti): kabuk müşteri
   değişince uyarıları silmez; müşteriye özel metin verilmez (müşteri ayrımı).
@@ -213,7 +220,8 @@ orta tık tarayıcıya bırakılır (yeni sekme).
 | `sahneOynat(kok?)` | `[data-ik-sahne]` hareketlerini ve sayaçları yeniden oynatır |
 | `durumYap({ baglanti, esitleme })` | Durum kapsülünü günceller |
 | `rozetYap(url, sayi)` | Modül ya da sayfa rozetini günceller (0 gizler) |
-| `uyariYap(url, metin)` | Menü adresine kaynak uyarısı koyar (mega menüde grup başlığında ve modülde nokta); boş metin kaldırır |
+| `uyariYap(url, metin)` | Menü adresine kaynak uyarısı koyar (mega menüde grupta ve modülde nokta, önizlemede bant); boş metin kaldırır |
+| `onizlemeKaynagi`, `onizlemeSifirla()` | Önizleme kartının verisi ve önbelleğini boşaltma (yukarıda "Mega menü") |
 | `kullaniciYap({ ad, rol, eposta })` | Profil düğmesini günceller (oturum bilgisi sonradan gelirse) |
 | `kapat()` | Açık açılırı (arama, profil) kapatır |
 | `ustYuva` | Üst alandaki ürün yuvası (öğe): ürün aktif müşteri ve platform gibi denetimlerini içine koyar (React: `createPortal`); kabuğun genel öğe kuralları yuvaya karışmaz |
@@ -355,7 +363,7 @@ Gerçek `a` ve `button`; `aria-expanded`, `aria-current="page"`, `aria-pressed`,
 ve odak açan düğmeye döner; odak açılırdan çıkınca açılır kapanır. Sol menüde maddeye (daraltılmışta simgeye) odaklanınca
 mega menü açılır, → ile menüye girilir (yukarıda "Mega menü").
 
-**Köşe yuvarlaması** (Muhittin, 24 Kas 2026): `--ik-yaricap-kart: 12px` (kart, tablo, mega menü), `--ik-yaricap: 8px` (düğme, girdi,
+**Köşe yuvarlaması** (Muhittin, 24 ve 25 Kas 2026): `--ik-yaricap-kart: 16px` (kart, tablo, mega menü), `--ik-yaricap: 8px` (düğme, girdi,
 açılır liste, sekme), `--ik-yaricap-kucuk: 6px` (durum etiketi). Sayı rozeti, daireler (avatar, nokta, asistan) ve açma kapama anahtarı yuvarlaktır.
 Ürünler kendi köşe ölçeğini bu değişkenlere bağlar (IDOS: Tailwind `borderRadius`).
 
