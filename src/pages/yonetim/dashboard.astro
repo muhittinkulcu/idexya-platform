@@ -107,7 +107,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </style>
 
 <div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: -8px">
-  <p class="baslik-font" data-selam style="margin: 0; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.12; font-weight: 500; color: var(--head); max-width: 760px"></p>
+  <p class="baslik-font" data-selam style="margin: 0; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.12; font-weight: 600; color: var(--head); max-width: 760px"></p>
   <button type="button" class="dugme" data-duzenle aria-pressed="false">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><path d="M17.5 14v7M14 17.5h7"></path></svg>
     <span>Modülleri düzenle</span>
@@ -255,7 +255,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
   const saat = new Date().getHours();
   const selam = saat < 6 ? 'İyi geceler' : saat < 12 ? 'Günaydın' : saat < 18 ? 'İyi günler' : 'İyi akşamlar';
-  const selamYaz = (alt) => { const p = $('[data-selam]'); p.replaceChildren(selam + '.', el('br'), el('span', { style: 'color: var(--acc)' }, alt)); };
+  const selamYaz = (alt) => { const p = $('[data-selam]'); p.replaceChildren(selam + '.', el('br'), el('span', { style: 'color: var(--karar)' }, alt)); };
   selamYaz('Panel verileri yükleniyor…');
   const v = (k, metin) => { const e = $(`[data-v="${k}"]`); if (e) e.textContent = metin; };
 
@@ -354,7 +354,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     har.replaceChildren();
     if (!o.sonKayitlar.length) har.append(el('div', { class: 'bos' }, 'Henüz hareket yok. Siteden gelen ilk talep CRM’e alındığında burada görünür.'));
     o.sonKayitlar.forEach((k) => har.append(el('a', { href: '/customer?id=' + encodeURIComponent(k.musteri_id), style: 'display: flex; gap: 12px; align-items: center; padding: 11px 2px; border-top: 1px solid rgb(var(--line)); text-decoration: none; color: inherit' },
-      el('span', { style: 'width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; background: ' + (k.tur === 'talep' ? '#F07A23' : k.tur === 'sistem' ? 'var(--ok)' : 'var(--info)') }),
+      el('span', { style: 'width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; background: ' + (k.tur === 'talep' ? 'var(--fill)' : k.tur === 'sistem' ? 'var(--ok)' : 'var(--info)') }),
       el('span', { style: 'flex: 1; display: flex; flex-direction: column; min-width: 0' }, el('strong', { style: 'color: var(--head)' }, k.firma || k.ad || '—'), el('span', { style: 'font-size: 13px; color: var(--tx2)' }, k.baslik + ' · ' + k.kim)),
       el('span', { style: 'font-size: 12px; color: var(--tx2); white-space: nowrap' }, once(k.zaman)))));
   }

@@ -2,14 +2,14 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Yedekler" aktif="yedek" yol="Sistem" aciklama="Panel verisinin (talepler, CRM, teklifler, muhasebe, üyeler, içerikler…) sıkıştırılmış JSON yedeği. R2 deposu bağlıysa her gün kendiliğinden alınır.">
-<section class="kart" data-durum style="padding: 20px 22px; display: flex; flex-direction: column; gap: 12px"><div class="bos">Yükleniyor…</div></section>
+<section class="kart" data-durum style="padding: 24px; display: flex; flex-direction: column; gap: 12px"><div class="bos">Yükleniyor…</div></section>
 <div class="uyari bilgi">Yedek dosyası <b>kişisel veri</b> içerir (talep ve müşteri iletişim bilgileri, üye kayıtları). İndirdiğiniz dosyayı yalnız güvenli bir yerde saklayın ve paylaşmayın. Oturumlar, giriş denemeleri, şifre yenileme kayıtları ve erişim anahtarları yedeğe girmez. Geri yükleme panelden yapılmaz; gerekirse kontrollü olarak ayrıca yapılır.</div>
 <section class="kart" aria-label="Kayıtlı yedekler" data-liste style="overflow-x: auto"></section>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
   const durum = document.querySelector('[data-durum]'), liste = document.querySelector('[data-liste]');
   const kb = (n) => (n >= 1048576 ? (n / 1048576).toLocaleString('tr-TR', { maximumFractionDigits: 1 }) + ' MB' : Math.max(1, Math.round(n / 1024)).toLocaleString('tr-TR') + ' KB');
-  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left';
+  const hucre = 'padding: 15px 20px; border-top: 1px solid rgb(var(--line)); text-align: left';
   async function yukle() {
     let r;
     try { r = await api('yedek'); genelHata(''); } catch (h) { genelHata('Yedek bilgisi alınamadı: ' + h.message); return; }
@@ -30,7 +30,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       el('span', { style: 'font-size: 12px; color: var(--tx2)' }, `${r.tablolar.length} tablo yedeklenir. Yedeğe girmeyenler: ${r.haric.join(', ')}.`)]);
     if (!r.kurulu) { liste.replaceChildren(el('div', { class: 'bos' }, 'R2 deposu bağlanınca günlük yedekler burada listelenir.')); return; }
     liste.replaceChildren(r.yedekler.length ? el('table', { style: 'width: 100%; min-width: 620px; border-collapse: collapse; font-size: 14px' },
-      el('thead', {}, el('tr', {}, ...['Tarih', 'Satır', 'Boyut', 'Alan', ''].map((b) => el('th', { scope: 'col', style: 'padding: 10px 14px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
+      el('thead', {}, el('tr', {}, ...['Tarih', 'Satır', 'Boyut', 'Alan', ''].map((b) => el('th', { scope: 'col', style: 'padding: 15px 20px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
       el('tbody', {}, ...r.yedekler.map((y) => {
         const g = y.anahtar.match(/(\d{4}-\d{2}-\d{2})/)?.[1];
         return el('tr', {},

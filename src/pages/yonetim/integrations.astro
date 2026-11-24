@@ -2,7 +2,7 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Entegrasyonlar" aktif="entegre" yol="Finans ve bağlantılar" aciklama="Sitenin ve panelin bağlı olduğu servislerin durumu. Değerler güvenlik için gösterilmez; yalnızca tanımlı olup olmadıkları görünür. Değişiklikler Cloudflare panelinde, Workers › idexya-platform › Ayarlar › Değişkenler bölümünden yapılır.">
-<section class="kart" aria-label="Bağlantılar" data-liste style="padding: 20px 22px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px"></section>
+<section class="kart" aria-label="Bağlantılar" data-liste style="padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px"></section>
 <script>
   import { api, el, genelHata } from '../../scripts/yonetim/ortak.js';
   const DURUM = { bagli: ['Bağlı', 'kazanildi'], eksik: ['Tanımlı değil', 'kaybedildi'], kapali: ['Kapalı', 'yeni'] };

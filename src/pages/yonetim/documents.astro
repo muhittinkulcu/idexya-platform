@@ -8,8 +8,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .bl-form{padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(200px,100%),1fr));gap:12px;align-items:end}
   .bl-form .genis{grid-column:1/-1}
   .bl-tablo{width:100%;min-width:880px;border-collapse:collapse;font-size:14px}
-  .bl-tablo th{padding:10px 14px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2)}
-  .bl-tablo td{padding:10px 14px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
+  .bl-tablo th{padding:12px 20px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2)}
+  .bl-tablo td{padding:15px 20px;border-top:1px solid rgb(var(--line));text-align:left;vertical-align:top}
 </style>
 <div class="uyari bilgi">Dosyalar bu panelde saklanmaz. Belge bulunduğu yerde (ör. Google Drive, OneDrive) kalır; burada yalnızca adı, türü, tarihi ve <b>https://</b> bağlantısı tutulur. Bağlantıyı silmek dosyayı silmez. Drive’da paylaşımı “bağlantıya sahip herkes” yerine yalnız ekibinize açık tutmanız önerilir. “Müşteri alanında paylaş” işaretlenen belge, o müşteriye bağlı üyelere görünür; bu durumda dosyayı Drive’da müşterinin e-postasıyla paylaşın.</div>
 <div class="bl-arac">
@@ -85,7 +85,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       && (!q || [b.ad, b.aciklama, musteriAdi(b), host(b.baglanti)].some((x) => x && kucuk(x).includes(q))));
     if (!tum.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Henüz belge yok. Dosyayı Google Drive gibi bir yere yükleyin, paylaşım bağlantısını kopyalayın ve “+ Yeni belge” ile buraya ekleyin.')); return; }
     if (!gor.length) { liste.replaceChildren(el('div', { class: 'bos' }, 'Süzgeçlerle eşleşen belge yok.')); return; }
-    liste.replaceChildren(el('div', { style: 'padding: 10px 14px 0; font-size: 12px; color: var(--tx2)' }, `${gor.length} belge` + (gor.length !== tum.length ? ` (toplam ${tum.length})` : '')),
+    liste.replaceChildren(el('div', { style: 'padding: 16px 20px 0; font-size: 12px; color: var(--tx2)' }, `${gor.length} belge` + (gor.length !== tum.length ? ` (toplam ${tum.length})` : '')),
       el('table', { class: 'bl-tablo' },
         el('thead', {}, el('tr', {}, ['Belge', 'Tür', 'Müşteri', 'Müşteri alanında', 'Tarih', 'Ekleyen', ''].map((b) => el('th', { scope: 'col' }, b)))),
         el('tbody', {}, gor.map((b) => el('tr', { 'data-belge': b.id },
