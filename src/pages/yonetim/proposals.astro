@@ -8,7 +8,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <button type="button" class="dugme ana" data-yeni>+ Yeni teklif</button>
 </div>
 
-<form class="kart" data-duzenleyici hidden novalidate style="padding: 20px 22px; display: flex; flex-direction: column; gap: 16px">
+<form class="kart" data-duzenleyici hidden novalidate style="padding: 24px; display: flex; flex-direction: column; gap: 16px">
 <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: baseline">
 <h2 data-duz-baslik style="margin: 0; font-size: 20px; color: var(--head)">Yeni teklif</h2>
 <span data-duz-no style="font-size: 13px; color: var(--tx2)"></span>
@@ -39,7 +39,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 </form>
 
-<section class="kart" data-detay hidden aria-label="Teklif ayrıntısı" style="padding: 20px 22px; display: flex; flex-direction: column; gap: 14px"></section>
+<section class="kart" data-detay hidden aria-label="Teklif ayrıntısı" style="padding: 24px; display: flex; flex-direction: column; gap: 14px"></section>
 <section class="kart" aria-label="Teklif listesi" data-liste style="overflow-x: auto"></section>
 
 <script>
@@ -62,7 +62,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   const sayiYaz = (n) => new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(Number(n) || 0);
   const gun = (s) => (s && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.split('-').reverse().join('.') : '—');
   const musteriAdi = (m) => (m ? m.firma || m.ad || m.eposta || 'Adsız müşteri' : '—');
-  const hucre = 'padding: 10px 14px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
+  const hucre = 'padding: 15px 20px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
   const yerelGun = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   let sekme = SEKMELER.some((s) => s[0] === prm('sekme')) ? prm('sekme') : 'taslak';
@@ -89,7 +89,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       return;
     }
     liste.replaceChildren(el('table', { style: 'width: 100%; min-width: 680px; border-collapse: collapse; font-size: 14px' },
-      el('thead', {}, el('tr', {}, ...['No', 'Kaynak', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 10px 14px; text-align: ${i === 4 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
+      el('thead', {}, el('tr', {}, ...['No', 'Kaynak', 'Müşteri', 'Başlık', 'Toplam', 'Durum', 'Tarih'].map((b, i) => el('th', { scope: 'col', style: `padding: 15px 20px; text-align: ${i === 4 ? 'right' : 'left'}; font-size: 12px; color: var(--tx2)` }, b)))),
       el('tbody', {}, ...gor.map((t) => t.kaynak === 'pdf' ? el('tr', { 'data-kaynak': 'pdf' },
         el('td', { style: hucre + '; white-space: nowrap' }, el('a', { href: `/api/yonetim/teklif-dosyalari/${encodeURIComponent(t.id)}/dosya`, target: '_blank', rel: 'noopener', style: 'font-weight: 500' }, 'PDF’i aç')),
         el('td', { style: hucre }, el('span', { class: 'cip' , style: 'border: 1px solid rgb(var(--line)); color: var(--tx2)' }, t.kaynak_dosya === 'sablon' ? 'Şablon' : 'Canva PDF')),

@@ -47,8 +47,8 @@ değiştirilmez (yapım kuralı 1).
 - Kabuk, öğenin içindeki düğümleri `.ik-icerik` alanına taşır ve etrafını kurar. İçerik kabuktan önce
   yazılabilir; React gibi çatılar kendi kökünü öğenin içine koyar (`<idexya-kabuk><div id="kok"></div></idexya-kabuk>`).
 - Yazı tipi dosyalarını kabuk getirmez. Ürün kendi sunucusundan `@font-face` ile Inter'i verir. Yazı tipi ve
-  kalınlık seçimi yoktur (Muhittin, 15 Kas 2026): yazı Inter, kalınlık "Zarif" (`--w-ince` 300, `--w-govde` 350,
-  `--w-orta` 400, `--w-vurgu` 500; `kabuk.css` `:root`). Inter yüklü değilse sistem yazısı görünür.
+  kalınlık seçimi yoktur (Muhittin, 15 Kas 2026): yazı Inter, kalınlık (24 Kas 2026: `--w-ince` ve `--w-govde` 400,
+  `--w-orta` 500, `--w-vurgu` 600; `kabuk.css` `:root`). Inter yüklü değilse sistem yazısı görünür.
 
 ### Çok sayfalı ürün: kabuk ilk boyamadan önce (önerilen)
 
@@ -139,8 +139,9 @@ Simge adları (grup ve katman): `ev`, `izgara`, `megafon`, `grafik`, `yildiz`, `
 **Üst alan** (talimat 4.2, "A, cam"): yarı saydam buzlu cam, temaya uyan (açıkta `rgba(255,255,255,.85)`, koyuda
 `rgba(21,32,43,.66)`; bulanıklık `.ik-ust::before` üzerinde). İçerik soldan sağa: IDOS kimliği, **ürün yuvası** (`ustYuva`;
 aktif müşteri seçimi ve tarih aralığı gibi ürünün denetimleri), arama, veri eşitleme durumu (1280 px altında yalnız saat),
-sabitleme, bildirimler, tema, kullanıcı menüsü. Turuncu (`--ik-turuncu`: açıkta `#DE681B`, koyuda `#F07A23`; yüzeyde en az
-3:1) yalnız X logosunun rozetinde (sabit `#F07A23` zemin, beyaz X) ve sol menüdeki açık maddenin 2 px çizgisindedir. `.ik-ust` adlandırılmış görünüm geçişi almaz
+sabitleme, bildirimler, tema, kullanıcı menüsü. Turuncu yalnız X logosunun rozetinde
+(sabit `#F07A23` zemin, beyaz X), ana eylem düğmesinde (`--ik-eylem` `#B84406`, beyaz yazıyla en az 4,5:1) ve karar bekleyen
+işte; açık maddenin 3 px çizgisi vurgu rengindedir (24 Kas 2026). `.ik-ust` adlandırılmış görünüm geçişi almaz
 (`view-transition-name` öğeyi "backdrop root" yapar, cam arkadaki sayfayı göremez). Açılır menüler (arama sonuçları, profil)
 koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satırdadır.
 
@@ -164,6 +165,24 @@ daraltılmış menüde aynıdır: madde satırının (daraltılmışta simgenin)
 ```js
 kabuk.uyariYap('https://marketing.idexya.com/search-console', 'Eşitleme başarısız · son veri 18 Kas'); // boş metin kaldırır
 ```
+
+## Sol menü listesi (`katmanlar.json`)
+
+Üç ürün aynı listeyi kullanır: sol menü her üründe aynıdır. Dosya `{ "surum": 2, "katmanlar": [...] }` biçimindedir;
+`katmanlar` ayar şemasındaki madde nesneleridir (adresler mutlak `https://`, sayfalar bulundukları uygulamanın kökeninde).
+Hangi maddenin hangi üründen geldiğini `test/katmanlar.test.mjs` "eşleme" testi tutar. Her ürün ayarını yazarken:
+
+1. `katmanlar.json` içindeki listeyi alır;
+2. **kendi kökenindeki adresleri** göreli adrese (temel yol dahil) çevirir ve **yetkiye göre süzer** (kendi menüsünde olmayan
+   ya da oturumun göremeyeceği sayfa atılır; yalnız ona özel sayfaları kendisi ekler, ör. IDOS süper admin sayfaları);
+3. sonucu `katmanlar` alanına koyar.
+
+Kabuk yetki kararı vermez: süzülmeden verilen liste olduğu gibi çizilir.
+
+Liste elle güncellenir; kaynaklar: Marketing `idexya-agency-os/web/src/lib/moduller.ts` (`yok` ve `süperAdmin` öğeleri
+konmaz), Website ve CRM `idexya-platform/src/data/panel-menu.js` (adressiz "Yakında" öğeleri konmaz), Creative
+`idexya-creative-os/web/src/lib/rotalar.ts` (hesap sahibine özel "Doğrula" sayfası konmaz). Her ürünün testi bu listeyi kendi
+menüsüyle karşılaştırır. `test/katmanlar.test.mjs` sırayı, bayrağı, adres tekliğini ve eşlemeyi denetler.
 
 ## Olaylar ve yöntemler
 
@@ -287,7 +306,7 @@ açılışı) oynamaz, kabuk ve içerik hemen son hâliyle çizilir. Sonraki `et
 hareketler yine oynar.
 
 Renk değişkenleri (`:root` ve `html[data-tema=koyu]`): `--ik-zemin`, `--ik-yuzey`, `--ik-gomuk`,
-`--ik-cizgi`, `--ik-metin`, `--ik-ikincil`, `--ik-turuncu`, `--ik-izgara`, üst alan `--ik-cu-*`; madde vurgusu `--ik-vurgu`,
+`--ik-cizgi`, `--ik-metin`, `--ik-ikincil`, `--ik-eylem`, `--ik-eylem-yazi`, üst alan `--ik-cu-*`; madde vurgusu `--ik-vurgu`,
 `--ik-vurgu-yazi`, `--ik-yumusak`. Yazı: `--ik-yazi` (aile), `--w-ince`, `--w-govde`, `--w-orta`,
 `--w-vurgu`. Bileşenlerde sabit kalınlık sayısı yazılmaz.
 
@@ -335,9 +354,9 @@ Gerçek `a` ve `button`; `aria-expanded`, `aria-current="page"`, `aria-pressed`,
 ve odak açan düğmeye döner; odak açılırdan çıkınca açılır kapanır. Sol menüde maddeye (daraltılmışta simgeye) odaklanınca
 mega menü açılır, → ile menüye girilir (yukarıda "Mega menü").
 
-**Köşe yuvarlaması** (Muhittin, 18 Kas 2026): tek değişken `--ik-yaricap: 5px` (`:root`); kart, düğme, girdi, açılır liste,
-rozet, sekme ve açılır pencere bunu kullanır. Yalnız daireler (avatar, nokta, asistan) ve açma kapama anahtarı yuvarlaktır.
-Ürünler kendi köşe ölçeğini bu değişkene bağlar (IDOS: Tailwind `borderRadius`).
+**Köşe yuvarlaması** (Muhittin, 24 Kas 2026): `--ik-yaricap-kart: 12px` (kart, tablo, mega menü), `--ik-yaricap: 8px` (düğme, girdi,
+açılır liste, sekme), `--ik-yaricap-kucuk: 6px` (durum etiketi). Sayı rozeti, daireler (avatar, nokta, asistan) ve açma kapama anahtarı yuvarlaktır.
+Ürünler kendi köşe ölçeğini bu değişkenlere bağlar (IDOS: Tailwind `borderRadius`).
 
 ## Bütçe (yapım kuralı 3)
 

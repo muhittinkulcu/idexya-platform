@@ -8,7 +8,7 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 
 | Sıra | Parça | İçerik |
 |---|---|---|
-| 1 | Üst alan | En üst, tam genişlik, ~52 px, yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; talimat 4.2). Soldan sağa: IDOS kimliği (turuncu `#F07A23` rozet içinde beyaz X; favicon da aynı görünüm ve "IDOS", ana ekrana döner), ürün yuvası (aktif müşteri seçimi, tarih aralığı), global arama (⌘K), veri eşitleme durumu, üst çubuğu sabitle, bildirimler, tema, kullanıcı menüsü. **Modül sekmesi ve mega menü yoktur**: modül gezinmesi yalnız sol menüdedir. Turuncu yalnız X logosunun rozetinde ve sol menüdeki açık maddenin çizgisinde. |
+| 1 | Üst alan | En üst, tam genişlik, 64 px, yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; talimat 4.2). Soldan sağa: IDOS kimliği (turuncu `#F07A23` rozet içinde beyaz X; favicon da aynı görünüm ve "IDOS", ana ekrana döner), ürün yuvası (aktif müşteri seçimi, tarih aralığı), global arama (⌘K), veri eşitleme durumu, üst çubuğu sabitle, bildirimler, tema, kullanıcı menüsü. **Modül sekmesi ve mega menü yoktur**: modül gezinmesi yalnız sol menüdedir. Turuncu yalnız X logosunun rozetinde, sayfanın ana eyleminde (`--ik-eylem`) ve karar bekleyen işte (24 Kas 2026). |
 | 2 | Sol menü | Tek menü, 12 madde (talimat 4.2; 20 Kas 2026'da Web ve Commerce ikiye ayrıldı): Genel bakış, Müşteriler, Görevler ve onaylar, Marketing (Meta, Google Ads, Google Analytics, Search Console, Tag Manager), CRM, Web Site Yönetimi (idexya.com), E-Ticaret, Creative, Marketplace (verisi yok; bayrakla açılır, bugün gizli), AI Center, Raporlar, Ayarlar. Sol menüde yalnız maddeler durur; maddenin üzerine gelince **mega menü** açılır (22 Kas 2026, aşağıda): en üstte madde adı, altında grup sütunları (bölümler ve sayfaları). Daraltılabilir; daraltınca madde simgeleri kalır ve simgenin üzerinde sütunlu mega menü açılır. Veri almayan öğe menüye konmaz. Sayfalar bulundukları uygulamada kalır; bağlantı os.idexya.com'da yol önekine çevrilir. |
 | 3 | Sayfa sekmeleri | Açılan her sayfa sekme olur (en çok 8). Genel bakış ilk sırada ve kapatılamaz. × ile kapanır. |
 | 4 | Sayfa başlığı ve eylem çubuğu | Solda konum yolu ve başlık; sağda sırayla Yenile, Dışa aktar, Yazdır ve tek ana eylem (vurgu renginde). |
@@ -19,19 +19,20 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 
 | Ad | Açık | Koyu |
 |---|---|---|
-| Zemin | `#F2F4F7` | `#15202B` |
+| Zemin | `#F6F7F9` | `#15202B` |
 | Yüzey (kart, menü) | `#FFFFFF` | `#1C2733` |
-| Gömük yüzey (tablo başlığı, sekme satırı) | `#F7F8FA` | `#192734` |
-| Çizgi | `#DCE1E8` | `#2F3D4A` |
+| Gömük yüzey (tablo başlığı, seçici) | `#F3F5F8` | `#192734` |
+| Çizgi | `#E6E9EE` | `#2F3D4A` |
 | Yazı | `#17202B` | `#E7ECF1` |
 | İkincil yazı | `#56606E` | `#A3AFBB` |
-| Üst alan (cam) | `rgba(255,255,255,.85)` + bulanıklık (yazı `#17202B`) | `rgba(21,32,43,.66)` + bulanıklık (yazı `#E7ECF1`) |
-| Turuncu çizgi (açık madde) | `#DE681B` | `#F07A23` |
+| Üst alan (cam) | `rgba(255,255,255,.94)` + bulanıklık (yazı `#17202B`) | `rgba(21,32,43,.66)` + bulanıklık (yazı `#E7ECF1`) |
+| Açık madde çizgisi | vurgu rengi | vurgu rengi |
+| Ana eylem düğmesi (beyaz yazı) | `#B84406` | `#B84406` |
 
-**Zemin ızgarası (Muhittin, 14 Kas 2026):** her modülün ve Ana ekranın zemininde idexya.com ana sayfasındaki
-gibi 64 px'lik hafif ızgara çizgileri bulunur. Çizgi rengi açıkta `rgba(0,37,89,.055)`, koyuda
-`rgba(255,255,255,.04)`. Kartlar ve tablolar ızgaranın üstünde dolu yüzeyle durur; ızgara yalnız boşlukta görünür.
-Ana ekranda ızgara fareyi izleyen turuncu ışıkla birlikte belirginleşir.
+**Birebir görünüm ve ferahlık (Muhittin, 24 Kas 2026):** "önizlemede gördüğüm temanın aynısı olacak şekilde yap"; "dar
+satırlar ve sıkıcı bir çalışma alanı yerine daha ferah ve kolay bir arayüz". Tasarım tuvalinin 8. turu esastır. Zemin düzdür:
+14 Kas 2026 tarihli zemin ızgarası kabuktan kalktı. Menü satırı 44 px, düğme 40 px, kart iç boşluğu 24 px, tablo satırı en az
+52 px, kartlar arası 20–24 px.
 
 ## Modül renkleri
 
@@ -46,18 +47,18 @@ Asistan düğmesinde IDOS'un kedisi (Ankara kedisi, `kabuk/kedi.webp`) görünü
 
 ## Ortak parçalar
 
-- Yazı: Inter (kendi sunucumuzdan), kalınlık sabit **Zarif: gövde 350, başlık 400, büyük başlık ve sayı 300, en kalın 500**.
+- Yazı: Inter (kendi sunucumuzdan), kalınlık sabit: **gövde 400, etiket ve düğme 500, başlık ve sayı 600** (24 Kas 2026; 12–15 Kas'taki Zarif 350/400/500'ün yerine).
   Yazı tipi ve kalınlık seçimi yoktur (Muhittin, 15 Kas 2026: "font vs seçimi olmasın").
-  Muhittin, 12 ve 14 Kas 2026: ince ve zarif, "incenin bir tık üstü"; aşırı ince ya da kalın değil; 600 ve üstü yok.
+  600'ün üstü yok.
   Satır aralığı 1,6. Sayılar eşit genişlikte. Kabuk ağırlıkları CSS değişkeniyle verir (`--w-ince`, `--w-govde`,
   `--w-orta`, `--w-vurgu`); bileşenlerde sabit sayı yazılmaz.
-- Kart: başlık solda; i (açıklama) ve ⋮ (seçenekler) sağ üstte; tek ana eylem sağ altta. Köşe 5 px (`--ik-yaricap`; Muhittin, 18 Kas 2026).
+- Kart: başlık solda; i (açıklama) ve ⋮ (seçenekler) sağ üstte; tek ana eylem sağ altta. Köşe 12 px (`--ik-yaricap-kart`; Muhittin, 24 Kas 2026).
 - İmzalı görünüm, 1. adım (Muhittin, 22 Kas 2026; tasarım tuvali 8. tur): kart, tablo ve ayar kartında yumuşak gölge
   (`--ik-golge`); sol menüde açık madde ve bulunulan sayfa dolu mavi değil, yumuşak vurgu zemini ve vurgu renginde yazı
   (turuncu çizgi yerinde); mega menüsü açık madde açık gri; menüdeki sayı rozeti yumuşak turuncu (`--ik-rozet-z`,
   `--ik-rozet-y`), çünkü turuncu karar bekleyen işi gösterir; sayfa sekmeleri beyaz şeritte, seçili sekmenin altında vurgu
-  çizgisi; eşitleme uyarısı yumuşak sarı zeminli. Turuncu çizgi, zemin ızgarası ve 5 px köşe kararları değişmedi.
-- Düğme: köşe 5 px (girdi, açılır liste, rozet, sekme ve açılır pencere de 5 px; yalnız daireler yuvarlak); ana düğme dolu vurgu rengi, diğerleri çerçeveli.
+  çizgisi; eşitleme uyarısı yumuşak sarı zeminli. 24 Kas 2026'da turuncu çizgi, zemin ızgarası ve 5 px köşe de çizime uydu.
+- Düğme: köşe 8 px (`--ik-yaricap`; girdi, açılır liste ve sekme de), küçük parça 6 px (`--ik-yaricap-kucuk`), sayı rozeti tam yuvarlak; ana düğme dolu turuncu (`--ik-eylem`), diğerleri çerçeveli.
 - Durum etiketi: yazı ve nokta birlikte; renk tek başına anlatmaz. Onaylandı, uygulandı ve etkisi doğrulandı ayrı etiketlerdir.
 - Tema: açık, koyu, sistem, zaman (gündüz açık, gece koyu; varsayılan 07.00–19.00 açık) dört seçenek. Üst çubuktaki tema
   düğmesi açılır pencere açmaz, tıklayınca dört seçenek arasında sırayla geçer; simge seçimi gösterir (Muhittin, 15 Kas 2026).

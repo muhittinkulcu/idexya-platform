@@ -121,7 +121,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
     gor.replaceChildren(el('div', { class: 'hb-y-editor' },
       el('div', { style: 'display:flex;flex-direction:column;gap:14px;min-width:0' },
-        el('div', { class: 'kart', style: 'padding: 20px 22px;display:flex;flex-direction:column;gap:10px' },
+        el('div', { class: 'kart', style: 'padding: 24px;display:flex;flex-direction:column;gap:10px' },
           el('div', { class: 'hb-y-satir' }, el('button', { type: 'button', class: 'dugme kucuk', onclick: () => { acik = null; duzenlenen = null; kreatif = false; ciz(); } }, '← Sayılar'), el('b', { style: 'color:var(--acc)' }, `Sayı #${sayi.no} · ${gunYaz(sayi.hafta_bas)} – ${gunYaz(sayi.hafta_bit)}`), el('span', { class: 'cip ' + (yayinda ? 'kazanildi' : 'gorusme') }, yayinda ? 'Yayında' : 'Taslak')),
           el('label', { class: 'alan' }, 'Sayı başlığı', baslik), el('label', { class: 'alan' }, 'Özet', ozet), el('div', {}, kaydetSayi)),
         el('div', { class: 'hb-y-ust' },
@@ -196,7 +196,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       try { if (m) await api('haftalik-bulten/madde/' + m.id, g); else await api(`haftalik-bulten/sayi/${acik.sayi.id}/madde`, g); duzenlenen = null; genelHata(''); await yukle(); }
       catch (h) { genelHata(h.message); }
     };
-    return el('div', { class: 'kart', style: 'padding: 20px 22px;display:flex;flex-direction:column;gap:12px;border:2px solid var(--btnline)' },
+    return el('div', { class: 'kart', style: 'padding: 24px;display:flex;flex-direction:column;gap:12px;border:2px solid var(--btnline)' },
       el('b', { style: 'color:var(--head)' }, m ? 'Maddeyi düzenle' : 'Yeni madde (taslak olarak eklenir)'),
       el('div', { class: 'hb-y-form' },
         el('label', { class: 'alan' }, 'Konu', f.konu), el('label', { class: 'alan' }, 'Gelişme tarihi', f.tarih), el('label', { class: 'alan' }, 'Etki', f.etki),
