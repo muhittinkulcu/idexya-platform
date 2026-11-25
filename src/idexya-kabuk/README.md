@@ -159,8 +159,10 @@ daraltılmış menüde aynıdır: madde satırının (daraltılmışta simgenin)
   maddede (Marketing) gruplar solda liste (`grupOzet` alt satırıyla), üzerine gelinen ya da odaklanan grubun bölümleri yanında.
 - **Renk:** maddenin `ton`u, gruplarda sırayla `GRUP_TON`; öğe rengini `--t` ile taşır, açık zemin ve yazı rengi ondan türer.
 - **Önizleme kartı** (pencerenin sağında; 1180 px altında ve telefonda yok): üzerinde 90 ms durulan ya da odaklanan sayfanın adı,
-  `aciklama`sı, ürünün verdiği uyarı, en çok 4 sayı ve eğri; altta **Aç**, **Yeni sekmede**, **Sabitle** (sayfayı sekmeye ekler).
-  Veri isteğe bağlıdır: ürün `kabuk.onizlemeKaynagi = async (url) => ({ uyari, sayilar: [{ ad, deger, degisim, iyi }], egri, not })`
+  `aciklama`sı (sayfanın renginde başlıkta), ürünün verdiği uyarı, büyük ilk sayı ve eğrisi, en çok 3 küçük sayı, en çok 5 satırlık
+  liste ve bölümün öteki sayfaları ("Bu bölümde"; menüden, veri olmasa da çizilir); altta **Aç**, **Yeni sekmede**, **Sabitle**
+  (sayfayı sekmeye ekler). Muhittin, 25 Kas 2026: "önizlemeler biraz yavan gibi".
+  Veri isteğe bağlıdır: ürün `kabuk.onizlemeKaynagi = async (url) => ({ uyari, sayilar: [{ ad, deger, degisim, iyi }], egri, egriAd, not, liste: { baslik, ogeler: [{ ad, deger, oran, iyi, url }] } })`
   verir; kabuk her adresi bir kez sorar, bilinmeyen değer "—". **Müşteri ayrımı:** veri sunucuda seçili müşteriye süzülür; müşteri
   ya da dönem değişince ürün `onizlemeSifirla()` çağırır (başka sekmede `idx-musteri` `storage` olayıyla kendiliğinden).
 - **Kaynak uyarısı:** ürün `uyariYap(url, metin)` ile verir; grup başlığında ve modül satırında kırmızı nokta, metin ipucunda

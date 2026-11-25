@@ -10,7 +10,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 </div>
 <script>
   import { api, el, tarih, once, KAYNAK, TALEP_DURUM, genelHata, prm, adresMetni } from '../../scripts/yonetim/ortak.js';
-  import { ozetCiz, karar } from '../../scripts/yonetim/ozet-kutusu.js';
+  import { ozetCiz, bag, karar } from '../../scripts/yonetim/ozet-kutusu.js';
   const liste = document.querySelector('[data-liste]'), ayr = document.querySelector('[data-ayrinti]'), sekmeler = document.querySelector('[data-sekmeler]');
   let tum = [], sekme = (['yeni', 'crm', 'spam', 'hepsi'].includes(prm('sekme')) ? prm('sekme') : 'yeni'), secili = null, sabit = null, mesaj = null;
   const BOLUM = [['yeni', 'Yeni'], ['crm', 'CRM’e alınan'], ['spam', 'Spam'], ['hepsi', 'Tümü']];
@@ -26,19 +26,18 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const crm30 = son30.filter((t) => t.durum === 'crm').length;
     const p = [];
     if (yeni.length) {
-      p.push(karar(`${kesik ? 'En az ' : ''}${yeni.length} talep`), ' yanıt bekliyor');
       const enEski = yeni.reduce((a, b) => (new Date(a.olusturma) < new Date(b.olusturma) ? a : b));
-      p.push(kesik ? '.' : `, en eskisi ${once(enEski.olusturma)} geldi.`);
-    } else if (tum.length) p.push('Yanıt bekleyen talep yok.');
+      p.push([karar(`${kesik ? 'En az ' : ''}${yeni.length} talep`, '/leads?tab=new'), ' yanıt bekliyor' + (kesik ? '.' : `, en eskisi ${once(enEski.olusturma)} geldi.`)]);
+    } else if (tum.length) p.push(['Yanıt bekleyen talep yok.']);
     // Liste kesikse son 30 gün ancak listedeki en eski talep 30 günden eskiyse tam sayılır.
     const otuzTam = !kesik || tum.some((t) => new Date(t.olusturma).getTime() < ay);
-    if (son30.length && otuzTam) p.push(` Son 30 günde spam dışında ${son30.length} talep geldi${crm30 ? `, ${crm30} tanesi CRM’e alındı` : ''}.`);
+    if (son30.length && otuzTam) p.push(['Son 30 günde spam dışında ', bag(`${son30.length} talep`, '/leads?tab=all'), ' geldi', ...(crm30 ? [', ', bag(`${crm30} tanesi`, '/leads?tab=crm'), ' CRM’e alındı.'] : ['.'])]);
     let eylem = null;
     if (yeni.length && !kesik) {
       const enEski = yeni.reduce((a, b) => (new Date(a.olusturma) < new Date(b.olusturma) ? a : b));
       eylem = el('button', { type: 'button', class: 'dugme ikincil', onclick: () => { sekme = 'yeni'; secili = enEski.id; sabit = null; mesaj = null; try { history.replaceState(null, '', adresMetni({ sekme: 'yeni' })); } catch (e) {} ciz(); } }, 'En eskisini aç');
     }
-    ozetCiz(document.querySelector('[data-ozet-kutusu]'), { etiket: 'Bu sayfanın özeti · ' + (kesik ? 'en yeni ' + SINIR + ' talep' : 'tüm talepler'), parcalar: p, eylem });
+    ozetCiz(document.querySelector('[data-ozet-kutusu]'), { etiket: 'Bu sayfanın özeti · ' + (kesik ? 'en yeni ' + SINIR + ' talep' : 'tüm talepler'), maddeler: p, eylem });
   }
 
   function ciz() {
