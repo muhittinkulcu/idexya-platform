@@ -455,9 +455,7 @@ class IdexyaKabuk extends HTMLElement {
       : ((x) => (x && s.url !== genel.url ? x.yol.split(' › ')[0] + ' › ' : ''))(this.havuz.find((y) => y.url === s.url)) + s.ad);
     const yazS = (l) => { this.sekmeler = l; yaz('idx-sekme', l); this.sekmeCiz(); }, odak = (x) => { const l = [...this.sekmeNav.querySelectorAll('a,[data-g]')].find((y) => [y.getAttribute('href'), y.dataset.g].includes(x)) || this.sekmeNav.querySelector('a'); if (l) l.focus(); };
     const maddesi = (url) => { const y = this.havuz.find((q) => q.url === url), ad = y && y.yol.split(' › ')[0]; return this.a.katmanlar.find((q) => q.ad === ad || q.url === url); };
-    // Sabit sekme simgeye iner; aynı modülden birden çok sabit varsa adı da yazar (ayırt edilsin).
-    const tek = (k) => this.sekmeler.filter((y) => y.sabit && maddesi(y.url) === k).length < 2;
-    const duz = (ad, x, sekme) => h('button', { type: 'button', class: 'ik-sekme-' + x, 'aria-label': ad, title: ad, onclick: sekme }, x === 'kapat' ? '×' : svg(I.raptiye, 12, 2));
+    const duz = (ad, x, sekme) => h('button', { type: 'button', class: 'ik-sekme-' + (x === 'kapat' ? x : 'sabitle'), 'aria-label': ad, title: ad, onclick: sekme }, x === 'kapat' ? '×' : [svg(x ? SIMGE[x] : I.raptiye, 17, 1.9), svg(I.raptiye, 16, 2)]);
     const ciz = (s, i) => {
       const k = maddesi(s.url), ad = s.ad + (s.sabit ? ' (sabit)' : ''), sec = s.url === u;
       const sabitle = () => { yazS(sekmeSabit(this.sekmeler, s.url, genel, this.gorulen)); odak(s.url); };
@@ -472,9 +470,10 @@ class IdexyaKabuk extends HTMLElement {
           if (y) { e.preventDefault(); if (t) { yazS(sekmeTasi(this.sekmeler, s.url, t.url, genel, this.gorulen)); odak(s.url); } }
         }
       },
-      h('a', { href: s.url, 'data-ik-git': '', title: ad, 'aria-label': ad, 'aria-current': sec ? 'page' : null, draggable: 'false' }, s.sabit && k ? [svg(SIMGE[k.simge], 15, 1.9), tek(k) ? null : h('span', {}, kisa(s.ad))] : adi(s)),
-      i ? h('span', { class: 'ik-sekme-is' }, duz(s.ad + (s.sabit ? ' sekmesini çöz' : ' sekmesini sabitle'), 'sabitle', sabitle),
-        s.sabit ? null : duz(s.ad + ' sekmesini kapat', 'kapat', () => { const r = sekmeKapat(this.sekmeler, s.url, genel, u, this.gorulen); yazS(r.liste); if (r.git) this.git(r.git); else odak(); })) : null);
+      // Solda modülün simgesi: üzerine gelince raptiye olur, basınca sabitler; sabit sekmede hep raptiye. Adın üstüne düğme binmez.
+      i ? duz(s.ad + (s.sabit ? ' sekmesini çöz' : ' sekmesini sabitle'), k && k.simge, sabitle) : null,
+      h('a', { href: s.url, 'data-ik-git': '', title: ad, 'aria-label': ad, 'aria-current': sec ? 'page' : null, draggable: 'false' }, adi(s)),
+      i && !s.sabit ? duz(s.ad + ' sekmesini kapat', 'kapat', () => { const r = sekmeKapat(this.sekmeler, s.url, genel, u, this.gorulen); yazS(r.liste); if (r.git) this.git(r.git); else odak(); }) : null);
     };
     // Gruplama: sabit olmayan sekmeler modülüne göre toplanır; grup kapanınca yalnız etkin sekmesi görünür.
     const g = this.sekmeGrup, parca = [];
