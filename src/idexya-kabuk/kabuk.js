@@ -374,7 +374,7 @@ class IdexyaKabuk extends HTMLElement {
         s.map((x) => { const i = b.indexOf(x); return h('a', {
           id: 'ik-ara-' + i, role: 'option', tabindex: '-1', href: x.url, 'data-ik-git': '', class: 'ik-liste-oge ik-ara-oge',
           'aria-selected': String(i === this.secim), css: { '--j': i }, onmousedown: (e) => e.preventDefault()
-        }, h('span', { class: 'ik-ara-simge', css: { color: x.renk } }, x.ksimge ? svg(SIMGE[x.ksimge], 15, 1.9) : x.simge), h('span', { class: 'ik-oge-ad' }, x.ad), h('span', { class: 'ik-ara-yol' }, x.yol)); })];
+        }, h('span', { class: 'ik-kare ik-ara-simge', css: { '--t': x.renk } }, x.ksimge ? svg(SIMGE[x.ksimge], 16, 1.9) : x.simge), h('span', { class: 'ik-oge-ad' }, x.ad), h('span', { class: 'ik-ara-yol' }, x.yol)); })];
     });
     this.sonuc.replaceChildren(...[grup, b.length || kd ? null : h('div', { class: 'ik-ara-bos' }, '“' + q.trim() + '” için sonuç yok. Sayfa ya da modül adını dene.'), this.kDurum,
       h('div', { class: 'ik-ara-ipucu', 'aria-hidden': 'true' }, h('span', null, '↑ ↓ seç'), h('span', null, 'Enter git'), h('span', null, 'Esc kapat'))].flat(3).filter(Boolean));
@@ -443,8 +443,11 @@ class IdexyaKabuk extends HTMLElement {
   sekmeCiz() {
     const genel = this.genelSekme();
     const u = this.a.etkin.sayfaUrl || this.a.etkin.modulUrl || genel.url;
+    // Açık sayfalar az yer kaplar (Muhittin, 25 Kas 2026): yalnız sayfanın adı; aynı ad iki sekmede ise tam yol. Tam ad ipucundadır.
+    const kisa = (ad) => ad.split(' › ').pop(), adi = (s) => (this.sekmeler.filter((y) => kisa(y.ad) === kisa(s.ad)).length < 2 ? kisa(s.ad) : s.ad !== kisa(s.ad) ? s.ad
+      : ((x) => (x && s.url !== genel.url ? x.yol.split(' › ')[0] + ' › ' : ''))(this.havuz.find((y) => y.url === s.url)) + s.ad);
     this.sekmeNav.replaceChildren(...this.sekmeler.map((s, i) => h('div', { class: 'ik-sekme' + (s.url === u ? ' ik-secili' : '') },
-      h('a', { href: s.url, 'data-ik-git': '', 'aria-current': s.url === u ? 'page' : null }, s.ad),
+      h('a', { href: s.url, 'data-ik-git': '', title: s.ad, 'aria-current': s.url === u ? 'page' : null }, adi(s)),
       i ? h('button', {
         type: 'button', class: 'ik-sekme-kapat', 'aria-label': s.ad + ' sekmesini kapat',
         onclick: () => {
@@ -540,8 +543,10 @@ class IdexyaKabuk extends HTMLElement {
       const nokta = (m) => (m ? h('span', { class: 'ik-uyari-nokta', title: m, 'aria-label': m, role: 'img' }) : null);
       const gUyari = (g) => nokta(g.moduller.map((m) => [m].concat(m.sayfalar).map((x) => this.uyari[x.url]).find(Boolean)).find(Boolean));
       const ton = (g) => (g && k.gruplar.length > 1 ? GRUP_TON[k.gruplar.indexOf(g) % GRUP_TON.length] : k.ton);
-      const bag = (x, g, ust, sinif, secili, ac) => {
-        const oz = { x, g, ad: x.ad, url: x.url, aciklama: x.aciklama || ac, ust, ton: ton(g), simge: g ? g.simge : k.simge };
+      const bag = (x, g, ust, sinif, secili, ac, m = x) => {
+        // Aynı bölümün öteki sayfaları (önizleme kartının altı): modülün sayfaları, yoksa grubun öteki modülleri.
+        const kom = (m.sayfalar.length ? m.sayfalar : g ? g.moduller : []).filter((y) => y.url !== x.url).slice(0, 5);
+        const oz = { x, g, kom, ad: x.ad, url: x.url, aciklama: x.aciklama || ac, ust, ton: ton(g), simge: g ? g.simge : k.simge };
         ozler.push(oz);
         return oz.el = h('a', {
           href: x.url, 'data-ik-git': '', class: sinif, css: { '--t': oz.ton }, 'aria-current': secili ? 'page' : null,
@@ -554,7 +559,7 @@ class IdexyaKabuk extends HTMLElement {
       let n = 1;
       const modul = (m, g) => h('div', { class: 'ik-u-oge', css: { '--u': Math.min(n++, 8) } },
         bag(m, g, g ? g.baslik : k.ad, 'ik-ucan-modul', e.modul === m && !e.sayfa),
-        m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => bag(s, g, m.ad, 'ik-ucan-sayfa', e.sayfa === s, m.aciklama))) : null);
+        m.sayfalar.length ? h('div', { class: 'ik-ucan-sayfalar' }, m.sayfalar.map((s) => bag(s, g, m.ad, 'ik-ucan-sayfa', e.sayfa === s, m.aciklama, m))) : null);
       const grupBas = (g) => h('div', { class: 'ik-ucan-grup', css: { '--t': ton(g) } }, h('span', { class: 'ik-kare' }, svg(SIMGE[g.simge], 15)), g.baslik, gUyari(g));
       // Mega menü (Muhittin, 20 Kas 2026; "tüm modüller için"): birden çok grup yan yana sütun; tek grupta modüller sayfa
       // sayısına göre dengeli en çok 3 sütuna (sutunBol); 1-2 modüllük madde tek sütun.
@@ -600,8 +605,8 @@ class IdexyaKabuk extends HTMLElement {
     u.style.setProperty('--ucan-ust', Math.max(0, this.ust.getBoundingClientRect().bottom) + 48 + 'px');
     u.style.setProperty('--ucan-sol', this.yan.getBoundingClientRect().right + 8 + 'px');
   }
-  // Önizleme kartı (9. tur; F2'deki kart): ad, açıklama; ürün onizlemeKaynagi(url) verdiyse uyarı, en çok 4 sayı ve eğri. Kabuk her
-  // adresi bir kez sorar. Telefonda ve dar ekranda kart yoktur (CSS), veri de istenmez.
+  // Önizleme kartı (9. tur; F2'deki kart; Muhittin, 25 Kas 2026 "yavan": renkli başlık, büyük ilk sayı, liste, bölümün öteki sayfaları).
+  // Ürün onizlemeKaynagi(url) verdiyse uyarı, en çok 4 sayı, eğri ve en çok 5 satırlık liste. Kabuk her adresi bir kez sorar. Telefonda ve dar ekranda kart yoktur (CSS), veri de istenmez.
   onzCiz(x) {
     clearTimeout(this._onzZ);
     if (!this.onz || innerWidth < 1180) return;
@@ -617,25 +622,35 @@ class IdexyaKabuk extends HTMLElement {
         .then(() => { if (this._onzX && this._onzX.url === u && this.ucanGrup != null) this.onzCiz(this._onzX); });
     }
     const v = this.oz.get(u), uy = (v && v.uyari) || this.uyari[u], sab = this.sekmeler.some((t) => t.url === u);
-    const yol = v && egriYol(v.egri, 300, 96), eg = yol ? D.createElementNS(NS, 'svg') : null;
-    if (eg) {
-      [['viewBox', '0 0 300 96'], ['preserveAspectRatio', 'none'], ['class', 'ik-onz-egri'], ['aria-hidden', 'true']].forEach((a) => eg.setAttribute(a[0], a[1]));
-      [yol + 'L300 96L0 96Z', yol].forEach((d) => { const p = D.createElementNS(NS, 'path'); p.setAttribute('d', d); eg.append(p); });
-    }
+    const yol = v && egriYol(v.egri, 300, 84);
+    const eg = yol ? this.onzEgri(yol) : null, [ilk, ...kalan] = (v && v.sayilar) || [];
+    const ton = (x2) => (x2 === true ? 'ik-iyi' : x2 === false ? 'ik-kotu' : null);
+    const sayi = (y, ana) => h('div', { class: ana ? 'ik-onz-ana' : null }, h('small', null, y.ad),
+      h('b', null, y.deger), y.degisim ? h('small', { class: ton(y.iyi) }, y.degisim) : null, ana ? eg : null, ana && eg && v.egriAd ? h('small', null, v.egriAd) : null);
     this.onz.style.setProperty('--t', x.ton);
     this.onz.replaceChildren(...[
-      h('div', { class: 'ik-onz-ust' }, h('span', { class: 'ik-kare' }, svg(SIMGE[x.simge], 14)), x.ust),
-      h('div', null, h('h2', null, x.ad), x.aciklama ? h('p', null, x.aciklama) : null),
+      h('header', { class: 'ik-onz-bas' }, h('div', { class: 'ik-onz-ust' }, h('span', { class: 'ik-kare' }, svg(SIMGE[x.simge], 18)), h('span', null, x.ust)),
+        h('h2', null, x.ad), x.aciklama ? h('p', null, x.aciklama) : null),
       uy ? h('div', { class: 'ik-onz-uyari', role: 'note' }, uy) : null,
-      v === null ? h('div', { class: 'ik-soluk' }, 'Özet yükleniyor…') : null,
-      v && v.sayilar.length ? h('div', { class: 'ik-onz-sayilar' }, v.sayilar.map((y) => h('div', null, h('small', null, y.ad),
-        h('b', null, y.deger), y.degisim ? h('small', { class: y.iyi === true ? 'ik-iyi' : y.iyi === false ? 'ik-kotu' : null }, y.degisim) : null))) : null,
-      eg, v && v.not ? h('div', { class: 'ik-soluk' }, v.not) : null,
+      v === null ? h('div', { class: 'ik-onz-bekle', role: 'status', 'aria-label': 'Özet yükleniyor' }, h('i'), h('i'), h('i')) : null,
+      ilk ? h('div', { class: 'ik-onz-sayilar', css: { '--n': Math.min(kalan.length, 3) } }, sayi(ilk, true), kalan.map((y) => sayi(y))) : eg,
+      v && v.liste ? h('section', { class: 'ik-onz-liste' }, h('h3', null, v.liste.baslik), h('ul', null, v.liste.ogeler.map((y) => h('li', { class: ton(y.iyi) },
+        h('span', null, h(y.url ? 'a' : 'span', y.url ? { href: y.url, 'data-ik-git': '' } : null, y.ad), h('b', null, y.deger)),
+        y.oran === null ? null : h('i', { css: { '--o': y.oran } }))))) : null,
+      v && v.not ? h('div', { class: 'ik-soluk' }, v.not) : null,
+      x.kom.length ? h('section', { class: 'ik-onz-kom' }, h('h3', null, 'Bu bölümde'), h('div', null, x.kom.map((y) => h('a', { href: y.url, 'data-ik-git': '' }, y.ad)))) : null,
       h('div', { class: 'ik-onz-eylem' },
         h('a', { href: u, 'data-ik-git': '', class: 'ik-dugme ik-dugme-ana' }, 'Aç'),
         h('a', { href: u, target: '_blank', rel: 'noopener', class: 'ik-dugme' }, 'Yeni sekmede'),
         h('button', { type: 'button', class: 'ik-dugme', disabled: sab, onclick: () => this.sabitleSekme(x) }, sab ? 'Sekmede' : 'Sabitle'))
     ].filter(Boolean));
+  }
+  // Eğri: dolgusu sayfanın renginden aşağı doğru söner.
+  onzEgri(yol) {
+    const e = (ad, oz, ...c) => { const x = D.createElementNS(NS, ad); Object.entries(oz).forEach((a) => x.setAttribute(...a)); x.append(...c); return x; };
+    return e('svg', { viewBox: '0 0 300 84', preserveAspectRatio: 'none', class: 'ik-onz-egri', 'aria-hidden': 'true' },
+      e('defs', {}, e('linearGradient', { id: 'ik-onz-g', x1: 0, y1: 0, x2: 0, y2: 1 }, e('stop', { class: 'ik-onz-g1' }), e('stop', { offset: 1, class: 'ik-onz-g2' }))),
+      e('path', { d: yol + 'L300 84L0 84Z', fill: 'url(#ik-onz-g)' }), e('path', { d: yol }));
   }
   // Sabitle: sayfa sekme satırına eklenir (sekme listesi kuralları, en çok 8).
   sabitleSekme(x) {

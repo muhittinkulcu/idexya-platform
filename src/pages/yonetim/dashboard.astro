@@ -213,7 +213,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   import { api, el, ASAMALAR, once, para, genelHata, saklananVeri } from '../../scripts/yonetim/ortak.js';
   import { kpiKart, trendCiz, isiCiz, yatayCiz, ipucuKur, gunler, KAYNAK_GRUP } from '../../scripts/yonetim/grafik.js';
   import { reklamBolumu } from '../../scripts/yonetim/reklam.js';
-  import { ozetCiz, karar } from '../../scripts/yonetim/ozet-kutusu.js';
+  import { ozetCiz, bag, karar } from '../../scripts/yonetim/ozet-kutusu.js';
   const $ = (s, k = document) => k.querySelector(s);
   const $$ = (s, k = document) => [...k.querySelectorAll(s)];
   const pano = $('[data-pano]');
@@ -317,12 +317,12 @@ import Yonetim from '../../layouts/Yonetim.astro';
 
     // Özet kutusu: Temel sayılarla aynı kaynaktan (son 7 gün talep, bekleyen, açık fırsat). Spam sayılmaz.
     { const s7 = topla(gunT, g14.slice(7)), o7 = topla(gunT, g14.slice(0, 7));
-      const p = [`Son 7 günde ${s7} talep geldi${o7 || s7 ? ` (önceki 7 gün ${o7})` : ''}.`];
-      if (bekleyen) p.push(' ', karar(`${bekleyen} talep`), ' yanıt bekliyor' + (b24.n ? `, ${Math.min(b24.n, bekleyen)} tanesi 24 saati geçti.` : '.'));
-      else p.push(' Yanıt bekleyen talep yok.');
+      const p = [['Son 7 günde ', bag(`${s7} talep`, '/leads?tab=all'), ` geldi${o7 || s7 ? ` (önceki 7 gün ${o7})` : ''}.`]];
+      if (bekleyen) p.push([karar(`${bekleyen} talep`, '/leads?tab=new'), ' yanıt bekliyor' + (b24.n ? `, ${Math.min(b24.n, bekleyen)} tanesi 24 saati geçti.` : '.')]);
+      else p.push(['Yanıt bekleyen talep yok.']);
       // Değer girilmemiş fırsat toplamda 0 sayılır; toplam 0 ise tutar yazılmaz (bilinmeyen 0 gösterilmez).
-      if (o.musteri.n && acik) p.push(` CRM’de ${acik} açık fırsat var${o.musteri.hat > 0 ? `, değeri girilenlerin tahmini aylık toplamı ${para(o.musteri.hat)}` : ''}.`);
-      ozetCiz($('[data-ozet-kutusu]'), { etiket: 'Bu sayfanın özeti · site talepleri ve CRM', parcalar: p, eylem: bekleyen ? el('a', { class: 'dugme ikincil', href: '/leads?tab=new' }, 'Taleplere git') : null }); }
+      if (o.musteri.n && acik) p.push(['CRM’de ', bag(`${acik} açık fırsat`, '/crm'), ` var${o.musteri.hat > 0 ? `, değeri girilenlerin tahmini aylık toplamı ${para(o.musteri.hat)}` : ''}.`]);
+      ozetCiz($('[data-ozet-kutusu]'), { etiket: 'Bu sayfanın özeti · site talepleri ve CRM', maddeler: p, eylem: bekleyen ? el('a', { class: 'dugme ikincil', href: '/leads?tab=new' }, 'Taleplere git') : null }); }
 
     trend();
 
@@ -371,7 +371,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
     selamYaz('Veriler şu an alınamadı.');
     const yok = (s) => { const e = $(s); if (e) e.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); };
     $('[data-kpi]').replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı; rakamlar gösterilmiyor.'));
-    ozetCiz($('[data-ozet-kutusu]'), { parcalar: [] });  // eski oturum değerleri taze gibi kalmasın
+    ozetCiz($('[data-ozet-kutusu]'), { maddeler: [] });  // eski oturum değerleri taze gibi kalmasın
     if (eskiCizildi) {
       ['[data-huni]', '[data-huni-alt]', '[data-isi]', '[data-kaynaklar]', '[data-sayfalar]', '[data-cubuk-alan]', '[data-x-eksen]', '[data-lejant]', '[data-trend-tablo]'].forEach(yok);
       ['[data-isi-not]', '[data-trend-not]'].forEach((k) => { const e = $(k); if (e) e.textContent = ''; });

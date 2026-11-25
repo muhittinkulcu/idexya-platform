@@ -232,14 +232,14 @@ export function aramaHavuzu(ayar) {
   const h = [];
   ayar.katmanlar.forEach((k) => k.gruplar.forEach((g) => g.moduller.forEach((m) => {
     const yol = k.ad + ' › ' + g.baslik;
-    h.push({ tur: 'Sayfalar', ad: m.ad, yol, url: m.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0), ksimge: k.simge });
-    m.sayfalar.forEach((s) => h.push({ tur: 'Sayfalar', ad: m.ad + ' › ' + s.ad, yol, url: s.url, katman: k.anahtar, renk: k.renkKoyu, simge: k.ad.charAt(0), ksimge: k.simge }));
+    h.push({ tur: 'Sayfalar', ad: m.ad, yol, url: m.url, katman: k.anahtar, renk: k.ton, simge: k.ad.charAt(0), ksimge: k.simge });
+    m.sayfalar.forEach((s) => h.push({ tur: 'Sayfalar', ad: m.ad + ' › ' + s.ad, yol, url: s.url, katman: k.anahtar, renk: k.ton, simge: k.ad.charAt(0), ksimge: k.simge }));
   })));
   const ak = ayar.katmanlar.find((x) => x.anahtar === ayar.katman);
-  if (ayar.ayarlarUrl) h.push({ tur: 'Sayfalar', ad: 'Ayarlar', yol: (ak ? ak.ad + ' › ' : '') + 'Görünüm, arayüz, hesap', url: ayar.ayarlarUrl, katman: ayar.katman, renk: ak ? ak.renkKoyu : '#2F55D4', simge: 'A' });
+  if (ayar.ayarlarUrl) h.push({ tur: 'Sayfalar', ad: 'Ayarlar', yol: (ak ? ak.ad + ' › ' : '') + 'Görünüm, arayüz, hesap', url: ayar.ayarlarUrl, katman: ayar.katman, renk: ak ? ak.ton : '#2F55D4', simge: 'A' });
   ayar.eylemler.forEach((e) => {
     const k = ayar.katmanlar.find((x) => x.anahtar === e.katman);
-    h.push({ tur: 'Eylemler', ad: e.ad, yol: k ? k.ad : '', url: e.url, katman: e.katman, renk: '#FFA35C', simge: '+' });
+    h.push({ tur: 'Eylemler', ad: e.ad, yol: k ? k.ad : '', url: e.url, katman: e.katman, renk: '#B85C08', simge: '+' });
   });
   return h;
 }
@@ -251,14 +251,20 @@ export function grupOzet(g) {
 }
 
 // Önizleme kartı için ürünün verdiği veri (README "Mega menü"). Metinler kısaltılır, en çok 4 sayı ve 60 noktalık eğri; geçersiz
-// değer atılır, bilinmeyen değer "—". iyi: true (yeşil) | false (kırmızı) | yok; renk tek başına anlatmaz, değişim metni yazılır.
+// değer atılır, bilinmeyen değer "—". Liste en çok 5 satır; `oran` 0-1 arası çubuk, `url` güvenli adres. iyi: true (yeşil) | false (kırmızı) | yok; renk tek başına anlatmaz, değişim metni yazılır.
 export function onizlemeCoz(x) {
   x = x && typeof x === 'object' ? x : {};
   const sayilar = (Array.isArray(x.sayilar) ? x.sayilar : []).map((y) => y && typeof y === 'object' ? {
     ad: metin(y.ad, 40), deger: metin(y.deger, 24) || '—', degisim: metin(y.degisim, 16), iyi: y.iyi === true || y.iyi === false ? y.iyi : null
   } : null).filter((y) => y && y.ad).slice(0, 4);
   const egri = (Array.isArray(x.egri) ? x.egri : []).filter((n) => typeof n === 'number' && Number.isFinite(n)).slice(-60);
-  return { uyari: metin(x.uyari, 120), sayilar, egri: egri.length > 1 ? egri : [], not: metin(x.not, 120) };
+  const l = x.liste && typeof x.liste === 'object' ? x.liste : {};
+  const ogeler = (Array.isArray(l.ogeler) ? l.ogeler : []).map((y) => y && typeof y === 'object' ? {
+    ad: metin(y.ad, 60), deger: metin(y.deger, 24), url: guvenliUrl(y.url) || '', iyi: y.iyi === true || y.iyi === false ? y.iyi : null,
+    oran: typeof y.oran === 'number' && y.oran >= 0 ? Math.min(y.oran, 1) : null
+  } : null).filter((y) => y && y.ad).slice(0, 5);
+  return { uyari: metin(x.uyari, 120), sayilar, egri: egri.length > 1 ? egri : [], egriAd: metin(x.egriAd, 60), not: metin(x.not, 120),
+    liste: ogeler.length ? { baslik: metin(l.baslik, 40) || 'Öne çıkanlar', ogeler } : null };
 }
 
 // Eğri: seri, w × h kutusuna ölçeklenmiş SVG yol verisi (üstte 2 px pay). Düz seri ortada yatay çizgidir.
