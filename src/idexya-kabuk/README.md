@@ -75,7 +75,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   "katman": "marketing",                 // ürünün varsayılan maddesi (adres menüde yoksa açık olan): genel | musteriler | gorevler |
                                          // marketing | crm | web | creative | marketplace | ai | raporlar | ayarlar
   "bayraklar": [],                       // isteğe bağlı: bayraklı maddeleri açar (ör. "marketplace"); verilmeyen bayraklı madde çizilmez
-  "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://marketing.idexya.com/welcome", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
+  "katmanlar": [{ "anahtar": "genel", "ad": "Genel bakış", "simge": "ev", "url": "https://os.idexya.com/welcome", "renk": "#2F55D4", "renkKoyu": "#7F9AF2", "gruplar": [] }, {
     "anahtar": "marketing", "ad": "Marketing", "simge": "megafon", // madde simgesi (simge adı, aşağıda)
     "url": "https://marketing.idexya.com/meta", // maddenin adresi (madde satırı ve mega menü başlığı buraya gider)
     "renk": "#2F55D4", "renkKoyu": "#7F9AF2", // açık temada vurgu, koyu temada vurgu (#RRGGBB)
@@ -107,7 +107,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   adresten bulunur (`etkinKatman`: önce sayfa, sonra modül, sonra maddenin kendi adresi; hiçbiri değilse `katman`). Madde
   satırı maddenin adresine bağlantıdır; üzerine gelince mega menü açılır (aşağıda "Mega menü"). Aynı adres iki maddede olmaz (`test/katmanlar.test.mjs`).
 - Üst alanda modül sekmesi **yoktur**; mega menü sol menüden açılır. Logo (X + "IDOS") Genel bakış maddesine (ana ekran) gider.
-- Genel bakış maddesi, ilk sekme ve logo karşılama ekranına (küreli Modüller) gider: `https://marketing.idexya.com/welcome`.
+- Genel bakış maddesi, ilk sekme ve logo karşılama ekranına (küreli Modüller) gider: `https://os.idexya.com/welcome` (25 Kas 2026; eski `/marketing/welcome` yönlendiricide 301).
   os.idexya.com kökü açılınca operasyon merkezine geçilir (Muhittin, 24 ve 25 Kas 2026); Genel bakış grubunun ilk modülü
   "Operasyon merkezi" `https://os.idexya.com/dashboard`. Tek adresin
   kendi ekranları (`os.idexya.com/<yol>`) yalnız Genel bakış maddesinde olur; öteki adresler ürün kökenlerindedir.
