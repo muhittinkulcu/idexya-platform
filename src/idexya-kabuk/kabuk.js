@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, etkinKatman, katmanRozeti, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir,
-  kaynakDurumu, sekmeEkle, sekmeKapat, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum, OS_ALANLARI, grupOzet, onizlemeCoz, egriYol
+  kaynakDurumu, sekmeEkle, sekmeKapat, sekmeSabit, sekmeTasi, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum, OS_ALANLARI, grupOzet, onizlemeCoz, egriYol
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -157,7 +157,14 @@ class IdexyaKabuk extends HTMLElement {
     if (menuVar) {
       this.sekmeNav = h('nav', { class: 'ik-sekmeler', 'aria-label': 'Açık sayfalar' });
       this.yan = h('aside', { id: 'ik-yan', class: 'ik-yan', 'aria-label': 'IDOS menüsü' });
-      ana.append(this.sekmeNav);
+      // Çok sekme tek satırda kayar (Muhittin, 25 Kas 2026): fare tekerleği, oklar ya da parmak; oklar yalnız taşınca görünür.
+      const n = this.sekmeNav, dg = (ad, yol, is) => h('button', { type: 'button', class: 'ik-sekme-ok', 'aria-label': ad, title: ad, onclick: is }, svg(yol, 14, 2));
+      const kay = (y) => () => n.scrollBy({ left: y * n.clientWidth * .7, behavior: azHareket() ? 'auto' : 'smooth' });
+      n.addEventListener('wheel', (e) => { if (!e.deltaX && !e.ctrlKey && n.scrollWidth > n.clientWidth) { n.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false });
+      this.sekmeSatir = h('div', { class: 'ik-sekme-satir' }, dg('Sekmeleri sola kaydır', ['M15 6l-6 6 6 6'], kay(-1)), n, dg('Sekmeleri sağa kaydır', SAG, kay(1)),
+        this.grupDugme = dg('Sekmeleri grupla', ['M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z', 'M14 16.5h6M17 13.5v6'], () => { const g = this.sekmeGrup; yaz('idx-sekme-grup', { acik: !g.acik, kapali: g.kapali }); this.sekmeCiz(); }));
+      new ResizeObserver(() => this.sekmeTasma()).observe(n);
+      ana.append(this.sekmeSatir);
     }
     ana.append(this.icerik);
     this.replaceChildren(this.ust, h('div', { class: 'ik-govde' }, this.yan, ana));
@@ -427,7 +434,7 @@ class IdexyaKabuk extends HTMLElement {
       const ham = this.a.etkin.sayfaUrl || this.a.etkin.modulUrl, u = OS_ALANLARI.some((x) => ham === 'https://' + x + '/') && ham !== genel.url ? null : ham;
       if (u) this.gorulen.add(u);
       // Adı bilinmeyen adres (menüde yok, ürün ad vermedi) sekme olmaz: sekmede ham adres görünmez.
-      this.sekmeler = sekmeEkle(oku('idx-sekme', []), u && u !== genel.url && this.e.ad ? { ad: this.e.ad, url: u } : null, genel, 8, this.gorulen);
+      this.sekmeler = sekmeEkle(oku('idx-sekme', []), u && u !== genel.url && this.e.ad ? { ad: this.e.ad, url: u } : null, genel, 16, this.gorulen);
       yaz('idx-sekme', this.sekmeler);
       this.yanCiz(); this.sekmeCiz();
     } else this.sekmeler = [];
@@ -446,17 +453,53 @@ class IdexyaKabuk extends HTMLElement {
     // Açık sayfalar az yer kaplar (Muhittin, 25 Kas 2026): yalnız sayfanın adı; aynı ad iki sekmede ise tam yol. Tam ad ipucundadır.
     const kisa = (ad) => ad.split(' › ').pop(), adi = (s) => (this.sekmeler.filter((y) => kisa(y.ad) === kisa(s.ad)).length < 2 ? kisa(s.ad) : s.ad !== kisa(s.ad) ? s.ad
       : ((x) => (x && s.url !== genel.url ? x.yol.split(' › ')[0] + ' › ' : ''))(this.havuz.find((y) => y.url === s.url)) + s.ad);
-    this.sekmeNav.replaceChildren(...this.sekmeler.map((s, i) => h('div', { class: 'ik-sekme' + (s.url === u ? ' ik-secili' : '') },
-      h('a', { href: s.url, 'data-ik-git': '', title: s.ad, 'aria-current': s.url === u ? 'page' : null }, adi(s)),
-      i ? h('button', {
-        type: 'button', class: 'ik-sekme-kapat', 'aria-label': s.ad + ' sekmesini kapat',
-        onclick: () => {
-          const r = sekmeKapat(this.sekmeler, s.url, genel, u, this.gorulen);
-          this.sekmeler = r.liste; yaz('idx-sekme', r.liste); this.sekmeCiz();
-          if (r.git) this.git(r.git); else { const l = this.sekmeNav.querySelector('a'); if (l) l.focus(); }
+    const yazS = (l) => { this.sekmeler = l; yaz('idx-sekme', l); this.sekmeCiz(); }, odak = (x) => { const l = [...this.sekmeNav.querySelectorAll('a,[data-g]')].find((y) => [y.getAttribute('href'), y.dataset.g].includes(x)) || this.sekmeNav.querySelector('a'); if (l) l.focus(); };
+    const maddesi = (url) => { const y = this.havuz.find((q) => q.url === url), ad = y && y.yol.split(' › ')[0]; return this.a.katmanlar.find((q) => q.ad === ad || q.url === url); };
+    // Sabit sekme simgeye iner; aynı modülden birden çok sabit varsa adı da yazar (ayırt edilsin).
+    const tek = (k) => this.sekmeler.filter((y) => y.sabit && maddesi(y.url) === k).length < 2;
+    const duz = (ad, x, sekme) => h('button', { type: 'button', class: 'ik-sekme-' + x, 'aria-label': ad, title: ad, onclick: sekme }, x === 'kapat' ? '×' : svg(I.raptiye, 12, 2));
+    const ciz = (s, i) => {
+      const k = maddesi(s.url), ad = s.sabit ? s.ad + ' (sabit)' : s.ad, sec = s.url === u;
+      const sabitle = () => { yazS(sekmeSabit(this.sekmeler, s.url, genel, this.gorulen)); odak(s.url); };
+      return h('div', {
+        class: 'ik-sekme' + (sec ? ' ik-secili' : '') + (s.sabit ? ' ik-sabit' : ''), draggable: i ? 'true' : null, css: k ? { '--t': k.ton } : null,
+        ondragstart: (e) => { this.suruk = s.url; e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', ''); },
+        ondragover: (e) => { if (this.suruk && i) e.preventDefault(); },
+        ondrop: (e) => { e.preventDefault(); if (this.suruk) yazS(sekmeTasi(this.sekmeler, this.suruk, s.url, genel, this.gorulen)); this.suruk = null; },
+        // Klavye: Alt + sol/sağ ok taşır.
+        onkeydown: (e) => {
+          const y = e.altKey && i && { ArrowLeft: -1, ArrowRight: 1 }[e.key], t = y && this.sekmeler[this.sekmeler.findIndex((q) => q.url === s.url) + y];
+          if (y) { e.preventDefault(); if (t) { yazS(sekmeTasi(this.sekmeler, s.url, t.url, genel, this.gorulen)); odak(s.url); } }
         }
-      }, '×') : null)));
+      },
+      h('a', { href: s.url, 'data-ik-git': '', title: ad, 'aria-label': s.sabit ? ad : null, 'aria-current': sec ? 'page' : null, draggable: 'false' }, s.sabit && k ? [svg(SIMGE[k.simge], 15, 1.9), tek(k) ? null : h('span', {}, kisa(s.ad))] : adi(s)),
+      i ? h('span', { class: 'ik-sekme-is' }, duz(s.ad + (s.sabit ? ' sekmesini çöz' : ' sekmesini sabitle'), 'sabitle', sabitle),
+        s.sabit ? null : duz(s.ad + ' sekmesini kapat', 'kapat', () => { const r = sekmeKapat(this.sekmeler, s.url, genel, u, this.gorulen); yazS(r.liste); if (r.git) this.git(r.git); else odak(); })) : null);
+    };
+    // Gruplama: sabit olmayan sekmeler modülüne göre toplanır; grup kapanınca yalnız etkin sekmesi görünür.
+    const g = this.sekmeGrup, parca = [];
+    this.grupDugme.setAttribute('aria-pressed', g.acik);
+    this.sekmeler.forEach((s, i) => {
+      const k = g.acik && i && !s.sabit ? maddesi(s.url) || { anahtar: 'diger', ad: 'Diğer' } : null;
+      if (!k) return parca.push(ciz(s, i));
+      let p = parca.find((y) => y.k === k.anahtar);
+      if (!p) parca.push(p = { k: k.anahtar, m: k, l: [] });
+      p.l.push([s, i]);
+    });
+    this.sekmeNav.replaceChildren(...parca.flatMap((p) => {
+      if (!p.l) return [p];
+      const kapali = g.kapali.includes(p.k);
+      return [h('button', {
+        type: 'button', class: 'ik-sekme-grup', 'data-g': p.k, css: p.m.ton ? { '--t': p.m.ton } : null, 'aria-expanded': String(!kapali), title: p.m.ad + (kapali ? ': grubu aç' : ': grubu kapat'),
+        onclick: () => { yaz('idx-sekme-grup', { acik: true, kapali: kapali ? g.kapali.filter((y) => y !== p.k) : g.kapali.concat(p.k) }); this.sekmeCiz(); odak(p.k); }
+      }, p.m.ad, h('span', {}, String(p.l.length)))].concat(p.l.filter(([s]) => !kapali || s.url === u).map(([s, i]) => ciz(s, i)));
+    }));
+    this.sekmeTasma();
+    const sec = this.sekmeNav.querySelector('.ik-secili'), n = this.sekmeNav;
+    if (sec) { const x = sec.offsetLeft - n.offsetLeft; if (x < n.scrollLeft || x + sec.offsetWidth > n.scrollLeft + n.clientWidth) n.scrollLeft = x - 24; }
   }
+  get sekmeGrup() { const g = oku('idx-sekme-grup', null) || {}; return { acik: g.acik === true, kapali: Array.isArray(g.kapali) ? g.kapali.filter((y) => typeof y === 'string').slice(0, 20) : [] }; }
+  sekmeTasma() { this.sekmeSatir.classList.toggle('ik-tasar', this.sekmeNav.scrollWidth > this.sekmeNav.clientWidth + 1); }
 
   kokRozet(k) { return h('span', { class: 'ik-rozet', 'aria-hidden': 'true', 'data-k': k.anahtar, 'data-ad': k.ad }); }
 
@@ -652,10 +695,10 @@ class IdexyaKabuk extends HTMLElement {
       e('defs', {}, e('linearGradient', { id: 'ik-onz-g', x1: 0, y1: 0, x2: 0, y2: 1 }, e('stop', { class: 'ik-onz-g1' }), e('stop', { offset: 1, class: 'ik-onz-g2' }))),
       e('path', { d: yol + 'L300 84L0 84Z', fill: 'url(#ik-onz-g)' }), e('path', { d: yol }));
   }
-  // Sabitle: sayfa sekme satırına eklenir (sekme listesi kuralları, en çok 8).
+  // Sabitle: sayfa sekme satırına eklenir (sekme listesi kuralları, en çok 16).
   sabitleSekme(x) {
     this.gorulen.add(x.url);
-    this.sekmeler = sekmeEkle(this.sekmeler, { ad: x.ad, url: x.url }, this.genelSekme(), 8, this.gorulen);
+    this.sekmeler = sekmeSabit(sekmeEkle(this.sekmeler, { ad: x.ad, url: x.url }, this.genelSekme(), 16, this.gorulen), x.url, this.genelSekme(), this.gorulen);
     yaz('idx-sekme', this.sekmeler); this.sekmeCiz(); this.onzCiz(x);
   }
   // Önizleme müşteriye özeldir (müşteri ayrımı): müşteri ya da dönem değişince önbellek boşalır. Başka sekmedeki müşteri

@@ -303,21 +303,22 @@ export const aramaBirlestir = (menu, kaynaklar, durum) => menu.concat(...kaynakl
 export const kaynakDurumu = (kaynaklar, durum) => kaynaklar.map((k) => (durum.get(k.ad) === 0 ? k.ad + ' aranıyor…'
   : durum.get(k.ad) === null ? k.ad + ' alınamadı' : '')).filter(Boolean).join('. ');
 
-// Sekmeler: Genel bakış ilk ve kapatılamaz, taşan en eski düşer; saklanan sekme yalnız aynı köken ve `izinli`.
+// Sekmeler: Genel bakış ilk ve kapatılamaz; sonra sabitler, sonra ötekiler (25 Kas 2026). Taşan en eski SABİT OLMAYAN düşer;
+// saklanan sekme yalnız aynı köken ve `izinli`.
 export function sekmeListesi(liste, genel, izinli) {
   const temiz = [{ ad: genel.ad, url: genel.url }];
   (Array.isArray(liste) ? liste : []).forEach((s) => {
     const url = guvenliUrl(s && s.url);
-    if (url && (!izinli || izinli.has(url)) && metin(s.ad) && !temiz.some((x) => x.url === url)) temiz.push({ ad: metin(s.ad), url });
+    if (url && (!izinli || izinli.has(url)) && metin(s.ad) && !temiz.some((x) => x.url === url)) temiz.push(s.sabit === true ? { ad: metin(s.ad), url, sabit: true } : { ad: metin(s.ad), url });
   });
-  return temiz;
+  return temiz.slice(0, 1).concat(temiz.slice(1).filter((x) => x.sabit), temiz.slice(1).filter((x) => !x.sabit));
 }
 
 export function sekmeEkle(liste, sekme, genel, sinir = SEKME_SINIRI, izinli) {
   const l = sekmeListesi(liste, genel, izinli);
   if (!sekme || !guvenliUrl(sekme.url) || l.some((x) => x.url === sekme.url)) return l;
   l.push({ ad: metin(sekme.ad) || sekme.url, url: sekme.url });
-  while (l.length > sinir) l.splice(1, 1);
+  for (let i; l.length > sinir && (i = l.findIndex((x, j) => j && !x.sabit && j < l.length - 1)) > 0;) l.splice(i, 1);
   return l;
 }
 
@@ -328,6 +329,15 @@ export function sekmeKapat(liste, url, genel, etkinUrl, izinli) {
   l.splice(i, 1);
   const git = url === etkinUrl ? (l[i] || l[i - 1]).url : null;
   return { liste: l, git };
+}
+
+// Sabitle ya da çöz; liste kendi sırasına oturur.
+export const sekmeSabit = (liste, url, genel, izinli) => sekmeListesi(sekmeListesi(liste, genel, izinli).map((x, i) => (i && x.url === url ? { ad: x.ad, url, sabit: !x.sabit } : x)), genel);
+// `url` sekmesini `hedef` sekmesinin yerine taşır; Genel bakış ve sabit/sabit olmayan sınırı geçilmez.
+export function sekmeTasi(liste, url, hedef, genel, izinli) {
+  const l = sekmeListesi(liste, genel, izinli), a = l.findIndex((x) => x.url === url), b = l.findIndex((x) => x.url === hedef);
+  if (a > 0 && b > 0 && !l[a].sabit === !l[b].sabit) l.splice(b, 0, l.splice(a, 1)[0]);
+  return l;
 }
 
 // idx-gorunum kaydı. Eski `oto` → `sistem`; eski `kalinlik` ve `yazi` okunur, atılır (yazı tipi seçimi kalktı, 15 Kas 2026).
