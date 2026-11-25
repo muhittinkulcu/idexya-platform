@@ -150,8 +150,10 @@ koyu cam olarak kalır. Telefonda arama ikinci, ürün yuvası üçüncü satır
 modüller ve alt sayfalar"; 25 Kas 2026, 9. tur: "başlıklar renkli, aralıklar ferah, en sonda önizleme"). Geniş ve
 daraltılmış menüde aynıdır: madde satırının (daraltılmışta simgenin) üzerine gelince ya da klavye odağında açılır.
 
-- **Yer:** menünün sağından ekranın sağına (16 px pay), üst çubuğun altından; yüksekliği içeriğe göre, ekrana sığmazsa
-  yalnız içi kayar. Tek grupta (ya da 1-2 modülde) dar pencere kalır.
+- **Yer ve boy sabittir** (9. tur çizimi; Muhittin, 25 Kas 2026): menünün sağında, üst çubuğun 48 px altında, en çok 1240 × 720 px (dar
+  ekranda 20 px pay). Üzerine gelinen madde değişince pencere yerinde kalır, yalnız içeriği değişir; taşan içerik içinde kayar.
+- **Seçili satır:** açılışta bulunulan sayfa, yoksa ilk satır; önizleme kartındaki sayfanın satırı vurgulu kalır. Madde fareyle 90 ms
+  sonra değişir: pencereye giderken üstünden geçilen madde içeriği değiştirmez.
 - **İçerik:** en üstte maddenin renginde bant: simge, ad ve açıklama (maddenin adresine bağlantı). Altında gruplar sütun sütun
   (renkli simgeli başlık › modüller › sayfaları); tek gruplu madde modülleri en çok 3 sütuna böler (`sutunBol`). Üçten çok gruplu
   maddede (Marketing) gruplar solda liste (`grupOzet` alt satırıyla), üzerine gelinen ya da odaklanan grubun bölümleri yanında.
@@ -166,7 +168,7 @@ daraltılmış menüde aynıdır: madde satırının (daraltılmışta simgenin)
   değişince uyarıları silmez; müşteriye özel metin verilmez (müşteri ayrımı).
 - **Tık:** madde satırı maddenin sayfasına, menüdeki satır sayfasına gider ve menüyü kapatır. Dokunmatikte ve telefonda
   maddeye ilk dokunuş menüyü açar, ikincisi sayfaya gider.
-- **Kapanma:** fare menüden ve satırdan ayrılınca 180 ms sonra; satırdan menüye geçerken kapanmaz. Esc ve × kapatır, odak
+- **Kapanma:** fare menüden ve satırdan ayrılınca 260 ms sonra; satırdan menüye geçerken kapanmaz. Esc ve × kapatır, odak
   maddeye döner. Klavye: sol menüde ↑ ↓ maddeler arasında (odak menüyü o maddeye geçirir), → menüye girer, Tab menüde ilerler.
 - Telefonda tam ekrandır, sütunlar alt alta. "Hareketleri azalt"ta açılış hareketi yoktur. Menünün durumu saklanmaz.
 
