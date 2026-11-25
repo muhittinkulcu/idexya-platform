@@ -53,7 +53,7 @@ const { ortakMenu, eksikAdresler, PANEL_KOKEN } = await import(join(kok, 'src/da
 const sol = ortakMenu(ORTAK.katmanlar, MENU);
 const eksik = eksikAdresler(ORTAK.katmanlar, MENU);
 kontrol('panel menüsündeki her adres sol menüde' + (eksik.length ? ': eksik ' + eksik.join(', ') : ''), eksik.length === 0);
-kontrol('sol menü 12 madde (Marketplace bayraklı; Web Site Yönetimi ve E-Ticaret ayrı)', sol.map((k) => k.anahtar).join() === 'genel,musteriler,gorevler,marketing,crm,web,eticaret,creative,marketplace,ai,raporlar,ayarlar' && sol.find((k) => k.anahtar === 'marketplace').bayrak === 'marketplace');
+kontrol('sol menü 13 madde (Marketplace bayraklı; Web Site Yönetimi ve E-Ticaret ayrı)', sol.map((k) => k.anahtar).join() === 'genel,musteriler,gorevler,marketing,crm,web,eticaret,creative,marketplace,ai,akademi,raporlar,ayarlar' && sol.find((k) => k.anahtar === 'marketplace').bayrak === 'marketplace');
 const adr = sol.flatMap((k) => k.gruplar.flatMap((g) => g.moduller.flatMap((m) => [m.url, ...m.sayfalar.map((x) => x.url)])));
 kontrol('panel sayfaları göreli, panel kökeninde tam adres kalmadı', !adr.some((u) => u.startsWith(PANEL_KOKEN)) && adr.some((u) => u === '/leads'));
 kontrol('öteki ürünlerin sayfaları tam adres (Marketing, Creative)', adr.includes('https://marketing.idexya.com/crm') && adr.includes('https://creative.idexya.com/calendar'));
