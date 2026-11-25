@@ -1,7 +1,7 @@
 // <idexya-kabuk>: ortak kabuk. Kurallar README.md: innerHTML ve dış istek yok, veri textContent ile.
 import {
   SIMGE, TEMA, temaCoz, sonrakiTema, sinirBekle, ayarDogrula, etkinBul, etkinKatman, katmanRozeti, aramaHavuzu, aramaSuz, kaynakAra, aramaBirlestir,
-  kaynakDurumu, sekmeEkle, sekmeKapat, sekmeSabit, sekmeTasi, gorunumCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum, OS_ALANLARI, grupOzet, onizlemeCoz, egriYol
+  kaynakDurumu, sekmeEkle, sekmeKapat, sekmeSabit, sekmeTasi, gorunumCoz, olcekCoz, sayiBicim, saatKisa, rozetSay, guvenliUrl, metinListesi, osAdresi, durumCoz, sutunBol, kediKonum, OS_ALANLARI, grupOzet, onizlemeCoz, egriYol
 } from './kabuk-cekirdek.js';
 
 const D = document, R = D.documentElement;
@@ -13,7 +13,16 @@ const yaz = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catc
 // Görünüm (idx-gorunum): tema açık | koyu | sistem | zaman, zaman sınırları, hareketi azalt. Eski kayıt (oto, yazı, kalınlık)
 // okunurken yeni biçime çevrilip yazılır.
 const gorunumOku = () => { const ham = oku('idx-gorunum', null), g = gorunumCoz(ham); if (ham && JSON.stringify(ham) !== JSON.stringify(g)) yaz('idx-gorunum', g); return g; };
-let GOR = gorunumOku(), zZaman;
+let GOR = gorunumOku(), OLC, zZaman;
+// Ölçek: html yakınlaşır; ekran ölçüsünden stil yazan yer Z() ile böler.
+const Z = () => +R.style.zoom || 1;
+function olcekUygula(g) {
+  OLC = olcekCoz(g);
+  R.style.zoom = OLC.o / 100;
+  [['olcek', OLC.o / 100], ['tablo-yazi', OLC.yazi + 'px'], ['tablo-satir', OLC.satir + 'px']].forEach(([k, v]) => R.style.setProperty('--ik-' + k, v));
+  R.dataset.ikOlcek = Object.keys(OLC).filter((k) => OLC[k] === true).join(' ');
+}
+olcekUygula(oku('idx-olcek'));
 const azHareket = () => GOR.azHareket || matchMedia('(prefers-reduced-motion: reduce)').matches;
 function gorunumUygula() {
   R.dataset.tema = temaCoz(GOR, MQ.matches, new Date());
@@ -26,7 +35,7 @@ gorunumUygula();
 MQ.addEventListener('change', gorunumUygula);
 D.addEventListener('visibilitychange', () => { if (!D.hidden) gorunumUygula(); });
 const gorunumYayinla = () => D.querySelectorAll('idexya-kabuk').forEach((k) => k.temaDugme && (k.temaCiz(), olay(k, 'gorunum', Object.assign({}, GOR))));
-addEventListener('storage', (e) => { if (e.key === 'idx-gorunum') { GOR = gorunumOku(); gorunumUygula(); gorunumYayinla(); } });
+addEventListener('storage', (e) => { if (e.key === 'idx-olcek') { olcekUygula(oku(e.key)); gorunumYayinla(); } if (e.key === 'idx-gorunum') { GOR = gorunumOku(); gorunumUygula(); gorunumYayinla(); } });
 
 function h(tag, a, ...c) {
   const e = D.createElement(tag);
@@ -250,7 +259,7 @@ class IdexyaKabuk extends HTMLElement {
     this.acik = tur; this._donus = donus;
     this.cekmece(false); this.ucanKapat();
     const r = this.ust.getBoundingClientRect();
-    this.perde.style.setProperty('top', Math.max(0, r.bottom) + 'px');
+    this.perde.style.setProperty('top', Math.max(0, r.bottom) / Z() + 'px');
     this.perde.className = 'ik-perde' + (tur === 'profil' ? ' ik-perde-saydam' : '');
     this.perde.hidden = false;
   }
@@ -327,13 +336,13 @@ class IdexyaKabuk extends HTMLElement {
     this._kediKonum = o && Number.isFinite(o.x) && Number.isFinite(o.y) ? { x: o.x, y: o.y } : null;
     kap.classList.toggle('ik-serbest', !!this._kediKonum);
     if (!this._kediKonum) { kap.style.removeProperty('left'); kap.style.removeProperty('top'); kap.classList.remove('ik-ipucu-sag'); return; }
-    const d = kap.querySelector('.ik-asistan'), w = d.offsetWidth || 52, hh = d.offsetHeight || 52;
-    const p = kediKonum(this._kediKonum.x * innerWidth, this._kediKonum.y * innerHeight, w, hh, innerWidth, innerHeight);
-    const sağa = p.x < innerWidth / 2;
+    const d = kap.querySelector('.ik-asistan'), w = d.offsetWidth || 52, hh = d.offsetHeight || 52, W = innerWidth / Z(), H = innerHeight / Z();
+    const p = kediKonum(this._kediKonum.x * W, this._kediKonum.y * H, w, hh, W, H);
+    const sağa = p.x < W / 2;
     kap.classList.toggle('ik-ipucu-sag', sağa);
     const ipucu = sağa ? 0 : (kap.querySelector('.ik-asistan-ipucu').offsetWidth + 10);
     kap.style.left = (p.x - ipucu) + 'px'; kap.style.top = p.y + 'px';
-    if (!sürüklerken) this._kediKonum = { x: p.x / innerWidth, y: p.y / innerHeight };
+    if (!sürüklerken) this._kediKonum = { x: p.x / W, y: p.y / H };
   }
 
   hesapCiz() {
@@ -412,6 +421,8 @@ class IdexyaKabuk extends HTMLElement {
   gorunumYap(p) {
     GOR = gorunumCoz(Object.assign({}, GOR, p)); yaz('idx-gorunum', GOR); gorunumUygula(); gorunumYayinla();
   }
+  olcekYap(p) { olcekUygula(Object.assign({}, OLC, p)); yaz('idx-olcek', OLC); gorunumYayinla(); }
+  get olcek() { return Object.assign({}, OLC); }
   get gorunum() { return Object.assign({}, GOR); }
   darYap(v) { this.dar = !!v; yaz('idx-yan-dar', this.dar); this.ucanKapat(); if (this.yan) this.yanCiz(); }
 
@@ -434,13 +445,18 @@ class IdexyaKabuk extends HTMLElement {
       const ham = this.a.etkin.sayfaUrl || this.a.etkin.modulUrl, u = OS_ALANLARI.some((x) => ham === 'https://' + x + '/') && ham !== genel.url ? null : ham;
       if (u) this.gorulen.add(u);
       // Adı bilinmeyen adres (menüde yok, ürün ad vermedi) sekme olmaz: sekmede ham adres görünmez.
-      this.sekmeler = sekmeEkle(oku('idx-sekme', []), u && u !== genel.url && this.e.ad ? { ad: this.e.ad, url: u } : null, genel, 16, this.gorulen);
+      this.sekmeler = sekmeEkle(oku('idx-sekme', []), u && u !== genel.url && this.e.ad ? this.sekmeYap(this.e.ad, u) : null, genel, 16, this.gorulen);
       yaz('idx-sekme', this.sekmeler);
       this.yanCiz(); this.sekmeCiz();
     } else this.sekmeler = [];
     this.sahneOynat();
   }
 
+  // Modülde `sekme` adı varsa aynı adlı modüllerin bütün sayfaları tek sekmede durur.
+  sekmeYap(ad, url) {
+    const l = this.k ? this.k.gruplar.flatMap((g) => g.moduller) : [], m = l.find((x) => x.sekme && (x.url === url || x.sayfalar.some((y) => y.url === url)));
+    return m ? { ad: m.sekme, url, ayni: l.filter((x) => x.sekme === m.sekme).flatMap((x) => [x.url, ...x.sayfalar.map((y) => y.url)]) } : { ad, url };
+  }
   genelSekme() { return { ad: 'Genel bakış', url: this.ana ? this.ana.url : '/' }; }
   get konum() {
     const g = this.k && this.e && this.k.gruplar[this.e.grup];
@@ -644,8 +660,8 @@ class IdexyaKabuk extends HTMLElement {
     }
     // Sabit pencere (9. tur çizimi; Muhittin, 25 Kas 2026): menünün sağında, üst çubuğun altında, her maddede AYNI yerde ve aynı
     // boyda (CSS); üzerine gelinen madde değişince yalnız içeriği değişir, taşan içerik pencerenin içinde kayar.
-    u.style.setProperty('--ucan-ust', Math.max(0, this.ust.getBoundingClientRect().bottom) + 48 + 'px');
-    u.style.setProperty('--ucan-sol', this.yan.getBoundingClientRect().right + 8 + 'px');
+    u.style.setProperty('--ucan-ust', Math.max(0, this.ust.getBoundingClientRect().bottom) / Z() + 48 + 'px');
+    u.style.setProperty('--ucan-sol', this.yan.getBoundingClientRect().right / Z() + 8 + 'px');
   }
   // Önizleme kartı (9. tur; F2'deki kart; Muhittin, 25 Kas 2026 "yavan": renkli başlık, büyük ilk sayı, liste, bölümün öteki sayfaları).
   // Ürün onizlemeKaynagi(url) verdiyse uyarı, en çok 4 sayı, eğri ve en çok 5 satırlık liste. Kabuk her adresi bir kez sorar. Telefonda ve dar ekranda kart yoktur (CSS), veri de istenmez.
@@ -697,7 +713,7 @@ class IdexyaKabuk extends HTMLElement {
   // Sabitle: sayfa sekme satırına eklenir (sekme listesi kuralları, en çok 16).
   sabitleSekme(x) {
     this.gorulen.add(x.url);
-    this.sekmeler = sekmeSabit(sekmeEkle(this.sekmeler, { ad: x.ad, url: x.url }, this.genelSekme(), 16, this.gorulen), x.url, this.genelSekme(), this.gorulen);
+    this.sekmeler = sekmeSabit(sekmeEkle(this.sekmeler, this.sekmeYap(x.ad, x.url), this.genelSekme(), 16, this.gorulen), x.url, this.genelSekme(), this.gorulen);
     yaz('idx-sekme', this.sekmeler); this.sekmeCiz(); this.onzCiz(x);
   }
   // Önizleme müşteriye özeldir (müşteri ayrımı): müşteri ya da dönem değişince önbellek boşalır. Başka sekmedeki müşteri

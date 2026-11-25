@@ -39,8 +39,10 @@ export function ipucuKur(k) {
   kutu = k;
   const goster = (hedef, x, y) => {
     kutu.textContent = hedef.dataset.ip; kutu.hidden = false;
+    // Kişisel ölçek (html zoom): fare konumu ekran, stil ölçekli pikseldir.
+    const z = Number(document.documentElement.style.zoom) || 1; x /= z; y /= z;
     const w = kutu.offsetWidth, h = kutu.offsetHeight;
-    kutu.style.left = Math.round(Math.min(Math.max(8, x + 14), innerWidth - w - 8)) + 'px';
+    kutu.style.left = Math.round(Math.min(Math.max(8, x + 14), innerWidth / z - w - 8)) + 'px';
     kutu.style.top = Math.round(y - h - 14 < 8 ? y + 18 : y - h - 14) + 'px';
   };
   document.addEventListener('pointermove', (o) => { const h = o.target.closest && o.target.closest('[data-ip]'); if (h) goster(h, o.clientX, o.clientY); else kutu.hidden = true; });

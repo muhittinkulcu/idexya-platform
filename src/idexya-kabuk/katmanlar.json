@@ -252,14 +252,18 @@
      "simge": "megafon",
      "moduller": [
       {
-       "ad": "Reklam yöneticisi",
+       "ad": "Genel bakış",
        "url": "https://marketing.idexya.com/meta",
-       "aciklama": "Meta kampanya, reklam seti ve reklamları.",
+       "aciklama": "Meta hesabının özeti: göstergeler, eğri ve öneriler.",
+       "sekme": "Reklam yöneticisi",
+       "sayfalar": []
+      },
+      {
+       "ad": "Reklam yöneticisi",
+       "url": "https://marketing.idexya.com/meta/campaigns",
+       "aciklama": "Kampanya, reklam seti ve reklamlar tek ekranda.",
+       "sekme": "Reklam yöneticisi",
        "sayfalar": [
-        {
-         "ad": "Genel bakış",
-         "url": "https://marketing.idexya.com/meta"
-        },
         {
          "ad": "Kampanyalar",
          "url": "https://marketing.idexya.com/meta/campaigns"
@@ -271,10 +275,6 @@
         {
          "ad": "Reklamlar",
          "url": "https://marketing.idexya.com/meta/ads"
-        },
-        {
-         "ad": "Otomatik kurallar",
-         "url": "https://marketing.idexya.com/meta/rules"
         }
        ]
       },
@@ -282,6 +282,7 @@
        "ad": "Hedef kitleler",
        "url": "https://marketing.idexya.com/meta/audience",
        "aciklama": "Kitle, yerleşim, yaş, bölge ve cihaz kırılımı.",
+       "sekme": "Reklam yöneticisi",
        "sayfalar": [
         {
          "ad": "Kitle ve yerleşim",
@@ -298,9 +299,10 @@
        ]
       },
       {
-       "ad": "Kreatif",
+       "ad": "Kreatifler",
        "url": "https://marketing.idexya.com/meta/creatives",
        "aciklama": "Kreatif performansı, yorgunluk ve reklam kalitesi.",
+       "sekme": "Reklam yöneticisi",
        "sayfalar": [
         {
          "ad": "Kreatif merkezi",
@@ -317,38 +319,66 @@
        ]
       },
       {
-       "ad": "Analiz ve raporlama",
-       "url": "https://marketing.idexya.com/meta/analysis",
-       "aciklama": "Dönem karşılaştırma, uyarılar ve değişiklik geçmişi.",
+       "ad": "Harcamalar",
+       "url": "https://marketing.idexya.com/meta/spend",
+       "aciklama": "Günlük harcama, kampanya payı ve mutabakat.",
+       "sekme": "Reklam yöneticisi",
        "sayfalar": [
         {
-         "ad": "Dönem karşılaştırma",
-         "url": "https://marketing.idexya.com/meta/analysis"
-        },
-        {
-         "ad": "Uyarılar",
-         "url": "https://marketing.idexya.com/meta/alerts"
-        },
-        {
-         "ad": "Değişiklik geçmişi",
-         "url": "https://marketing.idexya.com/meta/history"
-        }
-       ]
-      },
-      {
-       "ad": "Reklam hesabı ayarları",
-       "url": "https://marketing.idexya.com/meta/accounts",
-       "aciklama": "Hesaplar, ödeme ve harcama mutabakatı.",
-       "sayfalar": [
-        {
-         "ad": "Hesaplar ve ödeme",
-         "url": "https://marketing.idexya.com/meta/accounts"
+         "ad": "Harcamalar",
+         "url": "https://marketing.idexya.com/meta/spend"
         },
         {
          "ad": "Harcama mutabakatı",
          "url": "https://marketing.idexya.com/meta/reconciliation"
         }
        ]
+      },
+      {
+       "ad": "Kurallar",
+       "url": "https://marketing.idexya.com/meta/rules",
+       "aciklama": "Öneri üreten otomatik kurallar.",
+       "sekme": "Reklam yöneticisi",
+       "sayfalar": []
+      },
+      {
+       "ad": "Raporlar",
+       "url": "https://marketing.idexya.com/meta/reports",
+       "aciklama": "Reklam raporları ve dönem karşılaştırma.",
+       "sekme": "Reklam yöneticisi",
+       "sayfalar": [
+        {
+         "ad": "Reklam raporları",
+         "url": "https://marketing.idexya.com/meta/reports"
+        },
+        {
+         "ad": "Dönem karşılaştırma",
+         "url": "https://marketing.idexya.com/meta/analysis"
+        }
+       ]
+      },
+      {
+       "ad": "Değişiklikler",
+       "url": "https://marketing.idexya.com/meta/history",
+       "aciklama": "Değişiklik geçmişi ve uyarılar.",
+       "sekme": "Reklam yöneticisi",
+       "sayfalar": [
+        {
+         "ad": "Değişiklik geçmişi",
+         "url": "https://marketing.idexya.com/meta/history"
+        },
+        {
+         "ad": "Uyarılar",
+         "url": "https://marketing.idexya.com/meta/alerts"
+        }
+       ]
+      },
+      {
+       "ad": "Hesap ayarları",
+       "url": "https://marketing.idexya.com/meta/accounts",
+       "aciklama": "Reklam hesapları ve ödeme durumu.",
+       "sekme": "Reklam yöneticisi",
+       "sayfalar": []
       }
      ]
     },

@@ -1,6 +1,6 @@
 # `<idexya-kabuk>`: ortak arayüz kabuğu
 
-Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: üst alan (cam), tek sol menü (12 madde), arama
+Marketing (IDOS), Website ve CRM (Panel) ve Creative'in ortak iskeleti: üst alan (cam), tek sol menü (13 madde), arama
 (komut paleti), tema düğmesi, Ayarlar sayfası (`<idexya-ayarlar>`), yan menü (geniş ve daraltılmış), sayfa sekmeleri, zemin ızgarası, asistan
 düğmesi ve sayfa hareketleri. Sözleşme: [`../arayuz-kabugu.md`](../arayuz-kabugu.md) (renkler, yerler,
 yapım kuralları). Onaylı tasarım: 14 Kas 2026 taslağı.
@@ -20,7 +20,7 @@ değiştirilmez (yapım kuralı 1).
 | `ayarlar.js` | `<idexya-ayarlar>`: ortak Ayarlar sayfasının içeriği (aşağıda "Ayarlar sayfası") | evet |
 | `kabuk.css` | Bütün stiller, renk değişkenleri, açık/koyu, hareketler, telefon düzeni | evet |
 | `README.md` | Bu belge | evet |
-| `katmanlar.json` | Sol menünün 12 maddesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); sol menü ve arama için | evet |
+| `katmanlar.json` | Sol menünün 13 maddesi (ad, simge, adres, renk, gruplar, modüller, sayfalar); sol menü ve arama için | evet |
 | `kedi.webp` | Asistan düğmesinin kedisi (IDOS maskotu, Ankara kedisi; 200×200). `kabuk.css` göreli adresle (`url(kedi.webp)`) kullanır, ürünün paketleyicisi (Vite, Astro) dosyayı özetli adla yayar | evet |
 | `demo.html`, `demo.js`, `demo.css`, `demo-ayar.json` | Yerel deneme sayfası | hayır |
 | `test/` | Node birim testleri ve Playwright tarayıcı denemesi | hayır |
@@ -289,6 +289,7 @@ ayarından okur. Bölümler (yalnız gerçekten çalışan ayarlar; karşılığ
 | Bölüm | Ne |
 |---|---|
 | Görünüm | Dört tema (radyo grubu, kart); Zaman seçiliyse "Açık tema başlar" ve "Koyu tema başlar" saatleri (aynı saat reddedilir) |
+| Görünüm ve ölçek | Hazır düzen (Meta gibi, Daha çok veri, Daha rahat), ölçek %85–120, tablo yazısı, satır yüksekliği, kuruş, satır altı açıklaması, çizgi, gölge, bölüm simgeleri; örnek satırlı önizleme, varsayılana dön (25 Kas 2026) |
 | Arayüz | Üst çubuğu sabitle (`idx-ust-sabit`), yan menüyü daraltılmış göster (`idx-yan-dar`), hareketleri azalt |
 | Bölge | Tarayıcının saat dilimi ve tarih, saat, sayı, tutar, oran örnekleri (salt gösterim) |
 | Hesap | `kullanici` (ad, e-posta, rol) salt okuma; "Oturumu kapat" `cikisUrl`'ye (yoksa os.idexya.com'da `/cdn-cgi/access/logout`) |
@@ -333,7 +334,9 @@ anahtarlarını (kabuğun ve ürünün oturum kayıtları) siler.
 
 | Anahtar | İçerik |
 |---|---|
+| `idx-sekme` (tek sekme) | Modülde `sekme` adı varsa (katmanlar.json) aynı adlı modüllerin bütün sayfaları tek sekmede durur; sekmenin adresi son sayfadır |
 | `idx-gorunum` | `{ tema: acik\|koyu\|sistem\|zaman, zamanAcik: 420, zamanKoyu: 1140, azHareket: false }` (zaman: gün içindeki dakika) |
+| `idx-olcek` | `{ o: 85–120, yazi: 12–16, satir: 34\|38\|46\|54, kurus, alt, golge, cizgi, simge }`; varsayılan Meta ölçeği (100, 14, 46). Kabuk `<html>` üzerinde `zoom`, `--ik-olcek`, `--ik-tablo-yazi`, `--ik-tablo-satir` ve `data-ik-olcek` (açık anahtarlar) yazar. Ürün tablosu bu değişkenleri okur; ekran yüksekliği `calc(100dvh / var(--ik-olcek,1))`, ekran ölçüsünden stil yazan kod ölçeğe böler |
 | `idx-sekme` | Açık sekmeler `[{ ad, url }]`, en çok 8 (tek liste; ilk sekme ana ekran; adı bilinmeyen adres sekme olmaz) |
 | `idx-yan-dar` | Yan menü daraltılmış mı |
 | `idx-ust-sabit` | Üst çubuk sabit mi |
