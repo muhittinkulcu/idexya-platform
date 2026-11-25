@@ -26,4 +26,6 @@
   d.setAttribute('data-tema-secim', t);
   d.setAttribute('data-tema', sonuc);
   if (g.azHareket === true) d.setAttribute('data-hareket', 'az');
+  // Kişisel ölçek (idx-olcek, kabuk "Görünüm ve ölçek"): sayfa sonradan büyüyüp küçülmesin.
+  try { var o = JSON.parse(localStorage.getItem('idx-olcek') || 'null'); if (o && o.o % 1 === 0 && o.o >= 85 && o.o <= 120) { d.style.zoom = o.o / 100; d.style.setProperty('--ik-olcek', o.o / 100); } } catch (e) { /* gizli kip */ }
 })();

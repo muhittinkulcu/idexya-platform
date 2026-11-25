@@ -152,7 +152,7 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
           if (su && metin(s.ad)) sayfalar.push({ ad: metin(s.ad), url: su, rozet: rozetSay(s.rozet), aciklama: metin(s.aciklama, 200) });
           else hatalar.push(k.anahtar + ': sayfa atlandı (' + metin(s && s.ad) + ')');
         });
-        moduller.push({ ad: metin(m.ad), url: mu, rozet: rozetSay(m.rozet), aciklama: metin(m.aciklama, 200), sayfalar });
+        moduller.push({ ad: metin(m.ad), url: mu, rozet: rozetSay(m.rozet), aciklama: metin(m.aciklama, 200), sekme: metin(m.sekme), sayfalar });
       });
       if (metin(g && g.baslik)) gruplar.push({ baslik: metin(g.baslik), simge: has(SIMGE, g.simge) ? g.simge : 'izgara', moduller });
     });
@@ -317,7 +317,13 @@ export function sekmeListesi(liste, genel, izinli) {
 
 export function sekmeEkle(liste, sekme, genel, sinir = SEKME_SINIRI, izinli) {
   const l = sekmeListesi(liste, genel, izinli);
-  if (!sekme || !guvenliUrl(sekme.url) || l.some((x) => x.url === sekme.url)) return l;
+  if (!sekme || !guvenliUrl(sekme.url)) return l;
+  // Tek sekme (modülün `sekme` adı; Reklam yöneticisi, 25 Kas 2026): aynı gruptan açık sekme varsa adresi yenilenir, ötekiler düşer.
+  if (sekme.ayni) {
+    const a = l.filter((x, j) => j && sekme.ayni.includes(x.url)), s = a.find((x) => x.sabit) || a[0];
+    if (s) { const url = sekme.url, t = l.filter((x) => x === s || !a.includes(x)); s.ad = metin(sekme.ad); s.url = url; return t; }
+  }
+  if (l.some((x) => x.url === sekme.url)) return l;
   l.push({ ad: metin(sekme.ad) || sekme.url, url: sekme.url });
   for (let i; l.length > sinir && (i = l.findIndex((x, j) => j && !x.sabit && j < l.length - 1)) > 0;) l.splice(i, 1);
   return l;
@@ -339,6 +345,19 @@ export function sekmeTasi(liste, url, hedef, genel, izinli) {
   const l = sekmeListesi(liste, genel, izinli), a = l.findIndex((x) => x.url === url), b = l.findIndex((x) => x.url === hedef);
   if (a > 0 && b > 0 && !l[a].sabit === !l[b].sabit) l.splice(b, 0, l.splice(a, 1)[0]);
   return l;
+}
+
+// Kişisel ölçek (idx-olcek; Muhittin, 25 Kas 2026: "Meta'nınki gibi, dilersem Ayarlar'dan değiştireyim"). o: yüzde, yazi: tablo
+// punto, satir: tablo satırı px. Ayrı kayıttır: eski kabuk sürümü idx-gorunum'daki tanımadığı alanı siler.
+export const OLCEK = { o: 100, yazi: 14, satir: 46, kurus: true, alt: true, golge: true, cizgi: false, simge: true };
+export const OLCEK_YAZI = [12, 13, 14, 15, 16], OLCEK_SATIR = [34, 38, 46, 54];
+export function olcekCoz(ham) {
+  const h = ham && typeof ham === 'object' ? ham : {}, g = Object.assign({}, OLCEK);
+  if (Number.isInteger(h.o)) g.o = Math.min(120, Math.max(85, h.o));
+  if (OLCEK_YAZI.includes(h.yazi)) g.yazi = h.yazi;
+  if (OLCEK_SATIR.includes(h.satir)) g.satir = h.satir;
+  for (const k in g) if (typeof g[k] === 'boolean' && typeof h[k] === 'boolean') g[k] = h[k];
+  return g;
 }
 
 // idx-gorunum kaydı. Eski `oto` → `sistem`; eski `kalinlik` ve `yazi` okunur, atılır (yazı tipi seçimi kalktı, 15 Kas 2026).

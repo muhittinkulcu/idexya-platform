@@ -2,7 +2,7 @@
 // innerHTML ve dış istek yok, veri textContent ile, stil yalnız kabuk.css'te. Yalnız gerçekten çalışan ayarlar çizilir.
 // Ayar, içinde bulunduğu <idexya-kabuk> öğesinin doğrulanmış ayarından (kullanıcı, çıkış adresi, modül ayarları) okunur;
 // değişiklik kabuğun yöntemleriyle yapılır (gorunumYap, sabitle, darYap).
-import { TEMA, TEMA_SIRASI, OS_ALANLARI, gorunumCoz, temaCoz, sinirBekle, saatMetni, saatOku, ayarDogrula } from './kabuk-cekirdek.js';
+import { OLCEK, OLCEK_YAZI, OLCEK_SATIR, olcekCoz, TEMA, TEMA_SIRASI, OS_ALANLARI, gorunumCoz, temaCoz, sinirBekle, saatMetni, saatOku, ayarDogrula } from './kabuk-cekirdek.js';
 
 const D = document;
 const oku = (k, v) => { try { const x = localStorage.getItem(k); return x === null ? v : JSON.parse(x); } catch (e) { return v; } };
@@ -23,6 +23,10 @@ function h(tag, a, ...c) {
   return e;
 }
 const ACIKLAMA = { acik: 'Her zaman açık', koyu: 'Her zaman koyu', sistem: 'Cihazının ayarını izler', zaman: 'Gündüz açık, gece koyu' };
+// Hazır düzenler: [ad, açıklama, değer, önizleme çizgisi]. Meta gibi = varsayılan.
+const DUZEN = [['Meta gibi', 'Varsayılan', { o: 100, yazi: 14, satir: 46, alt: true }, 5, 10], ['Daha çok veri', 'Sıkı satırlar', { o: 95, yazi: 13, satir: 38, alt: false }, 3, 6], ['Daha rahat', 'Büyük yazı', { o: 108, yazi: 15, satir: 54, alt: true }, 7, 15]];
+const SATIR_ADI = ['Sıkı', 'Dar', 'Meta', 'Rahat'];
+const ORNEK = [['Hizmet tanıtımı', 132, 'mesaj', 63.48], ['Profil ziyareti', 352, 'profil ziyareti', 5.31], ['Sezon kampanyası', 83, 'mesaj', 61.69], ['Yeni şube duyurusu', 49, 'mesaj', 70.61], ['Soru ve cevap serisi', 22, 'mesaj', 78.64]];
 let sira = 0;
 
 class IdexyaAyarlar extends HTMLElement {
@@ -55,6 +59,36 @@ class IdexyaAyarlar extends HTMLElement {
     else { yaz('idx-gorunum', gorunumCoz(Object.assign({}, this.gor, p))); this.guncelle(); }
   }
 
+  get olc() { return this.kabuk && this.kabuk.a ? this.kabuk.olcek : olcekCoz(oku('idx-olcek', null)); }
+  olcekKart(id) {
+    const k = this.kabuk, yap = (p) => k.olcekYap(p);
+    const secim = (ad, alan, l) => h('div', { class: 'ik-sec', role: 'radiogroup', 'aria-label': ad }, l.map(([v, t]) => {
+      const i = h('input', { type: 'radio', name: id + alan, onchange: () => yap({ [alan]: v }) });
+      this._o.push((o) => { i.checked = o[alan] === v; }); return h('label', null, i, t); }));
+    const satir = (ad, acik, cikti, alt) => { const o = h('output', null); this._o.push((x) => { o.textContent = cikti(x); }); return h('div', { class: 'ik-olcek-satir' }, h('span', null, h('span', { class: 'ik-ayar-ad' }, ad), h('span', { class: 'ik-soluk' }, acik)), o, alt); };
+    const anah = (alan, ad, acik) => { const e = this.anahtar(ad, acik, false, (v) => yap({ [alan]: v })); this._o.push((o) => { e.lastChild.checked = o[alan]; }); return e; };
+    this._o = [];
+    // Sürükleme sürerken yalnız yüzde yazılır; ölçek bırakınca uygulanır (sayfa parmağın altından kaymasın).
+    const kay = h('input', { type: 'range', min: 85, max: 120, step: 1, 'aria-label': 'Ölçek', oninput: () => { kay.parentNode.querySelector('output').textContent = '%' + kay.value; }, onchange: () => yap({ o: +kay.value }) });
+    this._o.push((o) => { kay.value = o.o; });
+    const duzen = h('div', { class: 'ik-duzen', role: 'radiogroup', 'aria-label': 'Hazır düzen' }, DUZEN.map(([ad, acik, p, kal, ara]) => {
+      const i = h('input', { type: 'radio', name: id + 'd', onchange: () => yap(p) }), c = h('i', { 'aria-hidden': 'true' });
+      c.style.setProperty('--k', kal + 'px'); c.style.setProperty('--a', ara + 'px');
+      this._o.push((o) => { i.checked = Object.keys(p).every((x) => o[x] === p[x]); });
+      return h('label', null, i, c, h('span', { class: 'ik-ayar-ad' }, ad), h('span', { class: 'ik-soluk' }, acik)); }));
+    const govde = h('tbody', null);
+    this._o.push((o) => govde.replaceChildren(...ORNEK.map(([ad, n, tur, m]) => h('tr', null, h('td', null, ad), h('td', { class: 'ik-s' }, n.toLocaleString('tr-TR'), h('small', null, tur)), h('td', { class: 'ik-s' }, m.toLocaleString('tr-TR', { minimumFractionDigits: o.kurus ? 2 : 0, maximumFractionDigits: o.kurus ? 2 : 0 }) + ' TL')))));
+    const e = this.kart(id, 'Görünüm ve ölçek', 'Yalnız senin ekranını değiştirir, bu tarayıcıda saklanır. Her değişiklik anında uygulanır.', h('div', { class: 'ik-olcek' },
+      h('div', null, duzen,
+        satir('Ölçek', 'Yazı, düğme ve boşluklar birlikte büyür', (o) => '%' + o.o, kay),
+        satir('Tablo yazısı', 'Meta: 14 punto', (o) => o.yazi + ' punto', secim('Tablo yazısı', 'yazi', OLCEK_YAZI.map((x) => [x, '' + x]))),
+        satir('Satır yüksekliği', 'Meta: 46 piksel', (o) => o.satir + ' piksel', secim('Satır yüksekliği', 'satir', OLCEK_SATIR.map((x, j) => [x, SATIR_ADI[j]]))),
+        anah('kurus', 'Kuruşları göster', 'Kapalıyken tutar tam liraya yuvarlanır'), anah('alt', 'Satır altı açıklaması', 'Sonuç türü ve üst kampanya adı'), anah('cizgi', 'Satır çizgileri', 'Satırların arasındaki ince çizgi'), anah('golge', 'Satırları gölgele', 'Bir açık, bir koyu satır'), anah('simge', 'Bölüm simgeleri', 'Reklam yöneticisi üst çubuğunda')),
+      h('div', null, h('p', { class: 'ik-soluk ik-ayar-not' }, 'Önizleme, örnek satırlar'), h('div', { class: 'ik-olcek-oniz' }, h('table', { class: 'ik-ot' }, h('thead', null, h('tr', null, h('th', null, 'Kampanya'), h('th', { class: 'ik-s' }, 'Sonuç'), h('th', { class: 'ik-s' }, 'Sonuç başına'))), govde)),
+        h('div', { class: 'ik-kart-son' }, h('button', { type: 'button', class: 'ik-dugme', onclick: () => yap(OLCEK) }, 'Varsayılana dön')))));
+    e.classList.add('ik-ayar-genis');
+    return e;
+  }
   kart(id, baslik, aciklama, ...ic) {
     return h('section', { class: 'ik-ayar-kart', 'aria-labelledby': id },
       h('div', { class: 'ik-ayar-bas' }, h('h2', { id }, baslik), aciklama ? h('p', null, aciklama) : null), ic);
@@ -137,13 +171,14 @@ class IdexyaAyarlar extends HTMLElement {
       h('ul', { class: 'ik-ayar-baglar' }, bag.map((b) => h('li', null, h('a', { href: b.url, onclick: (e) => this.git(e, b.url) },
         h('span', { class: 'ik-ayar-ad' }, b.ad), b.aciklama ? h('span', { class: 'ik-soluk' }, b.aciklama) : null))))) : null;
 
-    this.replaceChildren(...[gorunum, arayuz, bolge, hesap, kisa, modul].filter(Boolean));
+    this.replaceChildren(...[gorunum, k ? this.olcekKart(n + '-o') : null, arayuz, bolge, hesap, kisa, modul].filter(Boolean));
     this.guncelle();
   }
 
   guncelle() {
     if (!this.zaman) return;
     const g = this.gor;
+    if (this._o) { const o = this.olc; this._o.forEach((f) => f(o)); }
     this.temalar.forEach((l) => { const r = l.firstChild; r.checked = r.value === g.tema; });
     this.zaman.hidden = g.tema !== 'zaman';
     const v = (x) => saatMetni(x).replace('.', ':');
