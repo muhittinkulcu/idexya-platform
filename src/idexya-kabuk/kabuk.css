@@ -191,14 +191,22 @@ html[data-tema=koyu]{--ik-rozet-z:rgba(240,122,35,.18);--ik-rozet-y:#F7A866;--ik
 
 /* Ana alan ve sayfa sekmeleri */
 .ik-ana{flex:999 1 560px;min-width:0;display:flex;flex-direction:column}
-.ik-sekmeler{display:flex;align-items:flex-end;gap:2px;padding:4px 28px 0;overflow:auto hidden;scrollbar-width:none;background:var(--ik-yuzey);border-bottom:1px solid var(--ik-cizgi)}
-.ik-sekme{display:flex;align-items:center;flex:0 0 auto;border:1px solid transparent;border-bottom:0;border-radius:var(--ik-yaricap) var(--ik-yaricap) 0 0;margin-bottom:-1px;white-space:nowrap}
-.ik-sekme a{max-width:176px;padding:7px 12px;overflow:hidden;text-overflow:ellipsis;font-size:13px;color:var(--ik-ikincil)}
-.ik-sekme a:not(:only-child){padding-right:4px}
+.ik-sekme-satir{display:flex;align-items:center;gap:2px;padding:0 20px;background:var(--ik-yuzey);border-bottom:1px solid var(--ik-cizgi)}
+.ik-sekmeler{flex:1;min-width:0;display:flex;align-items:center;gap:1px;overflow:auto hidden;scrollbar-width:none;position:relative}.ik-sekmeler::-webkit-scrollbar{display:none}
+.ik-sekme{position:relative;display:flex;align-items:center;flex:0 0 auto;border-radius:var(--ik-yaricap) var(--ik-yaricap) 0 0;white-space:nowrap}
+.ik-sekme a{max-width:132px;padding:6px 9px;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;line-height:18px;color:var(--ik-ikincil)}
 .ik-sekme.ik-secili{box-shadow:inset 0 -2px 0 var(--ik-vurgu)}
 .ik-secili a{color:var(--ik-metin);font-weight:var(--w-orta)}
-.ik-sekme-kapat{width:24px;height:24px;margin-right:2px;padding:0;border:0;border-radius:var(--ik-yaricap);background:transparent;color:var(--ik-ikincil)!important}
-.ik-sekme-kapat:hover{background:var(--ik-cizgi)}
+.ik-sabit a{display:flex;align-items:center;justify-content:center;gap:5px;min-width:32px;max-width:112px;padding:6px 8px;color:color-mix(in srgb,var(--t,var(--ik-ikincil)) 88%,var(--ik-metin))}
+.ik-sabit a span{min-width:0;overflow:hidden;text-overflow:ellipsis}.ik-sabit a svg{flex:none}
+.ik-sekme-is{position:absolute;inset:0 0 2px auto;display:none;align-items:center;padding-left:14px;background:linear-gradient(90deg,transparent,var(--ik-yuzey) 12px)}
+.ik-sekme:is(:hover,:focus-within) .ik-sekme-is{display:flex}.ik-sabit .ik-sekme-is{inset:auto -2px auto auto;top:0;padding:0;background:var(--ik-yuzey);border-radius:var(--ik-yaricap)}
+:is(.ik-sekme-kapat,.ik-sekme-sabitle,.ik-sekme-ok){display:grid;place-items:center;flex:none;width:22px;height:22px;padding:0;border:0;border-radius:var(--ik-yaricap);background:transparent;color:var(--ik-ikincil)!important}
+:is(.ik-sekme-kapat,.ik-sekme-sabitle,.ik-sekme-ok):hover{background:var(--ik-cizgi)}.ik-sabit .ik-sekme-sabitle{width:16px;height:16px;color:var(--ik-metin)!important}
+.ik-sekme-ok{width:26px;height:26px}.ik-sekme-ok:not(:last-child){display:none}.ik-tasar>.ik-sekme-ok{display:grid}.ik-sekme-ok[aria-pressed=true]{background:var(--ik-gomuk);color:var(--ik-vurgu)!important}
+.ik-sekmeler .ik-sekme-grup{flex:none;display:flex;align-items:center;gap:5px;margin:0 3px;padding:2px 8px;border:0;border-radius:var(--ik-yaricap);font-size:12px;line-height:18px;background:color-mix(in srgb,var(--t,var(--ik-ikincil)) 12%,var(--ik-yuzey));color:color-mix(in srgb,var(--t,var(--ik-ikincil)) 82%,var(--ik-metin))!important}
+.ik-sekme-grup span{opacity:.75}.ik-sekme-grup[aria-expanded=false] span::after{content:' +'}
+@media (hover:none){.ik-secili:not(.ik-sabit) .ik-sekme-is{display:flex;position:static;padding:0;background:none}}
 .ik-icerik{flex:1;min-width:0}
 
 /* Asistan düğmesi */
@@ -369,7 +377,7 @@ html[data-hareket=az]::view-transition-group(*),html[data-hareket=az]::view-tran
 /* Çok sayfalı üründe sayfalar arası geçiş (çapraz belge View Transitions): paket çubuğu, yan menü ve sekme satırı yerinde
    kalır, yalnız içerik alanı kısa bir çapraz geçişle değişir. "Hareketi azalt" açıksa geçiş yok. */
 @media (prefers-reduced-motion:no-preference){@view-transition{navigation:auto}}
-.ik-yan{view-transition-name:ik-yan}.ik-sekmeler{view-transition-name:ik-sekmeler}.ik-icerik{view-transition-name:ik-icerik}
+.ik-yan{view-transition-name:ik-yan}.ik-sekme-satir{view-transition-name:ik-sekmeler}.ik-icerik{view-transition-name:ik-icerik}
 ::view-transition-group(*){animation-duration:.15s}
 /* Kabuk parçaları karışmaz: yeni hâli anında görünür (vurgu ve yeni sekme hemen yerinde), içeriğin üstünde kalır. */
 ::view-transition-group(ik-yan),::view-transition-group(ik-sekmeler){z-index:1;animation:none}
