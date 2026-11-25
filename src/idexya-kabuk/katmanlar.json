@@ -87,11 +87,15 @@
       {
        "ad": "Müşteriler",
        "url": "https://marketing.idexya.com/clients",
-       "aciklama": "Müşteri listesi ve toplu düzenleme.",
+       "aciklama": "Müşteri listesi, yeni hesaplar ve toplu düzenleme.",
        "sayfalar": [
         {
          "ad": "Müşteri listesi",
          "url": "https://marketing.idexya.com/clients"
+        },
+        {
+         "ad": "Yeni hesaplar",
+         "url": "https://marketing.idexya.com/clients/new-accounts"
         },
         {
          "ad": "Toplu düzenleme",
@@ -226,25 +230,6 @@
         {
          "ad": "Duyurular",
          "url": "https://marketing.idexya.com/team/announcements"
-        }
-       ]
-      },
-      {
-       "ad": "Akademi",
-       "url": "https://marketing.idexya.com/academy",
-       "aciklama": "Ekip eğitim içerikleri.",
-       "sayfalar": [
-        {
-         "ad": "Öğren",
-         "url": "https://marketing.idexya.com/academy"
-        },
-        {
-         "ad": "İçerik yönetimi",
-         "url": "https://marketing.idexya.com/academy/content"
-        },
-        {
-         "ad": "Ekip ilerlemesi",
-         "url": "https://marketing.idexya.com/academy/team"
         }
        ]
       }
@@ -1193,6 +1178,42 @@
    ]
   },
   {
+   "anahtar": "akademi",
+   "ad": "Akademi",
+   "simge": "sapka",
+   "url": "https://marketing.idexya.com/academy",
+   "renk": "#2F55D4",
+   "renkKoyu": "#7F9AF2",
+   "ton": "#3C6E1F",
+   "aciklama": "Meta ve Google bilgisi, dersler ve sınavlar",
+   "gruplar": [
+    {
+     "baslik": "Akademi",
+     "simge": "sapka",
+     "moduller": [
+      {
+       "ad": "Öğren",
+       "url": "https://marketing.idexya.com/academy",
+       "aciklama": "Konular, dersler, sınavlar ve ilerlemen.",
+       "sayfalar": []
+      },
+      {
+       "ad": "İçerik yönetimi",
+       "url": "https://marketing.idexya.com/academy/content",
+       "aciklama": "Taslak dersler ve onay.",
+       "sayfalar": []
+      },
+      {
+       "ad": "Ekip ilerlemesi",
+       "url": "https://marketing.idexya.com/academy/team",
+       "aciklama": "Kim ne okudu, hangi sınavı geçti.",
+       "sayfalar": []
+      }
+     ]
+    }
+   ]
+  },
+  {
    "anahtar": "raporlar",
    "ad": "Raporlar",
    "simge": "belge",
@@ -1297,6 +1318,12 @@
          "url": "https://marketing.idexya.com/changelog"
         }
        ]
+      },
+      {
+       "ad": "Kullanım kılavuzu",
+       "url": "https://marketing.idexya.com/guide",
+       "aciklama": "Neyi nasıl kullanırsın, konu konu ve görselli.",
+       "sayfalar": []
       }
      ]
     },

@@ -161,7 +161,7 @@ class IdexyaKabuk extends HTMLElement {
       const n = this.sekmeNav, dg = (ad, yol, is) => h('button', { type: 'button', class: 'ik-sekme-ok', 'aria-label': ad, title: ad, onclick: is }, svg(yol, 14, 2));
       const kay = (y) => () => n.scrollBy({ left: y * n.clientWidth * .7, behavior: azHareket() ? 'auto' : 'smooth' });
       n.addEventListener('wheel', (e) => { if (!e.deltaX && !e.ctrlKey && n.scrollWidth > n.clientWidth) { n.scrollLeft += e.deltaY; e.preventDefault(); } }, { passive: false });
-      this.sekmeSatir = h('div', { class: 'ik-sekme-satir' }, dg('Sekmeleri sola kaydır', ['M15 6l-6 6 6 6'], kay(-1)), n, dg('Sekmeleri sağa kaydır', SAG, kay(1)),
+      this.sekmeSatir = h('div', { class: 'ik-sekme-satir' }, dg('Sola kaydır', ['M15 6l-6 6 6 6'], kay(-1)), n, dg('Sağa kaydır', SAG, kay(1)),
         this.grupDugme = dg('Sekmeleri grupla', ['M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4z', 'M14 16.5h6M17 13.5v6'], () => { const g = this.sekmeGrup; yaz('idx-sekme-grup', { acik: !g.acik, kapali: g.kapali }); this.sekmeCiz(); }));
       new ResizeObserver(() => this.sekmeTasma()).observe(n);
       ana.append(this.sekmeSatir);
@@ -459,7 +459,7 @@ class IdexyaKabuk extends HTMLElement {
     const tek = (k) => this.sekmeler.filter((y) => y.sabit && maddesi(y.url) === k).length < 2;
     const duz = (ad, x, sekme) => h('button', { type: 'button', class: 'ik-sekme-' + x, 'aria-label': ad, title: ad, onclick: sekme }, x === 'kapat' ? '×' : svg(I.raptiye, 12, 2));
     const ciz = (s, i) => {
-      const k = maddesi(s.url), ad = s.sabit ? s.ad + ' (sabit)' : s.ad, sec = s.url === u;
+      const k = maddesi(s.url), ad = s.ad + (s.sabit ? ' (sabit)' : ''), sec = s.url === u;
       const sabitle = () => { yazS(sekmeSabit(this.sekmeler, s.url, genel, this.gorulen)); odak(s.url); };
       return h('div', {
         class: 'ik-sekme' + (sec ? ' ik-secili' : '') + (s.sabit ? ' ik-sabit' : ''), draggable: i ? 'true' : null, css: k ? { '--t': k.ton } : null,
@@ -472,7 +472,7 @@ class IdexyaKabuk extends HTMLElement {
           if (y) { e.preventDefault(); if (t) { yazS(sekmeTasi(this.sekmeler, s.url, t.url, genel, this.gorulen)); odak(s.url); } }
         }
       },
-      h('a', { href: s.url, 'data-ik-git': '', title: ad, 'aria-label': s.sabit ? ad : null, 'aria-current': sec ? 'page' : null, draggable: 'false' }, s.sabit && k ? [svg(SIMGE[k.simge], 15, 1.9), tek(k) ? null : h('span', {}, kisa(s.ad))] : adi(s)),
+      h('a', { href: s.url, 'data-ik-git': '', title: ad, 'aria-label': ad, 'aria-current': sec ? 'page' : null, draggable: 'false' }, s.sabit && k ? [svg(SIMGE[k.simge], 15, 1.9), tek(k) ? null : h('span', {}, kisa(s.ad))] : adi(s)),
       i ? h('span', { class: 'ik-sekme-is' }, duz(s.ad + (s.sabit ? ' sekmesini çöz' : ' sekmesini sabitle'), 'sabitle', sabitle),
         s.sabit ? null : duz(s.ad + ' sekmesini kapat', 'kapat', () => { const r = sekmeKapat(this.sekmeler, s.url, genel, u, this.gorulen); yazS(r.liste); if (r.git) this.git(r.git); else odak(); })) : null);
     };
@@ -490,7 +490,7 @@ class IdexyaKabuk extends HTMLElement {
       if (!p.l) return [p];
       const kapali = g.kapali.includes(p.k);
       return [h('button', {
-        type: 'button', class: 'ik-sekme-grup', 'data-g': p.k, css: p.m.ton ? { '--t': p.m.ton } : null, 'aria-expanded': String(!kapali), title: p.m.ad + (kapali ? ': grubu aç' : ': grubu kapat'),
+        type: 'button', class: 'ik-sekme-grup', 'data-g': p.k, css: p.m.ton ? { '--t': p.m.ton } : null, 'aria-expanded': String(!kapali),
         onclick: () => { yaz('idx-sekme-grup', { acik: true, kapali: kapali ? g.kapali.filter((y) => y !== p.k) : g.kapali.concat(p.k) }); this.sekmeCiz(); odak(p.k); }
       }, p.m.ad, h('span', {}, String(p.l.length)))].concat(p.l.filter(([s]) => !kapali || s.url === u).map(([s, i]) => ciz(s, i)));
     }));

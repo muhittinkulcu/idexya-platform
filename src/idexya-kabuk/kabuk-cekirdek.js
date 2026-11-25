@@ -1,7 +1,7 @@
 // Kabuğun saf işlevleri (DOM yok). Ayrıntı: README.md.
 
 // Tek gezinme (Muhittin, talimat 4.2): sol menü 12 maddedir (20 Kas 2026: Web ve Commerce → Web Site Yönetimi + E-Ticaret); "katman" artık sol menünün bir maddesidir (modül). Sıra katmanlar.json'dadır.
-export const KATMAN_ANAHTARLARI = ['genel', 'musteriler', 'gorevler', 'marketing', 'crm', 'web', 'eticaret', 'creative', 'marketplace', 'ai', 'raporlar', 'ayarlar'];
+export const KATMAN_ANAHTARLARI = ['genel', 'musteriler', 'gorevler', 'marketing', 'crm', 'web', 'eticaret', 'creative', 'marketplace', 'ai', 'akademi', 'raporlar', 'ayarlar'];
 // Madde simgesi katmanlar.json'da (`simge`, SIMGE adı) verilir; yoksa ya da bilinmiyorsa bu varsayılan.
 export const KATMAN_SIMGE = {
   genel: 'ev', musteriler: 'kisiler', gorevler: 'onay', marketing: 'megafon', crm: 'huni', web: 'dunya', eticaret: 'sepet', creative: 'palet',
@@ -31,6 +31,7 @@ export const SIMGE = {
   huni: ['M3 4h18l-7 8v6l-4 2v-8z'],
   sepet: ['M3 4h2l2.2 10.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2', 'M9.5 20h.01', 'M17 20h.01'],
   magaza: ['M4 9l1.5-5h13L20 9', 'M4 9h16v2a3 3 0 0 1-5.3 1.9A3 3 0 0 1 12 14a3 3 0 0 1-2.7-1.1A3 3 0 0 1 4 11z', 'M5 13.5V20h14v-6.5', 'M10 20v-4h4v4'],
+  sapka: ['M2 9l10-5 10 5-10 5z', 'M6 11v6h12v-6'],
   ayar: ['M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z', 'M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1']
 };
 
