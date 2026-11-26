@@ -6,7 +6,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <section class="kart" aria-label="Çekim geçmişi" data-liste style="overflow-x: auto"></section>
 <script>
   import { api, el, tarih, genelHata } from '../../scripts/yonetim/ortak.js';
-  const hucre = 'padding: 15px 20px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
+  const hucre = 'padding: 12px 16px; border-top: 1px solid rgb(var(--line)); text-align: left; vertical-align: top';
   async function yukle() {
     try {
       const r = await api('entegrasyonlar');
@@ -16,7 +16,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
       const l = document.querySelector('[data-liste]');
       if (!r.cekimler.length) { l.replaceChildren(el('div', { class: 'bos' }, 'Henüz veri çekimi yapılmadı.')); return; }
       l.replaceChildren(el('table', { style: 'width: 100%; border-collapse: collapse; font-size: 14px' },
-        el('thead', {}, el('tr', {}, ...['Zaman', 'Durum', 'Satır', 'Başlangıç', 'Tetikleyen', 'Mesaj'].map((b) => el('th', { scope: 'col', style: 'padding: 15px 20px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
+        el('thead', {}, el('tr', {}, ...['Zaman', 'Durum', 'Satır', 'Başlangıç', 'Tetikleyen', 'Mesaj'].map((b) => el('th', { scope: 'col', style: 'padding: 12px 16px; text-align: left; font-size: 12px; color: var(--tx2)' }, b)))),
         el('tbody', {}, ...r.cekimler.map((c) => el('tr', {}, el('td', { style: hucre + '; white-space: nowrap' }, tarih(c.zaman)),
           el('td', { style: hucre }, el('span', { class: 'cip ' + (c.durum === 'tamam' ? 'kazanildi' : 'kaybedildi') }, c.durum === 'tamam' ? 'Başarılı' : 'Hata')),
           el('td', { style: hucre }, c.satir ?? '—'), el('td', { style: hucre }, c.baslangic || '—'), el('td', { style: hucre }, c.tetikleyen), el('td', { style: hucre + '; color: var(--tx2); overflow-wrap: anywhere' }, c.mesaj || '—'))))));
