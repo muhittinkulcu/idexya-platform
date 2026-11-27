@@ -10,7 +10,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .dn-indir input{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit}
   .dn-tablo{width:100%;min-width:900px;border-collapse:collapse;font-size:14px}
   .dn-tablo th{padding:12px 20px;text-align:left;font-size:12px;color:var(--tx2);font-weight:500}
-  .dn-tablo td{padding:15px 20px;border-top:1px solid rgb(var(--line));vertical-align:top}
+  .dn-tablo td{padding:12px 16px;border-top:1px solid rgb(var(--line));vertical-align:top}
 </style>
 <div class="uyari bilgi">Kimlikler yalnız ziyaretçi <b>pazarlama çerezlerine izin verdiyse</b> toplanır. İndirilen dosyalarda e-posta ve telefon <b>yoktur</b>; eşleşme yalnız tıklama kimliğiyle yapılır. Google Ads tıklamadan sonra en çok 90 gün içindeki dönüşümleri kabul eder; dönüşüm işleminin adı Google Ads’te tanımlı adla birebir aynı olmalıdır. Yüklemeyi platformda siz yaparsınız; bu panel reklam hesaplarına bağlanmaz.</div>
 <div class="dn-kpi" data-kpi></div>
@@ -18,13 +18,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <section>
     <b>Google Ads çevrim dışı dönüşüm</b>
     <label class="alan">Dönüşüm işleminin adı (Google Ads’teki ile aynı)<input data-ad-google value="Müşteri kazanıldı" maxlength="100"></label>
-    <span style="display: flex; gap: 8px; flex-wrap: wrap"><a class="dugme ana" data-indir="google" href="#">CSV indir (yüklenmemişler)</a><button type="button" class="dugme" data-isaretle="google">Yüklendi olarak işaretle</button></span>
+    <span style="display: flex; gap: 8px; flex-wrap: wrap"><a class="dugme ikincil" data-indir="google" href="#">CSV indir (yüklenmemişler)</a><button type="button" class="dugme" data-isaretle="google">Yüklendi olarak işaretle</button></span>
     <small style="color: var(--tx2)">Google Ads › Hedefler › Dönüşümler › Yüklemeler bölümünden yüklenir.</small>
   </section>
   <section>
     <b>Meta çevrim dışı etkinlik</b>
     <label class="alan">Etkinlik adı<input data-ad-meta value="Purchase" maxlength="100"></label>
-    <span style="display: flex; gap: 8px; flex-wrap: wrap"><a class="dugme ana" data-indir="meta" href="#">CSV indir (yüklenmemişler)</a><button type="button" class="dugme" data-isaretle="meta">Yüklendi olarak işaretle</button></span>
+    <span style="display: flex; gap: 8px; flex-wrap: wrap"><a class="dugme ikincil" data-indir="meta" href="#">CSV indir (yüklenmemişler)</a><button type="button" class="dugme" data-isaretle="meta">Yüklendi olarak işaretle</button></span>
     <small style="color: var(--tx2)">Meta Etkinlik Yöneticisi › veri seti › çevrim dışı etkinlik yükleme; sütun eşleştirmesini yükleme ekranında yapın (fbc = tıklama kimliği).</small>
   </section>
 </div>

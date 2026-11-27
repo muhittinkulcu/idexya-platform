@@ -13,7 +13,7 @@ Son güncelleme: 14 Kasım 2026.
     Sistem). Daraltılınca grup simgeleri kalır; üzerine gelince grubun modülleri ve sayfaları yanda açılır. Talep, yorum, üye
     ve destek sayıları rozet olarak görünür.
   - **Sayfa sekmeleri:** açılan sayfalar sekme olur (en çok 8); Genel bakış ilk sırada ve kapatılamaz.
-  - **Sayfa başlığı:** konum, başlık ve eylemler (Yenile, Yazdır, Siteyi aç, "+ Yeni oluştur").
+  - **Sayfa başlığı:** konum, başlık ve eylemler (Yenile, Yazdır, Siteyi aç, "+ Yeni oluştur"). Sayfada tek turuncu düğme vardır: sayfanın kendi ana eylemi (ör. "+ Yeni müşteri") varsa "+ Yeni oluştur" çerçeveli görünür; ikincil işler (kopyala, CSV indir, günlüğe ekle) çerçeveli düğmededir. Tablo satırları 46 piksel, Meta ölçeğinde (27 Kasım 2026).
 - **Tablolar:** her tabloda "Satır sayısı" seçimi var (varsayılan 5). Müşteriler, Siteler ve Reklam tablolarında satırları seçince
   üstte işlem çubuğu açılır: durum değiştir, etiket, CSV indir, arşivle.
 - **Silme yok:** müşteri ve site kayıtları silinmez, **arşivlenir**. Arşivlenen kayıt "Arşivi göster" ile görülür ve geri alınır.

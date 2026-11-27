@@ -12,7 +12,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .cip.sb-hazir{background:var(--okb);color:var(--ok)}.cip.sb-taslak{background:var(--warnb,var(--card2));color:var(--warn)}.cip.sb-onerilen{background:var(--card2);color:var(--tx2)}.cip.sb-pasif{background:var(--card2);color:var(--tx2)}
   .sb-tablo{width:100%;border-collapse:collapse;font-size:14px}
   .sb-tablo th{padding:12px 20px;text-align:left;font-size:12px;font-weight:500;color:var(--tx2);border-bottom:1px solid rgb(var(--line))}
-  .sb-tablo td{padding:15px 20px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
+  .sb-tablo td{padding:12px 16px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
   .sb-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   .sb-tablo input[type=text],.sb-tablo select{min-height:36px;padding:4px 10px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:var(--bg);color:var(--tx);font:inherit;box-sizing:border-box;max-width:100%}
   .sb-tablo input.sb-fiyat{width:140px;text-align:right}
@@ -54,7 +54,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <section class="kart" id="catalog" aria-label="Hizmet kataloğu" data-katalog-bolum style="padding: 24px; display: flex; flex-direction: column; gap: 12px">
     <div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center">
       <div><h2 style="margin: 0; font-size: 16px; color: var(--head)">Hizmet kataloğu</h2><small style="color: var(--tx2)">Teklif oluştururken seçilen hizmetler ve varsayılan fiyatları (KDV hariç). Fiyat her teklifte değiştirilebilir. Hizmet silinmez, pasife alınır.</small></div>
-      <button type="button" class="dugme ana kucuk" data-hizmet-yeni>+ Hizmet ekle</button>
+      <button type="button" class="dugme ikincil kucuk" data-hizmet-yeni>+ Hizmet ekle</button>
     </div>
     <form class="kart sb-form" data-hizmet-form hidden novalidate style="background: var(--card2)">
       <h3 class="genis" style="margin: 0; font-size: 15px; color: var(--head)" data-hizmet-baslik>Yeni hizmet</h3>

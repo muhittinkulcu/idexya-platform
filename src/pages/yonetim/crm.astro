@@ -80,15 +80,15 @@ import Yonetim from '../../layouts/Yonetim.astro';
     if (gorunum === 'liste' || arsivMod) {
       const cip = (e) => el('span', { class: 'cip', style: 'font-size: 11px' }, e);
       alan.replaceChildren(el('div', { class: 'kart', style: 'overflow-x: auto' }, el('table', { style: 'width: 100%; min-width: 720px; border-collapse: collapse; font-size: 13px' },
-        el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 15px 20px; font-weight: 500${i === 3 ? '; text-align: right' : ''}` }, b)))),
+        el('thead', {}, el('tr', { style: 'text-align: left; color: var(--tx2); font-size: 12px' }, ['Müşteri', 'İletişim', 'Aşama', 'Tahmini aylık değer', 'Son hareket'].map((b, i) => el('th', { style: `padding: 12px 16px; font-weight: 500${i === 3 ? '; text-align: right' : ''}` }, b)))),
         el('tbody', {}, gor.map((m) => el('tr', { style: 'border-top: 1px solid rgb(var(--line))', 'data-id': m.id, 'data-ad': baslik(m) },
-          el('td', { style: 'padding: 15px 20px' }, el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null,
+          el('td', { style: 'padding: 12px 16px' }, el('a', { href: bag(m), style: 'font-weight: 500; text-decoration: none' }, baslik(m)), m.firma && m.ad ? el('div', { style: 'font-size: 12px; color: var(--tx2)' }, m.ad) : null,
             (etiketler[m.id] || []).length ? el('div', { style: 'display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px' }, etiketler[m.id].map(cip)) : null),
-          el('td', { style: 'padding: 15px 20px; color: var(--tx2)' }, [m.eposta, m.telefon].filter(Boolean).join(' · ') || '—'),
-          el('td', { style: 'padding: 15px 20px' }, asamaSec(m)),
+          el('td', { style: 'padding: 12px 16px; color: var(--tx2)' }, [m.eposta, m.telefon].filter(Boolean).join(' · ') || '—'),
+          el('td', { style: 'padding: 12px 16px' }, asamaSec(m)),
           // Değer ve son hareket kartın kendisine (bilgiler ve günlük) gider; değer yoksa düz "—".
-          el('td', { style: 'padding: 15px 20px; text-align: right; white-space: nowrap' }, m.deger ? el('a', { href: bag(m), title: 'Kart bilgilerini aç' }, para(m.deger)) : para(m.deger)),
-          el('td', { style: 'padding: 15px 20px; color: var(--tx2); white-space: nowrap' }, el('a', { href: bag(m), title: 'Kart günlüğünü aç', style: 'color: inherit' }, once(m.guncelleme)))))))));
+          el('td', { style: 'padding: 12px 16px; text-align: right; white-space: nowrap' }, m.deger ? el('a', { href: bag(m), title: 'Kart bilgilerini aç' }, para(m.deger)) : para(m.deger)),
+          el('td', { style: 'padding: 12px 16px; color: var(--tx2); white-space: nowrap' }, el('a', { href: bag(m), title: 'Kart günlüğünü aç', style: 'color: inherit' }, once(m.guncelleme)))))))));
       if (!gor.length) alan.append(el('div', { class: 'bos' }, 'Aramayla eşleşen müşteri yok.'));
       topluSecim(alan.querySelector('table'), {
         anahtar: 'crm', ad: 'musteriler', etiketTur: 'musteri', etiketler: tumEtiket, arsivGorunum: arsivMod,

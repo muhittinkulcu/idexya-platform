@@ -26,19 +26,19 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <form data-not style="display: flex; flex-direction: column; gap: 8px">
 <div role="group" aria-label="Kayıt türü" data-tur style="display: flex; gap: 6px; flex-wrap: wrap"></div>
 <label class="alan"><span style="position: absolute; left: -10000px">Kayıt metni</span><textarea name="metin" rows="3" placeholder="Görüşme özeti, alınan karar, sonraki adım…" style="resize: vertical"></textarea></label>
-<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><button type="submit" class="dugme ana">Günlüğe ekle</button><span data-not-durum role="status" style="font-size: 13px; color: var(--err)"></span></div>
+<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap"><button type="submit" class="dugme ikincil">Günlüğe ekle</button><span data-not-durum role="status" style="font-size: 13px; color: var(--err)"></span></div>
 </form>
 <ol data-gunluk style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column"></ol>
 </section>
 </div>
 <section class="kart" aria-label="Teklifler" data-teklif-bolum style="padding: 24px; display: flex; flex-direction: column; gap: 12px">
-<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Panelde hazırlanan, şablondan oluşturulan ve dışarıda (Canva) hazırlanıp PDF olarak yüklenen tekliflerin tümü. Tutarlar KDV hariçtir. Panel hiçbir teklifi müşteriye göndermez.">Teklifler: bu müşteriye gönderilenler</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler · panelde hazırlanan ve yüklenen dosya</small></div><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme kucuk" data-teklif-yukle>⬆ Teklif dosyası yükle (PDF)</button><a class="dugme kucuk" data-teklif-sablon href="/templates?tab=create">Şablondan teklif oluştur</a><a class="dugme ana kucuk" data-teklif-yeni href="/proposals?new=1">+ Panelde teklif hazırla</a></div></div>
+<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Panelde hazırlanan, şablondan oluşturulan ve dışarıda (Canva) hazırlanıp PDF olarak yüklenen tekliflerin tümü. Tutarlar KDV hariçtir. Panel hiçbir teklifi müşteriye göndermez.">Teklifler: bu müşteriye gönderilenler</h2><small class="kart-alt"><span data-baslik></span> · tüm teklifler · panelde hazırlanan ve yüklenen dosya</small></div><div style="display: flex; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme kucuk" data-teklif-yukle>⬆ Teklif dosyası yükle (PDF)</button><a class="dugme kucuk" data-teklif-sablon href="/templates?tab=create">Şablondan teklif oluştur</a><a class="dugme ikincil kucuk" data-teklif-yeni href="/proposals?new=1">+ Panelde teklif hazırla</a></div></div>
 <div role="group" aria-label="Teklif süzgeci" data-teklif-suzgec style="display: flex; gap: 6px; flex-wrap: wrap"></div>
 <div data-teklifler style="overflow-x: auto"></div>
 <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center"><span data-teklif-ozet style="font-size: 13px; color: var(--tx2)"></span><a href="/proposals?tab=all" style="font-size: 13px; font-weight: 500">Tüm teklifler →</a></div>
 </section>
 <section class="kart" id="belgeler" aria-label="Belgeler" data-belge-bolum style="padding: 24px; display: flex; flex-direction: column; gap: 12px">
-<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Belge şablonlarından bu müşteri için oluşturulan PDF’ler (erişim talebi, ödeme hatırlatma, fiyat güncelleme, teslim tutanağı, sözleşme) ve Belgeler sayfasında bu karta bağlanan dosyalar. Panel hiçbir belgeyi müşteriye göndermez.">Belgeler: bu müşteri için hazırlananlar</h2><small class="kart-alt"><span data-baslik></span> · şablondan oluşturulan PDF’ler ve bağlantılı belgeler</small></div><a class="dugme ana kucuk" data-belge-yeni href="/templates?tab=create">+ Şablondan belge oluştur</a></div>
+<div data-kart-bas style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; align-items: center"><div><h2 style="margin: 0; font-size: 16px; color: var(--head)" data-kart-bilgi="Belge şablonlarından bu müşteri için oluşturulan PDF’ler (erişim talebi, ödeme hatırlatma, fiyat güncelleme, teslim tutanağı, sözleşme) ve Belgeler sayfasında bu karta bağlanan dosyalar. Panel hiçbir belgeyi müşteriye göndermez.">Belgeler: bu müşteri için hazırlananlar</h2><small class="kart-alt"><span data-baslik></span> · şablondan oluşturulan PDF’ler ve bağlantılı belgeler</small></div><a class="dugme ikincil kucuk" data-belge-yeni href="/templates?tab=create">+ Şablondan belge oluştur</a></div>
 <div data-belgeler style="overflow-x: auto"></div>
 </section>
 <dialog class="tk-pencere" data-teklif-pencere aria-labelledby="tk-baslik">
@@ -50,7 +50,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 <div class="tk-iki"><label class="alan">Tutar (KDV hariç, TL)<input name="tutar" inputmode="decimal" placeholder="45.000,00"></label><label class="alan">Durum<select name="durum"><option value="gonderildi">Gönderildi</option><option value="taslak">Taslak</option><option value="kabul">Kabul edildi</option><option value="red">Reddedildi</option></select></label></div>
 <label style="display: flex; gap: 8px; align-items: flex-start; font-size: 13px"><input type="checkbox" name="asama" value="1" checked> <span>Kartın aşamasını “Teklif gönderildi” yap ve günlüğe yaz (ileri aşamadaki kart geri alınmaz)</span></label>
 <p data-teklif-hata role="status" class="uyari hata" hidden style="margin: 0"></p>
-<div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme" data-teklif-vazgec>Vazgeç</button><button type="submit" class="dugme ana" data-teklif-kaydet>Yükle ve kaydet</button></div>
+<div style="display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap"><button type="button" class="dugme" data-teklif-vazgec>Vazgeç</button><button type="submit" class="dugme ikincil" data-teklif-kaydet>Yükle ve kaydet</button></div>
 </form>
 </dialog>
 <style is:global>
@@ -61,7 +61,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
 .tk-iki{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
 .tk-tablo{width:100%;min-width:720px;border-collapse:collapse;font-size:13.5px}
 .tk-tablo th{text-align:left;color:var(--tx2);font-weight:500;font-size:12px;padding:8px 10px;border-bottom:1px solid rgb(var(--line))}
-.tk-tablo td{padding:15px 20px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
+.tk-tablo td{padding:12px 16px;border-bottom:1px solid rgb(var(--line));vertical-align:middle}
 .tk-tablo .sayi{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .tk-kaynak{font-size:11.5px;color:var(--tx2);border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);padding:1px 6px;white-space:nowrap}
 .tk-menu{position:relative;display:inline-block}.tk-menu summary{list-style:none}.tk-menu summary::-webkit-details-marker{display:none}
