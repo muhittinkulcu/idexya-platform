@@ -8,6 +8,7 @@
 // Sunucudan gelen her metin kabukta textContent ile yazılır.
 import { api, genelHata, sayacGuncelle, rozetSayilari, saklananVeri, tarih, yol, panelYolu, TEMEL } from './ortak.js';
 import { metaOku } from '../../data/temel-yol.js';
+import { osAdresi } from '../../idexya-kabuk/kabuk-cekirdek.js';
 
 let ayar = null, sonUrl = null;
 // Tek gezinme (talimat 4.2): panel sayfaları sol menünün birçok maddesinde (CRM, Web Site Yönetimi, E-Ticaret, Görevler, Ayarlar…). Panelin
@@ -46,6 +47,7 @@ function altBaslikYaz(url) {
   alt.textContent = goster ? ' · ' + ad : '';
 }
 
+const ASISTAN_URL = 'https://marketing.idexya.com/';
 const durumOzet = (o) => { const son = o.reklam && o.reklam.son; return { baglanti: true, esitleme: son && son.durum === 'tamam' ? tarih(son.zaman) : '' }; };
 
 document.addEventListener('idexya-kabuk:kur', () => {
@@ -102,6 +104,8 @@ document.addEventListener('idexya-kabuk:hazir', (olay) => {
   }
   addEventListener('popstate', guncelle);
   addEventListener('hashchange', guncelle);
+  // Asistan kedisi (IDOST, IDOS ile aynı ayar): sohbet IDOS'ta açılır. os adresinde /marketing önekine, değilse marketing.idexya.com'a gidilir.
+  kabuk.addEventListener('idexya-kabuk:asistan', () => { location.assign(osAdresi(ASISTAN_URL)); });
 
   // Taze özet: rozetler (talep, yorum, üye, destek), oturumdaki kullanıcı ve son reklam verisi eşitlemesi.
   // Alınamazsa eski değer taze gibi bırakılmaz: rozetler kalkar, durum "bağlantı yok/bilinmiyor" olur.
@@ -116,8 +120,13 @@ document.addEventListener('idexya-kabuk:hazir', (olay) => {
   });
 }, { once: true });
 
-// Sayfa eylem çubuğu: Yenile, Yazdır ve "+ Yeni oluştur" menüsü (dışarı tıklama ve Esc kapatır).
+// Konum satırındaki araçlar (IDOS YenileDugmesi.tsx ile aynı): "Güncelleme: <saat>" panelin veriyi aldığı andır; yenile, yazdır,
+// siteyi aç ve "+ Yeni oluştur" menüsü (dışarı tıklama ve Esc kapatır). Öteki ürün adresleri (kılavuz) os adresinde önekli olur.
+const saatBicim = (t) => new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Istanbul' }).format(t).replace(':', '.');
 function eylemCubugu() {
+  const gun = document.querySelector('[data-guncelleme]');
+  if (gun) gun.textContent = 'Güncelleme: ' + saatBicim(Date.now());
+  document.querySelectorAll('a[data-os-adres]').forEach((a) => { a.href = osAdresi(a.getAttribute('href')); });
   const yenile = document.querySelector('[data-yenile]');
   if (yenile) yenile.addEventListener('click', () => location.reload());
   const yazdir = document.querySelector('[data-yazdir]');

@@ -24,6 +24,14 @@ function h(etiket, ozellik = {}, ...cocuk) {
   return e;
 }
 
+// Açılır ok (IDOS MusteriSecici.tsx: yalnız ad + ok, 32 px; seçici üstünde "Müşteri" etiketi yok).
+function ok() {
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('class', 'ms-ok'); s.setAttribute('aria-hidden', 'true');
+  const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', 'm6 9 6 6 6-6'); s.append(p);
+  return s;
+}
+
 function kur(kabuk) {
   const yuva = kabuk && kabuk.ustYuva;
   if (!yuva || yuva.querySelector('.ms')) return;
@@ -32,9 +40,9 @@ function kur(kabuk) {
 
   const ad = h('span', { class: 'ms-ad', metin: 'Tüm müşteriler' });
   const dugme = h('button', { type: 'button', class: 'ms-dugme', 'aria-haspopup': 'listbox', 'aria-expanded': 'false', title: suzulur ? 'Müşteri seçimi' : SUZULMEZ, 'data-suzulur': suzulur ? 'evet' : 'hayir' },
-    h('span', { class: 'ms-etiket', metin: 'Müşteri' }), ad,
+    ad,
     suzulur ? null : h('span', { class: 'ms-nokta', role: 'img', 'aria-label': 'Bu sayfa müşteriye göre süzülmez' }),
-    h('span', { class: 'ms-ok', 'aria-hidden': 'true', metin: '▾' }));
+    ok());
   const ara = h('input', { type: 'search', class: 'ms-ara', placeholder: 'Müşteri ara…', 'aria-label': 'Müşteri ara', autocomplete: 'off' });
   const ul = h('ul', { class: 'ms-liste', role: 'listbox', 'aria-label': 'Müşteriler' });
   const durum = h('p', { class: 'ms-durum', role: 'status', hidden: true });
@@ -49,6 +57,9 @@ function kur(kabuk) {
     const m = id && Array.isArray(liste) ? liste.find((x) => x.id === id) : null;
     ad.textContent = !id ? 'Tüm müşteriler' : m ? m.ad : Array.isArray(liste) ? 'Seçili müşteri' : '…';
     dugme.classList.toggle('ms-secili', !!id);
+    // Konum yolunun ilk parçası (IDOS gibi): müşteriye göre süzülen sayfada seçili müşteri, öteki sayfalarda "Ajans geneli".
+    const konum = document.querySelector('[data-konum-musteri]');
+    if (konum && suzulur) konum.textContent = ad.textContent;
   }
   function satir(id, metin, secili) {
     return h('li', {}, h('button', { type: 'button', role: 'option', class: 'ms-secenek', 'aria-selected': secili ? 'true' : 'false', 'data-id': id, metin, onclick: () => sec(id) }));

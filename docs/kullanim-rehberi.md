@@ -1,7 +1,7 @@
 # Website Yönetim kullanım rehberi
 
 Adres: **panel.idexya.com**. Giriş Cloudflare Access ile yapılır; yalnız yönetici listesindeki e-postalar girer.
-Son güncelleme: 14 Kasım 2026.
+Son güncelleme: 28 Kasım 2026.
 
 ## Ekranın düzeni
 
@@ -13,7 +13,9 @@ Son güncelleme: 14 Kasım 2026.
     Sistem). Daraltılınca grup simgeleri kalır; üzerine gelince grubun modülleri ve sayfaları yanda açılır. Talep, yorum, üye
     ve destek sayıları rozet olarak görünür.
   - **Sayfa sekmeleri:** açılan sayfalar sekme olur (en çok 8); Genel bakış ilk sırada ve kapatılamaz.
-  - **Sayfa başlığı:** konum, başlık ve eylemler (Yenile, Yazdır, Siteyi aç, "+ Yeni oluştur"). Sayfada tek turuncu düğme vardır: sayfanın kendi ana eylemi (ör. "+ Yeni müşteri") varsa "+ Yeni oluştur" çerçeveli görünür; ikincil işler (kopyala, CSV indir, günlüğe ekle) çerçeveli düğmededir. Tablo satırları 46 piksel, Meta ölçeğinde (27 Kasım 2026).
+  - **Konum satırı (bandın üstünde, IDOS ile aynı):** solda konum yolu (müşteri / Website ve CRM / sayfa; müşteriye göre süzülmeyen sayfada "Ajans geneli"), sağda "Güncelleme: <saat>" ve küçük simge düğmeleri: verileri yenile, yazdır, siteyi aç (yeni sekmede) ve "+" (Yeni oluştur menüsü: blog yazısı, paket, müşteri, teklif, görev…). Aynı eylemler aramada (⌘K) da var (28 Kasım 2026).
+  - **Başlık bandı:** modül simgesi, sayfa adı ve açıklama; ortada sayfanın maddeli özeti (karar bekleyen madde turuncu noktalı), sağda yalnız o sayfanın kendi eylemleri (ör. "CSV indir", "+ Yeni kayıt") ve soru işaretli kılavuz düğmesi. Sayfada tek turuncu düğme vardır: sayfanın ana eylemi. Tablo satırları 46 piksel, Meta ölçeğinde.
+  - **Üst çubuk:** müşteri seçici (yalnız ad ve ok), dönemli sayfalarda sağda dönem seçici (ör. Muhasebe'de takvim simgeli "Kasım 2026": ay ızgarası, önceki/sonraki ay, bu ay). Sağ alttaki kedi (Idexya AI’ya sor) IDOS'u açar.
 - **Tablolar:** her tabloda "Satır sayısı" seçimi var (varsayılan 5). Müşteriler, Siteler ve Reklam tablolarında satırları seçince
   üstte işlem çubuğu açılır: durum değiştir, etiket, CSV indir, arşivle.
 - **Silme yok:** müşteri ve site kayıtları silinmez, **arşivlenir**. Arşivlenen kayıt "Arşivi göster" ile görülür ve geri alınır.

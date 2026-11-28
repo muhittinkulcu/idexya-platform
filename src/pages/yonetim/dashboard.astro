@@ -11,8 +11,8 @@ import Yonetim from '../../layouts/Yonetim.astro';
   .pano>.modul.tam{grid-column:span 2}
   .pano.duzen>.modul{border:2px dashed var(--btnline)}
   .modul-bas{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-  .modul-bas h2{margin:0;font-size:19px;font-weight:500;color:var(--head)}
-  .modul-bas small{font-size:12px;color:var(--tx2)}
+  .modul-bas h2{margin:0;font-size:15.5px;font-weight:600;color:var(--tx)}
+  .modul-bas small{font-size:12.5px;color:var(--tx3)}
   /* Bekleyen talepler */
   .bk-bag{font-size:13px;font-weight:500}
   .bk{display:flex;flex-wrap:wrap;align-items:center;gap:28px}
@@ -55,10 +55,7 @@ import Yonetim from '../../layouts/Yonetim.astro';
   @media (prefers-reduced-motion:reduce){.bk-halka circle,.hn-iz span{transition:none}}
   .modul-arac{display:flex;gap:6px}
   .modul-arac button{min-width:36px;height:36px;border-radius:var(--ik-yaricap, 5px);border:1px solid rgb(var(--line));background:rgb(var(--card));color:var(--head);cursor:pointer;font:inherit;font-size:12px}
-  .kart.kpi,.kpi{border-radius:var(--ik-yaricap, 5px);background:var(--card2);border:1px solid rgb(var(--line));padding:16px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-width:0}
-  .kpi:hover{border-color:var(--btnline);color:inherit}
-  .kpi b{font-size:28px;font-weight:400;letter-spacing:-.01em;color:var(--head);line-height:1.15}
-  .kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .kpi-sira{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
   .degisim{font-size:12px;color:var(--tx2);display:flex;align-items:center;gap:4px;flex-wrap:wrap}
   .degisim .ok-u,.degisim-tablo .ok-u{color:var(--ok);font-weight:500}.degisim .ok-a,.degisim-tablo .ok-a{color:var(--err);font-weight:500}
   .kivilcim{display:block;width:100%;height:34px;margin-top:4px}
@@ -106,13 +103,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
   @media (max-width:600px){.isi{grid-template-columns:30px repeat(24,minmax(0,1fr));gap:1px}.cubuk-alan,.x-eksen{margin-left:28px}}
 </style>
 
-<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px">
-  <p class="baslik-font" data-selam style="margin: 0; font-size: clamp(22px, 2.4vw, 32px); line-height: 1.12; font-weight: 600; color: var(--head); max-width: 760px"></p>
+<!-- Selam satırı kaldırıldı (IDOS modül sayfalarında yok; 28 Kas 2026): bekleyen talep bilgisi bandın maddeli özetindedir. -->
+<Fragment slot="eylemler">
   <button type="button" class="dugme" data-duzenle aria-pressed="false">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><path d="M17.5 14v7M14 17.5h7"></path></svg>
     <span>Modülleri düzenle</span>
   </button>
-</div>
+</Fragment>
 <div class="uyari-serit" data-uyari hidden role="status"></div>
 <section class="kart ozet-kutusu" data-ozet-kutusu hidden></section>
 <div class="uyari" data-duzen-not hidden style="background: var(--tint); color: var(--tintx)"><b>Düzenleme modu.</b> Modülleri taşı, genişliğini değiştir ya da gizle. Ayarlar bu tarayıcıda saklanır.</div>
@@ -253,10 +250,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
   ipucuKur($('[data-ipucu]'));
   reklamBolumu($('[data-m="reklam"]'));
 
-  const saat = new Date().getHours();
-  const selam = saat < 6 ? 'İyi geceler' : saat < 12 ? 'Günaydın' : saat < 18 ? 'İyi günler' : 'İyi akşamlar';
-  const selamYaz = (alt) => { const p = $('[data-selam]'); p.replaceChildren(selam + '.', el('br'), el('span', { style: 'color: var(--karar)' }, alt)); };
-  selamYaz('Panel verileri yükleniyor…');
   const v = (k, metin) => { const e = $(`[data-v="${k}"]`); if (e) e.textContent = metin; };
 
   // Talep grafiği: dönem ve görünüm seçimi bu tarayıcıda hatırlanır.
@@ -277,7 +270,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
     const t = Object.fromEntries(o.talepler.map((x) => [x.durum, x.n]));
     const acik = o.asamalar.filter((a) => !['kazanildi', 'kaybedildi'].includes(a.asama)).reduce((s, a) => s + a.n, 0);
     const bekleyen = t.yeni || 0;
-    selamYaz(bekleyen ? `Yanıt bekleyen ${bekleyen} talep var.` : 'Yanıt bekleyen talep yok, her şey yolunda.');
     v('bekleyen', String(bekleyen)); v('firsat', o.musteri.n ? para(o.musteri.hat || 0) : '—'); v('musteri', String(o.musteri.n || 0)); v('acikFirsat', String(acik));
 
     // 24 saatten eski, hâlâ yanıtlanmamış talep varsa uyarı şeridi
@@ -368,7 +360,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
   } catch (h) {
     // Taze veri alınamadı: bu oturumdan kalan değerler taze gibi bırakılmaz (ürün ilkesi 3).
     genelHata('Özet yüklenemedi: ' + h.message);
-    selamYaz('Veriler şu an alınamadı.');
     const yok = (s) => { const e = $(s); if (e) e.replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı.')); };
     $('[data-kpi]').replaceChildren(el('div', { class: 'bos' }, 'Veri alınamadı; rakamlar gösterilmiyor.'));
     ozetCiz($('[data-ozet-kutusu]'), { maddeler: [] });  // eski oturum değerleri taze gibi kalmasın

@@ -3,10 +3,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
 import '../../scripts/yonetim/grafik.css';
 ---
 <Yonetim baslik="SEO ve GEO" aktif="seo" yol="Site" aciklama="Sitenin kendi sayfalarının arama motoru (SEO) ve yapay zekâ arama motoru (GEO) uyumu. Denetim her sayfanın başlığını, açıklamasını, başlık yapısını, kanonik adresini, yapılandırılmış verisini ve iç bağlantılarını kontrol eder.">
+<!-- Sayfanın kendi eylemleri başlık bandının sağında (IDOS Sayfa sağ yuvası). -->
+<Fragment slot="eylemler">
+  <button type="button" class="dugme ana" data-calistir>Denetimi şimdi çalıştır</button>
+</Fragment>
 <div class="uyari bilgi" data-sinir>Denetim bilgisi yükleniyor…</div>
 <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between">
   <span style="color: var(--tx2); font-size: 14px" data-son-bilgi></span>
-  <button type="button" class="dugme ana" data-calistir>Denetimi şimdi çalıştır</button>
 </div>
 <div class="kpi-sira" data-kpi></div>
 <div class="pano">

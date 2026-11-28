@@ -3,10 +3,13 @@ import Yonetim from '../../layouts/Yonetim.astro';
 import IcerikStil from '../../components/IcerikStil.astro';
 ---
 <Yonetim baslik="Yazılar ve kaynaklar" aktif="icerikler" yol="Üyelik ve içerik" aciklama="Yazı ve kaynakları buradan yayınlayın. Her içerik için kimin göreceğini, kimin yorum yapabileceğini ve arama motorlarında görünüp görünmeyeceğini ayrı ayrı seçersiniz. Silme yoktur; yayından kaldırmak için arşive alın.">
+<!-- Sayfanın kendi eylemleri başlık bandının sağında (IDOS Sayfa sağ yuvası). -->
+<Fragment slot="eylemler">
+  <button type="button" class="dugme ana" data-yeni>+ Yeni içerik</button>
+</Fragment>
 <IcerikStil />
 <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
 <div role="tablist" aria-label="Durum" data-sekmeler style="display: flex; gap: 4px; padding: 4px; border-radius: var(--ik-yaricap, 5px); background: var(--card2); border: 1px solid rgb(var(--line)); flex-wrap: wrap"></div>
-<button type="button" class="dugme ana" data-yeni style="margin-left: auto">+ Yeni içerik</button>
 </div>
 <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start">
 <section aria-label="İçerik listesi" class="kart" data-liste style="flex: 1 1 300px; overflow: hidden"></section>
