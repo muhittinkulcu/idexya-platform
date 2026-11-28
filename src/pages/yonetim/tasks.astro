@@ -2,6 +2,11 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Görevler ve takvim" aktif="gorev" yol="Satış ve müşteri" aciklama="Ekibin yapılacakları. Her görevin bir günü, isteğe bağlı saati, önceliği ve sorumlusu olur; istenirse bir müşteriye bağlanır. Günler İstanbul saatine göre hesaplanır.">
+<!-- Sayfanın kendi eylemleri başlık bandının sağında (IDOS Sayfa sağ yuvası). -->
+<Fragment slot="eylemler">
+  <button type="button" class="dugme" data-ics title="Açık görevleri Google Takvim, Outlook veya Apple Takvim'e aktarmak için .ics dosyası indirir">Takvime aktar (.ics)</button>
+  <button type="button" class="dugme ana" data-yeni>+ Yeni görev</button>
+</Fragment>
 <style is:global>
   .gv-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .gv-grup{display:flex;gap:4px;padding:4px;border-radius:var(--ik-yaricap, 5px);background:var(--card2);border:1px solid rgb(var(--line))}
@@ -41,8 +46,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <div class="gv-grup" role="group" aria-label="Görünüm" data-gorunum></div>
   <label style="display: inline-flex; gap: 6px; align-items: center; font-size: 14px"><input type="checkbox" data-bana> Yalnız bana atananlar</label>
   <span style="flex: 1 1 0"></span>
-  <button type="button" class="dugme" data-ics title="Açık görevleri Google Takvim, Outlook veya Apple Takvim'e aktarmak için .ics dosyası indirir">Takvime aktar (.ics)</button>
-  <button type="button" class="dugme ana" data-yeni>+ Yeni görev</button>
 </div>
 <form class="kart gv-form" data-form hidden novalidate>
   <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni görev</h2>

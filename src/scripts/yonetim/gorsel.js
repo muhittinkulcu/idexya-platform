@@ -70,12 +70,17 @@ function baslikSimge(h) {
   if (ust.matches('.modul-bas > div:first-child')) { ust.classList.add('bas-simgeli'); ust.prepend(kare(ad)); }
   else { h.classList.add('kart-baslik'); h.prepend(kare(ad, 'kare-kucuk')); }
 }
+// Gösterge kartı (IDOS GöstergeKartı): üst satırda renkli kare ve kartın adı; değer ve alt satırlar altında.
 function kpiSimge(k) {
   if (k.dataset.simge !== undefined) return;
   const ilk = k.querySelector(':scope > span');
-  if (!ilk || ilk.classList.contains('kare')) return;
+  if (!ilk || ilk.classList.contains('kare') || ilk.classList.contains('kpi-ust')) return;
   k.dataset.simge = '';
-  k.prepend(kare(ilk.textContent));
+  ilk.classList.add('kpi-ad');
+  const ust = document.createElement('span');
+  ust.className = 'kpi-ust';
+  k.insertBefore(ust, ilk);
+  ust.append(kare(ilk.textContent), ilk);
 }
 
 export function gorsel() {

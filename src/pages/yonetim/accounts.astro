@@ -2,6 +2,10 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Hesap envanteri" aktif="hesaplar" yol="Satış" aciklama="Her müşterinin reklam, ölçüm ve satış hesapları; bu hesaplara kimin, hangi düzeyde ve ne zamandan beri eriştiği. Aynı hesap kimliği iki müşteriye yazılamaz.">
+<!-- Sayfanın kendi eylemleri başlık bandının sağında (IDOS Sayfa sağ yuvası). -->
+<Fragment slot="eylemler">
+  <button type="button" class="dugme ana" data-yeni>+ Hesap ekle</button>
+</Fragment>
 <style is:global>
   .hs-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .hs-arac input,.hs-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
@@ -23,7 +27,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <label><span style="position: absolute; left: -10000px">Platform</span><select data-platform-suz><option value="">Tüm platformlar</option></select></label>
   <label><span style="position: absolute; left: -10000px">Durum</span><select data-durum-suz><option value="">Tüm durumlar</option></select></label>
   <label><span style="position: absolute; left: -10000px">Müşteri</span><select data-musteri-suz style="max-width: 220px"><option value="">Tüm müşteriler</option></select></label>
-  <button type="button" class="dugme ana" data-yeni>+ Hesap ekle</button>
 </div>
 <form class="kart hs-form" data-form hidden novalidate>
   <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni hesap</h2>

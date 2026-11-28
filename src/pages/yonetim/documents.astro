@@ -2,6 +2,10 @@
 import Yonetim from '../../layouts/Yonetim.astro';
 ---
 <Yonetim baslik="Belgeler" aktif="belge" yol="Finans ve bağlantılar" aciklama="Sözleşme, teklif, fatura ve raporların listesi. Her belge türü, tarihi ve isteğe bağlı müşterisiyle kaydedilir; bağlantıya tıklayınca dosya bulunduğu yerde açılır.">
+<!-- Sayfanın kendi eylemleri başlık bandının sağında (IDOS Sayfa sağ yuvası). -->
+<Fragment slot="eylemler">
+  <button type="button" class="dugme ana" data-yeni>+ Yeni belge</button>
+</Fragment>
 <style is:global>
   .bl-arac{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .bl-arac input,.bl-arac select{min-height:40px;padding:0 12px;border:1px solid rgb(var(--line));border-radius:var(--ik-yaricap, 5px);background:rgb(var(--card));color:var(--tx);font:inherit;min-width:0;max-width:100%;box-sizing:border-box}
@@ -16,7 +20,6 @@ import Yonetim from '../../layouts/Yonetim.astro';
   <label style="flex: 1 1 240px; display: flex"><span style="position: absolute; left: -10000px">Belge ara</span><input type="search" data-ara placeholder="Ad, açıklama veya müşteri ara…" style="flex: 1"></label>
   <label><span style="position: absolute; left: -10000px">Türe göre süz</span><select data-tur-suz><option value="">Tüm türler</option></select></label>
   <label><span style="position: absolute; left: -10000px">Müşteriye göre süz</span><select data-musteri-suz style="max-width: 220px"><option value="">Tüm müşteriler</option></select></label>
-  <button type="button" class="dugme ana" data-yeni>+ Yeni belge</button>
 </div>
 <form class="kart bl-form" data-form hidden novalidate>
   <h2 class="genis" style="margin: 0; font-size: 17px; color: var(--head)" data-form-baslik>Yeni belge</h2>

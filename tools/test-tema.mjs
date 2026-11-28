@@ -101,7 +101,7 @@ for (const renk of ['light', 'dark']) {
       for (const r of kurallar) { if (r.constructor.name === 'CSSFontFaceRule') yuzler.push([r.style.getPropertyValue('font-family'), r.style.getPropertyValue('src')]); if (/googleapis|gstatic/.test(r.cssText)) google = true; } }
     const k = getComputedStyle(document.querySelector('.yonetim')); const ag = (q) => [...document.querySelectorAll(q)].map((e) => Number(getComputedStyle(e).fontWeight));
     return { yuzler, google, agirlik: k.fontWeight, satir: parseFloat(k.lineHeight) / parseFloat(k.fontSize), aile: k.fontFamily,
-      dugme: ag('.dugme, .ik-dugme'), menu: ag('.ik-yan a, .ik-yan button, .ik-katman-ad, .ik-sekme a'), baslik: ag('.ik-sayfa-bas h1, .yonetim h2'),
+      dugme: ag('.dugme, .ik-dugme'), menu: ag('.ik-yan a, .ik-yan button, .ik-katman-ad, .ik-sekme a'), baslik: ag('.bant h1, .yonetim h2'),
       yuklu: [...document.fonts].some((f) => f.family.replace(/"/g, '') === 'Inter' && f.status === 'loaded') };
   });
   const interYerel = ty.yuzler.filter(([a, src]) => /Inter/.test(a) && /\/fonts\/inter-/.test(src));
