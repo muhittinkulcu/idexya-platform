@@ -9,8 +9,8 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 | Sıra | Parça | İçerik |
 |---|---|---|
 | 1 | Üst alan | En üst, tam genişlik, 64 px, yarı saydam buzlu cam, temaya uyan ("A, cam" seçeneği; talimat 4.2). Soldan sağa: IDOS kimliği (turuncu `#F07A23` rozet içinde beyaz X; favicon da aynı görünüm ve "IDOS", ana ekrana döner), ürün yuvası (aktif müşteri seçimi, tarih aralığı), global arama (⌘K), veri eşitleme durumu, üst çubuğu sabitle, bildirimler, tema, kullanıcı menüsü. **Modül sekmesi ve mega menü yoktur**: modül gezinmesi yalnız sol menüdedir. Turuncu yalnız X logosunun rozetinde, sayfanın ana eyleminde (`--ik-eylem`) ve karar bekleyen işte (24 Kas 2026). |
-| 2 | Sol menü | Tek menü, 12 madde (talimat 4.2; 20 Kas 2026'da Web ve Commerce ikiye ayrıldı): Genel bakış, Müşteriler, Görevler ve onaylar, Marketing (Meta, Google Ads, Google Analytics, Search Console, Tag Manager), CRM, Web Site Yönetimi (idexya.com), E-Ticaret, Creative, Marketplace (verisi yok; bayrakla açılır, bugün gizli), AI Center, Raporlar, Ayarlar. Sol menüde yalnız maddeler durur; maddenin üzerine gelince **mega menü** açılır (22 Kas 2026, aşağıda): en üstte madde adı, altında grup sütunları (bölümler ve sayfaları). Daraltılabilir; daraltınca madde simgeleri kalır ve simgenin üzerinde sütunlu mega menü açılır. Veri almayan öğe menüye konmaz. Sayfalar bulundukları uygulamada kalır; bağlantı os.idexya.com'da yol önekine çevrilir. |
-| 3 | Sayfa sekmeleri | Açılan her sayfa sekme olur (en çok 8). Genel bakış ilk sırada ve kapatılamaz. × ile kapanır. |
+| 2 | Sol menü | Tek menü, 13 madde (talimat 4.2; 20 Kas 2026'da Web ve Commerce ikiye ayrıldı): Genel bakış, Müşteriler, Görevler ve onaylar, Marketing (Meta, Google Ads, Google Analytics, Search Console, Tag Manager), CRM, Web Site Yönetimi (idexya.com), E-Ticaret, Creative, Marketplace (verisi yok; bayrakla açılır, bugün gizli), AI Center, Akademi (25 Kas 2026), Raporlar, Ayarlar. Sol menüde yalnız maddeler durur; maddenin üzerine gelince **mega menü** açılır (22 Kas 2026, aşağıda): en üstte madde adı, altında grup sütunları (bölümler ve sayfaları). Daraltılabilir; daraltınca madde simgeleri kalır ve simgenin üzerinde sütunlu mega menü açılır. Veri almayan öğe menüye konmaz. Sayfalar bulundukları uygulamada kalır; bağlantı os.idexya.com'da yol önekine çevrilir. |
+| 3 | Sayfa sekmeleri | Açılan her sayfa sekme olur (en çok 16; taşınca en eski sabit olmayan düşer). Genel bakış ilk sırada ve kapatılamaz. 36 px yüksek, 14 punto (Meta ölçeği; Muhittin, 25 Kas 2026). Soldaki modül simgesi üzerine gelince raptiye olur (sabitle); sabit sekme solda kalır, raptiyesi görünür, × taşımaz. Sürükleyerek ya da Alt + ok ile taşınır; tek satırda kayar; sağdaki düğme modüle göre gruplar (25 Kas 2026). Chrome gibi (27 Kas 2026): sekme açıldıkça hepsi eşit daralır (en çok 200, en az 120 px), seçili sekme daralmaz, sığmayınca satır kayar; dar sekmede × yalnız seçili ve üzerine gelinen sekmede; sürüklenen sekme tutma imleciyle, bırakılacak yer solunda çizgiyle belli olur. |
 | 4 | Sayfa başlığı ve eylem çubuğu | Solda konum yolu ve başlık; sağda sırayla Yenile, Dışa aktar, Yazdır ve tek ana eylem (vurgu renginde). |
 | 5 | Süzgeç satırı | Müşteri, marka ya da site seçimi; dönem; süzgeç. Üst süzgeç sayfadaki her kartı etkiler. |
 | 6 | Durum çubuğu | En alt, 28 px: bağlantı, kullanıcı, modül, son eşitleme, sağda "Idexya OS". |
@@ -31,8 +31,8 @@ Creative, tek yazılımın modülleri gibi görünür. Kod tabanları ayrı kal�
 
 **Birebir görünüm ve ferahlık (Muhittin, 24 Kas 2026):** "önizlemede gördüğüm temanın aynısı olacak şekilde yap"; "dar
 satırlar ve sıkıcı bir çalışma alanı yerine daha ferah ve kolay bir arayüz". Tasarım tuvalinin 8. turu esastır. Zemin düzdür:
-14 Kas 2026 tarihli zemin ızgarası kabuktan kalktı. Menü satırı 44 px, düğme 40 px, kart iç boşluğu 24 px, tablo satırı en az
-52 px, kartlar arası 20–24 px.
+14 Kas 2026 tarihli zemin ızgarası kabuktan kalktı. Menü satırı 44 px, düğme 40 px, kart iç boşluğu 24 px, tablo satırı
+46 px (Meta ölçeği, 25 Kas 2026; kişi Ayarlar’dan değiştirir), kartlar arası 20–24 px.
 
 ## Modül renkleri
 
@@ -128,3 +128,10 @@ işaret vardır. Simgenin üzerine gelince (ya da klavyeyle odaklanınca) sağa 
 madde adı (maddeye bağlantı), grup başlıkları, modüller ve her modülün sayfaları. Başka simgeye geçince panel o hizaya kayar ve içerik sırayla yenilenir.
 Fare panele geçerken kapanmaz (kısa bekleme); dışarı çıkınca ya da Esc ile kapanır. Geniş menüde de grup
 başlıkları aynı simgeleri taşır.
+
+## Sık kullanılanlar (27 Kas 2026)
+
+Açılan her sayfa bu tarayıcıda sayılır (`idx-sik`, en çok 40 kayıt; ana ekran sayılmaz; çıkışta silinir). En çok açılan
+8 sayfa sol menünün sonunda, ince çizginin altındaki "Sık kullanılanlar" maddesinde durur; üzerine gelince öteki maddeler gibi
+mega menü açılır (önizleme kartı dahil). Aynı adlı iki sayfa bölüm adıyla ayrılır ("Meta › Genel bakış"). Hiç sayfa
+açılmadıysa madde görünmez. Maddelerin sırası değişmez.

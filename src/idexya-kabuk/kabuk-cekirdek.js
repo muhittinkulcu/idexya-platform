@@ -18,6 +18,7 @@ export const SIMGE = {
   izgara: ['M4 4h6v7H4z', 'M14 4h6v4h-6z', 'M14 12h6v8h-6z', 'M4 15h6v5H4z'],
   megafon: ['M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z', 'M15 9a4 4 0 0 1 0 6', 'M18 6a8 8 0 0 1 0 12'],
   grafik: ['M4 20V10', 'M10 20V4', 'M16 20v-7', 'M21 20H3'],
+  favori: ['M12 3.5l2.6 5.3 5.9.9-4.25 4.1 1 5.85L12 16.9l-5.25 2.75 1-5.85L3.5 9.7l5.9-.9z'],
   yildiz: ['M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z', 'M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z'],
   belge: ['M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z', 'M14 3v6h6', 'M8 13h8', 'M8 17h5'],
   gelen: ['M22 12h-6l-2 3h-4l-2-3H2', 'M5.5 5h13L22 12v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6z'],
@@ -166,7 +167,8 @@ export function ayarDogrula(ham, alan = BU_ALAN) {
   const kul = a.kullanici || {};
   const d = a.durum || {};
   // Asistan görseli kabuğun kendi kedisidir (kedi.webp, kabuk.css); ürün görsel vermez, `gorsel` alanı yok sayılır.
-  const as = a.asistan && typeof a.asistan === 'object' ? { etiket: metin(a.asistan.etiket) || 'IDOS’a sor' } : null;
+  // Asistanın adı da kabuğundur (Muhittin, 26 Kas 2026: IDOST); ürünün verdiği etiket yok sayılır.
+  const as = a.asistan && typeof a.asistan === 'object' ? { etiket: 'IDOST’a sor' } : null;
   const eylemler = (Array.isArray(a.eylemler) ? a.eylemler : [])
     .map((x) => ({ ad: metin(x && x.ad), url: U(x && x.url), katman: x && x.katman }))
     .filter((x) => x.ad && x.url);
@@ -415,3 +417,13 @@ export function saatKisa(x) {
   const m = /T(\d{2}):(\d{2})/.exec(s) || /(?:^|\s)(\d{1,2})[:.](\d{2})$/.exec(s);
   return m ? m[1].padStart(2, '0') + '.' + m[2] : '—';
 }
+
+// Sık kullanılanlar (Muhittin, 27 Kas 2026): açılan her sayfa sayılır; en çok açılan 8 sayfa sol menüde "Sık kullanılanlar"
+// maddesinde. Ana ekran sayılmaz. En çok 40 kayıt tutulur (en az açılan, eşitse en eski düşer).
+export function sikSay(liste, url, ad, simdi) {
+  const l = (Array.isArray(liste) ? liste : []).filter((x) => x && typeof x.url === 'string' && typeof x.ad === 'string' && x.url !== url);
+  const eski = (Array.isArray(liste) ? liste : []).find((x) => x && x.url === url);
+  l.push({ url, ad: String(ad).slice(0, 80), n: Math.min(((eski && Number(eski.n)) || 0) + 1, 1e6), t: simdi });
+  return sikSirala(l).slice(0, 40);
+}
+export const sikSirala = (l) => [...l].sort((a, b) => (b.n - a.n) || (b.t - a.t));
