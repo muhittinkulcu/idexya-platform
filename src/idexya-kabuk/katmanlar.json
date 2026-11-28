@@ -295,6 +295,10 @@
         {
          "ad": "Bölge, cihaz ve saat",
          "url": "https://marketing.idexya.com/meta/delivery"
+        },
+        {
+         "ad": "Kayıtlı kitleler",
+         "url": "https://marketing.idexya.com/meta/saved-audiences"
         }
        ]
       },
@@ -376,9 +380,22 @@
       {
        "ad": "Hesap ayarları",
        "url": "https://marketing.idexya.com/meta/accounts",
-       "aciklama": "Reklam hesapları ve ödeme durumu.",
+       "aciklama": "Reklam hesapları, ödeme durumu, hedef profili ve eşikler.",
        "sekme": "Reklam yöneticisi",
-       "sayfalar": []
+       "sayfalar": [
+        {
+         "ad": "Hesaplar ve ödeme",
+         "url": "https://marketing.idexya.com/meta/accounts"
+        },
+        {
+         "ad": "Hedef profili",
+         "url": "https://marketing.idexya.com/meta/goal-profile"
+        },
+        {
+         "ad": "Eşikler",
+         "url": "https://marketing.idexya.com/meta/thresholds"
+        }
+       ]
       }
      ]
     },
@@ -1147,6 +1164,10 @@
        "url": "https://marketing.idexya.com/ai/analyses",
        "aciklama": "Yayın kırılımı ve performans.",
        "sayfalar": [
+        {
+         "ad": "Müşteri önerileri",
+         "url": "https://marketing.idexya.com/ai/clients"
+        },
         {
          "ad": "Karşılaştırmalı analizler",
          "url": "https://marketing.idexya.com/ai/analyses"

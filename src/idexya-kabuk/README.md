@@ -94,7 +94,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
   // Uyarı (bağlı ama sorun var): { "baglanti": "uyari", "metin": "3 kaynak eşitlenemiyor", "esitleme": "...", "url": "/data" }
   // metin kapsülde görünür (en çok 80 karakter; boşsa "Eşitlemede sorun var"), nokta sarı; url verilirse kapsül oraya gider
   // (idexya-kabuk:git). url her durumda kullanılabilir; eski değerler (true, false, null) değişmeden çalışır. durumYap() aynı alanları alır.
-  "asistan": { "etiket": "IDOS’a sor" },  // isteğe bağlı; yoksa düğme çizilmez. Görsel kabuğun kedisidir (kedi.webp), ürün vermez
+  "asistan": { "etiket": "IDOST’a sor" },  // isteğe bağlı; yoksa düğme çizilmez. Görsel kabuğun kedisidir (kedi.webp), ürün vermez
   "eylemler": [{ "ad": "Yeni öneri oluştur", "url": "/oneriler?yeni=1", "katman": "marketing" }], // isteğe bağlı, aramada çıkar
   "bildirimUrl": "/notifications",
   "cikisUrl": "/cdn-cgi/access/logout",
@@ -121,6 +121,7 @@ etkisi yoktur (belge değişmez). Geçişin düzgün olması için kabuk ilk boy
 - **Madde simgesi**: her maddenin `simge` alanı (simge adı) `katmanlar.json`'da verilir; kabuk sol menü satırında, daraltılmış
   rayda, uçan panelin başlığında ve ⌘K aramasında o maddenin sayfa satırlarında çizer. Eksik ya da bilinmeyen ad anahtarın
   varsayılanına döner (`KATMAN_SIMGE`). SVG yolu kabul edilmez (yalnız ad; dışarıdan çizim verisi alınmaz).
+- **Kediyi gizleme** (26 Kas 2026): × kediyi sağ kenardaki IDOST sekmesine indirir, sekmeye basınca döner (`idx-kedi-gizli`).
 - **Asistan kedisi** (Muhittin, 15 Kas 2026: "ben kediyi sevmiştim"): asistan düğmesinin görseli kabuğun parçasıdır
   (`kedi.webp`, eşitlemeyle gelir); üç üründe aynıdır. Ayardaki `asistan.gorsel` yok sayılır. Düğme yalnız ürün `asistan`
   verdiğinde (asistan paneli olan üründe) çizilir.

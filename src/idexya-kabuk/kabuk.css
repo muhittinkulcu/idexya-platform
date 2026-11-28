@@ -195,6 +195,15 @@ html[data-tema=koyu]{--ik-rozet-z:rgba(240,122,35,.18);--ik-rozet-y:#F7A866;--ik
 .ik-sekmeler{flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:auto hidden;scrollbar-width:none;position:relative}.ik-sekmeler::-webkit-scrollbar{display:none}
 .ik-sekme{--tz:color-mix(in srgb,var(--t,var(--ik-vurgu)) 12%,var(--ik-yuzey));--ty:color-mix(in srgb,var(--t,var(--ik-vurgu)) 86%,var(--ik-metin));display:flex;align-items:center;flex:0 0 auto;height:36px;padding:0 6px;border-radius:var(--ik-yaricap);white-space:nowrap}
 .ik-sekme:hover{background:var(--ik-gomuk)}.ik-sekme.ik-secili{background:var(--tz)}
+/* Chrome gibi sekmeler (Muhittin, 27 Kas 2026): sekme açıldıkça hepsi eşit daralır (en çok 200, en az 120 piksel; adın ilk sözcüğü okunur), sığmayınca kayar.
+   Sabit sekme ve ana ekran daralmaz, solda kalır. Dar sekmede × yalnız seçili sekmede ve üstüne gelince görünür. Sürüklenen sekme
+   tutma imleciyle, bırakılacak yer solunda çizgiyle belli olur. */
+.ik-sekme:not(.ik-sabit):not(:first-child){flex:0 1 200px;min-width:120px;container-type:inline-size}
+.ik-sekme:not(.ik-sabit):not(:first-child) a{flex:1;min-width:0;max-width:none}
+.ik-sekme.ik-secili:not(.ik-sabit):not(:first-child){flex-shrink:0}
+.ik-sekme[draggable=true]{cursor:grab}.ik-sekme[draggable=true]:active{cursor:grabbing}
+.ik-sekme.ik-surukleniyor{opacity:.45}.ik-sekme.ik-birak{box-shadow:inset 2px 0 0 var(--ik-vurgu)}
+@container (max-width:140px){.ik-sekme:not(.ik-secili):not(:hover):not(:focus-within) .ik-sekme-kapat{display:none}.ik-sekme a{padding:0 4px}}
 .ik-sekme a{max-width:230px;padding:0 10px 0 6px;overflow:hidden;text-overflow:ellipsis;font-size:14px;line-height:36px;color:var(--ik-ikincil)}
 .ik-sekme a:first-child{padding:0 10px}.ik-sekme:hover a{color:var(--ik-metin)}.ik-sekme.ik-secili a{color:var(--ty);font-weight:var(--w-orta)}
 :is(.ik-sekme-kapat,.ik-sekme-sabitle,.ik-sekme-ok){display:grid;place-items:center;flex:none;width:26px;height:26px;padding:0;border:0;border-radius:var(--ik-yaricap);background:transparent;color:var(--ik-ikincil)!important;font-size:18px;line-height:1}
@@ -216,6 +225,13 @@ html[data-tema=koyu]{--ik-rozet-z:rgba(240,122,35,.18);--ik-rozet-y:#F7A866;--ik
 .ik-asistan{touch-action:none;cursor:grab}.ik-asistan-kap.ik-serbest{right:auto;bottom:auto}.ik-serbest .ik-asistan,.ik-serbest:hover .ik-asistan{transform:none}.ik-serbest:hover .ik-asistan{scale:1.06}
 .ik-asistan-kap.ik-ipucu-sag{flex-direction:row-reverse}.ik-ipucu-sag .ik-asistan-ipucu{transform:translateX(-6px)}
 .ik-suruklen .ik-asistan{cursor:grabbing;animation:none;box-shadow:0 18px 40px -8px rgba(240,122,35,.7)}.ik-suruklen .ik-asistan-ipucu{opacity:0!important}
+/* Gizle düğmesi ve gizliyken sağ kenardaki sekme (her zaman görünür, kediyi geri çağırır) */
+.ik-asistan-kap .ik-kedi-gizle{position:absolute;right:0;top:-12px;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:#15202B;color:#FFFFFF;font-size:14px;line-height:1;opacity:0;cursor:pointer}
+.ik-asistan-kap:hover .ik-kedi-gizle,.ik-asistan-kap .ik-kedi-gizle:focus-visible{opacity:1}@media(hover:none){.ik-asistan-kap .ik-kedi-gizle{opacity:1}}
+.ik-asistan-kap.ik-kedi-gizli{left:auto!important;right:0!important;top:auto!important;bottom:22px!important}
+.ik-kedi-gizli .ik-asistan,.ik-kedi-gizli:hover .ik-asistan,.ik-kedi-gizli .ik-asistan:focus-visible{display:grid;place-items:center;width:26px;height:62px;border-width:0;border-radius:var(--ik-yaricap);background:#B84406;transform:none;scale:1;animation:none;cursor:pointer}
+.ik-kedi-gizli .ik-asistan::after{content:'IDOST';color:#FFFFFF;font-size:11.5px;font-weight:var(--w-orta);writing-mode:vertical-rl}
+.ik-kedi-gizli .ik-kedi,.ik-asistan-kap.ik-kedi-gizli .ik-kedi-gizle,.ik-kedi-gizli .ik-asistan-ipucu{display:none}
 /* Ürün asistan penceresi açıkken kedi gizlenir (pencerenin alt köşesini kapatmasın): <html data-ik-asistan-acik> */
 :root[data-ik-asistan-acik] .ik-asistan-kap{opacity:0;pointer-events:none}
 
@@ -390,3 +406,5 @@ html[data-hareket=az]::view-transition-group(*),html[data-hareket=az]::view-tran
 ::view-transition-group(ik-yan),::view-transition-group(ik-sekmeler){z-index:1;animation:none}
 ::view-transition-old(ik-yan),::view-transition-old(ik-sekmeler){display:none}
 ::view-transition-new(ik-yan),::view-transition-new(ik-sekmeler){animation:none}
+/* Sık kullanılanlar maddesi menünün sonunda, üstünde ince çizgiyle ayrılır (27 Kas 2026). */
+.ik-agac [data-sik],.ik-ray [data-sik]{position:relative;margin-top:17px}.ik-agac [data-sik]::after,.ik-ray [data-sik]::after{content:'';position:absolute;left:8px;right:8px;top:-9px;border-top:1px solid var(--ik-cizgi);pointer-events:none}
